@@ -38,7 +38,7 @@ class FinancesController extends Controller
         $date = $request->search_money_month.'%';
         $agencies = Agencies::all();
         $salary = DB::table(DB::raw("users"))
-            ->whereNotIn('users.user_type_id',[1,2])
+            ->whereNotIn('users.user_type_id',[1,2,9])
             ->where('users.salary','>',0)
             ->selectRaw('
             `users`.`id`,

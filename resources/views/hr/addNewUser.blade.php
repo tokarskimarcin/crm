@@ -36,6 +36,9 @@
 @if (Session::has('message_ok'))
     <div class="alert alert-success">{{ Session::get('message_ok') }}</div>
 @endif
+@if (Session::has('message_error'))
+    <div class="alert alert-danger">{{ Session::get('message_error') }}</div>
+@endif
 
 <div class="row">
     <div class="col-md-12">
@@ -248,6 +251,15 @@
                                 </div>
                             </div>
                         @endif
+                        @if($type == 2)
+                        <div class="col-md-4" id="successorUserSelect" hidden>
+                            <div class="form-group">
+                                <label class="myLabel">Konto konsultanta dla sukcesora:</label>
+                                <select class="form-control" style="font-size:18px;" id="successorUserId" name="successorUserId">
+                                </select>
+                            </div>
+                        </div>
+                        @endif
                         <div class="col-md-4">
                             <div class="form-group">
                                 <label class="myLabel">Opis:</label>
@@ -282,14 +294,12 @@
     //Suma członków w pakiecie
     var totalMemberSum = 0;
     var medicalScanIsSet = false;
-
     function totalMemberCounter(diff, forceValue = null) {
         if (forceValue === null) {
             totalMemberSum += diff;
         } else {
             totalMemberSum = forceValue;
         }
-
         $('#totalMemberSum').val(totalMemberSum);
     }
 
@@ -301,7 +311,15 @@
     /************* Koniec pakietu medycznego *************/
 
 $(document).ready(function() {
-
+        let allUsersArray = {!! json_encode($allActiveUser) !!};
+        function getUserFromDepartment($departmentInfoID){
+        let returnArray = [];
+        allUsersArray.forEach(function (item) {
+            if(item.department_info_id == $departmentInfoID)
+                returnArray.push(item);
+        });
+        return returnArray;
+    }
     //Zabokowanie przesyłania formularza po naciścnięciu entera (rozwijał się przycisk z pakietem medycznym) 
     $(window).keydown(function(event){
         if(event.keyCode == 13) {
@@ -354,7 +372,7 @@ $(document).ready(function() {
         var department_info = $('#department_info').val();
         var login_phone = $('#login_phone').val();
         var description = $('#description').val();
-
+        let successorUserId = $('#successorUserId').val();
         if (first_name.trim().length == 0) {
             swal('Podaj imie!');
             return false;
@@ -428,6 +446,11 @@ $(document).ready(function() {
         if (user_type != null && user_type == 'Wybierz') {
             swal('Wybierz uprawnienia!');
             return false;
+        }else{
+            if(user_type == 9  && ( successorUserId != null &&  successorUserId.split(" ")[0] == 'Wybierz')){
+                swal('Wybierz konto konsultanta dla sukcesora!');
+                return false;
+            }
         }
 
         if (department_info != null && department_info == 'Wybierz') {
@@ -520,8 +543,42 @@ $(document).ready(function() {
     var salary = $('#salary');
     var additional_salary = $('#additional_salary');
     var pbx = $('#login_phone');
-
-
+    let userTypeSelect = $('#user_type');
+    let departmentInfoId = $('#department_info');
+    let successorSelect =  $('#successorUserId');
+    function getSelectOption(text){
+        let option = document.createElement('option');
+        option.textContent = text;
+        return option;
+    }
+    userTypeSelect.on('change',function (e) {
+       let selectedObject = $(this);
+       if(selectedObject.val() == 9){
+           $('#successorUserSelect').attr('hidden',false);
+           if(departmentInfoId.val() == 'Wybierz'){
+               successorSelect.empty();
+               successorSelect.append(getSelectOption("Wybierz oddział sukcesora"));
+           }
+       }else{
+           $('#successorUserSelect').attr('hidden',true);
+       }
+    });
+    departmentInfoId.on('change',function () {
+        if($(this).val() == 'Wybierz'){
+            successorSelect.empty();
+            successorSelect.append(getSelectOption("Wybierz oddział sukcesora"));
+        }else{
+            let userArray = getUserFromDepartment(departmentInfoId.val());
+            successorSelect.empty();
+            successorSelect.append(getSelectOption("Wybierz konto konsultanta"));
+            userArray.forEach(function (item) {
+                let option = document.createElement('option');
+                option.textContent = item.first_name+' '+item.last_name;
+                option.value = item.id;
+                successorSelect.append(option);
+            });
+        }
+    });
 
     salary.on('change', function() {
         if(salary.val() < 0) {
