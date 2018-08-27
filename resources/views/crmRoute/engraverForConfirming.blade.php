@@ -1,10 +1,3 @@
-{{--/*--}}
-{{--*@category: CRM,--}}
-{{--*@info: This view shows user detailed info about show hours with possibility of edition,--}}
-{{--*@controller: CrmRouteController,--}}
-{{--*@methods: showRoutesDetailedUpdateAjax, campaignsInfo, showRoutesDetailedGet--}}
-{{--*/--}}
-
 @extends('layouts.main')
 @section('style')
     <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
@@ -58,6 +51,9 @@
             <div class="panel-body">
                 <div class="alert alert-info page-info">
                     Moduł <strong>Grafik dla potwierdzeń</strong> wyświetla informacje o pokazo-godzinach. <br>
+                    W kolumnie <i>"Potwierdzająca osoba"</i> dostępne są osoby, które wg. grafiku są dostępne dla danej daty potwierdzenia dla danego oddziału. <br>
+                    Gdy wiersz jest podświetlony na <span style="background-color: indianred;">czerwono</span>, oznacza to, że osoba potwierdzająca w dniu potwierdzania nie nacisneła przycisku start do godziny 9:00 lub wogóle go nie nacisneła. <br>
+                    Dla otrzymania lepszego wyglądu tabeli zaleca się <i>wyłącznie</i> panelu nawigacyjnego naciskając przycisk <u>"OFF"</u> w górnym lewym rogu strony.
                 </div>
                 <div class="row">
                     <div class="col-md-2">
@@ -112,7 +108,7 @@
                             <th>Nazwa klienta</th>
                             <th>G</th>
                             <th>Oddział</th>
-                            <th>Potwierdzający</th>
+                            <th>Potwierdzająca osoba</th>
                             <th>Limit</th>
                             <th>Zgody</th>
                             <th>Frekw.</th>
@@ -524,7 +520,7 @@
                        return `<select class="confirming form-control" style="width: 100%;">
                                     <option value="0">Wybierz</option>
                                 </select>`;
-                        }, "name": "potwierdzający"
+                        }, "name": "potwierdzający", "width": "20%"
                    },
                    {"data":function (data, type, dataToSet) {
                            return data.limits;
