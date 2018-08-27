@@ -84,9 +84,9 @@ return [
     |
     */
 
-    'username' => env('jarzyna.verona@gmail.com'),
+    'username' => env('MAIL_USERNAME'),
 
-    'password' => env('haslo123'),
+    'password' => env('MAIL_PASSWORD'),
 
     /*
     |--------------------------------------------------------------------------
