@@ -429,9 +429,12 @@
                                    }
                                }
                            }
+                           else {
+                               numberOfChanges++;
+                               badge.textContent = numberOfChanges;
+                           }
                            changeArr.push(changedRow);
-                           numberOfChanges++;
-                           badge.textContent = numberOfChanges;
+
                            elementRow.classList.add('colorRow');
                        }
                        else { //check whether confirming person exist in array. If yes, delete him
