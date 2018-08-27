@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\VeronaMail;
 use Illuminate\Http\Request;
 use App\Department_info;
 use App\HourReport;
@@ -170,9 +171,19 @@ class ScreensController extends Controller
     }
 
     public function sendAllChartsMail(){
-        Mail::send('mail/allCharts',['fileURL' => Storage::url("allChartsImage_files/allChartsImage.png")],function ($message){
-            //$message->from('noreply.verona@gmail.com', 'Verona Consulting');
-            $message->to('tokarski.verona@gmail.com','Marcin Tokarski')->subject('Statystki oddziałów');
-        });
+
+        $title = 'Godzinowy wykres Telemarketingu';
+        $data = ['fileURL' => Storage::url("allChartsImage_files/allChartsImage.png")];
+        $preperMail = new VeronaMail('allCharts',$data,$title,User::where('id',1364)->get());
+        if($preperMail->sendMail()){
+            return 'Mail wysłano';
+        }else{
+            return 'Błąd podczas wysyłania maila';
+        }
+
+//        Mail::send('mail/allCharts',['fileURL' => Storage::url("allChartsImage_files/allChartsImage.png")],function ($message){
+//            //$message->from('noreply.verona@gmail.com', 'Verona Consulting');
+//            $message->to('tokarski.verona@gmail.com','Marcin Tokarski')->subject('Statystki oddziałów');
+//        });
     }
 }
