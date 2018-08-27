@@ -101,7 +101,7 @@
                     </div>
                     <div class="col-md-4">
                         <button class="btn btn-default" id="clearButton" style="width:100%;">
-                            <span class='glyphicon glyphicon-unchecked'></span> Wyczyść zaznaczenia</button>
+                            <span class='glyphicon glyphicon-unchecked'></span> Wyczyść zaznaczenia <span class="badge">0</span></button>
                     </div>
 
                 </div>
@@ -233,6 +233,7 @@
                    clientRouteInfoIdArr.push(id);
                    row.addClass('colorRow');
                }
+               $('#clearButton').find('.badge').text(clientRouteInfoIdArr.length);
            }
 
            /**
@@ -1025,7 +1026,7 @@
            /**
             * This function clear all row selections and disable edit button
             */
-           function clearAllSelections() {
+           function clearAllSelections(e) {
                if(arrayOfTableRows.length > 0) {
                    if(document.querySelectorAll('.colorRow')) {
                        const coloredRows = document.querySelectorAll('.colorRow');
@@ -1039,9 +1040,12 @@
                }
                clientRouteInfoIdArr = [];
                arrayOfTableRows = [];
+               $(e.target).find('.badge').text(clientRouteInfoIdArr.length);
            }
 
-           clearButton.addEventListener('click', clearAllSelections);
+           clearButton.addEventListener('click', function (e){
+               clearAllSelections(e);
+           });
        });
     </script>
 @endsection

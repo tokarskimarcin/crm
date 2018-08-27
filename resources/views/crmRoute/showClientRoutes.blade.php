@@ -234,7 +234,7 @@
 
                         <div class="col-md-4">
                             <button class="btn btn-default" id="clearButton" style="width:100%;">
-                                <span class='glyphicon glyphicon-unchecked'></span> Czyść zaznaczone</button>
+                                <span class='glyphicon glyphicon-unchecked'></span> Czyść zaznaczone <span class="badge">0</span></button>
                         </div>
                     </div>
 
@@ -1174,6 +1174,8 @@
                     clientRouteIdArr.push(id);
                     row.addClass('colorRow');
                 }
+
+                $('#clearButton').find('.badge').text(clientRouteIdArr.length);
             }
 
             function showAllClientsInputHandler(e) {
@@ -1571,7 +1573,7 @@
             /**
              * This function clear all row selections and disable edit button
              */
-            function clearAllSelections() {
+            function clearAllSelections(e) {
                 if(arrayOfTableRows.length > 0) {
                     if(document.querySelectorAll('.colorRow')) {
                         const coloredRows = document.querySelectorAll('.colorRow');
@@ -1585,6 +1587,8 @@
                 clientRouteIdArr = [];
                 let limitsButton = document.querySelector('#limitsButton');
                 limitsButton.disabled = true;
+
+                $(e.target).find('.badge').text(clientRouteIdArr.length);
             }
 
             function globalClickHandler(e) {
@@ -1596,7 +1600,9 @@
             }
 
             window.addEventListener('pagehide', setItemsToSeessionStorage);
-            clearButton.addEventListener('click', clearAllSelections);
+            clearButton.addEventListener('click', function (e) {
+                clearAllSelections(e);
+            });
             document.addEventListener('click', globalClickHandler);
 
             resizeDatatablesOnMenuToggle([table2]);
