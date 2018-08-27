@@ -26,6 +26,10 @@
             animation-fill-mode: forwards;
         }
 
+        .notPresentAtWork {
+            background-color: indianred !important;
+        }
+
         .page-info {
             font-size: 1.3em;
         }
@@ -145,6 +149,10 @@
            let changeArr = []; //This array collect changed rows
            let saveButton = document.querySelector('#save');
            let userData = @json($userData);
+           let workHourData = @json($workHours);
+           let dataTableData =  null;
+
+           /********* END OF GLOBAL VARIABLES*********/
 
            // let testArr = [
            //     {
@@ -210,6 +218,9 @@
                });
            }
 
+           /**
+            * This function append "Wybierz" option to given select
+            */
            function appendBasicOption(placeToAppend) {
                console.assert(placeToAppend.tagName == "SELECT", "placeToAppend in appendBasicOption is not SELECT element");
                let basicOptionElement = document.createElement('option');
@@ -218,6 +229,9 @@
                placeToAppend.appendChild(basicOptionElement);
            }
 
+           /**
+            * This function append option with person data to given select
+            */
            function addPersonToConfirmationList(person, placeToAppend) {
                console.assert(placeToAppend.tagName == "SELECT", "placeToAppend in addPersonToConfirmationList is not SELECT element");
 
@@ -262,7 +276,12 @@
                this.id = id;
            }
 
+           /**
+            * This method checks whether obiect with given id is in given array of objects
+            * return truefalse
+            */
            function existInArr(id, array) {
+               console.assert(Array.isArray(array), 'array parameter is not Array in existInArr function');
                let exist = false;
                array.forEach(item => {
                    if(item.hasOwnProperty('id')) {
@@ -275,6 +294,9 @@
                return exist;
            }
 
+           /**
+            * This method set proper values for row inputs.
+            */
            function setProperRowValues(row, item) {
                let confirmDateInput = row.querySelector('.confirm-date');
                let confirmingPeopleSelect = row.querySelector('.confirming');
@@ -301,17 +323,20 @@
 
                },
                "rowCallback": function( row, data, index ) {
-                   row.setAttribute('data-id', data.id);
-                   row.setAttribute('data-depid', data.depId);
+                   row.setAttribute('data-id', data.id); //clientRouteInfo Id
+                   row.setAttribute('data-depid', data.depId); //department info Id
 
                    const confirmDateInput = row.querySelector('.confirm-date');
                    const confirmDate = confirmDateInput.value;
                    let confirmingPeopleSelect = row.querySelector('.confirming');
+                   let alreadyIn = false;
                    userData.forEach(person => { //looping over all data about people
+                       alreadyIn = false;
                        if(person.hasOwnProperty('date')) {
                            person.date.forEach(day => {
-                               if(day == confirmDate) { //current person is available this day
+                               if(day == confirmDate && !alreadyIn) { //current person is available this day
                                    if(data.depId == person.depId) {
+                                       alreadyIn = true;
                                        addPersonToConfirmationList(person, confirmingPeopleSelect);
                                    }
                                }
@@ -321,7 +346,19 @@
 
                    setOldValues(confirmingPeopleSelect, data.confirmingUser);
 
-                   changeArr.forEach(item => { //when someone change table page, we have to reassign classes to rows.
+                   //part responsible for highlighting row if user is not at work at confirm date after 8:59
+                   if(workHourData.hasOwnProperty(`${data.confirmingUser}`)) {
+                       workHourData[data.confirmingUser].forEach(item => {
+                           if(item.date == confirmDate) {
+                               if(item.presentAtTime == 0) {
+                                   row.classList.add('notPresentAtWork');
+                               }
+                           }
+                       });
+                   }
+
+                    //reassigning classes to rows after changing page.
+                   changeArr.forEach(item => {
                        if(item.hasOwnProperty('id')) {
                            if (item['id'] == data.id) {
                                row.classList.add('colorRow');
@@ -338,6 +375,9 @@
                         const depId = elementRow.dataset.depid
                         const id = elementRow.dataset.id;
 
+                        let confDate = elementRow.querySelector('.confirm-date');
+                        let confDateObject = new Date(confDate.value);
+                        let showDateObject = new Date(dataTableData.date);
                         let confirmingPeopleSelect = elementRow.querySelector('.confirming');
                         const frequencyElement = elementRow.querySelector('.frequency');
                         const frequencyValue = frequencyElement.value;
@@ -347,8 +387,6 @@
 
                         if(changedElement.matches('.confirm-date')) { //confirm date has been changed.
                             const newConfirmDate = e.target.value;
-                            // let confirmingPeopleSelect = elementRow.querySelector('.confirming');
-
                             confirmingPeopleSelect.innerHTML = ''; //clearing list of current people
                             appendBasicOption(confirmingPeopleSelect);
                             userData.forEach(person => { //looping over all data about people
@@ -372,20 +410,18 @@
 
                         }
 
-                        let confDate = elementRow.querySelector('.confirm-date');
-
                        //if only data has changed + dodac warunek na date zeby nie byla wieksza niz data pokazu
-                       if(confirmingPeopleSelect.options[confirmingPeopleSelect.selectedIndex].value != 0) {
+                       if(confirmingPeopleSelect.options[confirmingPeopleSelect.selectedIndex].value != 0 && (showDateObject > confDateObject)) {
                            let exist = existInArr(id, changeArr);
                            let newConfirmingPerson = getSelectedOption(confirmingPeopleSelect);
                            let changedRow = new ChangeObject(newConfirmingPerson, frequencyValue, pairValue, confDate.value, id);
 
                            //remove existing item
-                           if(exist) {
-                               for(let j = 0, max = changeArr.length; j < max; j++) {
-                                   if(changeArr[j].hasOwnProperty('id')) {
-                                       if(changeArr[j].id == id) {
-                                           changeArr.splice(j,1);
+                           if (exist) {
+                               for (let j = 0, max = changeArr.length; j < max; j++) {
+                                   if (changeArr[j].hasOwnProperty('id')) {
+                                       if (changeArr[j].id == id) {
+                                           changeArr.splice(j, 1);
                                            max--;
                                        }
                                    }
@@ -395,6 +431,12 @@
                            elementRow.classList.add('colorRow');
                        }
                        else { //check whether confirming person exist in array. If yes, delete him
+                           if(confirmingPeopleSelect.options[confirmingPeopleSelect.selectedIndex].value == 0) {
+                               notify("Wybierz osobę z listy");
+                           }
+                           if(showDateObject < confDateObject) {
+                               notify("Data potwierdzania musi być mniejsza niż data pokazu");
+                           }
                            for(let j = 0, max = changeArr.length; j < max; j++) {
                                if(changeArr[j].hasOwnProperty('id')) {
                                    if(changeArr[j]['id'] == id) {
@@ -405,7 +447,6 @@
                            }
                            elementRow.classList.remove('colorRow');
                        }
-
                        // console.log(changeArr);
                        saveButton.disabled = changeArr.length > 0 ? false : true;
                    });
@@ -426,6 +467,7 @@
                },
                "columns":[
                    {"data":function (data, type, dataToSet) {
+                           dataTableData = data;
                            return data.weekOfYear;
                        },"name":"weekOfYear", "width": "1%",
                    },
@@ -461,7 +503,6 @@
                             else {
                                 return '';
                             }
-
                        },"name":"hour"
                    },
                    {"data":function (data, type, dataToSet) {

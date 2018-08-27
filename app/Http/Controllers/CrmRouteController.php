@@ -23,6 +23,7 @@ use App\RouteInfo;
 use App\Schedule;
 use App\User;
 use App\Voivodes;
+use App\Work_Hour;
 use DateTime;
 use function foo\func;
 use Illuminate\Support\Facades\Mail;
@@ -4203,6 +4204,9 @@ class CrmRouteController extends Controller
         }
     }
 
+    /**
+     * @return view engraverForConfirming with necessary data
+     */
     public function engraverForConfirmingGet() {
         $year = date('Y',strtotime("this year"));
 
@@ -4219,15 +4223,40 @@ class CrmRouteController extends Controller
             ->get();
 
         $limitDate = Date('W', strtotime('-100 days'));
+        $limitDateFull = Date('Y-m-d', strtotime('-100 days'));
 
         $scheduleData = Schedule::select('id_user as userId', 'users.first_name as name','department_info.id as depId' ,'users.last_name as surname', 'week_num', 'year', 'monday_comment as pon', 'tuesday_comment as wt', 'wednesday_comment as sr', 'thursday_comment as czw', 'friday_comment as pt', 'saturday_comment as sob','sunday_comment as nd')
             ->join('users', 'schedule.id_user', '=', 'users.id')
             ->join('department_info', 'users.department_info_id', '=', 'department_info.id')
             ->where('week_num', '>', $limitDate)
+//            ->where('department_info.id_dep_type', '=', 1) //gdy beda juz grafiki dla potwierdzen
+            ->where('users.status_work', '=', 1)
+            ->orderBy('surname')
             ->get();
+
+        $workHours = Work_Hour::where('date', '>=', $limitDateFull)->select(DB::raw('
+        CASE
+            WHEN 
+                HOUR(click_start) >= 9 THEN 0
+            WHEN
+                HOUR(click_start) < 9 THEN 1
+            WHEN 
+                click_start IS NULL THEN 0                
+        END AS presentAtTime,
+        id_user, 
+        date'
+        ))
+            ->join('users', 'work_hours.id_user', '=', 'users.id')
+            ->join('department_info', 'users.department_info_id', '=', 'department_info.id')
+//            ->where('department_info.id_dep_type', '=', 1) //gdy beda juz grafiki dla potwierdzen
+            ->where('users.status_work', '=', 1)
+            ->get();
+
+        $workHours = $workHours->groupBy('id_user');
 
         $scheduleGroupedByUser = $scheduleData->groupBy('userId', 'week_num');
 
+        //This part is responsible for creating user objects with date field and pass it to userArr
         $userArr = [];
         foreach($scheduleGroupedByUser as $id => $data) {
             $user = new \stdClass();
@@ -4274,14 +4303,13 @@ class CrmRouteController extends Controller
             array_push($userArr, $user);
         }
 
-//        dd($userArr[1]);
-
         return view('crmRoute.engraverForConfirming')
             ->with('lastWeek', $numberOfLastYearsWeek)
             ->with('currentWeek', $weeksString)
             ->with('currentYear', $year)
             ->with('departmentInfo', $departmentInfo)
-            ->with('userData', $userArr);
+            ->with('userData', $userArr)
+            ->with('workHours', $workHours);
     }
 
     public function engraverForConfirmingDatatable(Request $request) {
