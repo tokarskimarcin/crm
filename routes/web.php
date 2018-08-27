@@ -948,7 +948,7 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
 //CHARTS
 Route::get('/charts', 'ScreensController@showScreensGet');
 
-Route::get('/allCharts','ScreensController@allCharts');
+Route::get('/pageAllCharts','ScreensController@allCharts');
 Route::post('/uploadScreenshotsAjax','ScreensController@uploadScreenshotsAjax')->name('api.uploadScreenshotsAjax');
 
 Route::get('/sendAllChartsMail','ScreensController@sendAllChartsMail');
