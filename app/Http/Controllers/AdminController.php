@@ -226,6 +226,7 @@ class AdminController extends Controller
         $department_info->director_id = ($request->director != 0) ? $request->director : null ;
         $department_info->director_hr_id = ($request->director_hr != 0) ? $request->director_hr : null;
         $department_info->hr_id = ($request->hrEmployee != 0) ? $request->hrEmployee : null ;
+        $department_info->hr_id_second = ($request->hrEmployee2 != 0) ? $request->hrEmployee2 : null ;
         $department_info->regionalManager_id = ($request->regionalManager != 0) ? $request->regionalManager : null ;
 
         $department_info->save();
@@ -315,6 +316,7 @@ class AdminController extends Controller
             $selected_department->director_id = ($request->director != 0) ? $request->director : null ;
             $selected_department->director_hr_id = ($request->director_hr != 0) ? $request->director_hr : null;
             $selected_department->hr_id = ($request->hrEmployee != 0) ? $request->hrEmployee : null ;
+            $selected_department->hr_id_second = ($request->hrEmployee2 != 0) ? $request->hrEmployee2 : null ;
             $selected_department->regionalManager_id = ($request->regionalManager != 0) ? $request->regionalManager : null ;
             $selected_department->save();
         }
