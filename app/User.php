@@ -4,6 +4,7 @@ namespace App;
 
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Support\Facades\Auth;
 
 class User extends Authenticatable
 {
@@ -18,7 +19,7 @@ class User extends Authenticatable
         'first_name','last_name','username','last_login','password_date','user_type_id','department_info_id',
         'start_work','end_work','status_work','phone','desc','student','ck','agency_id','guid','login_phone','rate','priv_phone',
         'salary','add_to_salary',
-        'email', 'password','id_manager','documents','dating_type','coach_id','recommended_by','promotion_date','degradation_date'
+        'email', 'password','id_manager','documents','dating_type','coach_id','recommended_by','promotion_date','degradation_date','successorUserId'
     ];
 
     /**
@@ -30,6 +31,15 @@ class User extends Authenticatable
         'password', 'remember_token',
     ];
 
+    public function scopeOnlyConsultant($query){
+        return $query->whereIn('user_type_id',[1,2]);
+    }
+    public function scopeActiveUser($query){
+        return $query->where('status_work',1);
+    }
+    public function scopeAuthDepartment($query){
+        return $query->where('department_info_id',Auth::user()->department_info_id);
+    }
     public function department_info() {
         return $this->belongsTo('App\Department_info','department_info_id');
     }

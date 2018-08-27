@@ -48,6 +48,7 @@ class UsersController extends Controller
             ->with('agencies', $agencies)
             ->with('send_type', $user->department_info->type)
             ->with('type', 1)
+            ->with('allActiveUser', [])
             ->with('recomendingPeople', $workingUsers)
             ->with('workingTreners', $workingTreners);
 
@@ -58,10 +59,12 @@ class UsersController extends Controller
         $agencies = Agencies::all();
         $user_types = UserTypes::all();
         $department_info = Department_info::all();
+        $allActiveUser = User::activeUser()->onlyConsultant()->get();
         return view('hr.addNewUser')
             ->with('agencies', $agencies)
             ->with('department_info', $department_info)
             ->with('user_types', $user_types)
+            ->with('allActiveUser', $allActiveUser)
             ->with('type', 2);
 
     }
@@ -131,6 +134,9 @@ class UsersController extends Controller
         if (isset($request->department_info) && isset($request->user_type)) {
             $redirect = 1;
             $user->user_type_id = $request->user_type;
+            if($user->user_type_id == 9){
+                $user->successorUserId = $request->successorUserId;
+            }
             $user->department_info_id = $request->department_info;
             $user->main_department_id = $request->department_info;
         } else {
@@ -158,13 +164,25 @@ class UsersController extends Controller
         $user->rate = $request->rate;
         $user->id_manager = Auth::id();
         $user->documents = $request->documents;
-        $user->save();
+        try{
+            $user->save();
+        }catch (Exception $exception){
+            Session::flash('message_error', "Problem podczas zapisywania użytkownika");
+            return Redirect::back();
+        }
+
 
         $userEmployment->pbx_id = $request->login_phone;
         $userEmployment->pbx_id_add_date = $request->start_date;
         $userEmployment->pbx_id_remove_date = 0;
         $userEmployment->user_id = $user->id;
-        $userEmployment->save();
+        try{
+            $userEmployment->save();
+        }catch (Exception $exception){
+            Session::flash('message_error', "Problem z dodaniem użytkownika");
+            return Redirect::back();
+        }
+
 
         $data = [
             'T' => 'Dodanie użytkownika',
@@ -270,6 +288,8 @@ class UsersController extends Controller
             ->with('department_info', $department_info)
             ->with('userTypes', $userTypes)
             ->with('type', 1)
+            ->with('allActiveUser', [])
+            ->with('succesorVisableStatus', "hidden")
             ->with('recomendingPeople', $workingUsers)
             ->with('workingTreners', $workingTreners);
 
@@ -329,7 +349,11 @@ class UsersController extends Controller
                 ->get();
 
             $userTypes = UserTypes::all();
-
+            $allActiveUser = User::activeUser()->onlyConsultant()->get();
+            if($user->successorUserId != null)
+                $succesorVisableStatus = "";
+            else
+                $succesorVisableStatus = "hidden";
             return view('hr.editUser')
                 ->with('agencies', $agencies)
                 ->with('userTypes', $userTypes)
@@ -337,6 +361,8 @@ class UsersController extends Controller
                 ->with('penalty_bonuses', $penalty_bonuses)
                 ->with('month', $months)
                 ->with('department_info', $department_info)
+                ->with('allActiveUser', $allActiveUser)
+                ->with('succesorVisableStatus', $succesorVisableStatus)
                 ->with('type', 2);
         } else if ($flag == "true") {
             return Redirect::to('edit_cadre/' . $user->id);
@@ -584,7 +610,17 @@ class UsersController extends Controller
             if($promotionDateFloatYearhMonth >= $nowDataeFloatYearhMonth)
                 $user->promotion_date = date('Y-m-d',strtotime('last day of previous month'));
         }
-        $user->save();
+        if($user->user_type_id == 9){
+            $user->successorUserId = $request->successorUserId;
+        }else{
+            $user->successorUserId = null;
+        }
+        try{
+            $user->save();
+        }catch (Exception $exception){
+            Session::flash('message_error', "Problem podczas zapisywania użytkownika");
+            return Redirect::back();
+        }
 //        dd($user->toArray());
         $data = [
             'T' => 'Edycja użytkownika',

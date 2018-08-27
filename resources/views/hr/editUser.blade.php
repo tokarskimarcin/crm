@@ -18,6 +18,9 @@
     @if (Session::has('message_edit'))
         <div class="alert alert-success">{{ Session::get('message_edit') }}</div>
     @endif
+    @if (Session::has('message_error'))
+        <div class="alert alert-danger">{{ Session::get('message_error') }}</div>
+    @endif
 
     @if(Session::has('candidate_data'))
         @php
@@ -251,6 +254,7 @@
                                     </div>
                                 </div>
                             </div>
+
                         @endif
                         @if($type == 1)
                             <div class="row">
@@ -271,6 +275,9 @@
                                 </div>
                             </div>
                         @endif
+
+
+
                         <div class="row">
                             @if(Auth::user()->user_type_id == 10 OR Auth::user()->user_type_id == 3 OR isset($user->payment_type))
                                 <div class="col-md-4">
@@ -283,6 +290,23 @@
                                     </div>
                                 </div>
                             @endif
+                                @if($type == 2)
+                                    <div class="col-md-4" id="successorUserSelect" {{$succesorVisableStatus}}>
+                                        <div class="form-group">
+                                            <label class="myLabel">Konto konsultanta dla sukcesora:</label>
+                                            <select class="form-control" style="font-size:18px;" id="successorUserId" name="successorUserId">
+                                                    <option>Wybierz konsultanta</option>
+                                                @foreach($allActiveUser->where('department_info_id',$user->main_department_id) as $item)
+                                                    @if($user->successorUserId == $item->id)
+                                                     <option value = {{$item->id}} selected>{{$item->first_name.' '.$item->last_name}}</option>
+                                                    @else
+                                                     <option value = {{$item->id}}>{{$item->first_name.' '.$item->last_name}}</option>
+                                                    @endif
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
+                                @endif
                         </div>
                         <div class="row">
                             @if($type == 1)
@@ -550,6 +574,7 @@
             let department_info = $('#department_info').val();
             let login_phone = $('#login_phone').val();
             let description = $('#description').val();
+            let successorUserId = $('#successorUserId').val();
 
             if (first_name.trim().length == 0) {
                 swal('Podaj imie!');
@@ -633,7 +658,13 @@
             if (department_info != null && department_info == 'Wybierz') {
                 swal('Wybierz oddział!');
                 return false;
+            }else{
+                if(user_type == 9  && ( successorUserId != null &&  successorUserId.split(" ")[0] == 'Wybierz')){
+                    swal('Wybierz konto konsultanta dla sukcesora!');
+                    return false;
+                }
             }
+
 
 //
             var ajaxCheck = true;
@@ -971,6 +1002,57 @@
             pbx.on('change', function() {
                 if(pbx.val() < 0) {
                     pbx.val(0);
+                }
+            });
+
+
+
+            let userTypeSelect           = $('#user_type');
+            let departmentInfoId         = $('#department_info');
+            let successorSelect          =  $('#successorUserId');
+            let allUsersArray            = {!! json_encode($allActiveUser) !!};
+            let consultantIDForSuccessor = {!! json_encode($user->successorUserId) !!};
+            function getUserFromDepartment($departmentInfoID){
+                let returnArray = [];
+                allUsersArray.forEach(function (item) {
+                    if(item.department_info_id == $departmentInfoID)
+                        returnArray.push(item);
+                });
+                return returnArray;
+            }
+            function getSelectOption(text){
+                let option = document.createElement('option');
+                option.textContent = text;
+                return option;
+            }
+            userTypeSelect.on('change',function (e) {
+                let selectedObject = $(this);
+                if(selectedObject.val() == 9){
+                    $('#successorUserSelect').attr('hidden',false);
+                    if(departmentInfoId.val() == 'Wybierz'){
+                        successorSelect.empty();
+                        successorSelect.append(getSelectOption("Wybierz oddział sukcesora"));
+                    }
+                }else{
+                    $('#successorUserSelect').attr('hidden',true);
+                }
+            });
+            departmentInfoId.on('change',function () {
+                if($(this).val() == 'Wybierz'){
+                    successorSelect.empty();
+                    successorSelect.append(getSelectOption("Wybierz oddział sukcesora"));
+                }else{
+                    let userArray = getUserFromDepartment(departmentInfoId.val());
+                    successorSelect.empty();
+                    successorSelect.append(getSelectOption("Wybierz konto konsultanta"));
+                    userArray.forEach(function (item) {
+                        let option = document.createElement('option');
+                        option.textContent = item.first_name+' '+item.last_name;
+                        option.value = item.id;
+                        if(consultantIDForSuccessor == item.id)
+                            option.setAttribute('selected',true);
+                        successorSelect.append(option);
+                    });
                 }
             });
 
