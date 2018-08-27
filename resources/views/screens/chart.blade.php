@@ -2,7 +2,7 @@
 {{--THIS PAGE SHOWS DIAGRAMS OF AVERAGE VS HOUR --}}
 {{--********************************************--}}
 
-<!DOCTYPE html>
+        <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -10,7 +10,6 @@
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <title>Document</title>
 </head>
-
 <style>
     * {
         margin: 0;
@@ -26,52 +25,22 @@
 <body>
 <div id="my_chart">
 </div>
-</body>
 
+
+</body>
 @include('chartsScripts.averageDepartmentsChartScript')
-<script type="text/javascript">
+<script>
     let departmentsAveragesForEveryHour = <?php echo json_encode($departmentsAveragesForEveryHour) ?>;
     let departmentsAveragesForEveryHourChartsData = prepareDataForCharts(departmentsAveragesForEveryHour);
-    let iterator = 0;
     google.charts.load('current', {'packages':['corechart']});
     google.charts.setOnLoadCallback(function (){
-        let id = departmentsAveragesForEveryHour[iterator].dep_info_id;
+        let id = parseInt({{ $dep_info_id }});
         if(departmentsAveragesForEveryHourChartsData[id] !== undefined){
             var data = google.visualization.arrayToDataTable(departmentsAveragesForEveryHourChartsData[id]);
             drawChart(data, id, 'my_chart');
-            iterator++;
-        }else{
-            console.log('No data');
         }
     });
 
-    setInterval(myfunc, 10000);
-    function myfunc() {
-        let id = departmentsAveragesForEveryHour[iterator].dep_info_id;
-        var data = google.visualization.arrayToDataTable(departmentsAveragesForEveryHourChartsData[id]);
-        drawChart(data, id, 'my_chart');
-        iterator++;
-        if(iterator === departmentsAveragesForEveryHour.length) {
-            iterator = 0;
-        }
-    }
-
-    var today = new Date();
-    var today2 = new Date();
-    setInterval(function(){
-        today = new Date();
-        if(today.getMinutes() == '5' && (today.getSeconds() == '1' || today.getSeconds() == '2')){
-            window.location.reload(1);
-        }
-    }, 1000);
-    var actualHour = today2.getHours();
-    setInterval(function(){
-        today2 = new Date();
-        if(actualHour - today2.getHours() != 0) {
-            window.location.reload(1);
-            actualHour = today2.getHours()
-        }
-    }, 1000);
 </script>
 </html>
 
