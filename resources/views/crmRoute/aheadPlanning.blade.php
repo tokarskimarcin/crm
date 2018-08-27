@@ -157,8 +157,8 @@
                                         <label for="simulationType">Rodzaj symulacji</label>
                                         <select id="simulationType" class="form-control">
                                             <option value="1">Najbardziej prawdopodobna</option>
-                                            <option value="2">W najgorszym przypadku</option>
-                                            <option value="3">W najlepszym przypadku</option>
+                                            <option value="2">W pesymistycznym przypadku</option>
+                                            <option value="3">W optymistycznym przypadku</option>
                                         </select>
                                     </div>
                                 </div>

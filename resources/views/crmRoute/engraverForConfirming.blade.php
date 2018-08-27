@@ -96,7 +96,6 @@
                         <button class="btn btn-success" style="margin-bottom: 1em;  width: 100%;" id="save" disabled="true">
                             <span class='glyphicon glyphicon-save'></span> Zapisz zmiany <span class="badge">0</span></button>
                     </div>
-
                 </div>
                 <div class="row">
                     <table id="datatable" class="thead-inverse table table-striped table-bordered" style="max-width:100%;">
