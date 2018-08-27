@@ -474,11 +474,11 @@
                    {"data":function (data, type, dataToSet) {
                            dataTableData = data;
                            return data.weekOfYear;
-                       },"name":"weekOfYear", "width": "1%",
+                       },"name":"weekOfYear", "width": "1%", "searchable": false
                    },
                    {"data":function (data, type, dataToSet) {
                            return data.date;
-                       },"name":"date"
+                       },"name":"date", "searchable": false
                    },
                    {"data":function (data, type, dataToSet) {
                            if(data.nrPBX != null) {
@@ -487,7 +487,7 @@
                            else {
                                return data.cityName;
                            }
-                       },"name":"cityName"
+                       },"name":"cityName", "orderable": false
                    },
                    {"data":function (data, type, dataToSet) {
                            let clientNameVariable = '';
@@ -513,29 +513,29 @@
                    {"data":function (data, type, dataToSet) {
                            //let fullDepartmentName = data.departmentName == null ? null : data.departmentName + ' ' + data.departmentName2;
                            return data.departmentName;
-                       },"name":"departmentName", "searchable": "false"
+                       },"name":"departmentName", "searchable": "false", "orderable": false
                    },
                    {"data":function(data, type, dataToSet) {
                        return `<select class="confirming form-control" style="width: 100%;">
                                     <option value="0">Wybierz</option>
                                 </select>`;
-                        }, "name": "potwierdzający", "width": "20%"
+                        }, "name": "potwierdzający", "width": "20%", "orderable": false, "searchable": false
                    },
                    {"data":function (data, type, dataToSet) {
                            return data.limits;
-                       },"name":"limits"
+                       },"name":"limits", "orderable": false, "searchable": false
                    },
                    {"data":function (data, type, dataToSet) {
                            return data.actual_success;
-                       },"name":"actual_success"
+                       },"name":"actual_success", "orderable": false, "searchable": false
                    },
                    {"data":function(data, type, dataToSet) {
                            return `<input class="frequency form-control" type="number" min="0" step="1" style="width: 5em;" value="${data.frequency}">`;
-                       }, "name": "Frekw."
+                       }, "name": "Frekw.", "orderable": false, "searchable": false
                    },
                    {"data":function(data, type, dataToSet) {
                            return `<input class="pairs form-control" type="number" min="0" step="1" style="width: 5em;" value="${data.pairs}">`;
-                       }, "name": "pairs"
+                       }, "name": "pairs", "orderable": false, "searchable": false
                    },
                    {"data":function(data, type, dataToSet) {
                        if(data.confirmDate != null) {
@@ -551,7 +551,7 @@
                            return `<input type="date" style="width: 100%;" class="form-control confirm-date" value="${fullDate}">`;
                        }
 
-                       }, "name": "dataPotwierdzenia"
+                       }, "name": "dataPotwierdzenia", "orderable": false, "searchable": false
                    }
                ],
                order: [[1, 'asc'], [3, 'desc'], [4, 'asc']],
