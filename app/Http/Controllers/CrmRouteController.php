@@ -20,8 +20,10 @@ use App\PaymentMethod;
 use App\PbxCrmInfo;
 use App\Route;
 use App\RouteInfo;
+use App\Schedule;
 use App\User;
 use App\Voivodes;
+use App\Work_Hour;
 use DateTime;
 use function foo\func;
 use Illuminate\Support\Facades\Mail;
@@ -4205,6 +4207,189 @@ class CrmRouteController extends Controller
         }else{
             return 'Brak Danych';
         }
+    }
+
+    /**
+     * @return view engraverForConfirming with necessary data
+     */
+    public function engraverForConfirmingGet() {
+        $year = date('Y',strtotime("this year"));
+
+        $weeksString = date('W', strtotime("this week"));
+        $numberOfLastYearsWeek = date('W',mktime(0, 0, 0, 12, 30, $year));
+
+        $departmentInfo = DB::table('department_info')->select(DB::raw('
+        department_info.id as id, 
+        department_type.name as name, 
+        departments.name as name2
+        '))
+            ->join('department_type', 'department_info.id_dep_type', '=', 'department_type.id')
+            ->join('departments', 'department_info.id_dep', '=', 'departments.id')
+            ->get();
+
+        $limitDate = Date('W', strtotime('-100 days'));
+        $limitDateFull = Date('Y-m-d', strtotime('-100 days'));
+
+        $scheduleData = Schedule::select('id_user as userId', 'users.first_name as name','department_info.id as depId' ,'users.last_name as surname', 'week_num', 'year', 'monday_comment as pon', 'tuesday_comment as wt', 'wednesday_comment as sr', 'thursday_comment as czw', 'friday_comment as pt', 'saturday_comment as sob','sunday_comment as nd')
+            ->join('users', 'schedule.id_user', '=', 'users.id')
+            ->join('department_info', 'users.department_info_id', '=', 'department_info.id')
+            ->where('week_num', '>', $limitDate)
+//            ->where('department_info.id_dep_type', '=', 1) //gdy beda juz grafiki dla potwierdzen
+            ->where('users.status_work', '=', 1)
+            ->orderBy('surname')
+            ->get();
+
+        $workHours = Work_Hour::where('date', '>=', $limitDateFull)->select(DB::raw('
+        CASE
+            WHEN 
+                HOUR(click_start) >= 9 THEN 0
+            WHEN
+                HOUR(click_start) < 9 THEN 1
+            WHEN 
+                click_start IS NULL THEN 0                
+        END AS presentAtTime,
+        id_user, 
+        date'
+        ))
+            ->join('users', 'work_hours.id_user', '=', 'users.id')
+            ->join('department_info', 'users.department_info_id', '=', 'department_info.id')
+//            ->where('department_info.id_dep_type', '=', 1) //gdy beda juz grafiki dla potwierdzen
+            ->where('users.status_work', '=', 1)
+            ->get();
+
+        $workHours = $workHours->groupBy('id_user');
+
+        $scheduleGroupedByUser = $scheduleData->groupBy('userId', 'week_num');
+
+        //This part is responsible for creating user objects with date field and pass it to userArr
+        $userArr = [];
+        foreach($scheduleGroupedByUser as $id => $data) {
+            $user = new \stdClass();
+            $user->userId = $id;
+            $dataArr = [];
+            $i = 0;
+            foreach($data as $item) {
+                if($i == 0) {
+                    $user->name = $item->name;
+                    $user->surname = $item->surname;
+                    $user->depId = $item->depId;
+                }
+                $i++;
+                $firstDayOfGivenWeek = Date('Y-m-d', strtotime($item->year . 'W' . $item->week_num));
+                if($item->pon != '') {
+                    array_push($dataArr, $firstDayOfGivenWeek);
+                }
+
+                if($item->wt != '') {
+                    array_push($dataArr, Date('Y-m-d', strtotime($firstDayOfGivenWeek . '+ 1 day')));
+                }
+
+                if($item->sr != '') {
+                    array_push($dataArr, Date('Y-m-d', strtotime($firstDayOfGivenWeek . '+ 2 days')));
+                }
+
+                if($item->czw != '') {
+                    array_push($dataArr, Date('Y-m-d', strtotime($firstDayOfGivenWeek . '+ 4 days')));
+                }
+
+                if($item->pt != '') {
+                    array_push($dataArr, Date('Y-m-d', strtotime($firstDayOfGivenWeek . '+ 5 days')));
+                }
+
+                if($item->sob != '') {
+                    array_push($dataArr, Date('Y-m-d', strtotime($firstDayOfGivenWeek . '+ 6 days')));
+                }
+
+                if($item->nd != '') {
+                    array_push($dataArr, Date('Y-m-d', strtotime($firstDayOfGivenWeek . '+ 7 days')));
+                }
+            }
+            $user->date = $dataArr;
+            array_push($userArr, $user);
+        }
+
+        return view('crmRoute.engraverForConfirming')
+            ->with('lastWeek', $numberOfLastYearsWeek)
+            ->with('currentWeek', $weeksString)
+            ->with('currentYear', $year)
+            ->with('departmentInfo', $departmentInfo)
+            ->with('userData', $userArr)
+            ->with('workHours', $workHours);
+    }
+
+    public function engraverForConfirmingDatatable(Request $request) {
+        $years = $request->years;
+        $weeks = $request->weeks;
+        $departments = $request->departments;
+        $typ = $request->typ;
+
+        $campaignsInfo = ClientRouteInfo::select(DB::raw('
+        client_route_info.id as id,
+        client_route_info.date as date,
+        client_route_info.hour as hour,
+        client_route_info.pbx_campaign_id as nrPBX,
+        client_route_info.weekOfYear as weekOfYear,
+        client_route_info.limits as limits,
+        client_route_info.frequency as frequency,
+        client_route_info.pairs as pairs,
+        client_route_info.confirmingUser as confirmingUser,
+        client_route_info.confirmDate as confirmDate,
+        client_route_info.actual_success as actual_success,
+        YEAR(client_route_info.date) as year,
+        client.name as clientName,
+        departments.name as departmentName,
+        client_route_info.department_info_id as depId,
+        department_type.name as departmentName2,
+        city.name as cityName,
+        client_route.type as typ
+        '))
+            ->join('client_route','client_route.id','client_route_info.client_route_id')
+            ->leftjoin('client','client.id','client_route.client_id')
+            ->leftjoin('city','city.id','client_route_info.city_id')
+            ->leftjoin('department_info','department_info.id','client_route_info.department_info_id')
+            ->leftjoin('departments','departments.id','department_info.id_dep')
+            ->leftjoin('department_type', 'department_type.id', '=', 'department_info.id_dep_type')
+            ->where('client_route_info.status', '=', 1) //now it's important
+            ->whereIn('client_route.status',[1,2]);
+
+        if($years[0] != '0') {
+            $campaignsInfo = $campaignsInfo->whereIn(DB::raw('YEAR(client_route_info.date)'), $years);
+        }
+
+        if($weeks[0] != '0') {
+            $campaignsInfo = $campaignsInfo->whereIn('weekOfYear', $weeks);
+        }
+
+        if($departments[0] != '0') {
+            $campaignsInfo->where(function ($query) use ($departments){
+                $query->whereIn('client_route_info.department_info_id', $departments);
+                if(in_array('-1',$departments)){
+                    $query->orWhere(function ($query){
+                        $query->whereNull('client_route_info.department_info_id');
+                    });
+                }
+            });
+        }
+
+        if($typ[0] != '0') {
+            $campaignsInfo = $campaignsInfo->whereIn('client_route.type', $typ);
+        }
+        return datatables($campaignsInfo->get())->make(true);
+    }
+
+    public function engraverForConfirmingUpdate(Request $request) {
+        $data = json_decode($request->data);
+        $idsArr = [];
+        foreach($data as $item) {
+            ClientRouteInfo::where('id', '=', $item->id)
+                ->update([
+                    'frequency' => $item->frequency,
+                    'pairs' => $item->pairs,
+                    'confirmingUser' => $item->confirmingPerson,
+                    'confirmDate' => $item->date
+                ]);
+        }
+        return 'Zmiany zostały zapisane!';
     }
 
 }
