@@ -14,11 +14,14 @@
             height: 80vh;
             margin: auto;
             /*width: 80vw;*/
+            font-size: xx-large;
+            color: grey;
+            text-align: center;
         }
         .navOption{
             cursor: pointer;
         }
-        .dropdown-menu {
+        .bootstrap-select > .dropdown-menu {
             left: 0px !important;
         }
 
@@ -49,24 +52,39 @@
             </div>
             <div class="row">
                 <div class="dailyIntervals">
-                    <div class="col-md-4" >
-                        <div class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" {{--style="width:100%;"--}}>
-                            <input class="form-control" name="start_date" type="text" value="{{date("Y-m-d")}}" readonly >
-                            <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="date" class="myLabel">Data początkowa:</label>
+                            <div class="input-group date form_date col-md-5" data-date=""
+                                 data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">
+                                <input class="form-control" name="date_start" id="date_start" type="text"
+                                       value="{{date("Y-m-d")}}">
+                                <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
+                            </div>
                         </div>
                     </div>
-                    <div class="col-md-4" >
-                        <div class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" {{--style="width:100%;"--}}>
-                            <input class="form-control" name="stop_date" type="text" value="{{date("Y-m-d")}}" readonly >
-                            <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="date" class="myLabel">Data końcowa:</label>
+                            <div class="input-group date form_date col-md-5" data-date=""
+                                 data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">
+                                <input class="form-control" name="date_stop" id="date_stop" type="text"
+                                       value="{{date("Y-m-d")}}">
+                                <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
+                            </div>
                         </div>
                     </div>
                 </div>
                 <div class="hourlyIntervals" hidden>
-                    <div class="col-md-4" >
-                        <div class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" {{--style="width:100%;"--}}>
-                            <input class="form-control" name="date" type="text" value="{{date("Y-m-d")}}" readonly >
-                            <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="date" class="myLabel">Data:</label>
+                            <div class="input-group date form_date col-md-5" data-date=""
+                                 data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">
+                                <input class="form-control" name="date" id="date" type="text"
+                                       value="{{date("Y-m-d")}}">
+                                <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -84,15 +102,30 @@
 @include('chartsScripts.averageDepartmentsChartScript')
 @section('script')
     <script>
-        /*let departmentsAveragesForEveryHour = <?php /*echo json_encode($departmentsAveragesForEveryHour)*/ ?>;
-        let departmentsAveragesForEveryHourChartsData = prepareDataForCharts(departmentsAveragesForEveryHour);*/
+        let departmentsAveragesForEveryHour = null;
+        let departmentsAveragesForEveryHourChartsData = null;
+        let departmentsAveragesForEveryDay = null;
+        let departmentsAveragesForEveryDayChartsData = null;
+        let statisticsType = $('.navOption.active').attr('id');
+
         $(document).ready(function () {
-            getDepartmentsAveragesForEveryHourAjax().then(function () {
+            (function activateDatepicker() {
+                $('.form_date').datetimepicker({
+                    language: 'pl',
+                    autoclose: 1,
+                    minView: 2,
+                    pickTime: false,
+                });
+            })();
+
+            getDepartmentsAveragesForEveryDayAjax($('#date_start').val(), $('#date_stop').val()).then( function (){
+                return getDepartmentsAveragesForEveryHourAjax($('#date').val());
+            }).then(function (resolve) {
                 for(let i = 0 ; i < departmentsAveragesForEveryHour.length; i++){
                     //let divItemChart = $(document.createElement('div')).addClass('chart').attr('id','depChart_'+i);
 
                     let departmentValue = $(document.createElement('option')).val(i).text(departmentsAveragesForEveryHour[i].departmentName);
-                    if(i != 0){
+                    if(i !== 0){
                         //divItemChart.attr('hidden', true);
                     }else{
                         departmentValue.attr('selected', true);
@@ -106,52 +139,120 @@
 
                 google.charts.load('current', {'packages':['corechart']});
                 google.charts.setOnLoadCallback(function (){
-                    let statisticsType = $('.navOption active').attr('id');
-                    if( statisticsType === 'dailyIntervals'){
-                        $('#chart').text('');
-                    }else if( statisticsType === 'hourlyIntervals'){
-                        drawDepartmentsAveragesForEveryHourCharts($('#departmentsSelect').val());
-                    }
+                    drawProperTypeChart($('#departmentsSelect').val());
                 });
             });
         });
 
 
         function drawDepartmentsAveragesForEveryHourCharts(iterator){
-            let id = departmentsAveragesForEveryHour[iterator].dep_info_id;
-            var data = google.visualization.arrayToDataTable(departmentsAveragesForEveryHourChartsData[id]);
-            drawChart(data, id, 'chart',0.5);
+            if(iterator !== null ){
+                let depData = departmentsAveragesForEveryHour[iterator];
+                if(depData !== undefined){
+                    let id = depData.dep_info_id;
+                    if(departmentsAveragesForEveryHourChartsData[id].length>1){
+                        var data = google.visualization.arrayToDataTable(departmentsAveragesForEveryHourChartsData[id]);
+                        drawChart(data, id, 'chart',0.5);
+                    }else{
+                        $('#chart').text('Brak danych');
+                    }
+                }
+            }
+        }
+
+        function drawDepartmentsAveragesForEveryDayCharts(iterator){
+            if(iterator !== null ){
+                let depData = departmentsAveragesForEveryDay[iterator];
+                if(depData !== undefined){
+                    let id = depData.dep_info_id;
+                    if(departmentsAveragesForEveryDayChartsData[id].length>1){
+                        var data = google.visualization.arrayToDataTable(departmentsAveragesForEveryDayChartsData[id]);
+                        drawChart(data, id, 'chart',0.5);
+                    }else{
+                        $('#chart').text('Brak danych');
+                    }
+                }
+            }
         }
 
         $('.navOption').click(function (e) {
             if(!$(e.target).parent().hasClass('active')){
+                $.each($('.navOption'), function (index, item) {
+                    $('.'+item.id).hide();
+                });
                 $('.navOption').removeClass('active');
                 $(e.target).parent().addClass('active');
-                let statisticsType = $(e.target).parent().attr('id');
-                if( statisticsType === 'dailyIntervals'){
-                    $('#chart').text('');
-                }else if( statisticsType === 'hourlyIntervals'){
-                    drawDepartmentsAveragesForEveryHourCharts($('#departmentsSelect').val());
-                }
+                statisticsType = $(e.target).parent().attr('id');
+                $('.'+statisticsType).show();
+                drawProperTypeChart($('#departmentsSelect').val());
             }
         });
 
         $('#departmentsSelect').change(function (e){
-            drawDepartmentsAveragesForEveryHourCharts($(e.target).val());
+            drawProperTypeChart($(e.target).val());
         });
 
-        function getDepartmentsAveragesForEveryHourAjax() {
+        $('#date').change(function (e) {
+            getDepartmentsAveragesForEveryHourAjax($(e.target).val()).then(function (resolve) {
+                drawProperTypeChart($('#departmentsSelect').val());
+            });
+        });
+
+        $('#date_start, #date_stop').change(function (e) {
+            getDepartmentsAveragesForEveryDayAjax($('#date_start').val(), $('#date_stop').val()).then(function (resolve) {
+                drawProperTypeChart($('#departmentsSelect').val());
+            });
+        });
+
+        function drawProperTypeChart(value){
+            if( statisticsType === 'dailyIntervals'){
+                drawDepartmentsAveragesForEveryDayCharts(parseInt(value));
+            }else if( statisticsType === 'hourlyIntervals') {
+                drawDepartmentsAveragesForEveryHourCharts(parseInt(value));
+            }
+        }
+
+        function getDepartmentsAveragesForEveryHourAjax(date) {
             return $.ajax({
                 type: "POST",
                 url: "{{route('api.getDepartmentsAveragesForEveryHourAjax')}}",
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                },
+                headers: {'X-CSRF-TOKEN': '{{ csrf_token() }}'},
                 data: {
-
+                    date: date
                 },
                 success: function (response) {
+                    if(response !== false){
+                        departmentsAveragesForEveryHour = response;
+                        departmentsAveragesForEveryHourChartsData = prepareDataForCharts(departmentsAveragesForEveryHour);
+                    }
+                },
+                error: function (jqXHR, textStatus, thrownError) {
+                    console.log(jqXHR);
+                    console.log('textStatus: ' + textStatus);
+                    console.log('hrownError: ' + thrownError);
+                    swal({
+                        type: 'error',
+                        title: 'Błąd ' + jqXHR.status,
+                        text: 'Wystąpił błąd: ' + thrownError+' "'+jqXHR.responseJSON.message+'"',
+                    });
+                }
+            });
+        }
 
+        function getDepartmentsAveragesForEveryDayAjax(dateStart, dateStop) {
+            return $.ajax({
+                type: "POST",
+                url: "{{route('api.getDepartmentsAveragesForEveryDayAjax')}}",
+                headers: {'X-CSRF-TOKEN': '{{ csrf_token() }}'},
+                data: {
+                    date_start: dateStart,
+                    date_stop: dateStop
+                },
+                success: function (response) {
+                    if(response !== false){
+                        departmentsAveragesForEveryDay = response;
+                        departmentsAveragesForEveryDayChartsData = prepareDataForCharts(departmentsAveragesForEveryDay);
+                    }
                 },
                 error: function (jqXHR, textStatus, thrownError) {
                     console.log(jqXHR);
