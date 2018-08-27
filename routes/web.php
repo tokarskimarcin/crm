@@ -693,6 +693,7 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
 
     Route::get('/pageHourReportTimeOnRecord', 'StatisticsController@pageHourReportTimeOnRecord');
     Route::get('/statisticsCharts', 'StatisticsController@statisticsChartsGet');
+    Route::post('/getDepartmentsAveragesForEveryHourAjax', 'StatisticsController@getDepartmentsAveragesForEveryHourAjax')->name('api.getDepartmentsAveragesForEveryHourAjax');
 
     Route::get('/pageMailMonthReportDepartments', 'StatisticsController@pageMailMonthReportDepartments');
 

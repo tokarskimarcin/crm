@@ -5431,13 +5431,17 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
     }
 
     public function statisticsChartsGet(){
-        $today = date("Y-m-d"); //2000-10-11
-        $today = date("2018-08-22"); //2000-10-11
+        return view('statistics.statisticsCharts');//->with('departmentsAveragesForEveryHour', $departmentsAveragesForEveryHour);
+    }
+
+    public function getDepartmentsAveragesForEveryHourAjax(Request $request){
+        $date = $request->date;
+        $date = date("2018-08-22");
+
         $department_info = Department_info::where('id_dep_type', '=', '2')->get();
 
-        $departmentsAveragesForEveryHour = $this->getDepartmentsAveragesForEveryHour($today,$department_info);
-
-        return view('statistics.statisticsCharts')->with('departmentsAveragesForEveryHour', $departmentsAveragesForEveryHour);
+        $departmentsAveragesForEveryHour = $this->getDepartmentsAveragesForEveryHour($date,$department_info);
+        return $departmentsAveragesForEveryHour;
     }
 
     public static function getDepartmentsAveragesForEveryHour($date, $departments_info){
