@@ -118,6 +118,12 @@
             <div class="panel-body">
                 <h3 style="color: #3b3d3c">Rozmowy kwalifikacyjne</h3>
                 <div class="row">
+                    <div class="col-md-6">
+                        <input type="checkbox" id="showAllDepartmentData" style="display: inline-block; margin-right: .5em;">
+                        <label for="showAllDepartmentData">Pokaż wszystkie rozmowy kwalifikacyjne z Twojego działu</label>
+                    </div>
+                </div>
+                <div class="row">
                     <div class="col-md-3">
                         <div class="form-group">
                             <label class="myLabel">Od:</label>
@@ -301,6 +307,8 @@
 @section('script')
 <script>
 
+    console.log();
+
 $('.form_date').datetimepicker({
     language: 'pl',
     autoclose: 1,
@@ -315,6 +323,7 @@ var stop_search = today;
 
 function myInterviews(start_search, stop_search) {
 
+    let all_data_element = document.querySelector('#showAllDepartmentData');
     $.ajax({
         type: "POST",
         url: '{{ route('api.myInterviews') }}',
@@ -323,9 +332,11 @@ function myInterviews(start_search, stop_search) {
         },
         data: {
             "start_search": start_search,
-            "stop_search": stop_search
+            "stop_search": stop_search,
+            "all_data": all_data_element.checked
         },
         success: function (response) {
+            console.log(response);
             $('#my_interviews tr').remove();
 
             var content = '';
@@ -441,6 +452,10 @@ table = $('#candidates').DataTable({
         },"orderable": false, "searchable": false},
     ]
 });
+
+    // $('#showAllDepartmentData').on('change', function(event) {
+    //     myInterviews(start_search, stop_search);
+    // });
 
 </script>
 @endsection

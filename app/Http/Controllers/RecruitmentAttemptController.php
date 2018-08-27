@@ -142,21 +142,44 @@ class RecruitmentAttemptController extends Controller
      */
     public function myInterviews(Request $request) {
         if ($request->ajax()) {
-            $candidates = DB::table('recruitment_attempt')
-                ->select(DB::raw('
+//            dd(Auth::user()->department_info_id);
+            if($request->all_data == 'true') {
+//                dd('1');
+                $candidates = DB::table('recruitment_attempt')
+                    ->select(DB::raw('
                     recruitment_attempt.*,
                     candidate.first_name as user_name,
                     candidate.last_name as user_surname,
                     candidate.phone as user_phone,
                     candidate.id as candidate_id
                 '))
-                ->join('candidate', 'candidate.id', 'recruitment_attempt.candidate_id')
-                ->where('candidate.attempt_status_id', '=', 3)
-                ->where('interview_cadre', '=', Auth::user()->id)
-                ->where('recruitment_attempt.status', '=', 0)
-                ->whereBetween('recruitment_attempt.interview_date', [$request->start_search . ' 00:00:00', $request->stop_search . ' 23:00:00'])
-                ->orderby('recruitment_attempt.interview_date')
-                ->get();
+                    ->join('candidate', 'candidate.id', 'recruitment_attempt.candidate_id')
+                    ->join('users', 'recruitment_attempt.interview_cadre', '=', 'users.id')
+                    ->where('candidate.attempt_status_id', '=', 3)
+                    ->where('users.department_info_id', '=', Auth::user()->department_info_id)
+                    ->where('recruitment_attempt.status', '=', 0)
+                    ->whereBetween('recruitment_attempt.interview_date', [$request->start_search . ' 00:00:00', $request->stop_search . ' 23:00:00'])
+                    ->orderby('recruitment_attempt.interview_date')
+                    ->get();
+            }
+            else {
+                $candidates = DB::table('recruitment_attempt')
+                    ->select(DB::raw('
+                    recruitment_attempt.*,
+                    candidate.first_name as user_name,
+                    candidate.last_name as user_surname,
+                    candidate.phone as user_phone,
+                    candidate.id as candidate_id
+                '))
+                    ->join('candidate', 'candidate.id', 'recruitment_attempt.candidate_id')
+                    ->where('candidate.attempt_status_id', '=', 3)
+                    ->where('interview_cadre', '=', Auth::user()->id)
+                    ->where('recruitment_attempt.status', '=', 0)
+                    ->whereBetween('recruitment_attempt.interview_date', [$request->start_search . ' 00:00:00', $request->stop_search . ' 23:00:00'])
+                    ->orderby('recruitment_attempt.interview_date')
+                    ->get();
+            }
+
 
             return $candidates;
         }
