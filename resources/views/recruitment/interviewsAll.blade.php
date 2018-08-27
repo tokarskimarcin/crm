@@ -336,7 +336,6 @@ function myInterviews(start_search, stop_search) {
             "all_data": all_data_element.checked
         },
         success: function (response) {
-            console.log(response);
             $('#my_interviews tr').remove();
 
             var content = '';
