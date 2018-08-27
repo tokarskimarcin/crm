@@ -412,7 +412,7 @@
 
                         }
 
-                       //if only data has changed + dodac warunek na date zeby nie byla wieksza niz data pokazu
+                       //if only data has changed
                        if(confirmingPeopleSelect.options[confirmingPeopleSelect.selectedIndex].value != 0 && (showDateObject > confDateObject)) {
                            let exist = existInArr(id, changeArr);
                            let newConfirmingPerson = getSelectedOption(confirmingPeopleSelect);
@@ -446,12 +446,13 @@
                                    if(changeArr[j]['id'] == id) {
                                        changeArr.splice(j,1);
                                        max--;
+
+                                       numberOfChanges--;
+                                       badge.textContent = numberOfChanges;
+                                       elementRow.classList.remove('colorRow');
                                    }
                                }
                            }
-                           numberOfChanges--;
-                           badge.textContent = numberOfChanges;
-                           elementRow.classList.remove('colorRow');
                        }
                        // console.log(changeArr);
                        saveButton.disabled = changeArr.length > 0 ? false : true;
