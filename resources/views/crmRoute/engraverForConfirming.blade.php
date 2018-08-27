@@ -98,7 +98,7 @@
                 <div class="row">
                     <div class="col-md-4 buttonSection" style="min-height: 3.5em;">
                         <button class="btn btn-success" style="margin-bottom: 1em;  width: 100%;" id="save" disabled="true">
-                            <span class='glyphicon glyphicon-save'></span> Zapisz zmiany</button>
+                            <span class='glyphicon glyphicon-save'></span> Zapisz zmiany <span class="badge">0</span></button>
                     </div>
 
                 </div>
@@ -151,6 +151,8 @@
            let userData = @json($userData);
            let workHourData = @json($workHours);
            let dataTableData =  null;
+           let badge = document.querySelector('.badge');
+           let numberOfChanges = 0;
 
            /********* END OF GLOBAL VARIABLES*********/
 
@@ -428,6 +430,8 @@
                                }
                            }
                            changeArr.push(changedRow);
+                           numberOfChanges++;
+                           badge.textContent = numberOfChanges;
                            elementRow.classList.add('colorRow');
                        }
                        else { //check whether confirming person exist in array. If yes, delete him
@@ -445,6 +449,8 @@
                                    }
                                }
                            }
+                           numberOfChanges--;
+                           badge.textContent = numberOfChanges;
                            elementRow.classList.remove('colorRow');
                        }
                        // console.log(changeArr);
@@ -768,6 +774,8 @@
                        .then(resp => {
                            notify(resp);
                            changeArr = [];
+                           numberOfChanges = 0;
+                           badge.textContent = numberOfChanges;
                            saveButton.disabled = true;
                            let allHighlightedRows = document.querySelectorAll('.colorRow');
                            allHighlightedRows.forEach(item => {
