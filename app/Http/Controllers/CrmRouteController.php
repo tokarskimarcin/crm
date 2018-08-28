@@ -3008,7 +3008,6 @@ class CrmRouteController extends Controller
 
     private function getDepartmentsInvitationsAverages($startDate, $stopDate, $factors, $routeInfoOverall, $departmentInfo){
         $departmentsInvitationsAveragesInfo = collect();
-//        dd($departmentInfo);
         foreach ($departmentInfo as $item) {
             $actualDate = $startDate;
             $weekSum = 0;
@@ -3049,154 +3048,145 @@ class CrmRouteController extends Controller
 
             //Zakładamy, że pozyskane dane mają rozkład Normalny(średnia, odchylenie). Brak sprawdzenia testem parametrycznym.
             $departmentAverages = collect();
-            $average = 0;
-            $weekVariance = 0;
+            $weightAverageWeek = 0;
+            $stdDevWeek = 0;
             if($weekDivider != 0){
-                $average = $weekSum / $weekDivider;
-
-                $sumOfSquaresOfDifferences = 0; // numerator of variance
-                foreach($weekScoresArr as $score) { //this part counts stdDev numerator(licznik)
-                    $sumOfSquaresOfDifferences += pow(($score - $average),2);
+                $averageNumerator = 0;
+                $varianceNumerator = 0;
+                $denominator = 0;
+                foreach($weekScoresArr as $iterator => $value) {
+                    $denominator += $iterator + 1; //ponieważ zaczynamy od 0
+                    $averageNumerator += ($iterator + 1) * $value;
+                    $varianceNumerator += pow($value, 2) * ($iterator + 1);
                 }
+                $weightAverageWeek = $denominator == 0 ? 0 : $averageNumerator / $denominator;
 
-                if($weekDivider >= 2) {
-                    $weekVariance = $sumOfSquaresOfDifferences / ($weekDivider - 1); //wariancja dla próby
-                }
-                else {
-                    $weekVariance = $sumOfSquaresOfDifferences / ($weekDivider); //wariancja dla populacji (wymuszone działanie)
-                }
-
+                $weightedVarianceWeek = ($varianceNumerator / $denominator) - pow($weightAverageWeek, 2);
+                $stdDevWeek = ($weekDivider >= 2 && $weekDivider <= 75) ? sqrt($weightedVarianceWeek) / $this->getCzynnikC4($weekDivider) : sqrt($weightedVarianceWeek); // ważone odchylenie standardowe.
             }
 
-            $stdDev = ($weekDivider >= 2 && $weekDivider <= 75) ? sqrt($weekVariance) / $this->getCzynnikC4($weekDivider) : sqrt($weekVariance);  //week standard deviation
+            $coefficientOfVariationWeek = $weightAverageWeek != 0 ? (100 * $stdDevWeek / $weightAverageWeek) / 100 : 0; // procent średniej jakim jest odchylenie standardowe = wsp. zmienności
 
-            $percentOfAvgWeek = (100 * $stdDev / $average) / 100; // procent średniej jakim jest odchylenie standardowe
+            $departmentAverages->offsetSet('workingDaysCoefficient', round($coefficientOfVariationWeek, 3));
+            $departmentAverages->offsetSet('workingDays',floor($weightAverageWeek));
+            $departmentAverages->offsetSet('workingDaysStdDev',floor($stdDevWeek));
 
-            $departmentAverages->offsetSet('workingDays',floor($average));
-            $departmentAverages->offsetSet('$stdDev',floor($stdDev));
-
-            if($percentOfAvgWeek < 0.5) {
-                $departmentAverages->offsetSet('workingDaysMin', floor($average - ($stdDev)));
-                $departmentAverages->offsetSet('workingDaysMax', floor($average + ($stdDev)));
+            if($coefficientOfVariationWeek < 0.5) {
+                //obszar zmienności [x - sigma; x + sigma]
+                $departmentAverages->offsetSet('workingDaysMin', floor($weightAverageWeek - ($stdDevWeek)));
+                $departmentAverages->offsetSet('workingDaysMax', floor($weightAverageWeek + ($stdDevWeek)));
             }
-            else if($percentOfAvgWeek >= 0.5) {
-                $departmentAverages->offsetSet('workingDaysMin', floor($average - (0.8 * $stdDev)));
-                $departmentAverages->offsetSet('workingDaysMax', floor($average + (0.8 * $stdDev)));
+            else if($coefficientOfVariationWeek >= 0.5) {
+                //obszar zmienności [x - 0.8*sigma; x + 0.8*sigma]
+                $departmentAverages->offsetSet('workingDaysMin', floor($weightAverageWeek - (0.8 * $stdDevWeek)));
+                $departmentAverages->offsetSet('workingDaysMax', floor($weightAverageWeek + (0.8 * $stdDevWeek)));
             }
 
-            $departmentAverages->offsetSet('$weekScoresArr', $weekScoresArr);
+            $departmentAverages->offsetSet('workingDaysArr', $weekScoresArr);
             //**********
 
-
-            $saturdayVariance = 0;
-            $saturdayAvg = 0;
-            $saturdayStdDev = 0;
+            $weightAverageSaturday = 0;
+            $stdDevSaturday = 0;
 
             if($saturdayDivider != 0){
-                $saturdayAvg = $saturdaySum / $saturdayDivider;
+                $averageNumeratorSat = 0;
+                $varianceNumeratorSat = 0;
+                $denominatorSat = 0;
 
-                $sumOfSquaresOfDifferences = 0; // numerator of variance
-                foreach($saturdayScoresArr as $score) { //this part counts stdDev numerator(licznik)
-                    $sumOfSquaresOfDifferences += pow(($score - $saturdayAvg),2);
+                foreach($saturdayScoresArr as $iterator => $value) {
+                    $denominatorSat += $iterator + 1; //ponieważ zaczynamy od 0
+                    $averageNumeratorSat += ($iterator + 1) * $value;
+                    $varianceNumeratorSat += pow($value, 2) * ($iterator + 1);
                 }
 
-                if($saturdayDivider >= 2) {
-                    $saturdayVariance = $sumOfSquaresOfDifferences / ($saturdayDivider - 1);
-                }
-                else {
-                    $saturdayVariance = $sumOfSquaresOfDifferences / ($saturdayDivider);
-                }
-
-                $saturdayStdDev = ($saturdayVariance >= 2 && $saturdayVariance <= 75) ? sqrt($saturdayVariance) / $this->getCzynnikC4($saturdayDivider) : sqrt($saturdayVariance);  //saturday standard deviation
+                $weightAverageSaturday = $denominatorSat == 0 ? 0 : $averageNumeratorSat / $denominatorSat;
+                $weightedVarianceSaturday = ($varianceNumeratorSat / $denominatorSat) - pow($weightAverageSaturday, 2);
+                $stdDevSaturday = ($saturdayDivider >= 2 && $saturdayDivider <= 75) ? sqrt($weightedVarianceSaturday) / $this->getCzynnikC4($saturdayDivider) : sqrt($weightedVarianceSaturday); // ważone odchylenie standardowe.
             }else{
-                $saturdayAvg = $average*$factors['saturday']/100;
+                $weightAverageSaturday = $weightAverageWeek*$factors['saturday']/100;
 
-                $sumOfSquaresOfDifferences = 0; // numerator of variance
+                $averageNumeratorSat = 0;
+                $varianceNumeratorSat = 0;
+                $denominatorSat = 0;
 
-                //Estimation of variance with use of saturday factor to each data item.
-                foreach($weekScoresArr as $score) { //this part counts stdDev numerator(licznik)
-                    $sumOfSquaresOfDifferences += pow((($score * ($factors['saturday'] / 100)) - $saturdayAvg),2);
+                foreach($weekScoresArr as $iterator => $value) {
+                    $denominatorSat += $iterator + 1; //ponieważ zaczynamy od 0
+                    $averageNumeratorSat += ($iterator + 1) * $value * ($factors['saturday'] / 100);
+                    $varianceNumeratorSat += pow($value * ($factors['saturday'] / 100), 2) * ($iterator + 1);
                 }
 
-                if($weekDivider >= 2) {
-                    $saturdayVariance = $sumOfSquaresOfDifferences / ($weekDivider - 1);
-                }
-                else {
-                    $saturdayVariance = $sumOfSquaresOfDifferences / ($weekDivider);
-                }
-
-                $saturdayStdDev = ($weekDivider >= 2 && $weekDivider <= 75) ? sqrt($saturdayVariance) / $this->getCzynnikC4($weekDivider) : sqrt($saturdayVariance);  //saturday standard deviation
+                $weightedVarianceSaturday = ($varianceNumeratorSat / $denominatorSat) - pow($weightAverageSaturday, 2);
+                $stdDevSaturday = ($weekDivider >= 2 && $weekDivider <= 75) ? sqrt($weightedVarianceSaturday) / $this->getCzynnikC4($weekDivider) : sqrt($weightedVarianceSaturday); // ważone odchylenie standardowe.
             }
+            $coefficientOfVariationSaturday = $weightAverageSaturday != 0 ? (100 * $stdDevSaturday / $weightAverageSaturday) / 100 : 0; // procent średniej jakim jest odchylenie standardowe
 
-            $departmentAverages->offsetSet('saturday',floor($saturdayAvg));
+            $departmentAverages->offsetSet('saturday',floor($weightAverageSaturday));
+            $departmentAverages->offsetSet('saturdayScoresArr', $saturdayScoresArr);
+            $departmentAverages->offsetSet('saturdayStdDev', $stdDevSaturday);
+            $departmentAverages->offsetSet('saturdayCoefficient', round($coefficientOfVariationSaturday, 3));
 
-            $percentOfAvgSaturday = (100 * $saturdayStdDev / $saturdayAvg) / 100; // procent średniej jakim jest odchylenie standardowe
-
-            if($percentOfAvgSaturday < 0.5) {
-                $departmentAverages->offsetSet('saturdayMin', floor($saturdayAvg - ($saturdayStdDev)));
-                $departmentAverages->offsetSet('saturdayMax', floor($saturdayAvg + ($saturdayStdDev)));
+            if($coefficientOfVariationSaturday < 0.5) {
+                //obszar zmienności [x - sigma; x + sigma]
+                $departmentAverages->offsetSet('saturdayMin', floor($weightAverageSaturday - ($stdDevSaturday)));
+                $departmentAverages->offsetSet('saturdayMax', floor($weightAverageSaturday + ($stdDevSaturday)));
             }
-            else if($percentOfAvgSaturday >= 0.5) {
-                $departmentAverages->offsetSet('saturdayMin', floor($saturdayAvg - (0.8 * $saturdayStdDev)));
-                $departmentAverages->offsetSet('saturdayMax', floor($saturdayAvg + (0.8 * $saturdayStdDev)));
+            else if($coefficientOfVariationSaturday >= 0.5) {
+                //obszar zmienności [x - 0.8*sigma; x + 0.8*sigma]
+                $departmentAverages->offsetSet('saturdayMin', floor($weightAverageSaturday - (0.8 * $stdDevSaturday)));
+                $departmentAverages->offsetSet('saturdayMax', floor($weightAverageSaturday + (0.8 * $stdDevSaturday)));
             }
-            $departmentAverages->offsetSet('$saturdayScoresArr', $saturdayScoresArr);
 
             //**********
-            $sundayVariance = 0;
-            $sundayAvg = 0;
-            $sundayStdDev = 0;
+
+            $weightAverageSunday = 0;
+            $stdDevSunday = 0;
 
             if($sundayDivider != 0){
-                $sundayAvg = $sundaySum / $sundayDivider;
+                $averageNumeratorSun = 0;
+                $varianceNumeratorSun = 0;
+                $denominatorSun = 0;
 
-                $sumOfSquaresOfDifferences = 0; // numerator of variance
-                foreach($sundayScoresArr as $score) { //this part counts stdDev numerator(licznik)
-                    $sumOfSquaresOfDifferences += pow(($score - $sundayAvg),2);
+                foreach($sundayScoresArr as $iterator => $value) {
+                    $denominatorSun += $iterator + 1; //ponieważ zaczynamy od 0
+                    $averageNumeratorSun += ($iterator + 1) * $value;
+                    $varianceNumeratorSun += pow($value, 2) * ($iterator + 1);
                 }
 
-                if($sundayDivider >= 2) {
-                    $sundayVariance = $sumOfSquaresOfDifferences / ($sundayDivider - 1);
-                }
-                else {
-                    $sundayVariance = $sumOfSquaresOfDifferences / ($sundayDivider);
-                }
+                $weightAverageSunday = $denominatorSun == 0 ? 0 : $averageNumeratorSun / $denominatorSun;
+                $weightedVarianceSunday = ($varianceNumeratorSun / $denominatorSun) - pow($weightAverageSunday, 2);
 
-                $sundayStdDev = ($sundayVariance >= 2 && $sundayVariance <= 75) ? sqrt($sundayVariance) / $this->getCzynnikC4($sundayDivider) : sqrt($sundayVariance);  //saturday standard deviation
+                $sundayStdDev = ($sundayDivider >= 2 && $sundayDivider <= 75) ? sqrt($weightedVarianceSunday) / $this->getCzynnikC4($sundayDivider) : sqrt($weightedVarianceSunday);  //saturday standard deviation
             }else{
-                $sundayAvg = $average*$factors['sunday']/100;
+                $weightAverageSunday = $weightAverageWeek*$factors['sunday']/100;
 
-                $sumOfSquaresOfDifferences = 0; // numerator of variance
+                $averageNumeratorSun = 0;
+                $varianceNumeratorSun = 0;
+                $denominatorSun = 0;
 
-                //Estimation of variance with use of sunday factor to each data item.
-                foreach($weekScoresArr as $score) { //this part counts stdDev numerator(licznik)
-                    $sumOfSquaresOfDifferences += pow((($score * ($factors['sunday'] / 100)) - $sundayAvg), 2);
+                foreach($weekScoresArr as $iterator => $value) {
+                    $denominatorSun += $iterator + 1; //ponieważ zaczynamy od 0
+                    $averageNumeratorSun += ($iterator + 1) * $value * ($factors['sunday']/100);
+                    $varianceNumeratorSun += pow($value * ($factors['sunday']/100), 2) * ($iterator + 1);
                 }
 
-                if($weekDivider >= 2) {
-                    $sundayVariance = $sumOfSquaresOfDifferences / ($weekDivider - 1);
-                }
-                else {
-                    $sundayVariance = $sumOfSquaresOfDifferences / ($weekDivider);
-                }
-
-                $sundayStdDev = ($weekDivider >= 2 && $weekDivider <= 75) ? sqrt($sundayVariance) / $this->getCzynnikC4($weekDivider) : sqrt($sundayVariance);  //saturday standard deviation
+                $weightedVarianceSunday = ($varianceNumeratorSun / $denominatorSun) - pow($weightAverageSunday, 2);
+                $sundayStdDev = ($weekDivider >= 2 && $weekDivider <= 75) ? sqrt($weightedVarianceSunday) / $this->getCzynnikC4($weekDivider) : sqrt($weightedVarianceSunday);  //saturday standard deviation
             }
+            $sundayCoefficient = (100 * $sundayStdDev / $weightAverageSunday) / 100; // procent średniej jakim jest odchylenie standardowe
 
-            $departmentAverages->offsetSet('sunday',floor($sundayAvg));
+            $departmentAverages->offsetSet('sunday',floor($weightAverageSunday));
+            $departmentAverages->offsetSet('sundayScoresArr', $sundayScoresArr);
+            $departmentAverages->offsetSet('sundayStdDev', $sundayStdDev);
+            $departmentAverages->offsetSet('sundayCoefficient', round($sundayCoefficient, 3));
 
-            $percentOfAvgSunday = (100 * $sundayStdDev / $sundayAvg) / 100; // procent średniej jakim jest odchylenie standardowe
-
-            if($percentOfAvgSunday < 0.5) {
-                $departmentAverages->offsetSet('sundayMin', floor($sundayAvg - ($sundayStdDev)));
-                $departmentAverages->offsetSet('sundayMax', floor($sundayAvg + ($sundayStdDev)));
+            if($sundayCoefficient < 0.5) {
+                $departmentAverages->offsetSet('sundayMin', floor($weightAverageSunday - ($sundayStdDev)));
+                $departmentAverages->offsetSet('sundayMax', floor($weightAverageSunday + ($sundayStdDev)));
             }
-            else if($percentOfAvgSunday >= 0.5) {
-                $departmentAverages->offsetSet('sundayMin', floor($sundayAvg - (0.8 * $sundayStdDev)));
-                $departmentAverages->offsetSet('sundayMax', floor($sundayAvg + (0.8 * $sundayStdDev)));
+            else if($sundayCoefficient >= 0.5) {
+                $departmentAverages->offsetSet('sundayMin', floor($weightAverageSunday - (0.8 * $sundayStdDev)));
+                $departmentAverages->offsetSet('sundayMax', floor($weightAverageSunday + (0.8 * $sundayStdDev)));
             }
-            $departmentAverages->offsetSet('$sundayScoresArr', $sundayScoresArr);
-
             $departmentsInvitationsAveragesInfo->offsetSet($item->name2, $departmentAverages);
         }
         return $departmentsInvitationsAveragesInfo;

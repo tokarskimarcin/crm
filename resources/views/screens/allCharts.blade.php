@@ -25,6 +25,9 @@
 
     .chart {
         height: 100vh;
+        font-size: xx-large;
+        color: grey;
+        text-align: center;
     }
 </style>
 <body>
@@ -42,17 +45,25 @@
     let departmentsAveragesForEveryHourChartsData = prepareDataForCharts(departmentsAveragesForEveryHour);
 
     for( let i = 0; i < departmentsAveragesForEveryHour.length; i++){
-        let newDepChartDiv = $(document.createElement('div')).attr('id', 'dep_'+i).addClass('chart');
-        $('#my_charts').append(newDepChartDiv);
+        if(departmentsAveragesForEveryHour[i].dep_info_id != -1){
+            let newDepChartDiv = $(document.createElement('div')).attr('id', 'dep_'+i).addClass('chart');
+            $('#my_charts').append(newDepChartDiv);
+        }
     }
 
     google.charts.load('current', {'packages':['corechart']});
     google.charts.setOnLoadCallback(function (){
         for( let i = 0; i < departmentsAveragesForEveryHour.length; i++){
             let id = departmentsAveragesForEveryHour[i].dep_info_id;
-            if(departmentsAveragesForEveryHourChartsData[id] !== undefined){
-                var data = google.visualization.arrayToDataTable(departmentsAveragesForEveryHourChartsData[id]);
-                drawChart(data, id, 'dep_'+i);
+            if(id !== -1){ //id of all deps averages data
+                if(departmentsAveragesForEveryHourChartsData[id] !== undefined){
+                    if(departmentsAveragesForEveryHourChartsData[id].length>1) {
+                        var data = google.visualization.arrayToDataTable(departmentsAveragesForEveryHourChartsData[id]);
+                        drawChart(data, id, 'dep_'+i);
+                    }else{
+                        $('#dep_'+i).text(departmentsAveragesForEveryHour[i].departmentName+' Brak danych');
+                    }
+                }
             }
         }
         deferred.resolve('Charts loaded');
@@ -111,10 +122,11 @@
             processData: false,
             data: formData,
             success: function (response) {
-                if(response === 'success' ){
-                    console.log('Screenshot uploaded');
-                }else if(response === 'fail'){
+                if(response === 'fail'){
                     console.log('Failed to upload screenshot');
+                }else{
+                    console.log('Screenshot uploaded');
+                    console.log(response);
                 }
             },
             error: function (jqXHR, textStatus, thrownError) {
