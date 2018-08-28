@@ -46,7 +46,9 @@
             padding-bottom: 1em;
             margin: 1em;
         }
-
+        .selectedRowDayOfResultsSimulation{
+            background: #ff7878 !important;
+        }
         .selectedRowDay{
             background: #bcb7ff !important;
         }
@@ -152,10 +154,10 @@
                                         </select>
                                     </div>
                                 </div>
-                                <div class="simulationTypes"  style="margin-top:1em; display:none">
+                                <div class="row simulationTypes"  style="margin-top:1em; display:none">
                                     <div class="col-md-12">
                                         <label for="simulationType">Rodzaj symulacji</label>
-                                        <select id="simulationType" class="form-control">
+                                        <select id="simulationType" class="selectpicker form-control">
                                             <option value="1">Najbardziej prawdopodobna</option>
                                             <option value="2">W pesymistycznym przypadku</option>
                                             <option value="3">W optymistycznym przypadku</option>
@@ -397,6 +399,7 @@
 
             let factorsChanged = false;
             let selectedRowDays = [];
+            let selectedRowDaysOfResultsSimulation = [];
             //Pass only number
             $onyNumber = (function() {
                 this.value = this.value.replace(/[^0-9]/g, '');
@@ -1072,7 +1075,6 @@
                             }
                         },
                         success: function (response) {
-                            console.log(response);
                             obj.data.aheadPlaning = response.aheadPlanningData;
                             obj.data.departmentsInvitationsAverages = response.departmentsInvitationsAveragesData;
                             deferred.resolve(obj.data.aheadPlaning);
@@ -1224,7 +1226,9 @@
             $('#simulation').change(function (e){
                 //clear selected days
                 selectedRowDays = [];
-                colorSelectedRowDays();
+                selectedRowDaysOfResultsSimulation = [];
+                colorSelectedRowDays('selectedRowDay');
+                colorSelectedRowDays('selectedRowDayOfResultsSimulation');
                 let typeSelect = $('#simulationType');
                 if($(this).val() == 0) {
                     typeSelect.prop('disabled', false);
@@ -1275,6 +1279,10 @@
                 if(simulations[simulationIndex]){
                     if(simulations[simulationIndex].validate()){
                         let height = $(window).scrollTop();
+                        selectedRowDaysOfResultsSimulation = [];
+                        $.each(selectedRowDays, function (index,item) {
+                            selectedRowDaysOfResultsSimulation.push(item);
+                        });
                         simulations[simulationIndex].simulate();
                         if(simulations[simulationIndex].isChangingAheadPlanningData){
                             $('#removeSimulationButton').show();
@@ -1289,6 +1297,7 @@
             $('#removeSimulationButton').click(function (e) {
                 let height = $(window).scrollTop();
                 selectedRowDays = [];
+                selectedRowDaysOfResultsSimulation = [];
                 aheadPlaningTable.setTableData(aheadPlanningData.data.aheadPlaning);
                 $(e.target).hide();
                 $(window).scrollTop(height);
@@ -1386,12 +1395,10 @@
                     }
                 }
 
-                colorSelectedRowDays();
-
+                colorSelectedRowDays('selectedRowDay');
             }
 
-            function colorSelectedRowDays() {
-                let colorClassSelectedRowDay = 'selectedRowDay';
+            function colorSelectedRowDays(colorClassSelectedRowDay) {
                 $('.'+colorClassSelectedRowDay).removeClass(colorClassSelectedRowDay);
                 let tableTr = $('.DTFC_LeftBodyWrapper .table.dataTable tbody').children();
                 $.each(selectedRowDays, function (index, item) {
@@ -1471,7 +1478,6 @@
             //This function returns type of simulation
             function getSelectedType() {
                 let simulationTypeSelect = document.querySelector('#simulationType');
-                console.log(simulationTypeSelect);
                 return simulationTypeSelect.options[simulationTypeSelect.selectedIndex].value;
             }
 
@@ -1481,9 +1487,7 @@
                 ['factorsSection', 'simulationTypes'], //sections to show
                 true, // flag that identify is ahead planning data after simulation are changed
                 /* ---------------- simulation function ----------------------- */
-                function (thisObj){
-                    console.log(thisObj);
-                    let selectedDay = getSelectedDay(selectedRowDays[0]);
+                function (thisObj){                    let selectedDay = getSelectedDay(selectedRowDays[0]);
                     let selectedType = getSelectedType();
                     let daysBetweenSelectedAndActualDay = Math.abs(Math.round(moment.duration(moment(new Date(selectedDay)).diff(moment(new Date(today)))).asDays()));
                     let workingHoursLeft = Math.abs(Math.round(moment.duration((moment().diff(moment().hour(16).minute(0)))).asHours()));
@@ -1499,7 +1503,8 @@
                     }
 
                     aheadPlaningTable.setTableData(simulatedData);
-                    colorSelectedRowDays();
+                    colorSelectedRowDays('selectedRowDayOfResultsSimulation');
+                    colorSelectedRowDays('selectedRowDay');
 
                     function prepareSimulationData() {
                         $.each(departmentInfo,function (index, department) {
@@ -1778,20 +1783,66 @@
             }
 
             function createSimulationAveragesTable() {
+                console.log(aheadPlanningData.data.departmentsInvitationsAverages);
+                let tHeadTrFirst = $(document.createElement('tr'));
+                tHeadTrFirst.append($(document.createElement('th')).text(''));
+                tHeadTrFirst.append($(document.createElement('th')).attr('colspan',2).css('text-align','center').text('Faktyczne'));
+                tHeadTrFirst.append($(document.createElement('th')).attr('colspan',2).css('text-align','center').text('Zasymulowane'));
+
                 let tHeadTr = $(document.createElement('tr'));
                 tHeadTr.append($(document.createElement('th')).text('Oddział'));
-                tHeadTr.append($(document.createElement('th')).text('Pn-Pt'));
-                tHeadTr.append($(document.createElement('th')).text('Sobota'));
-                let tHead = $(document.createElement('thead')).append(tHeadTr);
+                tHeadTr.append($(document.createElement('th')).css('text-align','center').text('Pn-Pt'));
+                tHeadTr.append($(document.createElement('th')).css('text-align','center').text('Sobota'));
+                tHeadTr.append($(document.createElement('th')).css('text-align','center').text('Pn-Pt'));
+                tHeadTr.append($(document.createElement('th')).css('text-align','center').text('Sobota'));
+                let tHead = $(document.createElement('thead')).append(tHeadTrFirst).append(tHeadTr);
 
                 let tBody = $(document.createElement('tbody'));
+                let sums = {
+                    workingDays: 0,
+                    saturdays: 0,
+                    simulatedWorkingDays: 0,
+                    simulatedSaturdays: 0
+                };
                 $.each(aheadPlanningData.data.departmentsInvitationsAverages,function (department, departmentsInvitationsAverage) {
+                    sums.workingDays += departmentsInvitationsAverage.workingDays;
+                    sums.saturdays += departmentsInvitationsAverage.saturday;
+                    sums.simulatedWorkingDays += departmentsInvitationsAverage.simulated.workingDays;
+                    sums.simulatedSaturdays += departmentsInvitationsAverage.simulated.saturday;
+
                     let tr = $(document.createElement('tr'));
                     tr.append($(document.createElement('td')).append(department));
-                    tr.append($(document.createElement('td')).append(departmentsInvitationsAverage.simulated.workingDays));
-                    tr.append($(document.createElement('td')).append(departmentsInvitationsAverage.simulated.saturday));
+                    tr.append($(document.createElement('td')).append(departmentsInvitationsAverage.workingDays));
+                    tr.append($(document.createElement('td')).append(departmentsInvitationsAverage.saturday));
+                    let difference = departmentsInvitationsAverage.workingDays-departmentsInvitationsAverage.simulated.workingDays;
+                    let spanWorkingDays = $(document.createElement('span')).text(difference);
+                    if(difference > 0){
+                        spanWorkingDays.css('color','#00b400');
+                    }else if(difference < 0 ){
+                        spanWorkingDays.css('color','#b40000');
+                    }
+
+                    difference = departmentsInvitationsAverage.saturday-departmentsInvitationsAverage.simulated.saturday;
+                    let spanSaturday = $(document.createElement('span')).text(difference);
+                    if(difference > 0){
+                        spanSaturday.css('color','#00b400');
+                    }else if(difference < 0 ){
+                        spanSaturday.css('color','#b40000');
+                    }
+                    tr.append($(document.createElement('td')).append(departmentsInvitationsAverage.simulated.workingDays).append(' (').append(spanWorkingDays).append(')'));
+                    tr.append($(document.createElement('td')).append(departmentsInvitationsAverage.simulated.saturday).append(' (').append(spanSaturday).append(')'));
                     tBody.append(tr);
                 });
+
+                /* -------------------- row with sums of every column ------------------------- */
+                let tr = $(document.createElement('tr')).css({'font-weight': 'bold', 'background': '#cdcdcd'});
+                tr.append($(document.createElement('td')).append('Suma'));
+                tr.append($(document.createElement('td')).append(sums.workingDays));
+                tr.append($(document.createElement('td')).append(sums.saturdays));
+                tr.append($(document.createElement('td')).append(sums.simulatedWorkingDays));
+                tr.append($(document.createElement('td')).append(sums.simulatedSaturdays));
+                tBody.append(tr);
+                /* -------------------- end of row with sums of every column ------------------------- */
 
                 let simulationAveragesTable = $(document.createElement('table')).addClass('table table-striped').css('width','100%').prop('id','workFreeDaysTable');
                 simulationAveragesTable.append(tHead).append(tBody);
