@@ -250,6 +250,7 @@
             * This method sets given value in given list
             */
            function setOldValues(selectElement, givenValue) {
+               console.assert(selectElement.tagName == 'SELECT', 'selectElement in setOldValues is not SELECT element');
                let elementExistInList = false;
 
                for(let i = 0, max = selectElement.length; i < max; i++) {
@@ -797,7 +798,6 @@
                $('#departments').select2();
                $('#typ').select2();
            })();
-
 
        });
     </script>
