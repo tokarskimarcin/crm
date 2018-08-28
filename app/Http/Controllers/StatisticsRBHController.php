@@ -160,14 +160,20 @@ class StatisticsRBHController extends Controller
     public function WeekReportPlanningRBHMail(){
         $SactualYear = date('Y');
         $SactualWeekNumber = date('W');
+        $objectOfSumColumns = Schedule::prepereObjectSumColumn();
         $CsheduleInfo = Schedule::getUsersRBHSchedule($SactualWeekNumber,$SactualYear);
-        $CsheduleInfo = Schedule::groupUsersRBHbyDepartments($CsheduleInfo);
+        $CsheduleInfo = Schedule::groupUsersRBHbyDepartments($CsheduleInfo,$objectOfSumColumns);
+        $objectOfSumColumns = Schedule::changeSecondsToHourArray($objectOfSumColumns);
         $CsheduleInfo = Schedule::addMissingDepartmentToCollect($CsheduleInfo)->sortBy('department_info_id');
         $SfirstDate   =  date("Y-m-d", strtotime('monday this week'));
         $SlastDate    = date("Y-m-d", strtotime('sunday this week'));
         $title = 'Tygodniowy Raport (Planowanie) ' . $SfirstDate.' '.$SlastDate;
         $data = [
-          'CsheduleInfo' => $CsheduleInfo, 'SfirstDate' => $SfirstDate, 'SlastDate' => $SlastDate,
+                'CsheduleInfo' => $CsheduleInfo,
+                'SfirstDate' => $SfirstDate,
+                'SactualWeekNumber' => $SactualWeekNumber,
+                'columnSum' => $objectOfSumColumns,
+                'SlastDate' => $SlastDate,
         ];
         $preperMail = new VeronaMail('statisticsRBHMail.weekReportPlanningRBH',$data,$title);
         if($preperMail->sendMail()){
