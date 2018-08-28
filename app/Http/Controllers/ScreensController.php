@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\UploadedFiles;
 use App\VeronaMail;
 use Illuminate\Http\Request;
 use App\Department_info;
@@ -159,14 +160,29 @@ class ScreensController extends Controller
 
             // get uploaded file's extension`
             $ext = $this->getExtensionFromMimeType($file->getMimeType());
-
+            $deleteResult = null;
+            $uploadResult = null;
             if(in_array($ext, ['png','jpeg'])){
                 if (!in_array('public/'.$chartScreenshotsPath, Storage::allDirectories())) {
                     Storage::makeDirectory('public/'.$chartScreenshotsPath);
                 }
-                Storage::delete('public/'.$chartScreenshotsPath.'/'.$fileName.'.'.$ext);
-                $file->storeAs('public/'.$chartScreenshotsPath, $fileName.'.'.$ext);
-                return 'success';
+                $allChartsImageFile = UploadedFiles::where('file_name','=',$fileName)->first();
+                $name = $fileName.rand(1,1000).'.'.$ext;
+                $newPath = $chartScreenshotsPath.'/'.$name;
+                if(empty($allChartsImageFile)){
+                    $allChartsImageFile = new UploadedFiles();
+                    $allChartsImageFile->file_name = $fileName;
+                }else{
+                    while($newPath == $allChartsImageFile->path){
+                        $name = $fileName.rand(1,10000).'.'.$ext;
+                        $newPath = $chartScreenshotsPath.'/'.$name;
+                    }
+                    $deleteResult = Storage::delete('public/'.$allChartsImageFile->path);
+                }
+                $allChartsImageFile->path = $newPath;
+                $allChartsImageFile->save();
+                $uploadResult = $file->storeAs('public/'.$chartScreenshotsPath, $name);
+                return ['deletePrevImageResult' => $deleteResult, 'uploadResult' => $uploadResult, 'fileRecord' => $allChartsImageFile];
             }else{
                 return 'fail';
             }
@@ -186,16 +202,24 @@ class ScreensController extends Controller
     }
 
     public function sendAllChartsMail(){
-
-        $title = 'Godzinowy wykres Telemarketingu';
-        $data = ['fileURL' => Storage::url("allChartsImage_files/allChartsImage.png")];
-        $preperMail = new VeronaMail('allCharts',$data,$title);
-        if($preperMail->sendMail()){
-            return 'Mail wysłano';
+        $fileName = 'allChartsImage';
+        $allChartsImageFile = UploadedFiles::where('file_name','=',$fileName)->first();
+        if(!empty($allChartsImageFile)) {
+            if(Storage::exists($allChartsImageFile->path)){
+                $title = 'Godzinowy wykres Telemarketingu';
+                $data = ['fileURL' => Storage::url($allChartsImageFile->path)];
+                $prepareMail = new VeronaMail('allCharts', $data, $title);
+                if ($prepareMail->sendMail()) {
+                    return 'Mail wysłano';
+                } else {
+                    return 'Błąd podczas wysyłania maila';
+                }
+            }else{
+                return 'Plik nie istnieje na serwerze';
+            }
         }else{
-            return 'Błąd podczas wysyłania maila';
+            return 'Nie ma rekordu ze ścieżką do pliku w bazie danych';
         }
-
 //        Mail::send('mail/allCharts',['fileURL' => Storage::url("allChartsImage_files/allChartsImage.png")],function ($message){
 //            //$message->from('noreply.verona@gmail.com', 'Verona Consulting');
 //            $message->to('tokarski.verona@gmail.com','Marcin Tokarski')->subject('Statystki oddziałów');
