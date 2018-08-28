@@ -161,6 +161,7 @@
                                             <option value="1">Najbardziej prawdopodobna</option>
                                             <option value="2">W pesymistycznym przypadku</option>
                                             <option value="3">W optymistycznym przypadku</option>
+                                            <option value="4">Zbiorcze wyniki symulacji</option>
                                         </select>
                                     </div>
                                 </div>
@@ -936,7 +937,7 @@
                     simulationEditLimitArray.push(new SimulationChangeLimitForClient(arrayOfClinet,dateStartSimulation,dateStopSimulation,arrayOfLimit,onlyFirstLimit,saveStatus,arrayOfIncreaseLimit));
                     if(arrayOfClinet.length == 0){
                         valide = false;
-                        swal("Wybierz klienta do zmiany limitów")
+                        swal("Wybierz klienta do zmiany limitów");
                         return false;
                     }
                     if(dateStartSimulation > dateStopSimulation){
@@ -1164,7 +1165,9 @@
                         {"data": "day", orderable: false},
                             @foreach($departmentInfo as $item)
                         {
-                            "data": `{{$item->name2}}`, "searchable": false, orderable: false
+                            "data":function (data, type, dataToSet) {
+                                return data['{{$item->name2}}'];
+                            }, "searchable": false, orderable: false
                         },
                             @endforeach
                         {
@@ -1229,14 +1232,6 @@
                 selectedRowDaysOfResultsSimulation = [];
                 colorSelectedRowDays('selectedRowDay');
                 colorSelectedRowDays('selectedRowDayOfResultsSimulation');
-                let typeSelect = $('#simulationType');
-                if($(this).val() == 0) {
-                    typeSelect.prop('disabled', false);
-                }
-                else {
-                    typeSelect.val(1);
-                    typeSelect.prop('disabled', true);
-                }
 
                 if($('#removeSimulationButton').is(':visible'))
                     $('#removeSimulationButton').click();
@@ -1487,13 +1482,15 @@
                 ['factorsSection', 'simulationTypes'], //sections to show
                 true, // flag that identify is ahead planning data after simulation are changed
                 /* ---------------- simulation function ----------------------- */
-                function (thisObj){                    let selectedDay = getSelectedDay(selectedRowDays[0]);
-                    let selectedType = getSelectedType();
+                function (thisObj){
+                    let selectedDay = getSelectedDay(selectedRowDays[0]);
+                    let selectedType = parseInt(getSelectedType());
                     let daysBetweenSelectedAndActualDay = Math.abs(Math.round(moment.duration(moment(new Date(selectedDay)).diff(moment(new Date(today)))).asDays()));
                     let workingHoursLeft = Math.abs(Math.round(moment.duration((moment().diff(moment().hour(16).minute(0)))).asHours()));
                     let simulatedData = null;
 
                     prepareSimulationData();
+                    console.log(departmentInfo);
                     if(factorsChanged){
                         aheadPlanningData.getData($('#date_start').val(),$("#date_stop").val()).done(function () {
                             simulatedData = simulation();
@@ -1535,64 +1532,72 @@
                         //counting simulated result for every department
                         $.each(departmentInfo,function (index, department) {
                             department.simulatedResult = 0;
+                            department.simulatedPessimisticResult = 0;
+                            department.simulatedOptimisticResult = 0;
 
-                            if(selectedType == 1) {
+                            if(selectedType == 1 || selectedType == 4) {
                                 department.simulatedResult += department.multiplier.workingDays*aheadPlanningData.data.departmentsInvitationsAverages[department.name2].workingDays;
                                 department.simulatedResult += department.multiplier.saturdays*aheadPlanningData.data.departmentsInvitationsAverages[department.name2].saturday;
                                 department.simulatedResult += department.multiplier.sundays*aheadPlanningData.data.departmentsInvitationsAverages[department.name2].sunday;
                             }
-                            else if(selectedType == 2) {
-                                department.simulatedResult += department.multiplier.workingDays*aheadPlanningData.data.departmentsInvitationsAverages[department.name2].workingDaysMin;
-                                department.simulatedResult += department.multiplier.saturdays*aheadPlanningData.data.departmentsInvitationsAverages[department.name2].saturdayMin;
-                                department.simulatedResult += department.multiplier.sundays*aheadPlanningData.data.departmentsInvitationsAverages[department.name2].sundayMin;
+                            if(selectedType == 2 || selectedType == 4) {
+                                department.simulatedPessimisticResult += department.multiplier.workingDays*aheadPlanningData.data.departmentsInvitationsAverages[department.name2].workingDaysMin;
+                                department.simulatedPessimisticResult += department.multiplier.saturdays*aheadPlanningData.data.departmentsInvitationsAverages[department.name2].saturdayMin;
+                                department.simulatedPessimisticResult += department.multiplier.sundays*aheadPlanningData.data.departmentsInvitationsAverages[department.name2].sundayMin;
                             }
-                            else if(selectedType == 3) {
-                                department.simulatedResult += department.multiplier.workingDays*aheadPlanningData.data.departmentsInvitationsAverages[department.name2].workingDaysMax;
-                                department.simulatedResult += department.multiplier.saturdays*aheadPlanningData.data.departmentsInvitationsAverages[department.name2].saturdayMax;
-                                department.simulatedResult += department.multiplier.sundays*aheadPlanningData.data.departmentsInvitationsAverages[department.name2].sundayMax;
+                            if(selectedType == 3 || selectedType == 4) {
+                                department.simulatedOptimisticResult += department.multiplier.workingDays*aheadPlanningData.data.departmentsInvitationsAverages[department.name2].workingDaysMax;
+                                department.simulatedOptimisticResult += department.multiplier.saturdays*aheadPlanningData.data.departmentsInvitationsAverages[department.name2].saturdayMax;
+                                department.simulatedOptimisticResult += department.multiplier.sundays*aheadPlanningData.data.departmentsInvitationsAverages[department.name2].sundayMax;
                             }
 
                             let thisDayOfWeek = moment().format('E');
                             let thisDayMultiplier = workingHoursLeft/8;
                             let thisDaySimulatedResult = 0;
+                            let thisDaySimulatedPessimisticResult = 0;
+                            let thisDaySimulatedOptimisticResult = 0;
 
                             // console.log('aheadPlanningData.data.departmentsInvitationsAverages[department.name2].workingDays', aheadPlanningData.data.departmentsInvitationsAverages[department.name2].workingDays);
 
                             if(thisDayOfWeek < 6){
-                                if(selectedType == 1) {
+                                if(selectedType == 1 || selectedType == 4) {
                                     thisDaySimulatedResult = aheadPlanningData.data.departmentsInvitationsAverages[department.name2].workingDays*thisDayMultiplier;
                                 }
-                                else if(selectedType == 2) {
-                                    thisDaySimulatedResult = aheadPlanningData.data.departmentsInvitationsAverages[department.name2].workingDaysMin*thisDayMultiplier;
+                                if(selectedType == 2 || selectedType == 4) {
+                                    thisDaySimulatedPessimisticResult = aheadPlanningData.data.departmentsInvitationsAverages[department.name2].workingDaysMin*thisDayMultiplier;
                                 }
-                                else if(selectedType == 3) {
-                                    thisDaySimulatedResult = aheadPlanningData.data.departmentsInvitationsAverages[department.name2].workingDaysMax*thisDayMultiplier;
+                                if(selectedType == 3 || selectedType == 4) {
+                                    thisDaySimulatedOptimisticResult = aheadPlanningData.data.departmentsInvitationsAverages[department.name2].workingDaysMax*thisDayMultiplier;
                                 }
                             }else if(thisDayOfWeek == 6){
-                                if(selectedType == 1) {
+                                if(selectedType == 1 || selectedType == 4) {
                                     thisDaySimulatedResult = aheadPlanningData.data.departmentsInvitationsAverages[department.name2].saturday*thisDayMultiplier;
                                 }
-                                else if(selectedType == 2) {
-                                    thisDaySimulatedResult = aheadPlanningData.data.departmentsInvitationsAverages[department.name2].saturdayMin*thisDayMultiplier;
+                                if(selectedType == 2 || selectedType == 4) {
+                                    thisDaySimulatedPessimisticResult = aheadPlanningData.data.departmentsInvitationsAverages[department.name2].saturdayMin*thisDayMultiplier;
                                 }
-                                else if(selectedType == 3) {
-                                    thisDaySimulatedResult = aheadPlanningData.data.departmentsInvitationsAverages[department.name2].saturdayMax*thisDayMultiplier;
+                                if(selectedType == 3 || selectedType == 4) {
+                                    thisDaySimulatedOptimisticResult = aheadPlanningData.data.departmentsInvitationsAverages[department.name2].saturdayMax*thisDayMultiplier;
                                 }
-                                // thisDaySimulatedResult = aheadPlanningData.data.departmentsInvitationsAverages[department.name2].saturday*thisDayMultiplier;
                             }else{
-                                if(selectedType == 1) {
+                                if(selectedType == 1 || selectedType == 4) {
                                     thisDaySimulatedResult = aheadPlanningData.data.departmentsInvitationsAverages[department.name2].sunday*thisDayMultiplier;
                                 }
-                                else if(selectedType == 2) {
-                                    thisDaySimulatedResult = aheadPlanningData.data.departmentsInvitationsAverages[department.name2].sundayMin*thisDayMultiplier;
+                                if(selectedType == 2 || selectedType == 4) {
+                                    thisDaySimulatedPessimisticResult = aheadPlanningData.data.departmentsInvitationsAverages[department.name2].sundayMin*thisDayMultiplier;
                                 }
-                                else if(selectedType == 3) {
-                                    thisDaySimulatedResult = aheadPlanningData.data.departmentsInvitationsAverages[department.name2].sundayMax*thisDayMultiplier;
+                                if(selectedType == 3 || selectedType == 4) {
+                                    thisDaySimulatedOptimisticResult = aheadPlanningData.data.departmentsInvitationsAverages[department.name2].sundayMax*thisDayMultiplier;
                                 }
-                                // thisDaySimulatedResult = aheadPlanningData.data.departmentsInvitationsAverages[department.name2].sunday*thisDayMultiplier;
                             }
                             department.simulatedResult += Math.round(thisDaySimulatedResult);
                             department.simulatedResult = Math.round(department.simulatedResult);
+
+                            department.simulatedPessimisticResult += Math.round(thisDaySimulatedPessimisticResult);
+                            department.simulatedPessimisticResult = Math.round(department.simulatedPessimisticResult);
+
+                            department.simulatedOptimisticResult += Math.round(thisDaySimulatedOptimisticResult);
+                            department.simulatedOptimisticResult = Math.round(department.simulatedOptimisticResult);
                         });
                     }
 
@@ -1602,6 +1607,7 @@
                             let depResultsSum = 0;
                             if(moment(new Date(dayInfo.day)) >= moment(new Date(today))){
                                 $.each(departmentInfo,function (index, department) {
+
                                     if(department.simulatedResult >0){
                                         dayInfo[department.name2] += department.simulatedResult;
                                         if(dayInfo[department.name2] > 0){
@@ -1612,6 +1618,7 @@
                                         }
                                     }
                                     depResultsSum += dayInfo[department.name2];
+
                                 });
                                 dayInfo.totalScore = depResultsSum;
                             }
