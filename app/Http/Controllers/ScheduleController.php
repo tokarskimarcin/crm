@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\ActivityRecorder;
 use App\Schedule;
+use App\ScheduleRelation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -72,11 +73,16 @@ class ScheduleController extends Controller
 
     public function datatableShowUserSchedule(Request $request)
     {
+        $setter = $request->userType;
         $number_week =  $request->session()->get('number_of_week');
         $year = $request->year;
         $request->session()->put('year', $year);
+
+        $getters = ScheduleRelation::where('setter_type_id', '=', $setter)->pluck('getter_type_id')->toArray();
+//        dd($getters);
+
         $query = DB::table('users')
-            ->leftjoin("schedule", function ($join) use ($number_week,$year) {
+            ->leftjoin("schedule", function ($join) use ($number_week,$year, $getters) {
                 $join->on("schedule.id_user", "=", "users.id")
                     ->where("schedule.week_num", "=", $number_week)
                     ->where("schedule.year", "=", $year);
@@ -88,9 +94,14 @@ class ScheduleController extends Controller
                 users.last_name as user_last_name,
                 users.private_phone as user_phone
                 '))
-            ->wherein('users.user_type_id',[1,2])
+//            ->wherein('users.user_type_id',[1,2])
             ->where('users.status_work', '=', 1)
-            ->where('users.department_info_id',Auth::user()->department_info_id);
+            ->whereIn('users.user_type_id', $getters);
+
+        if($setter == 4) { //trainers see only consultans from their department.
+            $query = $query->where('users.department_info_id',Auth::user()->department_info_id);
+        }
+
         return datatables($query)->make(true);
     }
 
