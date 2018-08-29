@@ -118,6 +118,7 @@ function getStartAndEndDate($week, $year) {
                                                     <th>Nazwisko</th>
                                                     <th>Telefon</th>
                                                     <th>Grafik</th>
+                                                    <th>Rola</th>
                                                 </tr>
                                                 </thead>
                                                 <tbody>
@@ -195,7 +196,7 @@ function getStartAndEndDate($week, $year) {
                     table+='<option>'+time.format("HH:mm")+'</option>';
                 }
                 table+='</select>';
-                table+='<span class="glyphicon glyphicon-arrow-down"></span>';
+                table+='<span class="glyphicon glyphicon-arrow-down" style="display: block; margin-top: 1em; margin-bottom: 1em;"></span>';
 
                 time = moment('07'+':'+'45','HH:mm');
                 table+='<select name='+week_array[i]+'_stop_work class="form-control" style="font-size:12px; min-width: 90px">'+
@@ -220,13 +221,13 @@ function getStartAndEndDate($week, $year) {
                         table+= '<input type="text" name='+week_array[i]+'_reason class="form-control" placeholder="Powód">';
                 }
                 table+=
-                    '</div><p>';
+                    '</div>';
                 if(reason[i] != null)
-                    table+='<input type="checkbox" style="display: block" checked class="checkbox '+week_array[i]+'_reasonCheck">Wolne';
+                    table+='<input type="checkbox" style="display: inline-block; margin-right: 1em;" checked class="checkbox '+week_array[i]+'_reasonCheck"><label>Wolne</label>';
                 else
-                    table+='<input type="checkbox" style="display: block" class="checkbox '+week_array[i]+'_reasonCheck">Wolne';
+                    table+='<input type="checkbox" style="display: inline-block; margin-right: 1em;" class="checkbox '+week_array[i]+'_reasonCheck"><label>Wolne</label>';
 
-                    '</p></td>';
+                    '</td>';
                 time = moment('07'+':'+'45','HH:mm');
             }
         table+=
@@ -244,6 +245,9 @@ function getStartAndEndDate($week, $year) {
         year = year.split(".");
         var start_date = moment(year).add(week_number, 'weeks').startOf('week').format('DD MM YYYY');
         var stop_date =  moment(year).add(week_number, 'weeks').startOf('isoweek').format('DD MM YYYY');
+
+        let userTypes = @json($userTypes);
+        console.log(userTypes);
 
         table = $('#datatable').DataTable({
             "autoWidth": false,
@@ -280,6 +284,17 @@ function getStartAndEndDate($week, $year) {
                         else return 'Tak'
                     }, "name": "id"
                 },
+                {"data": function(data) {
+                    // console.log(data);
+                    let name = "Brak danych";
+                        userTypes.forEach(function(item) {
+                           if(item.id == data.user_type_id) {
+                               name = item.name;
+                           }
+                        });
+                        return name;
+                    }, "name": "rola"
+                }
             ],
             select: true
         });
