@@ -126,10 +126,14 @@ class NotificationController extends Controller
                 notifications.created_at,
                 departments.name as dep_name,
                 department_type.name as dep_name_type,
-                users.first_name,
-                users.last_name
+                data_start,
+                data_stop,
+                u.first_name,
+                u.last_name,
+                CONCAT(u1.first_name, " ", u1.last_name) as displayedBy
             '))
-            ->join('users', 'users.id', '=', 'notifications.user_id')
+            ->join('users as u', 'u.id', '=', 'notifications.user_id')
+            ->join('users as u1', 'u1.id', '=', 'notifications.displayed_by')
             ->join('department_info', 'department_info.id', '=', 'notifications.department_info_id')
             ->join('departments', 'departments.id', '=', 'department_info.id_dep')
             ->join('department_type', 'department_type.id', '=', 'department_info.id_dep_type')

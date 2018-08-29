@@ -43,7 +43,7 @@
                     <th style="width: 20%;">Data:</th>
                     <th style="width: 40%;">Tytuł:</th>
                     <th style="width: 20%;">Stan realizacji</th>
-                    <th style="width: 10%;">Szczegóły</th>
+                    <th style="width: 10%;">Akcja</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -190,7 +190,7 @@ let table2 = $('#datatable2').DataTable({
             }
         },
         {"data": function (data, type, dataToSet) {
-                return '<a class="btn btn-default" href="view_notification/'+data.id+'" >Szczegóły</a>';
+                return '<a class="btn btn-default" href="show_notification/'+data.id+'" >Pokaż</a>';
             },"orderable": false, "searchable": false },
     ]
 });

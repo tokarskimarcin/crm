@@ -5,6 +5,9 @@
     .table-striped tr td:first-child + td {
         word-break: break-all;
     }
+    a{
+        cursor: pointer;
+    }
 </style>
 
 <div class="row">
@@ -18,9 +21,9 @@
 <div class="row">
     <div class="col-md-12">
       <ul class="nav nav-tabs">
-        <li class="menu_item active" id="menu_new_notifications" data-type="1"><a href="#">Zgłoszone</a></li>
-        <li class="menu_item" id="menu_in_progress"><a href="#" data-type="2">Przyjęte do realizacji</a></li>
-        <li class="menu_item" id="menu_finished" data-type="3"><a href="#">Zakończone</a></li>
+        <li class="menu_item active" id="menu_new_notifications" data-type="1"><a >Zgłoszone</a></li>
+        <li class="menu_item" id="menu_in_progress"><a  data-type="2">Przyjęte do realizacji</a></li>
+        <li class="menu_item" id="menu_finished" data-type="3"><a >Zakończone</a></li>
       </ul>
         <br />
         <div class="col-md-12">
@@ -50,6 +53,8 @@
                       <td>Data dodania</td>
                       <td>Oddział</td>
                       <td>Użytkownik</td>
+                      <td>Data przyjęcia</td>
+                      <td>Os. przyjmująca</td>
                       <td>Akcja</td>
                   </tr>
               </thead>
@@ -67,6 +72,8 @@
                       <td>Data dodania</td>
                       <td>Oddział</td>
                       <td>Użytkownik</td>
+                      <td>Data realizacji</td>
+                      <td>Os. realizująca</td>
                       <td>Akcja</td>
                   </tr>
               </thead>
@@ -178,6 +185,8 @@ table = $('#in_progress').DataTable({
         {"data": function (data, type, dataToSet) {
               return data.first_name + " " + data.last_name;
         }, "name":  "last_name"},
+        {"data": 'data_start'},
+        {"data": 'displayedBy'},
         {"data": function (data, type, dataToSet) {
             return "<a class='btn btn-default' href={{URL::to('/show_notification/')}}/" + data.notification_id + ">Pokaż</a>";
         }, "name": "id_user"},
@@ -211,6 +220,8 @@ table = $('#finished').DataTable({
         {"data": function (data, type, dataToSet) {
               return data.first_name + " " + data.last_name;
         }, "name":  "last_name"},
+        {"data": 'data_stop'},
+        {"data": 'displayedBy'},
         {"data": function (data, type, dataToSet) {
             return "<a class='btn btn-default' href={{URL::to('/show_notification/')}}/" + data.notification_id + ">Pokaż</a>";
         }, "name": "id_user"},
