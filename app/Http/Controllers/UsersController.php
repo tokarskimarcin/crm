@@ -8,6 +8,7 @@ use App\CoachHistory;
 use App\Department_info;
 use App\DisableAccountInfo;
 use App\Pbx_report_extension;
+use App\SuccessorHistory;
 use Exception;
 use App\PrivilageRelation;
 use App\User;
@@ -134,9 +135,6 @@ class UsersController extends Controller
         if (isset($request->department_info) && isset($request->user_type)) {
             $redirect = 1;
             $user->user_type_id = $request->user_type;
-            if($user->user_type_id == 9){
-                $user->successorUserId = $request->successorUserId;
-            }
             $user->department_info_id = $request->department_info;
             $user->main_department_id = $request->department_info;
         } else {
@@ -170,8 +168,20 @@ class UsersController extends Controller
             Session::flash('message_error', "Problem podczas zapisywania użytkownika");
             return Redirect::back();
         }
-
-
+        if($user->user_type_id == 9){
+            $successorHistory = new SuccessorHistory();
+            $successorHistory->user_id = $user->id;
+            $successorHistory->status = 1;
+            $successorHistory->date_start = date('Y-m-d');
+            try{
+                $successorHistory->save();
+            }catch (Exception $exception){
+                dd($exception);
+                Session::flash('message_error', "Problem podczas zapisywania informacji o sukcesorze");
+                return Redirect::back();
+            }
+            $user->successorUserId = $request->successorUserId;
+        }
         $userEmployment->pbx_id = $request->login_phone;
         $userEmployment->pbx_id_add_date = $request->start_date;
         $userEmployment->pbx_id_remove_date = 0;
@@ -182,8 +192,6 @@ class UsersController extends Controller
             Session::flash('message_error', "Problem z dodaniem użytkownika");
             return Redirect::back();
         }
-
-
         $data = [
             'T' => 'Dodanie użytkownika',
             'id' =>  $user->id,
@@ -382,6 +390,7 @@ class UsersController extends Controller
         }
 
         $user = User::find($id);
+        $oldUserType = $user->user_type_id;
         $loggedUser = Auth::user();
         $userEmployment = UserEmploymentStatus::
         where('pbx_id', '=', $user->login_phone)
@@ -615,6 +624,47 @@ class UsersController extends Controller
         }else{
             $user->successorUserId = null;
         }
+
+        //Zmiana statusu z sukcesora na inny typ lub zwolnienie sukcesora zmiana statusu
+        if($oldUserType == 9 || $user->user_type_id == 9){
+            $save = false;
+            if(($oldUserType == 9 && $user->user_type_id != 9) || ($oldUserType == 9 && $user->status_work == 0)){
+                $successorHistory = SuccessorHistory::where('user_id',$user->id)
+                    ->where('status',1)->get()->first();
+                if(empty($successorHistory)){
+                    $successorHistory = new SuccessorHistory();
+                    $successorHistory->user_id = $user->id;
+                    $successorHistory->status  = 0;
+                    $successorHistory->date_start = date('Y-m-d');
+                    $successorHistory->date_stop = date('Y-m-d');
+                }else{
+                    $successorHistory->date_stop = date('Y-m-d');
+                    $successorHistory->status  = 0;
+                }
+                $save = true;
+            }else{
+                $successorHistory = SuccessorHistory::where('user_id',$user->id)
+                    ->where('status',1)->get();
+                if($successorHistory->isEmpty()){
+                    $successorHistory = new SuccessorHistory();
+                    $successorHistory->user_id = $user->id;
+                    $successorHistory->status  = 1;
+                    $successorHistory->date_start = date('Y-m-d');
+                    $save = true;
+                }
+            }
+            try{
+                if($save)
+                    $successorHistory->save();
+            }catch (Exception $exception){
+                dd($exception);
+                Session::flash('message_error', "Problem podczas zapisywania informacji o sukcesorze");
+                return Redirect::back();
+            }
+        }
+
+
+
         try{
             $user->save();
         }catch (Exception $exception){

@@ -175,7 +175,11 @@
                                                                                 $rbh = round($item2->sum/3600,2);
                                                                                 $janky_cost_per_price = 0;
                                                                                 $toAccount = ($item2->max_transaction == null) ? 0 : $item2->max_transaction;
-
+                                                                                $succesorSalary = 0;
+                                                                                if($item2->successorSalary > 0){
+                                                                                    $succesorSalary = $item2->successorSalary;
+                                                                                    $item2->last_name .= ' dodatek Sukcesora ('.$succesorSalary.' PLN)';
+                                                                                }
                                                                                 if($item2->success == 0)
                                                                                     $avg = 0;
                                                                                  else
@@ -268,7 +272,7 @@
                                                                                     $salary_total = $standart_salary+$bonus_salary - $janky_cost+$bonus_penalty;
                                                                                     $rbh_bonus = 0;
                                                                                 }
-
+                                                                                $salary_total += $succesorSalary;
                                                                                 if($salary_total <0)
                                                                                     $salary_total = 0;
                                                                                 $salary_total_all += $salary_total;
