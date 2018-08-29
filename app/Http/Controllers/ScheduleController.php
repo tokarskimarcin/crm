@@ -16,6 +16,7 @@ use App\Work_Hour;
 
 class ScheduleController extends Controller
 {
+
     public function setScheduleGet()
     {
         $userTypes = UserTypes::all();
@@ -23,25 +24,112 @@ class ScheduleController extends Controller
     }
     public function setSchedulePost(Request $request)
     {
-        $number_of_week = $request->show_schedule;
         $userTypes = UserTypes::all();
+        $number_of_week = $request->show_schedule;
         $request->session()->put('number_of_week', $number_of_week);
         $request->session()->put('year', $request->schedule_year);
         $schedule_analitics = $this->setWeekDays($number_of_week,$request);
         return view('schedule.setSchedule')
             ->with('number_of_week',$number_of_week)
-            ->with('userTypes', $userTypes)
-            ->with('schedule_analitics',$schedule_analitics);
+            ->with('schedule_analitics',$schedule_analitics)
+            ->with('userTypes', $userTypes);
     }
     public function viewScheduleGet()
     {
-
         return view('schedule.viewSchedule');
     }
     public function viewSchedulePost(Request $request)
     {
         if ($request->show_schedule == "Wybierz") {
             return view('schedule.viewSchedule');
+        }
+        $number_of_week = $request->show_schedule;
+        $year = $request->year;
+        $year = explode('.',$year);
+        $year = $year[0];
+        $query = DB::table('users')
+            ->leftjoin("schedule", function ($join) use ($number_of_week,$year) {
+                $join->on("schedule.id_user", "=", "users.id")
+                    ->where("schedule.week_num", "=", $number_of_week)
+                    ->orderBy('users.last_name')
+                    ->where("schedule.year", "=", $year);
+            })
+            ->select(DB::raw(
+                'schedule.*,
+                time_to_sec(`monday_stop`)-time_to_sec(`monday_start`) as sec_monday,
+                time_to_sec(`tuesday_stop`)-time_to_sec(`tuesday_start`) as sec_tuesday,
+                time_to_sec(`wednesday_stop`)-time_to_sec(`wednesday_start`) as sec_wednesday,
+                time_to_sec(`thursday_stop`)-time_to_sec(`thursday_start`) as sec_thursday,
+                time_to_sec(`friday_stop`)-time_to_sec(`friday_start`) as sec_friday,
+                time_to_sec(`saturday_stop`)-time_to_sec(`saturday_start`) as sec_saturday,
+                time_to_sec(`sunday_stop`)-time_to_sec(`sunday_start`) as sec_sunday,
+                users.id as id_user,
+                users.first_name as user_first_name,
+                users.last_name as user_last_name
+                '))
+            ->where('users.department_info_id',Auth::user()->department_info_id)
+            ->where('users.status_work', '=', 1)
+            ->wherein('users.user_type_id',[1,2])
+            ->orderBy('users.last_name')
+            ->get();
+
+        return view('schedule.viewSchedule')
+            ->with('number_of_week',$number_of_week)
+            ->with('schedule_user',$query);
+    }
+
+    public function datatableShowUserSchedule(Request $request)
+    {
+        $number_week =  $request->session()->get('number_of_week');
+        $year = $request->year;
+        $request->session()->put('year', $year);
+        $query = DB::table('users')
+            ->leftjoin("schedule", function ($join) use ($number_week,$year) {
+                $join->on("schedule.id_user", "=", "users.id")
+                    ->where("schedule.week_num", "=", $number_week)
+                    ->where("schedule.year", "=", $year);
+            })
+            ->select(DB::raw(
+                'schedule.*,
+                users.id as id_user,
+                users.first_name as user_first_name,
+                users.last_name as user_last_name,
+                users.private_phone as user_phone,
+                users.user_type_id as user_type_id
+                '))
+            ->wherein('users.user_type_id',[1,2])
+            ->where('users.status_work', '=', 1)
+            ->where('users.department_info_id',Auth::user()->department_info_id);
+        return datatables($query)->make(true);
+    }
+
+
+    public function setScheduleCadreGet()
+    {
+        $userTypes = UserTypes::all();
+        return view('schedule.setScheduleCadre')->with('userTypes', $userTypes);
+    }
+    public function setScheduleCadrePost(Request $request)
+    {
+        $number_of_week = $request->show_schedule;
+        $userTypes = UserTypes::all();
+        $request->session()->put('number_of_week', $number_of_week);
+        $request->session()->put('year', $request->schedule_year);
+        $schedule_analitics = $this->setWeekDays($number_of_week,$request);
+        return view('schedule.setScheduleCadre')
+            ->with('number_of_week',$number_of_week)
+            ->with('userTypes', $userTypes)
+            ->with('schedule_analitics',$schedule_analitics);
+    }
+    public function viewScheduleCadreGet()
+    {
+
+        return view('schedule.viewScheduleCadre');
+    }
+    public function viewScheduleCadrePost(Request $request)
+    {
+        if ($request->show_schedule == "Wybierz") {
+            return view('schedule.viewScheduleCadre');
         }
         $setter = Auth::user()->user_type_id;
         $getters = ScheduleRelation::where('setter_type_id', '=', $setter)->pluck('getter_type_id')->toArray();
@@ -114,12 +202,12 @@ class ScheduleController extends Controller
         }
 
         $query = $query->get();
-        return view('schedule.viewSchedule')
+        return view('schedule.viewScheduleCadre')
             ->with('number_of_week',$number_of_week)
             ->with('schedule_user',$query);
     }
 
-    public function datatableShowUserSchedule(Request $request)
+    public function datatableShowUserCadreSchedule(Request $request)
     {
         $setter = $request->userType;
         $number_week =  $request->session()->get('number_of_week');
