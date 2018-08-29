@@ -167,16 +167,12 @@ class ScreensController extends Controller
                     Storage::makeDirectory('public/'.$chartScreenshotsPath);
                 }
                 $allChartsImageFile = UploadedFiles::where('file_name','=',$fileName)->first();
-                $name = $fileName.rand(1,1000).'.'.$ext;
+                $name = $fileName.date('Ymd_His').'.'.$ext;
                 $newPath = $chartScreenshotsPath.'/'.$name;
                 if(empty($allChartsImageFile)){
                     $allChartsImageFile = new UploadedFiles();
                     $allChartsImageFile->file_name = $fileName;
                 }else{
-                    while($newPath == $allChartsImageFile->path){
-                        $name = $fileName.rand(1,10000).'.'.$ext;
-                        $newPath = $chartScreenshotsPath.'/'.$name;
-                    }
                     $deleteResult = Storage::delete('public/'.$allChartsImageFile->path);
                 }
                 $allChartsImageFile->path = $newPath;
@@ -205,7 +201,7 @@ class ScreensController extends Controller
         $fileName = 'allChartsImage';
         $allChartsImageFile = UploadedFiles::where('file_name','=',$fileName)->first();
         if(!empty($allChartsImageFile)) {
-            if(Storage::exists($allChartsImageFile->path)){
+            if(Storage::exists('public/'.$allChartsImageFile->path)){
                 $title = 'Godzinowy wykres Telemarketingu';
                 $data = ['fileURL' => Storage::url($allChartsImageFile->path)];
                 $prepareMail = new VeronaMail('allCharts', $data, $title);

@@ -21,6 +21,9 @@
     #my_chart {
         width: 100vw;
         height: 100vh;
+        font-size: xx-large;
+        color: grey;
+        text-align: center;
     }
 </style>
 <body>
@@ -36,20 +39,36 @@
     google.charts.load('current', {'packages':['corechart']});
     google.charts.setOnLoadCallback(function (){
         let id = departmentsAveragesForEveryHour[iterator].dep_info_id;
-        if(departmentsAveragesForEveryHourChartsData[id] !== undefined){
-            var data = google.visualization.arrayToDataTable(departmentsAveragesForEveryHourChartsData[id]);
-            drawChart(data, id, 'my_chart');
-            iterator++;
+        if(id !== -1){ //id of all deps averages data
+            if(departmentsAveragesForEveryHourChartsData[id] !== undefined){
+                if(departmentsAveragesForEveryHourChartsData[id].length>1) {
+                    var data = google.visualization.arrayToDataTable(departmentsAveragesForEveryHourChartsData[id]);
+                    drawChart(data, id, 'my_chart');
+                }else{
+                    $('#my_chart').text(departmentsAveragesForEveryHour[iterator].departmentName+' Brak danych');
+                }
+                iterator++;
+            }else{
+                console.log('No data');
+            }
         }else{
-            console.log('No data');
+            iterator++;
         }
     });
 
     setInterval(myfunc, 10000);
     function myfunc() {
         let id = departmentsAveragesForEveryHour[iterator].dep_info_id;
-        var data = google.visualization.arrayToDataTable(departmentsAveragesForEveryHourChartsData[id]);
-        drawChart(data, id, 'my_chart');
+        if(id !== -1) { //id of all deps averages data
+            if (departmentsAveragesForEveryHourChartsData[id].length > 1) {
+                var data = google.visualization.arrayToDataTable(departmentsAveragesForEveryHourChartsData[id]);
+                drawChart(data, id, 'my_chart');
+            } else {
+                $('#my_chart').text(departmentsAveragesForEveryHour[iterator].departmentName + ' Brak danych');
+            }
+        }else{
+            iterator++;
+        }
         iterator++;
         if(iterator === departmentsAveragesForEveryHour.length) {
             iterator = 0;

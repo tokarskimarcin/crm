@@ -65,6 +65,7 @@ Route::POST('/datatableShowPrinter', 'EquipmentsController@datatableShowPrinter'
 /* Equipment stop */
 
 Route::POST('/datatableShowUserSchedule', 'ScheduleController@datatableShowUserSchedule')->name('api.datatableShowUserSchedule');
+Route::POST('/datatableShowUserScheduleCadre', 'ScheduleController@datatableShowUserCadreSchedule')->name('api.datatableShowUserScheduleCadre');
 Route::POST('/saveSchedule', 'ScheduleController@saveSchedule')->name('api.saveSchedule');
 
 
@@ -542,10 +543,16 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
 
     // Schedule -- START --
     Route::get('/set_schedule', 'ScheduleController@setScheduleGet');
+    Route::get('/set_schedule_cadre', 'ScheduleController@setScheduleCadreGet');
+
     Route::Post('/set_schedule', 'ScheduleController@setSchedulePOST');
+    Route::Post('/set_schedule_cadre', 'ScheduleController@setScheduleCadrePost');
 
     Route::get('/view_schedule', 'ScheduleController@viewScheduleGet');
-    Route::Post('/view_schedule', 'ScheduleController@viewSchedulePOST');
+    Route::get('/view_schedule_cadre', 'ScheduleController@viewScheduleCadreGet');
+
+    Route::Post('/view_schedule', 'ScheduleController@viewSchedulePost');
+    Route::Post('/view_schedule_cadre', 'ScheduleController@viewScheduleCadrePost');
 
 
     Route::get('/timesheet', 'ScheduleController@timesheetGet');

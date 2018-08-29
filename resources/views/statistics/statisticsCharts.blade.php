@@ -159,6 +159,9 @@
                     }else{
                         $('#chart').text('Brak danych');
                     }
+                }else{
+                    $('#chart').text('Brak danych');
+                    console.log('Nie ma danych pod wybranym indeksem: ' + iterator);
                 }
             }
         }
@@ -174,6 +177,9 @@
                     }else{
                         $('#chart').text('Brak danych');
                     }
+                }else{
+                    $('#chart').text('Brak danych');
+                    console.log('Nie ma danych pod wybranym indeksem: ' + iterator);
                 }
             }
         }
