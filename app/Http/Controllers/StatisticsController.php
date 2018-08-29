@@ -5464,6 +5464,9 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
 
         $departmentsAveragesForEveryHour = [];
         //dd($departments_info,$reportData->where('department_info_id',8));
+
+        $allDeps = new \stdClass(); //[ /time/ => ['success' => 0, 'hour_time_use' => 0]];
+        //counting averages for each department for every hour independently
         foreach ($departments_info as $dep_info){
             $depReportData = $reportData->where('department_info_id',$dep_info->id);
             $depAveragesForEveryHour = [];
@@ -5471,25 +5474,48 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
             $useBefore = null;
             foreach ($depReportData as $depHourReportData){
                 $hourAndMinutes = substr($depHourReportData->hour,0,5);
-                if(count($depAveragesForEveryHour) <1){
-                    array_push($depAveragesForEveryHour,['time' => $hourAndMinutes,'average' => $depHourReportData->average]);
-                }else{
-                    $nominator = $depHourReportData->success - $successBefore;
-                    $denominator = $depHourReportData->hour_time_use - $useBefore;
-                    if($nominator > 0 and $denominator > 0){
-                        $average = ($nominator/$denominator);
-                        array_push($depAveragesForEveryHour,['time' => $hourAndMinutes,'average' => round($average,2)]);
-
+                $nominator = $depHourReportData->success - $successBefore;
+                $denominator = $depHourReportData->hour_time_use - $useBefore;
+                if($nominator > 0 and $denominator > 0){
+                    if(!property_exists($allDeps,$hourAndMinutes)){
+                        $allDeps->{$hourAndMinutes} = ['success' => 0, 'hour_time_use' => 0];
                     }
+                    $allDeps->{$hourAndMinutes}['success'] = $depHourReportData->success + $allDeps->{$hourAndMinutes}['success'];
+                    $allDeps->{$hourAndMinutes}['hour_time_use'] = $depHourReportData->hour_time_use + $allDeps->{$hourAndMinutes}['hour_time_use'];
+
+                    $average = ($nominator/$denominator);
+                    array_push($depAveragesForEveryHour,['time' => $hourAndMinutes,'average' => round($average,2)]);
+
                 }
+
                 $successBefore = $depHourReportData->success;
                 $useBefore =  $depHourReportData->hour_time_use;
             }
             array_push($departmentsAveragesForEveryHour, [
                 'dep_info_id' => $dep_info->id,
                 'departmentName'=>$dep_info->departments->name.' '.$dep_info->department_type->name,
+                'departmentSubtype' => $dep_info->type,
                 'depAverages' => $depAveragesForEveryHour]);
         }
+        $allDepAverages = [];
+        $successBefore = null;
+        $useBefore = null;
+        foreach ($allDeps as $hour => $data){
+            $nominator = $data['success']- $successBefore;
+            $denominator = $data['hour_time_use'] - $useBefore;
+            if($nominator > 0 and $denominator > 0) {
+                array_push($allDepAverages, ['time' => $hour, 'average' => round($nominator/$denominator,2)]);
+            }
+            $successBefore = $data['success'];
+            $useBefore =  $data['hour_time_use'];
+        }
+        array_push($departmentsAveragesForEveryHour, [
+            'dep_info_id' => -1,
+            'departmentName'=> 'Wszystkie oddziały',
+            'departmentSubtype' => 'Wysyłka',
+            'depAverages' => $allDepAverages]);
+
+        //dd($departmentsAveragesForEveryHour);
         return $departmentsAveragesForEveryHour;
     }
 
@@ -5497,21 +5523,46 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
         $reportData = HourReport::whereBetween('report_date', [$date_start, $date_stop])->get();
 
         $departmentsAveragesForEveryDay = [];
+        $allDeps = new \stdClass(); //[ /time/ => ['success' => 0, 'hour_time_use' => 0]];
+
         //dd($departments_info,$reportData->where('department_info_id',8));
         foreach ($departments_info as $dep_info){
             $depReportData = $reportData->where('department_info_id',$dep_info->id);
             $depAveragesForEveryDay = [];
 
             foreach ($depReportData->groupBy('report_date') as $depHourReportData) {
-                $depHourReportDataCompact = $depHourReportData->sortBy('hour')->last()->only(['report_date','average']);
+                $depHourReportDataCompact = $depHourReportData->sortBy('hour')->last()->only(['report_date','average','success','hour_time_use']);
                 $date = DateTime::createFromFormat('Y-m-d',$depHourReportDataCompact['report_date']);
-                array_push($depAveragesForEveryDay,['time' => $date->format('d.m'),'average' => $depHourReportDataCompact['average']]);
+                $dayOfMonth = $date->format('d.m');
+                if($depHourReportDataCompact['average'] > 0){
+                    if(!property_exists($allDeps,$dayOfMonth)){
+                        $allDeps->{$dayOfMonth} = ['success' => 0, 'hour_time_use' => 0];
+                    }
+                    $allDeps->{$dayOfMonth}['success'] = $depHourReportDataCompact['success'] + $allDeps->{$dayOfMonth}['success'];
+                    $allDeps->{$dayOfMonth}['hour_time_use'] = $depHourReportDataCompact['hour_time_use'] + $allDeps->{$dayOfMonth}['hour_time_use'];
+
+                    array_push($depAveragesForEveryDay,['time' => $dayOfMonth,'average' => $depHourReportDataCompact['average']]);
+                }
             }
             array_push($departmentsAveragesForEveryDay, [
                 'dep_info_id' => $dep_info->id,
                 'departmentName'=>$dep_info->departments->name.' '.$dep_info->department_type->name,
+                'departmentSubtype' => $dep_info->type,
                 'depAverages' => $depAveragesForEveryDay]);
         }
+        $allDepAverages = [];
+        foreach ($allDeps as $hour => $data){
+            $nominator = $data['success'];
+            $denominator = $data['hour_time_use'];
+            if($nominator > 0 and $denominator > 0) {
+                array_push($allDepAverages, ['time' => $hour, 'average' => round($nominator/$denominator,2)]);
+            }
+        }
+        array_push($departmentsAveragesForEveryDay, [
+            'dep_info_id' => -1,
+            'departmentName'=> 'Wszystkie oddziały',
+            'departmentSubtype' => 'Wysyłka',
+            'depAverages' => $allDepAverages]);
 
         //dd($departmentsAveragesForEveryDay);
         return $departmentsAveragesForEveryDay;

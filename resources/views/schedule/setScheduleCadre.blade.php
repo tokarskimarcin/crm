@@ -58,7 +58,7 @@ function getStartAndEndDate($week, $year) {
                                     <div class="col-md-6">
                                         <div class="well">
                                             <h1 style ="font-family: 'bebas_neueregular',sans-serif; margin-top:0px;text-shadow: 2px 2px 2px rgba(150, 150, 150, 0.8); font-size:25px;">Wybierz tydzień:</h1>
-                                            <form class="form-horizontal" method="post" action="{{URL::to('/set_schedule')}}">
+                                            <form class="form-horizontal" method="post" action="{{URL::to('/set_schedule_cadre')}}">
                                                 <input type="hidden" name="_token" value="{{ csrf_token() }}">
                                                 <input type="hidden" name="schedule_year" id="schedule_year" value="">
                                                 <select class="form-control" name="show_schedule" id="week_text">
@@ -259,7 +259,7 @@ function getStartAndEndDate($week, $year) {
             "drawCallback": function (settings) {
             },
             "ajax": {
-                'url': "{{ route('api.datatableShowUserSchedule') }}",
+                'url': "{{ route('api.datatableShowUserScheduleCadre') }}",
                 'type': 'POST',
                 'data': function (d) {
                     d.year = year[0];
