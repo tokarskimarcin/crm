@@ -123,7 +123,7 @@ class WorkHoursController extends Controller
                     }
                     $query = $query
                 ->where('users.department_info_id', '=', Auth::user()->department_info_id)
-                ->whereIn('users.user_type_id', [1,2])
+                ->whereIn('users.user_type_id', [1,2,9])
                 ->where('work_hours.id_manager', '=', null);
                 //"If" for proper date interval displaying
                 if($isChecked == 1 && $stop_date == $today) {
@@ -171,8 +171,7 @@ class WorkHoursController extends Controller
             {
                 $query->where('users.department_info_id', '=', $dep_info);
             }
-            $query->where('users.user_type_id','!=',1)
-                ->where('users.user_type_id','!=',2)
+            $query->whereNotIn('users.user_type_id',[1,2,9])
                 ->where('work_hours.id_manager', '=', null);
                 //"If" for proper date interval displaying
                 if($isChecked == 1 && $stop_date == $today) {
@@ -211,7 +210,7 @@ class WorkHoursController extends Controller
             {
                 $query = $query->where('users.department_info_id', '=', $dep_info);
             }
-            $query = $query->wherenotin('users.user_type_id',[1,2])
+            $query = $query->wherenotin('users.user_type_id',[1,2,9])
             ->where('users.id','!=',11)
             ->where('users.status_work',1);
             return datatables($query)->make(true);
@@ -306,7 +305,7 @@ class WorkHoursController extends Controller
     {
         $department_id = Auth::user()->department_info_id;
 
-        $users = User::where('status_work',1)->wherein('user_type_id',[1,2])
+        $users = User::where('status_work',1)->wherein('user_type_id',[1,2,9])
             ->where('department_info_id',$department_id)->orderBy('last_name')->get();
 
         $last_month = date("Y-m", strtotime("first day of previous month"));
@@ -333,7 +332,7 @@ class WorkHoursController extends Controller
     }
     public function viewHourGetCadre()
     {
-        $users = User::wherenotin('user_type_id', [1,2])
+        $users = User::wherenotin('user_type_id', [1,2,9])
             ->where('status_work',1)
             ->orderBy('last_name')
             ->get();
@@ -341,13 +340,13 @@ class WorkHoursController extends Controller
         $last_month = date("Y-m", strtotime("first day of previous month"));
         $current_month = date("Y-m");
         // zwolnieni miesiąc temu
-        $users_fired_last_month =  User::wherenotin('user_type_id', [1,2])
+        $users_fired_last_month =  User::wherenotin('user_type_id', [1,2,9])
             ->where('status_work', '=', 0)
             ->where('end_work', 'like', $last_month.'%')
             ->orderBy('last_name')
             ->get();
         // zwolnieni w tym miesiącu
-        $users_fired_current_month =  User::wherenotin('user_type_id', [1,2])
+        $users_fired_current_month =  User::wherenotin('user_type_id', [1,2,9])
             ->where('status_work', '=', 0)
             ->where('end_work', 'like', $current_month.'%')
             ->orderBy('last_name')
@@ -362,7 +361,7 @@ class WorkHoursController extends Controller
     public function viewHourPostCadre(Request $request)
     {
         if($request->userid == "-1") {
-              $users = User::wherenotin('user_type_id', [1,2])
+              $users = User::wherenotin('user_type_id', [1,2,9])
                   ->where('status_work',1)
                   ->orderBy('last_name')
                   ->get();
@@ -370,13 +369,13 @@ class WorkHoursController extends Controller
             $last_month = date("Y-m", strtotime("first day of previous month"));
             $current_month = date("Y-m");
             // zwolnieni miesiąc temu
-            $users_fired_last_month =  User::wherenotin('user_type_id', [1,2])
+            $users_fired_last_month =  User::wherenotin('user_type_id', [1,2,9])
                 ->where('status_work', '=', 0)
                 ->where('end_work', 'like', $last_month.'%')
                 ->orderBy('last_name')
                 ->get();
             // zwolnieni w tym miesiącu
-            $users_fired_current_month =  User::wherenotin('user_type_id', [1,2])
+            $users_fired_current_month =  User::wherenotin('user_type_id', [1,2,9])
                 ->where('status_work', '=', 0)
                 ->where('end_work', 'like', $current_month.'%')
                 ->orderBy('last_name')
@@ -402,7 +401,7 @@ class WorkHoursController extends Controller
         Session::put('count_agreement', $count_agreement);
         $user_info = $this->user_info($userid,$month);
 
-        $users = User::wherenotin('user_type_id', [1,2])
+        $users = User::wherenotin('user_type_id', [1,2,9])
             ->where('status_work',1)
             ->orderBy('last_name')
             ->get();
@@ -410,13 +409,13 @@ class WorkHoursController extends Controller
         $last_month = date("Y-m", strtotime("first day of previous month"));
         $current_month = date("Y-m");
         // zwolnieni miesiąc temu
-        $users_fired_last_month =  User::wherenotin('user_type_id', [1,2])
+        $users_fired_last_month =  User::wherenotin('user_type_id', [1,2,9])
             ->where('status_work', '=', 0)
             ->where('end_work', 'like', $last_month.'%')
             ->orderBy('last_name')
             ->get();
         // zwolnieni w tym miesiącu
-        $users_fired_current_month =  User::wherenotin('user_type_id', [1,2])
+        $users_fired_current_month =  User::wherenotin('user_type_id', [1,2,9])
             ->where('status_work', '=', 0)
             ->where('end_work', 'like', $current_month.'%')
             ->orderBy('last_name')
@@ -435,7 +434,7 @@ class WorkHoursController extends Controller
     {
         if ($request->userid == "-1") {
           $department_id = Auth::user()->department_info_id;
-            $users = User::where('status_work',1)->wherein('user_type_id',[1,2])
+            $users = User::where('status_work',1)->wherein('user_type_id',[1,2,9])
                 ->where('department_info_id',$department_id)->orderBy('last_name')->get();
 
             $last_month = date("Y-m", strtotime("first day of previous month"));
@@ -473,7 +472,7 @@ class WorkHoursController extends Controller
         $user_info = $this->user_info($userid,$month);
         $department_id = Auth::user()->department_info_id;
 
-        $users = User::where('status_work',1)->wherein('user_type_id',[1,2])
+        $users = User::where('status_work',1)->wherein('user_type_id',[1,2,9])
             ->where('department_info_id',$department_id)->orderBy('last_name')->get();
 
         $last_month = date("Y-m", strtotime("first day of previous month"));

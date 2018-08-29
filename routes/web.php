@@ -324,7 +324,10 @@ Route::post('/pbxReportDetailedAjax', 'StatisticsController@pbxReportDetailedAja
 /* END Report Database AJAX*/
 
 
-
+/* STATISTICS ROUTES AJAX */
+Route::post('/getDepartmentsAveragesForEveryHourAjax', 'StatisticsController@getDepartmentsAveragesForEveryHourAjax')->name('api.getDepartmentsAveragesForEveryHourAjax');
+Route::post('/getDepartmentsAveragesForEveryDayAjax', 'StatisticsController@getDepartmentsAveragesForEveryDayAjax')->name('api.getDepartmentsAveragesForEveryDayAjax');
+/* END STATISTICS ROUTES AJAX */
 
 //********************END AJAX*********************** */
 
@@ -694,6 +697,7 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
     Route::get('/pbxReportDetailed', 'StatisticsController@pbxReportDetailedGet');
 
     Route::get('/pageHourReportTimeOnRecord', 'StatisticsController@pageHourReportTimeOnRecord');
+    Route::get('/statisticsCharts', 'StatisticsController@statisticsChartsGet');
 
     Route::get('/pageMailMonthReportDepartments', 'StatisticsController@pageMailMonthReportDepartments');
 
@@ -951,6 +955,7 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
 
 //CHARTS
 Route::get('/charts', 'ScreensController@showScreensGet');
+Route::get('/chart/{id}', 'ScreensController@showScreenGet');
 
 Route::get('/pageAllCharts','ScreensController@allCharts');
 Route::post('/uploadScreenshotsAjax','ScreensController@uploadScreenshotsAjax')->name('api.uploadScreenshotsAjax');

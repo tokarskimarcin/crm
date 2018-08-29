@@ -32,123 +32,31 @@
 </div>
 </body>
 
+@include('chartsScripts.averageDepartmentsChartScript')
 <script type="text/javascript" src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
 <script src="https://html2canvas.hertzen.com/dist/html2canvas.js"></script>
 <script type="text/javascript">
-    google.charts.load('current', {'packages':['corechart']});
-    var data1 = [];
-    var data2 = [];
-    var nameOfDepartment = []; //array of departments name
-    var stringVariable; //this variable contains string of hour
-    var depName; //this variable contains name of given department
-
-    var successBefore = null;
-    var successAfter;
-    var useBefore = null;
-    var useAfter;
-    var realAverageValue;
-    var adnotation;
-    let formData = new FormData;
     let deferred = $.Deferred();
+    let formData = new FormData();
+    let departmentsAveragesForEveryHour = <?php echo json_encode($departmentsAveragesForEveryHour) ?>;
+    let departmentsAveragesForEveryHourChartsData = prepareDataForCharts(departmentsAveragesForEveryHour);
 
-    @foreach($department_info as $department_i)
-    @if($department_i->id == "2" || $department_i->id == "14" || $department_i->id =="8") //3 departments
-    @foreach($reportData as $reportD)
-            @if($department_i->id == $reportD->department_info_id)
-    if(data1.length === 0) {
-        data1.push(["Godzina", "Średnia", {type: 'string', role: 'annotation'}, "Low", "Max"]);
-        depName = "{{$department_i->departments->name}} " + "{{$department_i->department_type->name}}";
-        nameOfDepartment.push(depName);
-    }
-
-    stringVariable ="{{$reportD->hour}}";
-    stringVariable = stringVariable.slice(0,5);
-
-    successAfter = parseFloat({{$reportD->success}});
-    useAfter = parseFloat({{$reportD->hour_time_use}});
-    if(successBefore === null || useBefore === null) { //First iteration, where variables are undefined
-        data1.push([stringVariable, parseFloat({{$reportD->average}}), "{{$reportD->average}}", 2, 3]);
-    }
-    else{
-        realAverageValue = Math.round(100 *((successAfter - successBefore) / (useAfter - useBefore)))/100;
-        if((successAfter - successBefore) > 0 && (useAfter - useBefore) > 0) {
-            //console.log('realAverageValue: ' + realAverageValue);
-            adnotation = realAverageValue + '';
-            data1.push([stringVariable, realAverageValue, adnotation, 2, 3]);
-        }
-    }
-
-    successBefore = successAfter;
-    useBefore  = useAfter;
-    @endif
-            @endforeach
-    if(data1.length != 1) {
-        data2.push(data1);
-        data1 = [];
-    }
-    data1 = [];
-    successAfter = 1;
-    useAfter = 1;
-    successBefore = null;
-    useBefore = null;
-    adnotation = '';
-    @else //rest of departments excluding 3 above
-
-    @foreach($reportData as $reportD)
-            @if($department_i->id == $reportD->department_info_id)
-    if(data1.length === 0) {
-        data1.push(["Godzina", "Średnia", {type: 'string', role: 'annotation'}, "Low", "Max"]);
-        depName = "{{$department_i->departments->name}} " + "{{$department_i->department_type->name}}";
-        nameOfDepartment.push(depName);
-    }
-
-    stringVariable ="{{$reportD->hour}}";
-    stringVariable = stringVariable.slice(0,5);
-
-    successAfter = parseFloat({{$reportD->success}});
-    useAfter = parseFloat({{$reportD->hour_time_use}});
-    if(successBefore === null || useBefore === null) {
-        data1.push([stringVariable, parseFloat({{$reportD->average}}), "{{$reportD->average}}", 2.5, 3.5]);
-    }
-    else{
-        realAverageValue = Math.round(100 *((successAfter - successBefore) / (useAfter - useBefore)))/100;
-        if((successAfter - successBefore) > 0 && (useAfter - useBefore) > 0) {
-            //console.log('realAverageValue: ' + realAverageValue);
-            adnotation = realAverageValue + '';
-            data1.push([stringVariable, realAverageValue, adnotation, 2.5, 3.5]);
-        }
-    }
-
-    successBefore = successAfter;
-    useBefore  = useAfter;
-    @endif
-            @endforeach
-    if(data1.length != 1) {
-        data2.push(data1);
-        data1 = [];
-    }
-    data1 = [];
-    successAfter = 1;
-    useAfter = 1;
-    successBefore = null;
-    useBefore = null;
-    adnotation = '';
-    @endif
-    @endforeach
-
-
-    for( let i = 0; i < data2.length; i++){
+    for( let i = 0; i < departmentsAveragesForEveryHour.length; i++){
         let newDepChartDiv = $(document.createElement('div')).attr('id', 'dep_'+i).addClass('chart');
         $('#my_charts').append(newDepChartDiv);
     }
 
+    google.charts.load('current', {'packages':['corechart']});
     google.charts.setOnLoadCallback(function (){
-        for( let i = 0; i < data2.length; i++){
-            drawChart(i);
+        for( let i = 0; i < departmentsAveragesForEveryHour.length; i++){
+            let id = departmentsAveragesForEveryHour[i].dep_info_id;
+            if(departmentsAveragesForEveryHourChartsData[id] !== undefined){
+                var data = google.visualization.arrayToDataTable(departmentsAveragesForEveryHourChartsData[id]);
+                drawChart(data, id, 'dep_'+i);
+            }
         }
         deferred.resolve('Charts loaded');
     });
-
 
     $(document).ready(function () {
         deferred.promise().then(function (resolve) {
@@ -162,63 +70,6 @@
 
         });
     });
-    function drawChart(i) {
-        var data = google.visualization.arrayToDataTable(data2[i]);
-
-        var options = {
-            title: nameOfDepartment[i],
-            lineWidth: 8,
-            legend: { position: 'bottom' },
-            // chartArea: {
-            //     left: 30,
-            //     top: 30
-            // },
-            fontSize: 24,
-            fontName: "Tahoma",
-            series: {
-                0: {lineDashStyle: [2, 2, 20, 2, 20,2], color: 'red', lineWidth: 11},
-                1: {lineWidth: 6, visibleInLegend: false},
-                2: {lineWidth: 6, visibleInLegend: false}
-            },
-            colors: ['#1A1567'],
-            hAxis: {
-                minorGridlines: {count: 5},
-                textStyle: {
-                    bold: true,
-                    fontSize: 29
-                }
-            },
-            vAxis: {
-                gridlines: {count: 7},
-                maxValue: 6,
-                minValue: 0,
-                textStyle: {
-                    bold: true,
-                    fontSize: 34
-                }
-            },
-            titleTextStyle: {
-                color: "#C21A01",
-                fontSize: 70
-            },
-            viewWindowMode:'explicit',
-            viewWindow:{
-                max:6,
-                min:0
-            },
-            annotations: {
-                textStyle: {
-                    fontSize: 34,
-                    color: "black",
-                    bold: true
-                }
-            }
-        };
-
-        var chart = new google.visualization.LineChart(document.getElementById('dep_'+i));
-        chart.draw(data, options);
-    }
-
 
     function saveImage(canvas, size){/*
         canvas.width = Math.floor(canvas.width*size);

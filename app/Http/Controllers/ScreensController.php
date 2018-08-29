@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\UploadedFiles;
 use App\VeronaMail;
 use Illuminate\Http\Request;
 use App\Department_info;
@@ -114,9 +115,22 @@ class ScreensController extends Controller
      */
     public function showScreensGet() {
         $today = date("Y-m-d"); //2000-10-11
-        $reportData = HourReport::where('report_date', '=', $today)->get();
+        //$today = date("2018-08-22"); //2000-10-11
         $department_info = Department_info::where('id_dep_type', '=', '2')->get();
-        return view('screens.charts')->with('reportData', $reportData)->with('department_info', $department_info);
+
+        $departmentsAveragesForEveryHour = StatisticsController::getDepartmentsAveragesForEveryHour($today, $department_info);
+
+        return view('screens.charts')->with('departmentsAveragesForEveryHour', $departmentsAveragesForEveryHour);
+    }
+
+    public function showScreenGet($id){
+        $today = date("Y-m-d"); //2000-10-11
+        //$today = date("2018-08-22"); //2000-10-11
+        $department_info = Department_info::where('id_dep_type', '=', '2')->get();
+
+        $departmentsAveragesForEveryHour = StatisticsController::getDepartmentsAveragesForEveryHour($today, $department_info);
+
+        return view('screens.chart')->with('departmentsAveragesForEveryHour', $departmentsAveragesForEveryHour)->with('dep_info_id', $id);
     }
 
     /**
@@ -125,9 +139,11 @@ class ScreensController extends Controller
     public function allCharts() {
         $today = date("Y-m-d");
         //$today = date("2018-08-22"); //2000-10-11
-        $reportData = HourReport::where('report_date', '=', $today)->get();
         $department_info = Department_info::where('id_dep_type', '=', '2')->get();
-        return view('screens.allCharts')->with('reportData', $reportData)->with('department_info', $department_info);
+
+        $departmentsAveragesForEveryHour = StatisticsController::getDepartmentsAveragesForEveryHour($today, $department_info);
+
+        return view('screens.allCharts')->with('departmentsAveragesForEveryHour', $departmentsAveragesForEveryHour);
     }
 
     /**
@@ -142,16 +158,31 @@ class ScreensController extends Controller
         if ($file !== null) {
             $img = $file->getClientOriginalName();
 
-            // get uploaded file's extension
-            $ext = $this->getExtension($file->getMimeType());
-
+            // get uploaded file's extension`
+            $ext = $this->getExtensionFromMimeType($file->getMimeType());
+            $deleteResult = null;
+            $uploadResult = null;
             if(in_array($ext, ['png','jpeg'])){
                 if (!in_array('public/'.$chartScreenshotsPath, Storage::allDirectories())) {
                     Storage::makeDirectory('public/'.$chartScreenshotsPath);
                 }
-                Storage::delete('public/'.$chartScreenshotsPath.'/'.$fileName.'.'.$ext);
-                $file->storeAs('public/'.$chartScreenshotsPath, $fileName.'.'.$ext);
-                return 'success';
+                $allChartsImageFile = UploadedFiles::where('file_name','=',$fileName)->first();
+                $name = $fileName.rand(1,1000).'.'.$ext;
+                $newPath = $chartScreenshotsPath.'/'.$name;
+                if(empty($allChartsImageFile)){
+                    $allChartsImageFile = new UploadedFiles();
+                    $allChartsImageFile->file_name = $fileName;
+                }else{
+                    while($newPath == $allChartsImageFile->path){
+                        $name = $fileName.rand(1,10000).'.'.$ext;
+                        $newPath = $chartScreenshotsPath.'/'.$name;
+                    }
+                    $deleteResult = Storage::delete('public/'.$allChartsImageFile->path);
+                }
+                $allChartsImageFile->path = $newPath;
+                $allChartsImageFile->save();
+                $uploadResult = $file->storeAs('public/'.$chartScreenshotsPath, $name);
+                return ['deletePrevImageResult' => $deleteResult, 'uploadResult' => $uploadResult, 'fileRecord' => $allChartsImageFile];
             }else{
                 return 'fail';
             }
@@ -159,7 +190,7 @@ class ScreensController extends Controller
         return 'fail';
     }
 
-    private function getExtension ($mime_type){
+    private function getExtensionFromMimeType ($mime_type){
         $extensions = array(
             'image/jpeg' => 'jpeg',
             'image/png' => 'png',
@@ -171,16 +202,24 @@ class ScreensController extends Controller
     }
 
     public function sendAllChartsMail(){
-
-        $title = 'Godzinowy wykres Telemarketingu';
-        $data = ['fileURL' => Storage::url("allChartsImage_files/allChartsImage.png")];
-        $preperMail = new VeronaMail('allCharts',$data,$title);
-        if($preperMail->sendMail()){
-            return 'Mail wysłano';
+        $fileName = 'allChartsImage';
+        $allChartsImageFile = UploadedFiles::where('file_name','=',$fileName)->first();
+        if(!empty($allChartsImageFile)) {
+            if(Storage::exists($allChartsImageFile->path)){
+                $title = 'Godzinowy wykres Telemarketingu';
+                $data = ['fileURL' => Storage::url($allChartsImageFile->path)];
+                $prepareMail = new VeronaMail('allCharts', $data, $title);
+                if ($prepareMail->sendMail()) {
+                    return 'Mail wysłano';
+                } else {
+                    return 'Błąd podczas wysyłania maila';
+                }
+            }else{
+                return 'Plik nie istnieje na serwerze';
+            }
         }else{
-            return 'Błąd podczas wysyłania maila';
+            return 'Nie ma rekordu ze ścieżką do pliku w bazie danych';
         }
-
 //        Mail::send('mail/allCharts',['fileURL' => Storage::url("allChartsImage_files/allChartsImage.png")],function ($message){
 //            //$message->from('noreply.verona@gmail.com', 'Verona Consulting');
 //            $message->to('tokarski.verona@gmail.com','Marcin Tokarski')->subject('Statystki oddziałów');
