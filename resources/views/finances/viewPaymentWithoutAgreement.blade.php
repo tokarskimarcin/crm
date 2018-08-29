@@ -162,6 +162,11 @@
                                                                                 $janky_cost_per_price = 0;
                                                                                 $users_total++;
                                                                                 $toAccount = ($item2->max_transaction == null) ? 0 : $item2->max_transaction;
+                                                                                $succesorSalary = 0;
+                                                                                if($item2->successorSalary > 0){
+                                                                                    $succesorSalary = $item2->successorSalary;
+                                                                                    $item2->last_name .= ' dodatek Sukcesora ('.$succesorSalary.' PLN)';
+                                                                                }
                                                                                 if($item2->success == 0)
                                                                                     $avg = 0;
                                                                                  else
@@ -215,6 +220,7 @@
                                                                                 {
                                                                                     $salary_total = 0;
                                                                                 }
+                                                                                $salary_total += $succesorSalary;
                                                                                 $salary_total_all += $salary_total;
 
                                                                                 $documents_total += $item2->documents;
