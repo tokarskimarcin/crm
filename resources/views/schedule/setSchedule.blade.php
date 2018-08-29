@@ -109,46 +109,6 @@ function getStartAndEndDate($week, $year) {
                                 </div>
                                     <div class="col-md-12">
                                         @if (isset($number_of_week))
-                                        <div class="table-responsive">
-                                            <table class="table table-bordered">
-                                                <div class="panel-heading alert gray-nav" style="border:1px solid #d3d3d3;"><h4><b>Analiza Grafik Plan</b></h4></div>
-                                                <tr>
-                                                    <td align="center"><b>Godzina</b></td>
-                                                    <?php $week_array = ['Pon','Wt','Śr','Czw','Pt','Sob','Nie']; ?>
-                                                    @for($i=8;$i<21;$i++)
-                                                        @if($i <=9)
-                                                            <td align="center"><b>0{{$i}}</b></td>
-                                                        @else
-                                                            <td align="center"><b>{{$i}}</b></td>
-                                                        @endif
-                                                    @endfor
-                                                </tr>
-                                                @foreach($schedule_analitics as $item =>$key)
-                                                    <?php $lp = 8;
-                                                        $number_day_of_week = 0;?>
-                                                    @foreach($key as $item2 =>$key2)
-                                                        @if($lp == 8)
-                                                            <tr>
-                                                                <td>{{$week_array[$number_day_of_week++]}}</td>
-                                                        @endif
-                                                        @if($lp<= 21)
-                                                            @if($key2 > Auth::user()->department_info->size)
-                                                                <td align="center" style="background-color: #ffee29"><b>{{$key2}}</b></td>
-                                                            @elseif($key2 < Auth::user()->department_info->size*0.8 && $key2!=0)
-                                                                <td align="center" style="background-color: #ff7070"><b>{{$key2}}</b></td>
-                                                            @else
-                                                                <td align="center"><b>{{$key2}}</b></td>
-                                                            @endif
-                                                                    <?php $lp++; ?>
-                                                        @endif
-                                                        @if($lp >20)
-                                                            <?php $lp = 8; ?>
-                                                            </tr>
-                                                        @endif
-                                                    @endforeach
-                                                @endforeach
-                                            </table>
-                                          </div>
                                           <div class="table-responsive">
                                             <table id="datatable" class="table table-striped table-bordered" cellspacing="0" width="100%">
                                                 <thead style="color: white; background: #666564;">
@@ -158,6 +118,7 @@ function getStartAndEndDate($week, $year) {
                                                     <th>Nazwisko</th>
                                                     <th>Telefon</th>
                                                     <th>Grafik</th>
+                                                    <th>Rola</th>
                                                 </tr>
                                                 </thead>
                                                 <tbody>
@@ -235,7 +196,7 @@ function getStartAndEndDate($week, $year) {
                     table+='<option>'+time.format("HH:mm")+'</option>';
                 }
                 table+='</select>';
-                table+='<span class="glyphicon glyphicon-arrow-down"></span>';
+                table+='<span class="glyphicon glyphicon-arrow-down" style="display: block; margin-top: 1em; margin-bottom: 1em;"></span>';
 
                 time = moment('07'+':'+'45','HH:mm');
                 table+='<select name='+week_array[i]+'_stop_work class="form-control" style="font-size:12px; min-width: 90px">'+
@@ -260,13 +221,13 @@ function getStartAndEndDate($week, $year) {
                         table+= '<input type="text" name='+week_array[i]+'_reason class="form-control" placeholder="Powód">';
                 }
                 table+=
-                    '</div><p>';
+                    '</div>';
                 if(reason[i] != null)
-                    table+='<input type="checkbox" style="display: block" checked class="checkbox '+week_array[i]+'_reasonCheck">Wolne';
+                    table+='<input type="checkbox" style="display: inline-block; margin-right: 1em;" checked class="checkbox '+week_array[i]+'_reasonCheck"><label>Wolne</label>';
                 else
-                    table+='<input type="checkbox" style="display: block" class="checkbox '+week_array[i]+'_reasonCheck">Wolne';
+                    table+='<input type="checkbox" style="display: inline-block; margin-right: 1em;" class="checkbox '+week_array[i]+'_reasonCheck"><label>Wolne</label>';
 
-                    '</p></td>';
+                    '</td>';
                 time = moment('07'+':'+'45','HH:mm');
             }
         table+=
@@ -285,6 +246,9 @@ function getStartAndEndDate($week, $year) {
         var start_date = moment(year).add(week_number, 'weeks').startOf('week').format('DD MM YYYY');
         var stop_date =  moment(year).add(week_number, 'weeks').startOf('isoweek').format('DD MM YYYY');
 
+        let userTypes = @json($userTypes);
+        console.log(userTypes);
+
         table = $('#datatable').DataTable({
             "autoWidth": false,
             "processing": true,
@@ -299,6 +263,7 @@ function getStartAndEndDate($week, $year) {
                 'type': 'POST',
                 'data': function (d) {
                     d.year = year[0];
+                    d.userType = {{Auth::user()->user_type_id}};
                 },
                 'headers': {'X-CSRF-TOKEN': '{{ csrf_token() }}'}
             }, "columns": [
@@ -319,6 +284,17 @@ function getStartAndEndDate($week, $year) {
                         else return 'Tak'
                     }, "name": "id"
                 },
+                {"data": function(data) {
+                    // console.log(data);
+                    let name = "Brak danych";
+                        userTypes.forEach(function(item) {
+                           if(item.id == data.user_type_id) {
+                               name = item.name;
+                           }
+                        });
+                        return name;
+                    }, "name": "rola"
+                }
             ],
             select: true
         });
