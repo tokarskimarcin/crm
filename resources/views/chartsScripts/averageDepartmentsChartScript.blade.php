@@ -7,11 +7,11 @@
         $.each(departmentsAverages, function (index, item) {
             let depReportChartData = [];
             depReportChartData.push(['Czas','Średnia', {type: 'string', role: 'annotation'}, "Low", "Max"]);
-            if([8,14, -1].indexOf(item.dep_info_id)>=0){
+            if(item.departmentSubtype == 'Badania'){
                 $.each(item.depAverages, function (index, depAverages) {
                     depReportChartData.push([depAverages.time, parseFloat(depAverages.average), depAverages.average.toString(), 2, 3]);
                 });
-            }else{
+            }else if(item.departmentSubtype == 'Wysyłka'){
                 $.each(item.depAverages, function (index, depAverages) {
                     depReportChartData.push([depAverages.time, parseFloat(depAverages.average), depAverages.average.toString(), 2.5, 3.5]);
                 });

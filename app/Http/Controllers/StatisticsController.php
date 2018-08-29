@@ -5494,6 +5494,7 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
             array_push($departmentsAveragesForEveryHour, [
                 'dep_info_id' => $dep_info->id,
                 'departmentName'=>$dep_info->departments->name.' '.$dep_info->department_type->name,
+                'departmentSubtype' => $dep_info->type,
                 'depAverages' => $depAveragesForEveryHour]);
         }
         $allDepAverages = [];
@@ -5511,6 +5512,7 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
         array_push($departmentsAveragesForEveryHour, [
             'dep_info_id' => -1,
             'departmentName'=> 'Wszystkie oddziały',
+            'departmentSubtype' => 'Wysyłka',
             'depAverages' => $allDepAverages]);
 
         //dd($departmentsAveragesForEveryHour);
@@ -5545,6 +5547,7 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
             array_push($departmentsAveragesForEveryDay, [
                 'dep_info_id' => $dep_info->id,
                 'departmentName'=>$dep_info->departments->name.' '.$dep_info->department_type->name,
+                'departmentSubtype' => $dep_info->type,
                 'depAverages' => $depAveragesForEveryDay]);
         }
         $allDepAverages = [];
@@ -5558,6 +5561,7 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
         array_push($departmentsAveragesForEveryDay, [
             'dep_info_id' => -1,
             'departmentName'=> 'Wszystkie oddziały',
+            'departmentSubtype' => 'Wysyłka',
             'depAverages' => $allDepAverages]);
 
         //dd($departmentsAveragesForEveryDay);

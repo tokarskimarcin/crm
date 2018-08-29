@@ -10,9 +10,12 @@ use App\Departments;
 use App\JankyPenatlyProc;
 use App\PaymentAgencyStory;
 use App\PenaltyBonus;
+use App\SuccessorHistory;
 use App\SummaryPayment;
 use App\User;
 use App\UserEmploymentStatus;
+use App\Work_Hour;
+use function foo\func;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -95,7 +98,7 @@ class FinancesController extends Controller
                 salary
             "))
             ->where('start_work', 'like', $date)
-            ->whereNotIn('user_type_id', [1,2])
+            ->whereNotIn('user_type_id', [1,2,9])
             ->get();
 
         /**
@@ -168,7 +171,7 @@ class FinancesController extends Controller
             "))
             ->where('end_work', 'like', $date)
             ->where('start_work', 'like', $date)
-            ->whereNotIn('user_type_id', [1,2])
+            ->whereNotIn('user_type_id', [1,2,9])
             ->get();
 
         /**
@@ -454,6 +457,8 @@ class FinancesController extends Controller
     //Custom Function
     private function getSalary($month)
     {
+
+
             //Czy wypłata jest już zatwierdzona
             $payment_saved = AcceptedPayment::
             where('department_info_id','=',Auth::user()->department_info_id)
@@ -489,7 +494,10 @@ class FinancesController extends Controller
             (SELECT SUM(`penalty_bonus`.`amount`) FROM `penalty_bonus` WHERE `penalty_bonus`.`id_user`=`users`.`id` AND `penalty_bonus`.`event_date` LIKE "'.$month.'" AND `penalty_bonus`.`type`=1 AND `penalty_bonus`.`status`=1) as `kara`,
             (SELECT SUM(`penalty_bonus`.`amount`) FROM `penalty_bonus` WHERE `penalty_bonus`.`id_user`=`users`.`id` AND `penalty_bonus`.`event_date` LIKE  "'.$month.'" AND `penalty_bonus`.`type`=2 AND `penalty_bonus`.`status`=1) as `premia`,
             SUM(`work_hours`.`success`) as `success`,
-            `salary_to_account`');
+            `salary_to_account`,
+            `users`.`successorUserId`,
+            0 as successorSalary
+            ');
             if(!$payment_saved->isEmpty()){
                 $query = $query
                     ->leftjoin('payment_agency_story',function ($querry) use ($month){
@@ -517,7 +525,9 @@ class FinancesController extends Controller
                 ->selectRaw('`id`,`agency_id`,`first_name`,`last_name`,`max_transaction`,`username`,`rate`,`login_phone`,`sum`,`student`,`documents`,`kara`,`premia`,`success`,
             `f`.`ods`,
             `h`.`janki`,
-            `salary_to_account`')->get();
+            `salary_to_account`,
+            successorUserId,
+            successorSalary')->get();
             $result = $r->map(function($item) use($month) {
                 $user_empl_status = UserEmploymentStatus::
                     where( function ($querry) use ($item) {
@@ -584,10 +594,48 @@ class FinancesController extends Controller
                 }
                return $item;
             });
+            $this::mapSuccessorSalary(Auth::user()->department_info_id,$r,$month);
             $final_salary = $r->groupBy('agency_id');
             return $final_salary;
     }
+    public function mapSuccessorSalary($departmentInfoID,&$usersSalary,$month){
+        $map = SuccessorHistory::select('successor_history.*','users.rate','users.successorUserId')->join('users','users.id','successor_history.user_id')
+            ->where('users.department_info_id',$departmentInfoID)
+            ->where(function ($querry) use ($month){
+                $querry->orwhere('successor_history.date_stop','<=',substr($month,0,7).'-31')
+                    ->orwhere('successor_history.date_stop',null);
+            })
+            ->get()->groupBy('user_id');
+        $map->map(function ($item) use ($month,&$usersSalary){
+            $salaryAdd = 0;
+            $user_id = $item->first()->successorUserId;
+            $rate = $item->first()->rate;
+            foreach ($item as $row){
+                $date_stop = $row->date_stop == null ? substr($month,0,7).'-31' : $row->date_stop;
+                $salaryAdd +=  $this::getInfoAboutWorkHour($row->user_id,$row->date_start,$date_stop)->first()->sumHour;
+            }
+            $salaryAdd = round(($salaryAdd/3600)*$rate,2);
+            $usersSalary->where('id',$user_id)->map(function ($itemSalary) use ($salaryAdd,$user_id){
+                if($itemSalary->id == $user_id){
+                    $itemSalary->successorSalary = $salaryAdd;
+                }
+                return $itemSalary;
+            });
+            return $item;
+        });
+    }
 
+
+    public function getInfoAboutWorkHour($user_id,$date_start,$date_stop){
+        return $userInfo = Work_Hour::select(DB::raw(
+            'SUM( time_to_sec(`work_hours`.`accept_stop`)-time_to_sec(`work_hours`.`accept_start`)) as `sumHour`,
+            sum(success) as sumSucces
+            '))
+            ->where('id_user',$user_id)
+            ->where('date','>=',$date_start)
+            ->where('date','<=',$date_stop)
+            ->get();
+    }
     public function deletePenaltyBonus(Request $request) {
         if($request->ajax())
         {
