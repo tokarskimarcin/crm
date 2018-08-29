@@ -100,7 +100,6 @@
     }
 
     function uploadFilesAjax(){
-        console.log('Uploading screenshot');
         $.ajax({
             type: "POST",
             url: "{{route('api.uploadScreenshotsAjax')}}",
@@ -111,6 +110,7 @@
             processData: false,
             data: formData,
             success: function (response) {
+                self.close();
                 if(response === 'success' ){
                     console.log('Screenshot uploaded');
                 }else if(response === 'fail'){
