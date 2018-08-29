@@ -3,8 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\ActivityRecorder;
+use App\Department_info;
 use App\Schedule;
+use App\ScheduleRelation;
+use App\UserTypes;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use App\User;
@@ -14,20 +18,24 @@ class ScheduleController extends Controller
 {
     public function setScheduleGet()
     {
-        return view('schedule.setSchedule');
+        $userTypes = UserTypes::all();
+        return view('schedule.setSchedule')->with('userTypes', $userTypes);
     }
     public function setSchedulePost(Request $request)
     {
         $number_of_week = $request->show_schedule;
+        $userTypes = UserTypes::all();
         $request->session()->put('number_of_week', $number_of_week);
         $request->session()->put('year', $request->schedule_year);
         $schedule_analitics = $this->setWeekDays($number_of_week,$request);
         return view('schedule.setSchedule')
             ->with('number_of_week',$number_of_week)
+            ->with('userTypes', $userTypes)
             ->with('schedule_analitics',$schedule_analitics);
     }
     public function viewScheduleGet()
     {
+
         return view('schedule.viewSchedule');
     }
     public function viewSchedulePost(Request $request)
@@ -35,11 +43,15 @@ class ScheduleController extends Controller
         if ($request->show_schedule == "Wybierz") {
             return view('schedule.viewSchedule');
         }
+        $setter = Auth::user()->user_type_id;
+        $getters = ScheduleRelation::where('setter_type_id', '=', $setter)->pluck('getter_type_id')->toArray();
         $number_of_week = $request->show_schedule;
+        $userDepartmentInfo = Auth::user()->department_info_id;
         $year = $request->year;
         $year = explode('.',$year);
         $year = $year[0];
         $query = DB::table('users')
+            ->join('department_info', 'users.department_info_id', '=', 'department_info.id')
             ->leftjoin("schedule", function ($join) use ($number_of_week,$year) {
                 $join->on("schedule.id_user", "=", "users.id")
                     ->where("schedule.week_num", "=", $number_of_week)
@@ -57,14 +69,51 @@ class ScheduleController extends Controller
                 time_to_sec(`sunday_stop`)-time_to_sec(`sunday_start`) as sec_sunday,
                 users.id as id_user,
                 users.first_name as user_first_name,
-                users.last_name as user_last_name
+                users.last_name as user_last_name,
+                users.department_info_id as department_info_id,
+                users.user_type_id as user_type_id,
+                department_info.id_dep_type as id_dep_type
                 '))
-            ->where('users.department_info_id',Auth::user()->department_info_id)
             ->where('users.status_work', '=', 1)
-            ->wherein('users.user_type_id',[1,2])
             ->orderBy('users.last_name')
-            ->get();
+            ->whereIn('users.user_type_id', $getters);
 
+        if($setter == 4 || $setter == 12 || $setter == 22) {
+            $query = $query->where('users.department_info_id', $userDepartmentInfo);
+        }
+
+        //In this part we handle user types who has to set engravement for people within their department and also for regional roles.
+        $properCollection = collect();
+        if($setter == 17) {
+            $departmentInfo = Department_info::where('regionalManager_id', '=', Auth::user()->id)->pluck('id')->toArray();
+            $query = $query->whereIn('department_info_id', $departmentInfo);
+        }
+        if($setter == 7) {
+            $departmentInfo = Department_info::where('menager_id', '=', Auth::user()->id)->pluck('id')->toArray();
+            $query = $query->whereIn('department_info_id', $departmentInfo);
+        }
+        if($setter == 15) {
+//            $departmentInfo = Auth::user()->department_info->id_dep_type;
+//            $query= $query->get();
+//            foreach($query as $item) {
+//                if($item->id_dep_type == $departmentInfo) {
+//                    $properCollection->push($item);
+//                }
+//            }
+//            $query = $properCollection;
+            $departmentInfo = Department_info::where('director_id', '=', Auth::user()->id)->pluck('id')->toArray();
+            $query = $query->whereIn('department_info_id', $departmentInfo);
+        }
+        if($setter == 5) {
+            $departmentInfo = Department_info::where('hr_id', '=', Auth::user()->id)->orWhere('hr_id_second', '=', Auth::user()->id)->pluck('id')->toArray();
+            $query = $query->whereIn('department_info_id', $departmentInfo);
+        }
+        if($setter == 14) {
+            $departmentInfo = Department_info::where('director_hr_id', '=', Auth::user()->id)->pluck('id')->toArray();
+            $query = $query->whereIn('department_info_id', $departmentInfo);
+        }
+
+        $query = $query->get();
         return view('schedule.viewSchedule')
             ->with('number_of_week',$number_of_week)
             ->with('schedule_user',$query);
@@ -72,11 +121,18 @@ class ScheduleController extends Controller
 
     public function datatableShowUserSchedule(Request $request)
     {
+        $setter = $request->userType;
         $number_week =  $request->session()->get('number_of_week');
         $year = $request->year;
         $request->session()->put('year', $year);
+
+        $getters = ScheduleRelation::where('setter_type_id', '=', $setter)->pluck('getter_type_id')->toArray();
+        $userDepartmentInfo = Auth::user()->department_info_id;
+//        dd($getters);
+
         $query = DB::table('users')
-            ->leftjoin("schedule", function ($join) use ($number_week,$year) {
+            ->join('department_info', 'users.department_info_id', '=', 'department_info.id')
+            ->leftjoin("schedule", function ($join) use ($number_week,$year, $getters) {
                 $join->on("schedule.id_user", "=", "users.id")
                     ->where("schedule.week_num", "=", $number_week)
                     ->where("schedule.year", "=", $year);
@@ -86,11 +142,49 @@ class ScheduleController extends Controller
                 users.id as id_user,
                 users.first_name as user_first_name,
                 users.last_name as user_last_name,
-                users.private_phone as user_phone
+                users.private_phone as user_phone,
+                users.department_info_id as department_info_id,
+                users.user_type_id as user_type_id,
+                department_info.id_dep_type as id_dep_type
                 '))
-            ->wherein('users.user_type_id',[1,2])
             ->where('users.status_work', '=', 1)
-            ->where('users.department_info_id',Auth::user()->department_info_id);
+            ->whereIn('users.user_type_id', $getters);
+
+        if($setter == 4 || $setter == 12 || $setter == 22) {
+            $query = $query->where('users.department_info_id', $userDepartmentInfo);
+        }
+
+        //In this part we handle user types who has to set engravement for people within their department and also for regional roles.
+        $properCollection = collect();
+        if($setter == 17) {
+            $departmentInfo = Department_info::where('regionalManager_id', '=', Auth::user()->id)->pluck('id')->toArray();
+            $query = $query->whereIn('department_info_id', $departmentInfo)->get();
+        }
+        if($setter == 7) {
+            $departmentInfo = Department_info::where('menager_id', '=', Auth::user()->id)->pluck('id')->toArray();
+            $query = $query->whereIn('department_info_id', $departmentInfo)->get();
+        }
+        if($setter == 15) {
+//            $departmentInfo = Auth::user()->department_info->id_dep_type;
+//            $query= $query->get();
+//            foreach($query as $item) {
+//                if($item->id_dep_type == $departmentInfo) {
+//                    $properCollection->push($item);
+//                }
+//            }
+//            $query = $properCollection;
+            $departmentInfo = Department_info::where('director_id', '=', Auth::user()->id)->pluck('id')->toArray();
+            $query = $query->whereIn('department_info_id', $departmentInfo)->get();
+        }
+        if($setter == 5) {
+            $departmentInfo = Department_info::where('hr_id', '=', Auth::user()->id)->orWhere('hr_id_second', '=', Auth::user()->id)->pluck('id')->toArray();
+            $query = $query->whereIn('department_info_id', $departmentInfo)->get();
+        }
+        if($setter == 14) {
+            $departmentInfo = Department_info::where('director_hr_id', '=', Auth::user()->id)->pluck('id')->toArray();
+            $query = $query->whereIn('department_info_id', $departmentInfo)->get();
+        }
+
         return datatables($query)->make(true);
     }
 
