@@ -133,7 +133,7 @@ class NotificationController extends Controller
                 CONCAT(u1.first_name, " ", u1.last_name) as displayedBy
             '))
             ->join('users as u', 'u.id', '=', 'notifications.user_id')
-            ->join('users as u1', 'u1.id', '=', 'notifications.displayed_by')
+            ->leftJoin('users as u1', 'u1.id', '=', 'notifications.displayed_by')
             ->join('department_info', 'department_info.id', '=', 'notifications.department_info_id')
             ->join('departments', 'departments.id', '=', 'department_info.id_dep')
             ->join('department_type', 'department_type.id', '=', 'department_info.id_dep_type')
@@ -200,7 +200,13 @@ class NotificationController extends Controller
     }
     public function myNotifications() {
         $notifications = Notifications::where('displayed_by', '=', Auth::user()->id)->count();
-        return view('admin.myNotifications')->with('notifications', $notifications);
+        $unratedNotifications = Notifications::select('status','jr.id')
+            ->leftJoin('judge_results as jr','jr.notification_id','=','notifications.id')
+            ->where('notifications.user_id','=',Auth::user()->id)
+            ->where('status','=',3)
+            ->whereNull('jr.id')
+            ->count();
+        return view('admin.myNotifications')->with('notifications', $notifications)->with('unratedNotifications', $unratedNotifications);
     }
 
     public function judgeNotificationGet($id){
@@ -281,7 +287,7 @@ class NotificationController extends Controller
         $result->save();
 
         new ActivityRecorder(array_merge(['T'=>'Dodanie oceny zgłoszenia'],$result->toArray()),76,1);
-        return view('admin.myNotifications')
+        return $this->myNotifications()
             ->with('message_ok', 'Twoja opinia została przesłana!');
     }
 
@@ -290,11 +296,13 @@ class NotificationController extends Controller
             ->select(DB::raw('
                 notifications.*,
                 users.first_name as first_name,
-                users.last_name as last_name
+                users.last_name as last_name,
+                jr.id as judge_result
             '))
             ->leftJoin('users', 'users.id', '=', 'notifications.displayed_by')
+            ->leftJoin('judge_results as jr','jr.notification_id','=','notifications.id')
             ->where('status','!=',0)
-            ->where('user_id', '=', Auth::user()->id)
+            ->where('notifications.user_id', '=', Auth::user()->id)
             ->get();
 
         return datatables($data)->make(true);

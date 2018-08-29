@@ -14,42 +14,57 @@
         {{$message_ok}}
     </div>
 @endif
-<div class="well">Moje wysłane zgłoszenia</div>
-    <div class="table-responsive">
-        <table id="datatable" class="table table-striped table-bordered thead-inverse" cellspacing="0" width="100%">
-            <thead>
-                <tr>
-                    <th style="width: 20%;">Data:</th>
-                    <th style="width: 40%;">Tytuł:</th>
-                    <th style="width: 20%;">Stan realizacji</th>
-                    <th style="width: 10%;">Szczegóły</th>
-                    <th style="width: 5%;">Oceń</th>
-                    <th style="width: 10%;">Akcja</th>
-                </tr>
-            </thead>
-            <tbody>
-
-            </tbody>
-        </table>
+<div class="panel panel-info">
+    <div class="panel-heading">
+        Moje wysłane zgłoszenia
     </div>
-<hr>
-<div class="well">Moje przyjęte zgłoszenia</div>
-
-    @if($notifications > 0)
+    <div class="panel-body">
+        @if(isset($unratedNotifications) and $unratedNotifications > 0)
+            <div class="alert alert-warning">
+                Nieocenione zakończone zgłoszenia w liczbie: {{$unratedNotifications}}
+            </div>
+        @endif
         <div class="table-responsive">
-            <table id="datatable2" class="table table-striped table-bordered thead-inverse" cellspacing="0" width="100%">
+            <table id="datatable" class="table table-striped table-bordered thead-inverse" cellspacing="0" width="100%">
                 <thead>
-                <tr>
-                    <th style="width: 20%;">Data:</th>
-                    <th style="width: 40%;">Tytuł:</th>
-                    <th style="width: 20%;">Stan realizacji</th>
-                    <th style="width: 10%;">Akcja</th>
-                </tr>
+                    <tr>
+                        <th style="width: 20%;">Data:</th>
+                        <th style="width: 40%;">Tytuł:</th>
+                        <th style="width: 20%;">Stan realizacji</th>
+                        <th style="width: 10%;">Szczegóły</th>
+                        <th style="width: 5%;">Oceń</th>
+                        <th style="width: 10%;">Akcja</th>
+                    </tr>
                 </thead>
                 <tbody>
 
                 </tbody>
             </table>
+        </div>
+    </div>
+</div>
+    @if($notifications > 0)
+        <div class="panel panel-info">
+            <div class="panel-heading">
+                Moje przyjęte zgłoszenia
+            </div>
+            <div class="panel-body">
+                <div class="table-responsive">
+                    <table id="datatable2" class="table table-striped table-bordered thead-inverse" cellspacing="0" width="100%">
+                        <thead>
+                        <tr>
+                            <th style="width: 20%;">Data:</th>
+                            <th style="width: 40%;">Tytuł:</th>
+                            <th style="width: 20%;">Stan realizacji</th>
+                            <th style="width: 10%;">Akcja</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     @endif
 
@@ -93,7 +108,11 @@ table = $('#datatable').DataTable({
             if (status != 3) {
                 return '<a class="btn btn-default" href="#" data-toggle="tooltip" title="Ocenić wykonanie możesz po zakończonej realizacji!" data-placement="left" disabled>Oceń</a>';
             } else {
-                return '<a class="btn btn-default" href="judge_notification/'+data.id+'" >Oceń</a>';
+                if(data.judge_result == null){
+                    return '<a class="btn btn-default" href="judge_notification/'+data.id+'" >Oceń</a>';
+                }else{
+                    return '<a class="btn btn-success" href="judge_notification/'+data.id+'" >Ocena</a>';
+                }
             }
 
         },"orderable": false, "searchable": false },

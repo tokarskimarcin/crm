@@ -1,7 +1,6 @@
 @extends('layouts.main')
 @section('content')
 <style type="text/css">
-      body{margin:40px;}
       .btn-circle {
         width: 30px;
         height: 30px;
