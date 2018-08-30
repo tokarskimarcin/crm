@@ -93,7 +93,7 @@
                 </div>
                 <div class="row">
                     <div class="col-md-4 buttonSection" style="min-height: 3.5em;">
-                        <button class="btn btn-success" style="margin-bottom: 1em;  width: 100%;" id="save" disabled="true">
+                        <button class="btn btn-success" style="margin-bottom: 1em;  width: 100%;" id="save" disabled>
                             <span class='glyphicon glyphicon-save'></span> Zapisz zmiany <span class="badge">0</span></button>
                     </div>
                 </div>
@@ -434,12 +434,13 @@
                            elementRow.classList.add('colorRow');
                        }
                        else { //check whether confirming person exist in array. If yes, delete him
-                           if(confirmingPeopleSelect.options[confirmingPeopleSelect.selectedIndex].value == 0) {
-                               notify("Wybierz osobę z listy");
-                           }
                            if(showDateObject < confDateObject) {
                                notify("Data potwierdzania musi być mniejsza niż data pokazu");
                            }
+                           else if(confirmingPeopleSelect.options[confirmingPeopleSelect.selectedIndex].value == 0) {
+                               notify("Wybierz osobę z listy", 'info', 2000);
+                           }
+
                            for(let j = 0, max = changeArr.length; j < max; j++) {
                                if(changeArr[j].hasOwnProperty('id')) {
                                    if(changeArr[j]['id'] == id) {
@@ -772,7 +773,7 @@
                    })
                        .then(resp => resp.text())
                        .then(resp => {
-                           notify(resp);
+                           notify(resp, 'success', 4000);
                            changeArr = [];
                            numberOfChanges = 0;
                            badge.textContent = numberOfChanges;
