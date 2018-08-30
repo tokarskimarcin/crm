@@ -1,8 +1,7 @@
 <!-- Navigation -->
 
 <style>
-    .toggle.btn
-    {
+    .toggle.btn {
         margin-top: 7px;
     }
 </style>
@@ -36,6 +35,9 @@
               @php $show_moving_notifications = true;  @endphp
           @endif
 
+          {{-- Including Cadre notifications --}}
+          @include('partials.nav_includes._blocked_for_cadre')
+
           {{-- Including IT notifications --}}
           @include('partials.nav_includes._blocked_for_it')
 
@@ -49,8 +51,6 @@
           @include('partials.nav_includes._users_table')
 
       @endforeach
-
-
 @endif
         <li class="dropdown">
             <a class="dropdown-toggle" data-toggle="dropdown" href="#">{{Auth::user()->first_name.' '.Auth::user()->last_name}}

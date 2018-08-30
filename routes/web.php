@@ -87,7 +87,9 @@ Route::POST('/get_users', 'DkjController@getUsers')->name('api.getUsers');
 Route::POST('/change_department', 'HomeController@changeDepartment')->name('api.changeDepartment');
 
 Route::POST('/it_support', 'HomeController@itSupport')->name('api.itSupport');
-Route::POST('/count_notifications', 'HomeController@itCountNotifications')->name('api.itCountNotifications');
+Route::POST('/cadre_support', 'HomeController@cadreSupport')->name('api.cadreSupport');
+Route::POST('/count_notifications_it', 'HomeController@itCountNotifications')->name('api.itCountNotifications');
+Route::POST('/count_notifications_cadre', 'HomeController@cadreCountNotifications')->name('api.cadreCountNotifications');
 Route::POST('/datatableShowNewNotifications', 'NotificationController@datatableShowNewNotifications')->name('api.datatableShowNewNotifications'); //tu zmienic z ORM
 Route::POST('/datatableShowInProgressNotifications', 'NotificationController@datatableShowInProgressNotifications')->name('api.datatableShowInProgressNotifications'); //tu zmienic z ORM
 Route::POST('/datatableShowFinishedNotifications', 'NotificationController@datatableShowFinishedNotifications')->name('api.datatableShowFinishedNotifications'); //tu zmienic z ORM

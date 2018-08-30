@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\NotificationChangesDisplayedFlags;
 use Illuminate\Http\Request;
 use App\NotificationTypes;
 use App\Department_info;
@@ -46,6 +47,13 @@ class NotificationController extends Controller
         $notification->created_at = date("Y-m-d H:i:s");
         $notification->save();
 
+        $notification_changes_displayed_flags = new NotificationChangesDisplayedFlags();
+        $notification_changes_displayed_flags->notification_id = $notification->id;
+        $notification_changes_displayed_flags->comment_added_by_reporter_displayed = true;
+        $notification_changes_displayed_flags->comment_added_by_realizator_displayed = true;
+        $notification_changes_displayed_flags->status_change_displayed = true;
+        $notification_changes_displayed_flags->save();
+
         new ActivityRecorder(array_merge(['T'=>'Dodanie nowego zgłoszenia problemu'],$notification->toArray()), 35, 1);
         Session::flash('message_ok', "Problem zgłoszony pomyślnie!");
         return Redirect::back();
@@ -59,6 +67,12 @@ class NotificationController extends Controller
             return view('errors.404');
         } else {
             $user = User::find($notification->displayed_by);
+
+            $notificationChangesDisplayedFlags = NotificationChangesDisplayedFlags::where('notification_id','=',$notification->id)->first();
+            if(!empty($notificationChangesDisplayedFlags)){
+                $notificationChangesDisplayedFlags->comment_added_by_realizator_displayed = true;
+                $notificationChangesDisplayedFlags->save();
+            }
 
             return view('notifications.showNotification')
                 ->with('user', $user)
@@ -83,6 +97,13 @@ class NotificationController extends Controller
             $default_array = [1,2,3];
             if (!in_array($status, $default_array)) {
                 return view('errors.404');
+            }
+            if($notification->status != $status){
+                $notificationChangesDisplayedFlags = NotificationChangesDisplayedFlags::where('notification_id','=',$notification->id)->first();
+                if(!empty($notificationChangesDisplayedFlags)){
+                    $notificationChangesDisplayedFlags->status_change_displayed = false;
+                    $notificationChangesDisplayedFlags->save();
+                }
             }
             $notification->status = $status;
             $notification->displayed_by = Auth::user()->id;
@@ -168,6 +189,17 @@ class NotificationController extends Controller
         $checkNotification = Notifications::find($id);
         if ($checkNotification == null || ($urlValidation != $id)) {
             return view('errors.404');
+        }
+
+        $notificationsChangesDisplayedFlags = NotificationChangesDisplayedFlags::where('notification_id',$checkNotification->id)->first();
+        if(!empty($notificationsChangesDisplayedFlags)){
+            if(Auth::user()->id == $checkNotification->user_id){
+                $notificationsChangesDisplayedFlags->comment_added_by_realizator_displayed = false;
+            }
+            if(Auth::user()->id == $checkNotification->displayed_by){
+                $notificationsChangesDisplayedFlags->comment_added_by_reporter_displayed = false;
+            }
+            $notificationsChangesDisplayedFlags->save();
         }
 
         $comment->user_id = Auth::user()->id;
@@ -432,6 +464,12 @@ class NotificationController extends Controller
 
         if ($notification == null) {
             return view('errors.404');
+        }
+        $notificationChangesDisplayedFlags = NotificationChangesDisplayedFlags::where('notification_id','=',$notification->id)->first();
+        if(!empty($notificationChangesDisplayedFlags)){
+            $notificationChangesDisplayedFlags->comment_added_by_reporter_displayed = true;
+            $notificationChangesDisplayedFlags->status_change_displayed = true;
+            $notificationChangesDisplayedFlags->save();
         }
 
         $it_user = User::find($notification->displayed_by);

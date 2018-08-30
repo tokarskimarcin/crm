@@ -66,27 +66,37 @@
 
 
                     <p>
-                    <div class="col-md-8">
-                        <form method="POST" action="{{URL::to('/add_comment_notifications/')}}/{{$notification->id}}" id="form_comment">
-                            <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                            <div class="form-group">
-                                <label for="content">Dodaj komentarz:</label>
-                                <textarea id="content" name="content" placeholder="Tutaj wpisz treść komentarza" class="form-control"></textarea>
+                    <div class="row">
+                        @if($notification->status == 3)
+
+                            <div class="col-md-4">
+                                <form method="get" action="{{URL::to('/judge_notification/'.$notification->id)}}">
+                                    <button class="btn btn-default btn-block">Oceń</button>
+                                </form>
                             </div>
-                            <div class="alert alert-danger" style="display: none" id="alert_comment">
-                                Podaj treść komentarza!
-                            </div>
-                            <div class="form-group">
-                                <input id="add_comment" type="submit" class="btn btn-default" value="Dodaj komentarz" />
-                            </div>
-                        </form>
+                        @endif
+                        <div class="col-md-8">
+                            <form method="POST" action="{{URL::to('/add_comment_notifications/')}}/{{$notification->id}}" id="form_comment">
+                                <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                                <div class="form-group">
+                                    <label for="content">Dodaj komentarz:</label>
+                                    <textarea id="content" name="content" style="resize: vertical" placeholder="Tutaj wpisz treść komentarza" class="form-control"></textarea>
+                                </div>
+                                <div class="alert alert-danger" style="display: none" id="alert_comment">
+                                    Podaj treść komentarza!
+                                </div>
+                                <div class="form-group">
+                                    <input id="add_comment" type="submit" class="btn btn-default" value="Dodaj komentarz" />
+                                </div>
+                            </form>
+                        </div>
                     </div>
                     </p>
                     <div class="col-md-12">
                         <hr>
                         @if($notification->comments != null)
                             <h3>Komentarze:</h3>
-                            @foreach($notification->comments as $comment)
+                            @foreach($notification->comments->sortByDesc('created_at') as $comment)
                                 <div class="panel panel-default">
                                     <div class="panel-heading">
                                         Dodał: {{$comment->user->first_name . ' ' . $comment->user->last_name}}

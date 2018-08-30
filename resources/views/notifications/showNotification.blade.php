@@ -103,7 +103,7 @@
                   <input type="hidden" name="_token" value="{{ csrf_token() }}">
                   <div class="form-group">
                       <label for="content">Dodaj komentarz:</label>
-                      <textarea id="content" name="content" placeholder="Tutaj wpisz treść komentarza" class="form-control"></textarea>
+                      <textarea id="content" name="content" placeholder="Tutaj wpisz treść komentarza" style="resize: vertical" class="form-control"></textarea>
                   </div>
                   <div class="alert alert-danger" style="display: none" id="alert_comment">
                       Podaj treść komentarza!
@@ -118,7 +118,7 @@
             <hr>
             @if($notification->comments != null)
               <h3>Komentarze:</h3>
-              @foreach($notification->comments as $comment)
+              @foreach($notification->comments->sortByDesc('created_at') as $comment)
                     <div class="panel panel-default">
                         <div class="panel-heading">
                             Dodał: {{$comment->user->first_name . ' ' . $comment->user->last_name}}

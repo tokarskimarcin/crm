@@ -142,7 +142,9 @@ table = $('#new_notifications').DataTable({
         'headers': {'X-CSRF-TOKEN': '{{ csrf_token() }}'},
         'data': function (d) {
         }
-    }, "columns": [
+    },
+    "order": [[ 2, "desc" ]],
+    "columns": [
         {"data": 'notification_id'},
         {"data": 'title'},
         {"data": 'created_at'},
@@ -154,7 +156,7 @@ table = $('#new_notifications').DataTable({
         }, "name": "last_name"},
         {"data": function (data, type, dataToSet) {
             return "<a class='btn btn-default' href={{URL::to('/show_notification/')}}/" + data.notification_id + ">Pokaż</a>";
-        }, "name": "id_user"},
+        }, "name": "id_user", orderable: false},
 
     ],
 
@@ -175,7 +177,9 @@ table = $('#in_progress').DataTable({
         'headers': {'X-CSRF-TOKEN': '{{ csrf_token() }}'},
         'data': function (d) {
         }
-    }, "columns": [
+    },
+    "order": [[ 5, "desc" ]],
+    "columns": [
         {"data": 'notification_id'},
         {"data": 'title'},
         {"data": 'created_at'},
@@ -189,7 +193,7 @@ table = $('#in_progress').DataTable({
         {"data": 'displayedBy'},
         {"data": function (data, type, dataToSet) {
             return "<a class='btn btn-default' href={{URL::to('/show_notification/')}}/" + data.notification_id + ">Pokaż</a>";
-        }, "name": "id_user"},
+        }, "name": "id_user", orderable: false},
 
     ],
 
@@ -210,7 +214,9 @@ table = $('#finished').DataTable({
         'headers': {'X-CSRF-TOKEN': '{{ csrf_token() }}'},
         'data': function (d) {
         }
-    }, "columns": [
+    },
+    "order": [[ 5, "desc" ]],
+    "columns": [
         {"data": 'notification_id'},
         {"data": 'title'},
         {"data": 'created_at'},
@@ -224,7 +230,7 @@ table = $('#finished').DataTable({
         {"data": 'displayedBy'},
         {"data": function (data, type, dataToSet) {
             return "<a class='btn btn-default' href={{URL::to('/show_notification/')}}/" + data.notification_id + ">Pokaż</a>";
-        }, "name": "id_user"},
+        }, "name": "id_user", orderable: false},
 
     ],
 

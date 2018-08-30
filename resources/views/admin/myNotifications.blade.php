@@ -106,12 +106,12 @@ table = $('#datatable').DataTable({
         {"data": function (data, type, dataToSet) {
             var status = data.status;
             if (status != 3) {
-                return '<a class="btn btn-default" href="#" data-toggle="tooltip" title="Ocenić wykonanie możesz po zakończonej realizacji!" data-placement="left" disabled>Oceń</a>';
+                return '<a class="btn btn-default btn-block" href="#" data-toggle="tooltip" title="Ocenić wykonanie możesz po zakończonej realizacji!" data-placement="left" disabled>Oceń</a>';
             } else {
                 if(data.judge_result == null){
-                    return '<a class="btn btn-default" href="judge_notification/'+data.id+'" >Oceń</a>';
+                    return '<a class="btn btn-default btn-block" href="judge_notification/'+data.id+'" >Oceń</a>';
                 }else{
-                    return '<a class="btn btn-success" href="judge_notification/'+data.id+'" >Ocena</a>';
+                    return '<a class="btn btn-info btn-block" href="judge_notification/'+data.id+'" >Ocena</a>';
                 }
             }
 
@@ -209,7 +209,7 @@ let table2 = $('#datatable2').DataTable({
             }
         },
         {"data": function (data, type, dataToSet) {
-                return '<a class="btn btn-default" href="show_notification/'+data.id+'" >Pokaż</a>';
+                return '<a class="btn btn-default  btn-block" href="show_notification/'+data.id+'" >Pokaż</a>';
             },"orderable": false, "searchable": false },
     ]
 });
