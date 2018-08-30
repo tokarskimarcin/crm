@@ -240,7 +240,7 @@ function getStartAndEndDate($week, $year) {
                 else {
                     table+= '<input type="checkbox" style="display: inline-block; margin-right: 1em;" class="paid '+ week_array[i] + '_paid" disabled checked><label>Czy płatne</label>';
                 }
-                    '</td>';
+                   table += '</td>';
                 time = moment('07'+':'+'45','HH:mm');
             }
         table+=
