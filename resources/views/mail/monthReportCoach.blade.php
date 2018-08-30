@@ -55,25 +55,47 @@
         @foreach($coachData as $value)
                 @foreach($value as $item)
                     @php
+                    if($onlyNewUser == 1){
+                        if(in_array($item[$i]['user_id'],$onlyUserID) && count($onlyUserID) != 0){
+                        $collect_week->push($item[$i]);
+                            $data = $item[$i];
+
+                            $week_success += $data['success'];
+                            $week_checked += $data['all_checked'];
+                            $week_all_bad += $data['all_bad'];
+                            $week_pause_time += $data['pause_time'];
+                            $week_login_time += $data['login_time'];
+                            $week_received_calls += $data['received_calls'];
+                            $week_janky_count += $data['total_week_yanky'];
+
+                            $total_success += $data['success'];
+                            $total_checked += $data['all_checked'];
+                            $total_bad += $data['all_bad'];
+                            $total_pause_time += $data['pause_time'];
+                            $total_login_time += $data['login_time'];
+                            $total_received_calls += $data['received_calls'];
+                            $total_janky_count += $data['total_week_yanky'];
+                        }
+                    }else{
                     $collect_week->push($item[$i]);
-                        $data = $item[$i];
+                            $data = $item[$i];
 
-                        $week_success += $data['success'];
-                        $week_checked += $data['all_checked'];
-                        $week_all_bad += $data['all_bad'];
-                        $week_pause_time += $data['pause_time'];
-                        $week_login_time += $data['login_time'];
-                        $week_received_calls += $data['received_calls'];
-                        $week_janky_count += $data['total_week_yanky'];
+                            $week_success += $data['success'];
+                            $week_checked += $data['all_checked'];
+                            $week_all_bad += $data['all_bad'];
+                            $week_pause_time += $data['pause_time'];
+                            $week_login_time += $data['login_time'];
+                            $week_received_calls += $data['received_calls'];
+                            $week_janky_count += $data['total_week_yanky'];
 
-                        $total_success += $data['success'];
-                        $total_checked += $data['all_checked'];
-                        $total_bad += $data['all_bad'];
-                        $total_pause_time += $data['pause_time'];
-                        $total_login_time += $data['login_time'];
-                        $total_received_calls += $data['received_calls'];
-                        $total_janky_count += $data['total_week_yanky'];
-
+                            $total_success += $data['success'];
+                            $total_checked += $data['all_checked'];
+                            $total_bad += $data['all_bad'];
+                            $total_pause_time += $data['pause_time'];
+                            $total_login_time += $data['login_time'];
+                            $total_received_calls += $data['received_calls'];
+                            $total_janky_count += $data['total_week_yanky'];
+                    }
                 @endphp
             @endforeach
         @endforeach
@@ -102,6 +124,7 @@
             $week_janky_proc = ($week_checked > 0) ? round(($week_all_bad / $week_checked) * 100, 2) : 0 ;
             $week_janky_count = 0;
         @endphp
+        @if(isset($data))
         <tr>
             <td style="background-color: #c67979;border:1px solid #231f20;text-align:center;padding:3px"><b>SUMA {{ $data['first_week_day'] . '-' . $data['last_week_day']}}</b></td>
             <td style="background-color: #c67979;border:1px solid #231f20;text-align:center;padding:3px"><b>{{ $week_average }}</b></td>
@@ -112,6 +135,7 @@
             <td style="background-color: #c67979;border:1px solid #231f20;text-align:center;padding:3px"><b>{{ sprintf('%02d:%02d:%02d', ($week_pause_time/3600),($week_pause_time/60%60), $week_pause_time%60) }}</b></td>
             <td style="background-color: #c67979;border:1px solid #231f20;text-align:center;padding:3px"><b>{{ $week_login_time }} h</b></td>
         </tr>
+        @endif
         @php
             $week_average = 0;
             $week_janky_proc = 0;
