@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\NotificationChangesDisplayedFlags;
 use App\Work_Hour;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -138,6 +139,56 @@ class HomeController extends Controller
             $notifications_count = Notifications::where('status', 1)->count();
 
             return $notifications_count;
+        }
+    }
+
+    public function cadreSupport(Request $request) {
+        if($request->ajax()) {
+            $notifications = Notifications::where(function ($query){
+                $query->where('user_id',Auth::user()->id)->orWhere('displayed_by',Auth::user()->id);})
+                ->select('notifications.*')
+                ->rightJoin('notifications_changes_displayed_flags as ncdf','ncdf.notification_id','=','notifications.id')
+                ->where(function ($query){
+                    $query->where('status_change_displayed','<>',1)
+                        ->orWhere('comment_added_by_realizator_displayed','<>',1)
+                        ->orWhere('comment_added_by_reporter_displayed','<>',1);})
+                ->with('notifications_changes_displayed_flags')
+                ->with('notifications_changes_displayed_flags')
+                ->with('comments')
+                ->with('user')
+                ->get();
+            return $notifications;
+        }
+    }
+    public function cadreCountNotifications(Request $request) {
+        if($request->ajax()) {
+            $notifications = Notifications::where(function ($query){
+                $query->where('user_id',Auth::user()->id)->orWhere('displayed_by',Auth::user()->id);})
+                ->select('notifications.*')
+                ->rightJoin('notifications_changes_displayed_flags as ncdf','ncdf.notification_id','=','notifications.id')
+                ->where(function ($query){
+                    $query->where('status_change_displayed','<>',1)
+                        ->orWhere('comment_added_by_realizator_displayed','<>',1)
+                        ->orWhere('comment_added_by_reporter_displayed','<>',1);})
+                ->with('notifications_changes_displayed_flags')
+                ->get();
+            $counter = 0;
+            foreach($notifications as $notification){
+                if($notification->user_id == Auth::user()->id){
+                    if($notification->notifications_changes_displayed_flags->comment_added_by_reporter_displayed == 0){
+                        $counter++;
+                    }
+                    if($notification->notifications_changes_displayed_flags->status_change_displayed == 0){
+                        $counter++;
+                    }
+                }
+                if($notification->displayed_by == Auth::user()->id ){
+                    if($notification->notifications_changes_displayed_flags->comment_added_by_realizator_displayed == 0){
+                        $counter++;
+                    }
+                }
+            }
+            return $counter;
         }
     }
 

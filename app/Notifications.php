@@ -25,4 +25,8 @@ class Notifications extends Model
     public function comments() {
         return $this->hasMany('App\CommentsNotifications', 'notification_id');
     }
+
+    public function notifications_changes_displayed_flags() {
+        return $this->hasOne('App\NotificationChangesDisplayedFlags', 'notification_id');
+    }
 }
