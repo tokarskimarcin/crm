@@ -2,7 +2,7 @@
 @if($link->link == 'view_notification_table')
 <li class="dropdown">
     <a class="dropdown-toggle" data-toggle="dropdown" href="#" id="it_support">
-        <i class="fa fa-bell fa-fw"></i>
+        <i class="fa fa-bell fa-fw" style="letter-spacing: 1px">A</i>
         <span id="show_notification_count" class="fa-stack fa-5x has-badge" data-count="" style="
         visibility: hidden;
         width:  0em !important;

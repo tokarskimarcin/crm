@@ -31,7 +31,7 @@
                     </div>
                     <div class="form-group">
                         <label for="content">Szczegółowy opis</label>
-                        <textarea rows="7" type="text" placeholder="Dodaj opis" class="form-control" name="content" id="content"/></textarea>
+                        <textarea rows="7" type="text" placeholder="Dodaj opis" class="form-control" name="content" id="content" style="resize: vertical"/></textarea>
                     </div>
                     <div class="alert alert-danger" style="display: none" id="alert_description">
                         Podaj szczegółowy opis!

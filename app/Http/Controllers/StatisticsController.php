@@ -3371,8 +3371,10 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
             ->get();
         if (Auth::user()->user_type_id == 4 || Auth::user()->user_type_id == 12)
             $coaches = $coaches->where('department_info_id', '=', Auth::user()->department_info_id);
-        if($request->onlyNewUser == 1)
-            $monthData = $monthData->whereIn('user_id',$this::getUserLessThan30RBH()->pluck('id_user'));
+        $onlyUserID = [];
+        if($request->onlyNewUser == 1){
+            $onlyUserID = $this::getUserLessThan30RBH()->pluck('id_user')->toArray();
+        }
         return view('reportpage.MonthReportCoach')
             ->with([
                 'coaches'           => $coaches,
@@ -3382,7 +3384,8 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
                 'leader'            => $leader,
                 'months'            => self::getMonthsNames(),
                 'month_selected'    => $request->month_selected,
-                'onlyNewUser'       => $request->onlyNewUser
+                'onlyNewUser'       => $request->onlyNewUser,
+                'onlyUserID'       => $onlyUserID
             ]);
     }
 
@@ -3602,6 +3605,7 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
 
                     $user_sum[$y]['first_name'] = $consultant->first()->first_name;
                     $user_sum[$y]['last_name'] = $consultant->first()->last_name;
+                    $user_sum[$y]['user_id'] = $consultant->first()->id;
                     $user_sum[$y]['week_num'] = $y;
                     $user_sum[$y]['total_week_yanky'] = 0;
                     $user_sum[$y]['first_week_day'] = null;
@@ -4142,7 +4146,6 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
             }
 
             $data = $data->where('report_date', '=', $request->day_select);
-            //dd($data->get(), $request->coach_id);
             if($request->day_select > '2018-05-09') {
                 $data = $data->where('pbx_report_extension.pbx_department_info', '=', $pbx_department_id);
             }
@@ -4209,7 +4212,10 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
         $department = Department_info::find($request->dep_id);
 
         $data = $this->getDayCoachStatistics($request->dep_id, $request->day_select);
-//        dd($data);
+        $onlyUserID = [];
+        if($request->onlyNewUser == 1){
+            $onlyUserID = $this::getUserLessThan30RBH()->pluck('id_user')->toArray();
+        }
         return view('reportpage.DayReportSummaryCoaches')
             ->with([
                 'department_info'   => $department_info,
@@ -4222,7 +4228,8 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
                 'coaches'           => $data['coaches'],
                 'data'              => $data['data'],
                 'report_date'       => $data['report_date'],
-                'months'            => self::getMonthsNames()
+                'months'            => self::getMonthsNames(),
+                'onlyNewUser'   => $request->onlyNewUser
             ]);
     }
 
