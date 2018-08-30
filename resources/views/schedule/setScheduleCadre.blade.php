@@ -21,6 +21,10 @@
     .reason > *{
         width: 100% !important;
     }
+
+    hr {
+        margin: 0.5em;
+    }
 </style>
 <?php
 
