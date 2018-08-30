@@ -21,6 +21,10 @@
     .reason > *{
         width: 100% !important;
     }
+
+    hr {
+        margin: 0.5em;
+    }
 </style>
 <?php
 
@@ -162,6 +166,7 @@ function getStartAndEndDate($week, $year) {
         var day = $("#week_text option:selected").text();
         day = day.split(" ");
         var start_date = moment(day[0], "YYYY.MM.DD");
+        var paidArr = [d.mondayPaid, d.tuesdayPaid, d.wednesdayPaid, d.thursdayPaid, d.fridayPaid, d.saturdayPaid, d.sundayPaid];
         var table = '<table class="table-bordered" style="width: 100%">'+
             '<thead>' +
             '<tr>';
@@ -223,11 +228,19 @@ function getStartAndEndDate($week, $year) {
                 table+=
                     '</div>';
                 if(reason[i] != null)
-                    table+='<input type="checkbox" style="display: inline-block; margin-right: 1em;" checked class="checkbox '+week_array[i]+'_reasonCheck"><label>Wolne</label>';
+                    table+='<input type="checkbox" style="display: inline-block; margin-right: 1em;" checked class="checkbox '+week_array[i]+'_reasonCheck"><label>Wolne</label> <hr>';
                 else
-                    table+='<input type="checkbox" style="display: inline-block; margin-right: 1em;" class="checkbox '+week_array[i]+'_reasonCheck"><label>Wolne</label>';
-
-                    '</td>';
+                    table+='<input type="checkbox" style="display: inline-block; margin-right: 1em;" class="checkbox '+week_array[i]+'_reasonCheck"><label>Wolne</label> <hr>';
+                if(reason[i] != null && paidArr[i]) {
+                    table+= '<input type="checkbox" style="display: inline-block; margin-right: 1em;" class="paid '+ week_array[i] + '_paid" checked><label>Czy płatne</label>';
+                }
+                else if(reason[i] != null && !paidArr[i]) {
+                    table+= '<input type="checkbox" style="display: inline-block; margin-right: 1em;" class="paid '+ week_array[i] + '_paid"><label>Czy płatne</label>';
+                }
+                else {
+                    table+= '<input type="checkbox" style="display: inline-block; margin-right: 1em;" class="paid '+ week_array[i] + '_paid" disabled checked><label>Czy płatne</label>';
+                }
+                   table += '</td>';
                 time = moment('07'+':'+'45','HH:mm');
             }
         table+=
@@ -247,7 +260,6 @@ function getStartAndEndDate($week, $year) {
         var stop_date =  moment(year).add(week_number, 'weeks').startOf('isoweek').format('DD MM YYYY');
 
         let userTypes = @json($userTypes);
-        console.log(userTypes);
 
         table = $('#datatable').DataTable({
             "autoWidth": false,
@@ -318,9 +330,12 @@ function getStartAndEndDate($week, $year) {
                 if( $(this).is(':checked') )
                 {
                      $(this).closest('td').find('.hour').hide();
+                     $(this).closest('td').find('.paid').prop('disabled', false);
                      $(this).closest('td').find('.reason').show();
                 }else{
                     $(this).closest('td').find('.hour').show();
+                    $(this).closest('td').find('.paid').prop('disabled', true);
+                    $(this).closest('td').find('.paid').prop('checked', true);
                     $(this).closest('td').find('.reason').hide();
                 }
             });
@@ -330,6 +345,7 @@ function getStartAndEndDate($week, $year) {
                 var $start_hour_array = new Array();
                 var $stop_hour_array = new Array();
                 var $reason_array  = new Array();
+                var isPaid_array = new Array();
                 var closestTR =  $(this).closest('tr');
                 var id_user = closestTR.attr('id');
                 var schedule_id =  $(this).attr('id');
@@ -338,10 +354,12 @@ function getStartAndEndDate($week, $year) {
                 var time = true;
                 for(var i=0;i<week_array.length;i++)
                 {
+                    console.log(closestTR.find(`.${week_array[i]}_paid`));
                     checkbox = closestTR.find('.'+week_array[i]+"_reasonCheck");
                     $start_hour_array.push(closestTR.find("select[name="+week_array[i]+"_start_work]").val());
                     $stop_hour_array.push(closestTR.find("select[name="+week_array[i]+"_stop_work]").val());
                     $reason_array.push(closestTR.find("input[name="+week_array[i]+"_reason]").val());
+                    isPaid_array.push(closestTR.find("."+week_array[i]+"_paid").prop('checked'));
                     if(($start_hour_array[i] == "null" || $stop_hour_array[i] == "null") && !checkbox.is(':checked'))
                     {
                         valid = false;
@@ -371,7 +389,7 @@ function getStartAndEndDate($week, $year) {
                         headers: {
                             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                         },
-                        data:{"start_hours":$start_hour_array,"stop_hours":$stop_hour_array,"reasons":$reason_array,"id_user":id_user,"schedule_id":schedule_id},
+                        data:{"isPaid":isPaid_array,"start_hours":$start_hour_array,"stop_hours":$stop_hour_array,"reasons":$reason_array,"id_user":id_user,"schedule_id":schedule_id},
                         success: function(response) {
                                 swal({
                                     title: 'Godziny zostały zarejestrowane!',
