@@ -88,6 +88,7 @@ Route::POST('/get_users', 'DkjController@getUsers')->name('api.getUsers');
 Route::POST('/change_department', 'HomeController@changeDepartment')->name('api.changeDepartment');
 
 Route::POST('/it_support', 'HomeController@itSupport')->name('api.itSupport');
+Route::POST('/it_support_not_repaired_notifications', 'HomeController@itSupportNotRepairedNotifications')->name('api.itSupportNotRepairedNotifications');
 Route::POST('/cadre_support', 'HomeController@cadreSupport')->name('api.cadreSupport');
 Route::POST('/count_notifications_it', 'HomeController@itCountNotifications')->name('api.itCountNotifications');
 Route::POST('/count_notifications_cadre', 'HomeController@cadreCountNotifications')->name('api.cadreCountNotifications');

@@ -4,6 +4,10 @@
     .toggle.btn {
         margin-top: 7px;
     }
+    
+    #it_notifications a:hover, #cadre_notifications a:hover{
+        background-color: #cdcdcd;
+    }
 </style>
 <nav class="navbar navbar-default navbar-fixed-top" role="navigation" style="margin-bottom: 0">
     <div class="navbar-header">

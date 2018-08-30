@@ -238,7 +238,11 @@ class NotificationController extends Controller
             ->where('status','=',3)
             ->whereNull('jr.id')
             ->count();
-        return view('admin.myNotifications')->with('notifications', $notifications)->with('unratedNotifications', $unratedNotifications);
+        $notRepairedNotifications = Notifications::where('status','=',2)->where('displayed_by',Auth::user()->id)->count();
+        return view('admin.myNotifications')
+            ->with('notifications', $notifications)
+            ->with('unratedNotifications', $unratedNotifications)
+            ->with('notRepairedNotifications', $notRepairedNotifications);
     }
 
     public function judgeNotificationGet($id){
