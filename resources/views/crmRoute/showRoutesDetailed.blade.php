@@ -96,7 +96,7 @@
                 </div>
                 <div class="row">
                     <div class="col-md-4 buttonSection" style="min-height: 3.5em;">
-                        <button class="btn btn-info" data-toggle="modal" data-target="#editModal" style="margin-bottom: 1em;  width: 100%;" id="editOneRecord" disabled="true">
+                        <button class="btn btn-info" data-toggle="modal" data-target="#editModal" style="margin-bottom: 1em;  width: 100%;" id="editOneRecord" disabled>
                             <span class='glyphicon glyphicon-edit'></span> Edytuj rekordy</button>
                     </div>
                     <div class="col-md-4">

@@ -136,18 +136,29 @@
     <script>
        document.addEventListener('DOMContentLoaded', function() {
            /********** GLOBAL VARIABLES ***********/
-           let selectedYears = ["0"]; //this array collect selected by user years
-           let selectedWeeks = ["0"]; //this array collect selected by user weeks
-           let selectedDepartments = ["0"]; //this array collect selected by user departments
-           let selectedTypes = ['0']; //array of selected by user types
-           let datatableHeight = '75vh'; //this variable defines height of table
-           let changeArr = []; //This array collect changed rows
-           let saveButton = document.querySelector('#save');
-           let userData = @json($userData);
-           let workHourData = @json($workHours);
-           let dataTableData =  null;
-           let badge = document.querySelector('.badge');
-           let numberOfChanges = 0;
+
+           let APP = {
+               arrays: {
+                   selectedYears: ["0"], //this array collect selected by user years
+                   selectedWeeks: ["0"], //this array collect selected by user weeks
+                   selectedDepartments: ["0"], //this array collect selected by user departments
+                   selectedTypes: ['0'], //array of selected by user types
+                   changeArr: [] //This array collect changed rows
+               },
+               JSONS: {
+                   userData: @json($userData),
+                   workHourData: @json($workHours)
+               },
+               DOMElements: {
+                   saveButton: document.querySelector('#save'),
+                   badge: document.querySelector('.badge')
+               },
+               globalVariables: {
+                   numberOfChanges: 0,
+                   dataTableData: null,
+                   datatableHeight: '75vh' //this variable defines height of table
+               }
+           }
 
            /********* END OF GLOBAL VARIABLES*********/
 
@@ -316,7 +327,7 @@
                autoWidth: true,
                processing: true,
                serverSide: true,
-               scrollY: datatableHeight,
+               scrollY: APP.globalVariables.datatableHeight,
                "drawCallback": function( settings ) {
 
                },
@@ -328,7 +339,7 @@
                    const confirmDate = confirmDateInput.value;
                    let confirmingPeopleSelect = row.querySelector('.confirming');
                    let alreadyIn = false;
-                   userData.forEach(person => { //looping over all data about people
+                    APP.JSONS.userData.forEach(person => { //looping over all data about people
                        alreadyIn = false;
                        if(person.hasOwnProperty('date')) {
                            person.date.forEach(day => {
@@ -345,8 +356,8 @@
                    setOldValues(confirmingPeopleSelect, data.confirmingUser);
 
                    //part responsible for highlighting row if user is not at work at confirm date after 8:59
-                   if(workHourData.hasOwnProperty(`${data.confirmingUser}`)) {
-                       workHourData[data.confirmingUser].forEach(item => {
+                   if(APP.JSONS.workHourData.hasOwnProperty(`${data.confirmingUser}`)) {
+                       APP.JSONS.workHourData[data.confirmingUser].forEach(item => {
                            if(item.date == confirmDate) {
                                if(item.presentAtTime == 0) {
                                    row.classList.add('notPresentAtWork');
@@ -356,7 +367,7 @@
                    }
 
                     //reassigning classes to rows after changing page.
-                   changeArr.forEach(item => {
+                 APP.arrays.changeArr.forEach(item => {
                        if(item.hasOwnProperty('id')) {
                            if (item['id'] == data.id) {
                                row.classList.add('colorRow');
@@ -375,7 +386,7 @@
 
                         let confDate = elementRow.querySelector('.confirm-date');
                         let confDateObject = new Date(confDate.value);
-                        let showDateObject = new Date(dataTableData.date);
+                        let showDateObject = new Date(APP.globalVariables.dataTableData.date);
                         let confirmingPeopleSelect = elementRow.querySelector('.confirming');
                         const frequencyElement = elementRow.querySelector('.frequency');
                         const frequencyValue = frequencyElement.value;
@@ -387,7 +398,7 @@
                             const newConfirmDate = e.target.value;
                             confirmingPeopleSelect.innerHTML = ''; //clearing list of current people
                             appendBasicOption(confirmingPeopleSelect);
-                            userData.forEach(person => { //looping over all data about people
+                            APP.JSONS.userData.forEach(person => { //looping over all data about people
                                if(person.hasOwnProperty('date')) {
                                    person.date.forEach(day => {
                                        if(day == newConfirmDate) { //current person is available this day
@@ -410,26 +421,26 @@
 
                        //if only data has changed
                        if(confirmingPeopleSelect.options[confirmingPeopleSelect.selectedIndex].value != 0 && (showDateObject > confDateObject)) {
-                           let exist = existInArr(id, changeArr);
+                           let exist = existInArr(id, APP.arrays.changeArr);
                            let newConfirmingPerson = getSelectedOption(confirmingPeopleSelect);
                            let changedRow = new ChangeObject(newConfirmingPerson, frequencyValue, pairValue, confDate.value, id);
 
                            //remove existing item
                            if (exist) {
-                               for (let j = 0, max = changeArr.length; j < max; j++) {
-                                   if (changeArr[j].hasOwnProperty('id')) {
-                                       if (changeArr[j].id == id) {
-                                           changeArr.splice(j, 1);
+                               for (let j = 0, max = APP.arrays.changeArr.length; j < max; j++) {
+                                   if (APP.arrays.changeArr[j].hasOwnProperty('id')) {
+                                       if (APP.arrays.changeArr[j].id == id) {
+                                           APP.arrays.changeArr.splice(j, 1);
                                            max--;
                                        }
                                    }
                                }
                            }
                            else {
-                               numberOfChanges++;
-                               badge.textContent = numberOfChanges;
+                                APP.globalVariables.numberOfChanges++;
+                                APP.DOMElements.badge.textContent = APP.globalVariables.numberOfChanges;
                            }
-                           changeArr.push(changedRow);
+                           APP.arrays.changeArr.push(changedRow);
 
                            elementRow.classList.add('colorRow');
                        }
@@ -441,31 +452,31 @@
                                notify("Wybierz osobę z listy", 'info', 2000);
                            }
 
-                           for(let j = 0, max = changeArr.length; j < max; j++) {
-                               if(changeArr[j].hasOwnProperty('id')) {
-                                   if(changeArr[j]['id'] == id) {
-                                       changeArr.splice(j,1);
+                           for(let j = 0, max = APP.arrays.changeArr.length; j < max; j++) {
+                               if(APP.arrays.changeArr[j].hasOwnProperty('id')) {
+                                   if(APP.arrays.changeArr[j]['id'] == id) {
+                                       APP.arrays.changeArr.splice(j,1);
                                        max--;
 
-                                       numberOfChanges--;
-                                       badge.textContent = numberOfChanges;
+                                       APP.globalVariables.numberOfChanges--;
+                                       APP.DOMElements.badge.textContent = APP.globalVariables.numberOfChanges;
                                        elementRow.classList.remove('colorRow');
                                    }
                                }
                            }
                        }
-                       // console.log(changeArr);
-                       saveButton.disabled = changeArr.length > 0 ? false : true;
+                       // console.log(APP.arrays.changeArr);
+                      APP.DOMElements.saveButton.disabled = APP.arrays.changeArr.length > 0 ? false : true;
                    });
 
                },"ajax": {
                    'url': "{{route('api.engraverForConfirmingDatatable')}}",
                    'type': 'POST',
                    'data': function (d) {
-                        d.years = selectedYears;
-                        d.weeks = selectedWeeks;
-                        d.departments = selectedDepartments;
-                        d.typ = selectedTypes;
+                        d.years = APP.arrays.selectedYears;
+                        d.weeks = APP.arrays.selectedWeeks;
+                        d.departments = APP.arrays.selectedDepartments;
+                        d.typ = APP.arrays.selectedTypes;
                    },
                    'headers': {'X-CSRF-TOKEN': '{{ csrf_token() }}'}
                },
@@ -474,7 +485,7 @@
                },
                "columns":[
                    {"data":function (data, type, dataToSet) {
-                           dataTableData = data;
+                           APP.globalVariables.dataTableData = data;
                            return data.weekOfYear;
                        },"name":"weekOfYear", "width": "1%", "searchable": false
                    },
@@ -610,7 +621,7 @@
                    opt.textContent = j;
                    if(j == currentYear) {
                        opt.setAttribute('selected', 'selected');
-                       selectedYears = [j];
+                       APP.arrays.selectedYears = [j];
                    }
                    yearSelect.appendChild(opt);
                }
@@ -621,7 +632,7 @@
                    opt.textContent = i;
                    if(i == currentWeek) {
                        opt.setAttribute('selected', 'selected');
-                       selectedWeeks = [i];
+                       APP.arrays.selectedWeeks = [i];
                    }
                    weekSelect.appendChild(opt);
                }
@@ -637,10 +648,10 @@
            $('#year').on('select2:select', function () {
                let yearArr = $('#year').val();
                if(yearArr.length > 0) { //no values, removed by user
-                   selectedYears = yearArr;
+                   APP.arrays.selectedYears = yearArr;
                }
                else {
-                   selectedYears = ["0"];
+                   APP.arrays.selectedYears = ["0"];
                }
                table.ajax.reload();
            });
@@ -650,10 +661,10 @@
             */
            $('#year').on('select2:unselect', function() {
                if($('#year').val().length != 0) {
-                   selectedYears = $('#year').val();
+                   APP.arrays.selectedYears = $('#year').val();
                }
                else {
-                   selectedYears = ["0"];
+                   APP.arrays.selectedYears = ["0"];
                }
                table.ajax.reload();
            });
@@ -665,10 +676,10 @@
                let weeksArr = $('#weeks').val();
                // console.log('weeksArr', weeksArr);
                if(weeksArr.length > 0) {
-                   selectedWeeks = weeksArr;
+                   APP.arrays.selectedWeeks = weeksArr;
                }
                else {
-                   selectedWeeks = ["0"];
+                   APP.arrays.selectedWeeks = ["0"];
                }
                table.ajax.reload();
            });
@@ -678,10 +689,10 @@
             */
            $("#weeks").on('select2:unselect', function() {
                if($('#weeks').val().length != 0) {
-                   selectedWeeks = $('#weeks').val();
+                   APP.arrays.selectedWeeks = $('#weeks').val();
                }
                else {
-                   selectedWeeks = ['0'];
+                   APP.arrays.selectedWeeks = ['0'];
                }
                table.ajax.reload();
            });
@@ -698,10 +709,10 @@
                       tempArray = item.split('_');
                       helpArray.push(tempArray[1]);
                    });
-                   selectedDepartments = helpArray;
+                   APP.arrays.selectedDepartments = helpArray;
                }
                else {
-                   selectedDepartments = ["0"];
+                   APP.arrays.selectedDepartments = ["0"];
                }
                table.ajax.reload();
            });
@@ -718,10 +729,10 @@
                       tempArray = item.split('_');
                       helpArray.push(tempArray[1]);
                   });
-                  selectedDepartments = helpArray;
+                  APP.arrays.selectedDepartments = helpArray;
               }
               else {
-                  selectedDepartments = ["0"];
+                  APP.arrays.selectedDepartments = ["0"];
               }
 
               table.ajax.reload();
@@ -733,10 +744,10 @@
            $('#typ').on('select2:select', function() {
                let types = $('#typ').val();
                if(types.length > 0) {
-                   selectedTypes = types;
+                   APP.arrays.selectedTypes = types;
                }
                else {
-                   selectedTypes = ['0'];
+                   APP.arrays.selectedTypes = ['0'];
                }
                table.ajax.reload();
            });
@@ -746,10 +757,10 @@
             */
            $('#typ').on('select2:unselect', function() {
                if($('#typ').val().length != 0) {
-                   selectedTypes = $('#typ').val();
+                   APP.arrays.selectedTypes = $('#typ').val();
                }
                else {
-                   selectedTypes = ['0'];
+                   APP.arrays.selectedTypes = ['0'];
                }
                table.ajax.reload();
            });
@@ -757,7 +768,7 @@
            function saveHandler(e) {
                const saveBtn = e.target;
                if(saveBtn.disabled == false) { //user clicked on active save button, it mean there are rows to change
-                   const dataJSON = JSON.stringify(changeArr);
+                   const dataJSON = JSON.stringify(APP.arrays.changeArr);
 
                    const ourHeaders = new Headers();
                    ourHeaders.append('X-CSRF-TOKEN', $('meta[name="csrf-token"]').attr('content'));
@@ -774,10 +785,10 @@
                        .then(resp => resp.text())
                        .then(resp => {
                            notify(resp, 'success', 4000);
-                           changeArr = [];
-                           numberOfChanges = 0;
-                           badge.textContent = numberOfChanges;
-                           saveButton.disabled = true;
+                           APP.arrays.changeArr = [];
+                           APP.globalVariables.numberOfChanges = 0;
+                           APP.DOMElements.badge.textContent = APP.globalVariables.numberOfChanges;
+                           APP.DOMElements.saveButton.disabled = true;
                            let allHighlightedRows = document.querySelectorAll('.colorRow');
                            allHighlightedRows.forEach(item => {
                                item.classList.remove('colorRow');
@@ -790,7 +801,7 @@
 
            /***************************END OF EVENT LISTENERS FUNCTIONS********************/
 
-           saveButton.addEventListener('click', saveHandler);
+           APP.DOMElements.saveButton.addEventListener('click', saveHandler);
 
            /*Activation select2 framework*/
            (function initial() {
