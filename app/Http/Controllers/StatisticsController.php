@@ -2873,7 +2873,7 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
                 ]);
         } else { // Zbiorczy Raport Dyrektorów
             $dirId = substr($request->selected_dep, 2);
-            $director_departments = Department_info::select('id')->where(function($querry) use ($dirId) {
+            $director_departments = Department_info::where(function($querry) use ($dirId) {
                $querry->orwhere('director_id', '=', $dirId)
                    ->orwhere('regionalManager_id', '=', $dirId)
                    ->orwhere('director_hr_id', '=', $dirId);
@@ -2900,7 +2900,8 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
                     'dep_id'            => $request->selected_dep,
                     'months'            => $data['months'],
                     'wiev_type'         => 'director',
-                    'directors'         => $directors
+                    'directors'         => $directors,
+                    'director_departments' => $director_departments
                 ]);
         }
     }
