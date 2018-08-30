@@ -122,6 +122,7 @@
             processData: false,
             data: formData,
             success: function (response) {
+                self.close();
                 if(response === 'fail'){
                     console.log('Failed to upload screenshot');
                 }else{
