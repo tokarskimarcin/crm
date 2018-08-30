@@ -162,11 +162,13 @@ $('#blok').on('click', () => {
 });
 
 setInterval(function () {
-    countNotifications();
+    countNotificationsIt();
+    countNotificationsCadre();
 },60000);
 
 $(document).ready(function(){
-    countNotifications();
+    countNotificationsIt();
+    countNotificationsCadre();
 });
 
 /**
