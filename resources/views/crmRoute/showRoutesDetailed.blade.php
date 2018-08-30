@@ -166,15 +166,25 @@
     <script>
        document.addEventListener('DOMContentLoaded', function() {
            /********** GLOBAL VARIABLES ***********/
-           let selectedYears = ["0"]; //this array collect selected by user years
-           let selectedWeeks = ["0"]; //this array collect selected by user weeks
-           let selectedDepartments = ["0"]; //this array collect selected by user departments
-           let clientRouteInfoIdArr = []; //array of client_route_info ids
-           let selectedTypes = ['0']; //array of selected by user types
-           let arrayOfTableRows = []; //array of modal table rows
-           let datatableHeight = '75vh'; //this variable defines height of table
-           const clearButton = document.querySelector('#clearButton');
-           const editButton = document.querySelector('#editOneRecord');
+
+           let APP = {
+               arrays: {
+                   selectedYears: ["0"], //this array collect selected by user years
+                   selectedWeeks: ["0"], //this array collect selected by user weeks
+                   selectedDepartments: ["0"], //this array collect selected by user departments
+                   clientRouteInfoIdArr: [], //array of client_route_info ids
+                   selectedTypes: ['0'], //array of selected by user types
+                   arrayOfTableRows: [] //array of modal table rows
+               },
+               DOMElements: {
+                   clearButton: document.querySelector('#clearButton'),
+                   editButton: document.querySelector('#editOneRecord')
+               },
+               globalVariables: {
+                   datatableHeight: '75vh' //this variable defines height of table
+               }
+           }
+
            /*******END OF GLOBAL VARIABLES*********/
 
            $('#menu-toggle').change(()=>{
@@ -206,7 +216,7 @@
            function colorRowAndAddIdToArray(id, row) {
                let flag = false;
                let iterator = 0; //in this variable we will store position of id in array, that has been found.
-               clientRouteInfoIdArr.forEach(stringId => {
+              APP.arrays.clientRouteInfoIdArr.forEach(stringId => {
                    if (id === stringId) {
                        flag = true; //true - this row is already checked
                    }
@@ -216,36 +226,36 @@
                });
 
                if (flag) {
-                   clientRouteInfoIdArr.splice(iterator, 1);
+                   APP.arrays.clientRouteInfoIdArr.splice(iterator, 1);
                    row.removeClass('colorRow');
 
                    //this part removes object with given id form arrayOfTableRows
                    iterator = 0;
-                   arrayOfTableRows.forEach(clientId => {
+                   APP.arrays.arrayOfTableRows.forEach(clientId => {
                        if(id == clientId.id) {
-                           arrayOfTableRows.splice(iterator, 1);
+                           APP.arrays.arrayOfTableRows.splice(iterator, 1);
                        }
                        iterator++;
                    });
 
                }
                else {
-                   clientRouteInfoIdArr.push(id);
+                   APP.arrays.clientRouteInfoIdArr.push(id);
                    row.addClass('colorRow');
                }
-               $('#clearButton').find('.badge').text(clientRouteInfoIdArr.length);
+               $('#clearButton').find('.badge').text(APP.arrays.clientRouteInfoIdArr.length);
            }
 
            /**
             * This function append modify button with proper name and remove it if necessary
             */
            function showModifyButton() {
-               if (clientRouteInfoIdArr.length >0) {
-                   editButton.disabled = false;
+               if (APP.arrays.clientRouteInfoIdArr.length >0) {
+                   APP.DOMElements.editButton.disabled = false;
                    addModalBodyContext();
                }
                else {
-                   editButton.disabled = true;
+                   APP.DOMElements.editButton.disabled = true;
                }
            }
 
@@ -305,7 +315,7 @@
                    const header = new Headers();
                    header.append('X-CSRF-TOKEN', $('meta[name="csrf-token"]').attr('content'));
                    const data = new FormData();
-                   const JSONClientRouteInfoIdArr = JSON.stringify(clientRouteInfoIdArr);
+                   const JSONClientRouteInfoIdArr = JSON.stringify(APP.arrays.clientRouteInfoIdArr);
                    data.append('ids', JSONClientRouteInfoIdArr);
 
                    if(nrPBXValue != ''){
@@ -354,10 +364,10 @@
             * This function create one row of modal table and place it in rows array.
             */
            function createModalTableRow() {
-               clientRouteInfoIdArr.forEach(item => {
+               APP.arrays.clientRouteInfoIdArr.forEach(item => {
                    let addFlag = true;
                    let idItem = item;
-                   arrayOfTableRows.forEach(clientId => {
+                   APP.arrays.arrayOfTableRows.forEach(clientId => {
                        if(item == clientId.id) {
                            addFlag = false;
                        }
@@ -384,7 +394,7 @@
                            row: tr
                        };
 
-                       arrayOfTableRows.push(rowObject);
+                       APP.arrays.arrayOfTableRows.push(rowObject);
                    }
                });
            }
@@ -416,8 +426,8 @@
                theadElement.appendChild(tr1);
 
                infoTable.appendChild(theadElement);
-               clientRouteInfoIdArr.forEach(item => {
-                   arrayOfTableRows.forEach(tableRow => {
+               APP.arrays.clientRouteInfoIdArr.forEach(item => {
+                   APP.arrays.arrayOfTableRows.forEach(tableRow => {
                        if(item == tableRow.id){
                            tbodyElement.appendChild(tableRow.row);
                        }
@@ -632,7 +642,7 @@
                processing: true,
                serverSide: true,
                ordering: false,
-               scrollY: datatableHeight,
+               scrollY: APP.globalVariables.datatableHeight,
                "drawCallback": function( settings ) {
 
                },
@@ -641,7 +651,7 @@
                        $(row).css('background-color', '#fffc8b');
                    }
                    row.setAttribute('data-id', data.id);
-                   clientRouteInfoIdArr.forEach(specificId => { //when someone change table page, we have to reassign classes to rows.
+                   APP.arrays.clientRouteInfoIdArr.forEach(specificId => { //when someone change table page, we have to reassign classes to rows.
                        if (specificId == data.id) {
                            row.classList.add('colorRow');
                        }
@@ -688,10 +698,10 @@
                    'url': "{{route('api.campaignsInfo')}}",
                    'type': 'POST',
                    'data': function (d) {
-                        d.years = selectedYears;
-                        d.weeks = selectedWeeks;
-                        d.departments = selectedDepartments;
-                        d.typ = selectedTypes;
+                        d.years = APP.arrays.selectedYears;
+                        d.weeks = APP.arrays.selectedWeeks;
+                        d.departments = APP.arrays.selectedDepartments;
+                        d.typ = APP.arrays.selectedTypes;
                    },
                    'headers': {'X-CSRF-TOKEN': '{{ csrf_token() }}'}
                },
@@ -870,7 +880,7 @@
                    opt.textContent = j;
                    if(j == currentYear) {
                        opt.setAttribute('selected', 'selected');
-                       selectedYears = [j];
+                       APP.arrays.selectedYears = [j];
                    }
                    yearSelect.appendChild(opt);
                }
@@ -881,7 +891,7 @@
                    opt.textContent = i;
                    if(i == currentWeek) {
                        opt.setAttribute('selected', 'selected');
-                       selectedWeeks = [i];
+                       APP.arrays.selectedWeeks = [i];
                    }
                    weekSelect.appendChild(opt);
                }
@@ -897,10 +907,10 @@
            $('#year').on('select2:select', function () {
                let yearArr = $('#year').val();
                if(yearArr.length > 0) { //no values, removed by user
-                   selectedYears = yearArr;
+                   APP.arrays.selectedYears = yearArr;
                }
                else {
-                   selectedYears = ["0"];
+                   APP.arrays.selectedYears = ["0"];
                }
                table.ajax.reload();
            });
@@ -910,10 +920,10 @@
             */
            $('#year').on('select2:unselect', function() {
                if($('#year').val().length != 0) {
-                   selectedYears = $('#year').val();
+                   APP.arrays.selectedYears = $('#year').val();
                }
                else {
-                   selectedYears = ["0"];
+                   APP.arrays.selectedYears = ["0"];
                }
                table.ajax.reload();
            });
@@ -925,10 +935,10 @@
                let weeksArr = $('#weeks').val();
                console.log('weeksArr', weeksArr);
                if(weeksArr.length > 0) {
-                   selectedWeeks = weeksArr;
+                   APP.arrays.selectedWeeks = weeksArr;
                }
                else {
-                   selectedWeeks = ["0"];
+                   APP.arrays.selectedWeeks = ["0"];
                }
                table.ajax.reload();
            });
@@ -938,10 +948,10 @@
             */
            $("#weeks").on('select2:unselect', function() {
                if($('#weeks').val().length != 0) {
-                   selectedWeeks = $('#weeks').val();
+                   APP.arrays.selectedWeeks = $('#weeks').val();
                }
                else {
-                   selectedWeeks = ['0'];
+                   APP.arrays.selectedWeeks = ['0'];
                }
                table.ajax.reload();
            });
@@ -958,10 +968,10 @@
                       tempArray = item.split('_');
                       helpArray.push(tempArray[1]);
                    });
-                   selectedDepartments = helpArray;
+                   APP.arrays.selectedDepartments = helpArray;
                }
                else {
-                   selectedDepartments = ["0"];
+                   APP.arrays.selectedDepartments = ["0"];
                }
                table.ajax.reload();
            });
@@ -978,10 +988,10 @@
                       tempArray = item.split('_');
                       helpArray.push(tempArray[1]);
                   });
-                  selectedDepartments = helpArray;
+                  APP.arrays.selectedDepartments = helpArray;
               }
               else {
-                  selectedDepartments = ["0"];
+                  APP.arrays.selectedDepartments = ["0"];
               }
 
               table.ajax.reload();
@@ -993,10 +1003,10 @@
            $('#typ').on('select2:select', function() {
                let types = $('#typ').val();
                if(types.length > 0) {
-                   selectedTypes = types;
+                   APP.arrays.selectedTypes = types;
                }
                else {
-                   selectedTypes = ['0'];
+                   APP.arrays.selectedTypes = ['0'];
                }
                table.ajax.reload();
            });
@@ -1006,10 +1016,10 @@
             */
            $('#typ').on('select2:unselect', function() {
                if($('#typ').val().length != 0) {
-                   selectedTypes = $('#typ').val();
+                   APP.arrays.selectedTypes = $('#typ').val();
                }
                else {
-                   selectedTypes = ['0'];
+                   APP.arrays.selectedTypes = ['0'];
                }
                table.ajax.reload();
            });
@@ -1028,23 +1038,23 @@
             * This function clear all row selections and disable edit button
             */
            function clearAllSelections(e) {
-               if(arrayOfTableRows.length > 0) {
+               if(APP.arrays.arrayOfTableRows.length > 0) {
                    if(document.querySelectorAll('.colorRow')) {
                        const coloredRows = document.querySelectorAll('.colorRow');
                        coloredRows.forEach(colorRow => {
                            colorRow.classList.remove('colorRow');
                        });
-                       editButton.disabled = true;
+                       APP.DOMElements.editButton.disabled = true;
 
                        notify("<strong>Wszystkie zaznaczenia zostały usuniete</strong>", 'success', 4000);
                    }
                }
-               clientRouteInfoIdArr = [];
-               arrayOfTableRows = [];
-               $(e.target).find('.badge').text(clientRouteInfoIdArr.length);
+               APP.arrays.clientRouteInfoIdArr = [];
+               APP.arrays.arrayOfTableRows = [];
+               $(e.target).find('.badge').text(APP.arrays.clientRouteInfoIdArr.length);
            }
 
-           clearButton.addEventListener('click', function (e){
+            APP.DOMElements.clearButton.addEventListener('click', function (e){
                clearAllSelections(e);
            });
        });
