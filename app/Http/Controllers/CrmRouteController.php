@@ -4307,6 +4307,11 @@ class CrmRouteController extends Controller
             ->with('workHours', $workHours);
     }
 
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse|mixed
+     * This method return records for datatable
+     */
     public function engraverForConfirmingDatatable(Request $request) {
         $years = $request->years;
         $weeks = $request->weeks;
@@ -4367,6 +4372,11 @@ class CrmRouteController extends Controller
         return datatables($campaignsInfo->get())->make(true);
     }
 
+    /**
+     * @param Request $request
+     * @return string
+     * This method update database records
+     */
     public function engraverForConfirmingUpdate(Request $request) {
         $data = json_decode($request->data);
         $idsArr = [];

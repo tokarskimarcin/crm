@@ -305,7 +305,7 @@ function getStartAndEndDate($week, $year) {
                            }
                         });
                         return name;
-                    }, "name": "rola"
+                    }, "name": "rola", "searchable": "false"
                 }
             ],
             select: true
