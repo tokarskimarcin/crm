@@ -21,7 +21,7 @@
     <div class="panel-body">
         @if(isset($unratedNotifications) and $unratedNotifications > 0)
             <div class="alert alert-warning">
-                Nieocenione zakończone zgłoszenia w liczbie: {{$unratedNotifications}}
+                Masz zakończone zgłoszenia, które nie są ocenione: {{$unratedNotifications}}
             </div>
         @endif
         <div class="table-responsive">
@@ -49,6 +49,11 @@
                 Moje przyjęte zgłoszenia
             </div>
             <div class="panel-body">
+                @if(isset($notRepairedNotifications) and $notRepairedNotifications > 0)
+                    <div class="alert alert-warning">
+                        Masz zgłoszenia w trakcie realizacji: {{$notRepairedNotifications}}
+                    </div>
+                @endif
                 <div class="table-responsive">
                     <table id="datatable2" class="table table-striped table-bordered thead-inverse" cellspacing="0" width="100%">
                         <thead>
@@ -86,7 +91,9 @@ table = $('#datatable').DataTable({
     },
     "language": {
         "url": "//cdn.datatables.net/plug-ins/1.10.16/i18n/Polish.json"
-    },"columns":[
+    },
+    order: [[0,'desc']]
+    ,"columns":[
         {"data": "created_at"},
         {"data": "title"},
         {"data": function (data, type, dataToSet) {
@@ -194,7 +201,9 @@ let table2 = $('#datatable2').DataTable({
     },
     "language": {
         "url": "//cdn.datatables.net/plug-ins/1.10.16/i18n/Polish.json"
-    },"columns":[
+    },
+    order: [[0,'desc']]
+    ,"columns":[
         {"data": "created_at"},
         {"data": "title"},
         {"data": function (data, type, dataToSet) {

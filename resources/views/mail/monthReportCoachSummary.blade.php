@@ -65,23 +65,45 @@
             @foreach($coachData as $value)
                 @foreach($value as $item)
                     @php
-                            $collect_week->push($item[$i]);
-                            $data = $item[$i];
-                            $week_success += $data['success'];
-                            $week_checked += $data['all_checked'];
-                            $week_all_bad += $data['all_bad'];
-                            $week_pause_time += $data['pause_time'];
-                            $week_login_time += $data['login_time'];
-                            $week_received_calls += $data['received_calls'];
-                            $week_janky_count += $data['total_week_yanky'];
+                            if($onlyNewUser == 1){
+                               if(in_array($item[$i]['user_id'],$onlyUserID) && count($onlyUserID) != 0){
+                                   $collect_week->push($item[$i]);
+                                   $data = $item[$i];
+                                   $week_success += $data['success'];
+                                   $week_checked += $data['all_checked'];
+                                   $week_all_bad += $data['all_bad'];
+                                   $week_pause_time += $data['pause_time'];
+                                   $week_login_time += $data['login_time'];
+                                   $week_received_calls += $data['received_calls'];
+                                   $week_janky_count += $data['total_week_yanky'];
 
-                            $total_success += $data['success'];
-                            $total_checked += $data['all_checked'];
-                            $total_bad += $data['all_bad'];
-                            $total_pause_time += $data['pause_time'];
-                            $total_login_time += $data['login_time'];
-                            $total_received_calls += $data['received_calls'];
-                            $total_janky_count += $data['total_week_yanky'];
+                                   $total_success += $data['success'];
+                                   $total_checked += $data['all_checked'];
+                                   $total_bad += $data['all_bad'];
+                                   $total_pause_time += $data['pause_time'];
+                                   $total_login_time += $data['login_time'];
+                                   $total_received_calls += $data['received_calls'];
+                                   $total_janky_count += $data['total_week_yanky'];
+                            }
+                        }else{
+                         $collect_week->push($item[$i]);
+                                   $data = $item[$i];
+                                   $week_success += $data['success'];
+                                   $week_checked += $data['all_checked'];
+                                   $week_all_bad += $data['all_bad'];
+                                   $week_pause_time += $data['pause_time'];
+                                   $week_login_time += $data['login_time'];
+                                   $week_received_calls += $data['received_calls'];
+                                   $week_janky_count += $data['total_week_yanky'];
+
+                                   $total_success += $data['success'];
+                                   $total_checked += $data['all_checked'];
+                                   $total_bad += $data['all_bad'];
+                                   $total_pause_time += $data['pause_time'];
+                                   $total_login_time += $data['login_time'];
+                                   $total_received_calls += $data['received_calls'];
+                                   $total_janky_count += $data['total_week_yanky'];
+                        }
                     @endphp
                 @endforeach
             @endforeach

@@ -45,44 +45,83 @@
             </tr>
             @foreach($coach as $item)
                 @if(is_object($item))
-                    @php
-                    if($item->all_checked_talks != 0 && $item->all_checked_talks != null) {
-                        $janky_percent = round($item->all_bad_talks / $item->all_checked_talks * 100, 2);
-                    }
-                    else {
-                        $janky_percent = 0;
-                    }
+                    @if($onlyNewUser == 1)
+                        @if(in_array($item->user_id,$onlyUserID) && count($onlyUserID) != 0)
+                            @php
+                                if($item->all_checked_talks != 0 && $item->all_checked_talks != null) {
+                                    $janky_percent = round($item->all_bad_talks / $item->all_checked_talks * 100, 2);
+                                }
+                                else {
+                                    $janky_percent = 0;
+                                }
+                            @endphp
 
-                    @endphp
+                            <tr>
+                                <td style="border:1px solid #231f20;text-align:center;padding:3px">{{ $item->user_last_name . ' ' . $item->user_first_name }}</td>
+                                <td style="border:1px solid #231f20;text-align:center;padding:3px">{{ $item->average }}</td>
+                                <td style="border:1px solid #231f20;text-align:center;padding:3px">{{ $janky_percent }} %</td>
+                                <td style="border:1px solid #231f20;text-align:center;padding:3px">{{ $item->received_calls }}</td>
+                                <td style="border:1px solid #231f20;text-align:center;padding:3px">{{ $item->success }}</td>
+                                <td style="border:1px solid #231f20;text-align:center;padding:3px">{{ ($item->received_calls > 0) ? round(($item->success / $item->received_calls) * 100, 2) : 0 }} %</td>
+                                <td style="border:1px solid #231f20;text-align:center;padding:3px">{{ sprintf('%02d:%02d:%02d', ($item->time_pause/3600),($item->time_pause/60%60), $item->time_pause%60) }}</td>
+                                <td style="border:1px solid #231f20;text-align:center;padding:3px">{{ $item->login_time }}</td>
+                            </tr>
+                            @php
+                                $total_received_calls += $item->received_calls;
+                                $total_success += $item->success;
+                                $total_pause_time += $item->time_pause;
+                                $hours_array = explode(':', $item->login_time);
+                                $total_login_time += (($hours_array[0] * 3600) + ($hours_array[1] * 60) + $hours_array[2]);
+                                $total_janky_count += $item->all_bad_talks;
+                                $total_all_checked_talks += $item->all_checked_talks;
 
-                    <tr>
-                        <td style="border:1px solid #231f20;text-align:center;padding:3px">{{ $item->user_last_name . ' ' . $item->user_first_name }}</td>
-                        <td style="border:1px solid #231f20;text-align:center;padding:3px">{{ $item->average }}</td>
-                        <td style="border:1px solid #231f20;text-align:center;padding:3px">{{ $janky_percent }} %</td>
-                        <td style="border:1px solid #231f20;text-align:center;padding:3px">{{ $item->received_calls }}</td>
-                        <td style="border:1px solid #231f20;text-align:center;padding:3px">{{ $item->success }}</td>
-                        <td style="border:1px solid #231f20;text-align:center;padding:3px">{{ ($item->received_calls > 0) ? round(($item->success / $item->received_calls) * 100, 2) : 0 }} %</td>
-                        <td style="border:1px solid #231f20;text-align:center;padding:3px">{{ sprintf('%02d:%02d:%02d', ($item->time_pause/3600),($item->time_pause/60%60), $item->time_pause%60) }}</td>
-                        <td style="border:1px solid #231f20;text-align:center;padding:3px">{{ $item->login_time }}</td>
-                    </tr>
-                    @php
-                        $total_received_calls += $item->received_calls;
-                        $total_success += $item->success;
-                        $total_pause_time += $item->time_pause;
-                        $hours_array = explode(':', $item->login_time);
-                        $total_login_time += (($hours_array[0] * 3600) + ($hours_array[1] * 60) + $hours_array[2]);
-                        $total_janky_count += $item->all_bad_talks;
-                        $total_all_checked_talks += $item->all_checked_talks;
+                                $day_total_received_calls += $item->received_calls;
+                                $day_total_success += $item->success;
+                                $day_total_pause_time += $item->time_pause;
+                                $hours_array = explode(':', $item->login_time);
+                                $day_total_login_time += (($hours_array[0] * 3600) + ($hours_array[1] * 60) + $hours_array[2]);
+                                $day_total_janky_count += $item->all_bad_talks;
+                                $day_total_all_checked_talks += $item->all_checked_talks;
+                            @endphp
+                        @endif
+                        @else
+                        @php
+                            if($item->all_checked_talks != 0 && $item->all_checked_talks != null) {
+                                $janky_percent = round($item->all_bad_talks / $item->all_checked_talks * 100, 2);
+                            }
+                            else {
+                                $janky_percent = 0;
+                            }
+                        @endphp
 
-                        $day_total_received_calls += $item->received_calls;
-                        $day_total_success += $item->success;
-                        $day_total_pause_time += $item->time_pause;
-                        $hours_array = explode(':', $item->login_time);
-                        $day_total_login_time += (($hours_array[0] * 3600) + ($hours_array[1] * 60) + $hours_array[2]);
-                        $day_total_janky_count += $item->all_bad_talks;
-                        $day_total_all_checked_talks += $item->all_checked_talks;
-                    @endphp
+                        <tr>
+                            <td style="border:1px solid #231f20;text-align:center;padding:3px">{{ $item->user_last_name . ' ' . $item->user_first_name }}</td>
+                            <td style="border:1px solid #231f20;text-align:center;padding:3px">{{ $item->average }}</td>
+                            <td style="border:1px solid #231f20;text-align:center;padding:3px">{{ $janky_percent }} %</td>
+                            <td style="border:1px solid #231f20;text-align:center;padding:3px">{{ $item->received_calls }}</td>
+                            <td style="border:1px solid #231f20;text-align:center;padding:3px">{{ $item->success }}</td>
+                            <td style="border:1px solid #231f20;text-align:center;padding:3px">{{ ($item->received_calls > 0) ? round(($item->success / $item->received_calls) * 100, 2) : 0 }} %</td>
+                            <td style="border:1px solid #231f20;text-align:center;padding:3px">{{ sprintf('%02d:%02d:%02d', ($item->time_pause/3600),($item->time_pause/60%60), $item->time_pause%60) }}</td>
+                            <td style="border:1px solid #231f20;text-align:center;padding:3px">{{ $item->login_time }}</td>
+                        </tr>
+                        @php
+                            $total_received_calls += $item->received_calls;
+                            $total_success += $item->success;
+                            $total_pause_time += $item->time_pause;
+                            $hours_array = explode(':', $item->login_time);
+                            $total_login_time += (($hours_array[0] * 3600) + ($hours_array[1] * 60) + $hours_array[2]);
+                            $total_janky_count += $item->all_bad_talks;
+                            $total_all_checked_talks += $item->all_checked_talks;
 
+                            $day_total_received_calls += $item->received_calls;
+                            $day_total_success += $item->success;
+                            $day_total_pause_time += $item->time_pause;
+                            $hours_array = explode(':', $item->login_time);
+                            $day_total_login_time += (($hours_array[0] * 3600) + ($hours_array[1] * 60) + $hours_array[2]);
+                            $day_total_janky_count += $item->all_bad_talks;
+                            $day_total_all_checked_talks += $item->all_checked_talks;
+                        @endphp
+                    @endif
                 @endif
             @endforeach
             @php

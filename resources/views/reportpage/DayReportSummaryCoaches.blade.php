@@ -31,7 +31,7 @@
                     </select>
                 </div>
             </div>
-            <div class="col-md-3">
+            <div class="col-md-2">
                 <div class="form-group">
                     <label>Wybierz dzień:</label>
                     <select class="form-control" id="day_select" name="day_select">
@@ -45,7 +45,16 @@
                     </select>
                 </div>
             </div>
-            <div class="col-md-3">
+            <div class="col-md-2">
+                <div class="form-group">
+                    <label>Nowi konsultanci (30RBH):</label>
+                    <select class="form-control" name="onlyNewUser" id="onlyNewUser">
+                        <option value="0" @if(isset($onlyNewUser) && $onlyNewUser == 0) selected  @endif>Nie</option>
+                        <option value="1" @if(isset($onlyNewUser) && $onlyNewUser == 1) selected @endif>Tak</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-2">
                 <div class="form-group">
                     <input id="get_dep" style="margin-top: 25px; width: 100%" type="submit" class="btn btn-info" value="Generuj raport">
                 </div>
