@@ -73,6 +73,16 @@
                                 value="10{{ $director->id }}">{{ $director->last_name . ' ' . $director->first_name }}</option>
                             @endforeach
                         </optgroup>
+                        <optgroup label="Szkoleniowiec Regionalny">
+                            @foreach($regionalManagersInstructors as $regionalManagersInstructor)
+                                @php
+                                    $allDepartments = $departments->where('instructor_regional_id', '=', $regionalManagersInstructor->id);
+                                @endphp
+                                <option data-toggle="tooltip" data-placement="right" title="@foreach($allDepartments as $dep){{$dep->departments->name}} {{$dep->department_type->name}}, @endforeach"
+                                        @if($wiev_type == 'director' && ('10' . $regionalManagersInstructor->id == $dep_id)) selected @endif
+                                        value="10{{ $regionalManagersInstructor->id }}">{{ $regionalManagersInstructor->last_name . ' ' . $regionalManagersInstructor->first_name }}</option>
+                            @endforeach
+                        </optgroup>
                         <optgroup label="Kierownik Regionalny">
                             @foreach($regionalManagers as $director)
                                 @php

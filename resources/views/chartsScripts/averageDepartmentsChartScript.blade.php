@@ -23,7 +23,6 @@
     }
 
     function drawChart(data, id, srcElementToDraw, size = 1) {
-        console.log(window.innerHeight);
         let resizeFactor = window.innerHeight/1280;
         var options = {
             title: departmentsNames[id],
