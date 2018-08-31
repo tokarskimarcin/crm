@@ -4199,7 +4199,8 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
                 'month'             => $month,
                 'year'              => $year,
                 'date_selected'     => date('Y-m-d'),
-                'months'            => self::getMonthsNames()
+                'months'            => self::getMonthsNames(),
+                'onlyNewUser'   => 0,
             ]);
     }
 
@@ -4236,7 +4237,8 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
                 'data'              => $data['data'],
                 'report_date'       => $data['report_date'],
                 'months'            => self::getMonthsNames(),
-                'onlyNewUser'   => $request->onlyNewUser
+                'onlyNewUser'       => $request->onlyNewUser,
+                'onlyUserID'        => $onlyUserID
             ]);
     }
 
