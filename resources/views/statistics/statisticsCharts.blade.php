@@ -155,7 +155,7 @@
                     let id = depData.dep_info_id;
                     if(departmentsAveragesForEveryHourChartsData[id].length>1){
                         var data = google.visualization.arrayToDataTable(departmentsAveragesForEveryHourChartsData[id]);
-                        drawChart(data, id, 'chart',0.5);
+                        drawChart(data, id, 'chart',0.6);
                     }else{
                         $('#chart').text('Brak danych');
                     }
@@ -173,7 +173,7 @@
                     let id = depData.dep_info_id;
                     if(departmentsAveragesForEveryDayChartsData[id].length>1){
                         var data = google.visualization.arrayToDataTable(departmentsAveragesForEveryDayChartsData[id]);
-                        drawChart(data, id, 'chart',0.5);
+                        drawChart(data, id, 'chart',0.6);
                     }else{
                         $('#chart').text('Brak danych');
                     }
