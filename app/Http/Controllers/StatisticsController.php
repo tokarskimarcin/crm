@@ -4770,7 +4770,8 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
                 'coaches'   => $coaches,
                 'months'    => self::getMonthsNames(),
                 'month'     => date('m'),
-                'coach_selected' => 0
+                'coach_selected' => 0,
+                'onlyNewUser'   => 0,
             ]);
     }
 
@@ -4790,14 +4791,19 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
         $date_stop = date('Y-') . $request->month_selected . date('-t', strtotime(date('Y-') . $request->month_selected)) ;
 
         $data = self::monthReportConsultantsData($request->coach_id, $date_start, $date_stop);
+        $newUserID = [];
+        if($request->onlyNewUser == 1)
+            $newUserID = $this::getUserLessThan30RBH()->pluck('id_user')->toArray();
 
         return view('reportpage.monthReportConsultant')
             ->with([
-                'coaches'   => $coaches,
-                'months'    => self::getMonthsNames(),
-                'month'     => $request->month_selected,
-                'coach_selected' => $request->coach_id,
-                'data'      => $data
+                'coaches'       => $coaches,
+                'months'        => self::getMonthsNames(),
+                'month'         => $request->month_selected,
+                'coach_selected'=> $request->coach_id,
+                'data'          => $data,
+                'onlyNewUser'   => $request->onlyNewUser,
+                'onlyUserID'    => $newUserID
             ]);
     }
 
