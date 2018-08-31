@@ -3960,14 +3960,14 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
             $data[$coach->id]['trainer'] = $coach;
             $data[$coach->id]['date'] = [date('Y-m'.'-01'), date('Y-m-t')];
         }
-//        dd($data);
         return view('reportpage.monthReportCoachSummary')
             ->with([
                 'months'        => self::getMonthsNames(),
                 'month'         => date('m'),
                 'departments'   => $departments,
                 'dep_id'        => $departments->first()->id,
-                'data'          => $data
+                'data'          => $data,
+                'onlyNewUser'   => 0,
             ]);
     }
 
@@ -3992,13 +3992,20 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
             $data[$coach->id]['date'] = [$data_start, $data_stop];
         }
 
+        $newUserID = [];
+        if($request->onlyNewUser == 1)
+            $newUserID = $this::getUserLessThan30RBH()->pluck('id_user')->toArray();
+
+
         return view('reportpage.monthReportCoachSummary')
             ->with([
                 'months'        => self::getMonthsNames(),
                 'month'         => $request->month_selected,
                 'departments'   => $departments,
                 'dep_id'        => $request->dep_selected,
-                'data'          => $data
+                'data'          => $data,
+                'onlyNewUser'   => $request->onlyNewUser,
+                'onlyUserID'    => $newUserID
             ]);
     }
 
