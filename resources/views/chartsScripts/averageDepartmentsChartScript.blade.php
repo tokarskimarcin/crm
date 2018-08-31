@@ -23,27 +23,29 @@
     }
 
     function drawChart(data, id, srcElementToDraw, size = 1) {
+        console.log(window.innerHeight);
+        let resizeFactor = window.innerHeight/1280;
         var options = {
             title: departmentsNames[id],
-            lineWidth: 8*size,
+            lineWidth: 8*resizeFactor*size,
             legend: { position: 'bottom' },
             // chartArea: {
             //     left: 30,
             //     top: 30
             // },
-            fontSize: 24*size,
+            fontSize: 24*resizeFactor*size,
             fontName: "Tahoma",
             series: {
-                0: {lineDashStyle: [2, 2, 20, 2, 20,2], color: 'red', lineWidth: 11*size},
-                1: {lineWidth: 6*size, visibleInLegend: false, },
-                2: {lineWidth: 6*size, visibleInLegend: false}
+                0: {lineDashStyle: [2, 2, 20, 2, 20,2], color: 'red', lineWidth: 11*resizeFactor*size},
+                1: {lineWidth: 6*resizeFactor*size, visibleInLegend: false, },
+                2: {lineWidth: 6*resizeFactor*size, visibleInLegend: false}
             },
             colors: ['#1A1567'],
             hAxis: {
                 minorGridlines: {count: 5},
                 textStyle: {
                     bold: true,
-                    fontSize: 29*size
+                    fontSize: 29*resizeFactor*size
                 }
             },
             vAxis: {
@@ -52,12 +54,12 @@
                 minValue: 0,
                 textStyle: {
                     bold: true,
-                    fontSize: 34*size
+                    fontSize: 34*resizeFactor*size
                 }
             },
             titleTextStyle: {
                 color: "#C21A01",
-                fontSize: 70*size
+                fontSize: 70*resizeFactor*size
             },
             viewWindowMode:'explicit',
             viewWindow:{
@@ -66,7 +68,7 @@
             },
             annotations: {
                 textStyle: {
-                    fontSize: 34*size,
+                    fontSize: 34*resizeFactor*size,
                     color: "black",
                     bold: true
                 }
