@@ -10,7 +10,7 @@
     <form method="POST" action="{{ URL::to('/pageMonthReportCoachSummary') }}">
         <input type="hidden" name="_token" value="{{ csrf_token() }}">
         <div class="row">
-            <div class="col-md-4">
+            <div class="col-md-3">
                 <div class="form-group">
                     <label>Oddział:</label>
                     <select class="form-control" name="dep_selected">
@@ -20,7 +20,7 @@
                     </select>
                 </div>
             </div>
-            <div class="col-md-4">
+            <div class="col-md-3">
                 <div class="form-group">
                     <label>Miesiąc:</label>
                     <select class="form-control" name="month_selected">
@@ -30,7 +30,16 @@
                     </select>
                 </div>
             </div>
-            <div class="col-md-4">
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label>Tylko nowi konsultanci (30RBH):</label>
+                    <select class="form-control" name="onlyNewUser" id="onlyNewUser">
+                        <option value="0" @if(isset($onlyNewUser) && $onlyNewUser == 0) selected  @endif>Nie</option>
+                        <option value="1" @if(isset($onlyNewUser) && $onlyNewUser == 1) selected @endif>Tak</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-3">
                 <div class="form-group">
                     <input style="margin-top: 25px; width: 100%" type="submit" class="btn btn-info" value="Generuj raport">
                 </div>
