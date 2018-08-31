@@ -175,6 +175,7 @@ class AdminController extends Controller
         $hr = User::where('user_type_id', '=', '5')->where('status_work', '=', '1')->get();
         $hrDirectors = User::where('user_type_id', '=', '14')->where('status_work', '=', '1')->get();
         $regionalManagers = User::where('user_type_id', '=', '17')->where('status_work', '=', '1')->get();
+        $regionalManagersInstructors = User::where('user_type_id', '=', 21)->where('status_work', '=', 1)->get();
         return view('admin.addDepartment')
             ->with('departments', $departments)
             ->with('department_types', $department_types)
@@ -182,7 +183,7 @@ class AdminController extends Controller
             ->with('hrEmployee', $hr)
             ->with('hrDirectors', $hrDirectors)
             ->with('regionalManagers', $regionalManagers)
-            ;
+            ->with('regionalManagersInstructors', $regionalManagersInstructors);
     }
 
     public function addDepartmentPost(Request $request) {
@@ -228,6 +229,7 @@ class AdminController extends Controller
         $department_info->hr_id = ($request->hrEmployee != 0) ? $request->hrEmployee : null ;
         $department_info->hr_id_second = ($request->hrEmployee2 != 0) ? $request->hrEmployee2 : null ;
         $department_info->regionalManager_id = ($request->regionalManager != 0) ? $request->regionalManager : null ;
+        $department_info->instructor_regional_id = ($request->regionalManagersInstructors != 0) ? $request->regionalManagersInstructors : null ;
 
         $department_info->save();
 
@@ -260,6 +262,7 @@ class AdminController extends Controller
         $department_info = Department_info::all();
         $department_types = Department_types::all();
         $selected_department = Department_info::find($request->selected_department_info_id);
+        $regionalManagersInstructors = User::where('user_type_id', '=', 21)->where('status_work', '=', 1)->get();
 
         if ($selected_department == null || ($request->post_type != 1 && $request->post_type != 2)) {
             return view('errors.404');
@@ -273,7 +276,8 @@ class AdminController extends Controller
               ->with('hrEmployee', $hrEmployee)
               ->with('menagers', $menagers)
               ->with('hrDirectors', $hrDirectors)
-              ->with('regionalManagers', $regionalManagers);
+              ->with('regionalManagers', $regionalManagers)
+              ->with('regionalManagersInstructors', $regionalManagersInstructors);
         }
 
         if ($request->post_type == 2) {
@@ -318,6 +322,7 @@ class AdminController extends Controller
             $selected_department->hr_id = ($request->hrEmployee != 0) ? $request->hrEmployee : null ;
             $selected_department->hr_id_second = ($request->hrEmployee2 != 0) ? $request->hrEmployee2 : null ;
             $selected_department->regionalManager_id = ($request->regionalManager != 0) ? $request->regionalManager : null ;
+            $selected_department->instructor_regional_id = ($request->regionalManagersInstructors != 0) ? $request->regionalManagersInstructors : null ;
             $selected_department->save();
         }
 
