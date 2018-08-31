@@ -28,24 +28,40 @@
         $total_success_calls_proc = 0;
         $total_pause_time = 0;
         $total_login_time = 0;
-
+        $show = true;
         $total_checked = 0;
         $total_bad = 0;
     @endphp
 
     @foreach($data as $item)
         @php
-            $total_success += $item['success'];
-            $total_received_calls += $item['received_calls'];
-            $total_pause_time += $item['pause_time'];
-            $total_login_time += $item['login_time'];
-            $total_janky_count += $item['janky_count'];
-            $total_checked += $item['all_checked'];
-            $total_bad += $item['all_bad'];
+            if($onlyNewUser == 1){
+                if(in_array($item['consultant']->id,$onlyUserID) && count($onlyUserID) != 0){
+                    $total_success += $item['success'];
+                    $total_received_calls += $item['received_calls'];
+                    $total_pause_time += $item['pause_time'];
+                    $total_login_time += $item['login_time'];
+                    $total_janky_count += $item['janky_count'];
+                    $total_checked += $item['all_checked'];
+                    $total_bad += $item['all_bad'];
+                    $jank = $item['all_checked'] > 0 ? round((100 * $item['all_bad'] / $item['all_checked']),2) : 0;
+                    $show = true;
+                }else{
+                    $show = false;
+                }
+            }else{
+                    $total_success += $item['success'];
+                    $total_received_calls += $item['received_calls'];
+                    $total_pause_time += $item['pause_time'];
+                    $total_login_time += $item['login_time'];
+                    $total_janky_count += $item['janky_count'];
+                    $total_checked += $item['all_checked'];
+                    $total_bad += $item['all_bad'];
+                    $jank = $item['all_checked'] > 0 ? round((100 * $item['all_bad'] / $item['all_checked']),2) : 0;
+            }
+
         @endphp
-        @php
-            $jank = $item['all_checked'] > 0 ? round((100 * $item['all_bad'] / $item['all_checked']),2) : 0;
-        @endphp
+        @if($show)
         <tr>
             <td style="border:1px solid #231f20;text-align:center;padding:3px">{{ $item['consultant']->last_name . ' ' . $item['consultant']->first_name }}</td>
             <td style="border:1px solid #231f20;text-align:center;padding:3px">{{ $item['average'] }}</td>
@@ -56,6 +72,7 @@
             <td style="border:1px solid #231f20;text-align:center;padding:3px">{{ sprintf('%02d:%02d:%02d', ($item['pause_time']/3600),($item['pause_time']/60%60), $item['pause_time']%60) }}</td>
             <td style="border:1px solid #231f20;text-align:center;padding:3px">{{ sprintf('%02d:%02d:%02d', ($item['login_time']/3600),($item['login_time']/60%60), $item['login_time']%60) }}</td>
         </tr>
+        @endif
     @endforeach
 
     @php
