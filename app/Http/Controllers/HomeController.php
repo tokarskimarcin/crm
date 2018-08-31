@@ -134,6 +134,13 @@ class HomeController extends Controller
         }
     }
 
+    public function itSupportNotRepairedNotifications(Request $request) {
+        if($request->ajax()) {
+            $notRepairedNotifications = Notifications::where('status','=',2)->where('displayed_by', Auth::user()->id)->count();
+            return $notRepairedNotifications;
+        }
+    }
+
     public function itCountNotifications(Request $request) {
         if($request->ajax()) {
             $notifications_count = Notifications::where('status', 1)->count();
