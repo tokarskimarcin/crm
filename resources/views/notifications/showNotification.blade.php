@@ -74,7 +74,8 @@
             @if($notification->status == 3)
             <p>
               <b>Czas realizacji zgłoszenia:</b>
-                {{$notification->sec}}
+                @if($notification->realization_days_duration > 0){{$notification->realization_days_duration}}d
+                @endif {{$notification->sec}}
             </p>
             @endif
             <br />

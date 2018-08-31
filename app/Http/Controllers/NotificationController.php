@@ -114,15 +114,16 @@ class NotificationController extends Controller
             } else if ($request->status == 3) {
                 $stop = date("Y-m-d H:i:s");
                 $notification->data_stop = $stop;
-                $notification->save();
 
-                $sec = DB::table('notifications')
-                    ->select(DB::raw('
-                        SEC_TO_TIME(TIME_TO_SEC(data_stop) - TIME_TO_SEC(data_start)) as time
-                    '))
-                    ->where('id', '=', $id)
-                    ->get();
-              $notification->sec= $sec[0]->time;
+                $date_start =\DateTime::createFromFormat('Y-m-d H:i:s',$notification->data_start);
+                $date_stop = \DateTime::createFromFormat('Y-m-d H:i:s',$notification->data_stop);
+                $interval = $date_start->diff($date_stop);
+                $clockTimeDuration = ($interval->h < 10 ? '0'.$interval->h : $interval->h)
+                    .':'.($interval->i < 10 ? '0'.$interval->i : $interval->i)
+                    .':'.($interval->s < 10 ? '0'.$interval->s : $interval->s);
+
+                $notification->sec= $clockTimeDuration;
+                $notification->realization_days_duration = $interval->d + $interval->m*30; //estimation
             }
 
             $notification->save();
@@ -372,7 +373,7 @@ class NotificationController extends Controller
                 AVG(judge_time) as user_time,
                 AVG(judge_sum) as user_judge_sum,
                 SUM(CASE WHEN response_after = 1 THEN 1 ELSE 0 END) as response_after,
-                AVG(TIME_TO_SEC(notifications.sec)) / 3600 as notifications_time_sum
+                AVG(TIME_TO_SEC(notifications.sec) + (IFNULL(realization_days_duration, 0)*24*3600)) / 3600 as notifications_time_sum
             '))
             ->leftJoin('users', 'users.id', '=', 'judge_results.it_id')
             ->leftJoin('notifications', 'notifications.id', '=', 'judge_results.notification_id')
