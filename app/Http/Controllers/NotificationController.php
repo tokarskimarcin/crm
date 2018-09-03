@@ -511,7 +511,7 @@ class NotificationController extends Controller
 
     public function notificationJudgeResult(Request $request){
         if($request->ajax()) {
-            JudgeResult::find($request->judgeResultId);
+            return ['judgeResult' => JudgeResult::find($request->judgeResultId)];
         }
     }
 }

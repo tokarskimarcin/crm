@@ -74,7 +74,7 @@
         </div>
 
         <div id="modalJudgeResult" class="modal fade" tabindex="-1" role="dialog">
-            <div class="modal-dialog" role="document">
+            <div class="modal-dialog modal-lg" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
@@ -234,17 +234,17 @@ let table2 = $('#datatable2').DataTable({
             }
         },
         {"data": function (data, type, dataToSet) {
+            let button = $(document.createElement('button')).addClass('judgeResultButton btn btn-block btn-primary');
             if(data.jr_id == null){
-                return 'Brak';
+                button.append('Brak').attr('disabled',true);
             }else{
                 let span = $(document.createElement('span'));
                 if(data.comment !== 'Brak komentarza'){
                     span.addClass('glyphicon glyphicon-comment');
                 }
-                span.append(' '+data.judge_sum);
-                let button = $(document.createElement('button')).addClass('judgeResultButton btn btn-block btn-primary').append(span).attr('data-jrid',data.jr_id);
-                return button.prop('outerHTML');
+                button.append(span).append(' '+data.judge_sum).attr('data-jrid',data.jr_id);
             }
+            return button.prop('outerHTML');
             }, name: 'judgeResult',"orderable": false, "searchable": false},
         {"data": function (data, type, dataToSet) {
                 return '<a class="btn btn-default  btn-block" href="show_notification/'+data.id+'" ><span class="glyphicon glyphicon-search"></span></a>';
@@ -259,30 +259,107 @@ $('.panel-body').click(function (e) {
 
 });
 function judgeResultButtonHandler(e) {
-    $.ajax({
-        url: "{{ route('api.notificationJudgeResult') }}",
-        type: 'POST',
-        headers: {'X-CSRF-TOKEN': '{{ csrf_token() }}'},
-        data: {
-        'judgeResultId': $(e.target).data('jrid')
-        },
-        success: function (response) {
-
-        },
-        error: function (jqXHR, textStatus, thrownError) {
-            console.log(jqXHR);
-            console.log('textStatus: ' + textStatus);
-            console.log('hrownError: ' + thrownError);
-            swal({
-                type: 'error',
-                title: 'Błąd ' + jqXHR.status,
-                text: 'Wystąpił błąd: ' + thrownError+' "'+jqXHR.responseJSON.message+'"',
+    swal({
+        title: 'Ładowawnie...',
+        text: 'To może chwilę zająć',
+        showConfirmButton: false,
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+        allowEnterKey: false,
+        onOpen: () => {
+            swal.showLoading();
+            $.ajax({
+                url: "{{ route('api.notificationJudgeResult') }}",
+                type: 'POST',
+                headers: {'X-CSRF-TOKEN': '{{ csrf_token() }}'},
+                data: {
+                    'judgeResultId': $(e.target).data('jrid')
+                },
+                success: function (response) {
+                    if(response){
+                        let modalBody = $('#modalJudgeResult .modal-body');
+                        modalBody.text('');
+                        modalBody.append(createJudgeResultModalBody(response.judgeResult));
+                        $('#modalJudgeResult').modal('show');
+                    }
+                },
+                error: function (jqXHR, textStatus, thrownError) {
+                    console.log(jqXHR);
+                    console.log('textStatus: ' + textStatus);
+                    console.log('hrownError: ' + thrownError);
+                    swal({
+                        type: 'error',
+                        title: 'Błąd ' + jqXHR.status,
+                        text: 'Wystąpił błąd: ' + thrownError+' "'+jqXHR.responseJSON.message+'"',
+                    });
+                }
+            }).then((response) => {
+                swal.close();
             });
         }
-    })
+    });
+
+
 }
 
-function createJudgeResultModalBody(){
+function createJudgeResultModalBody(judgeResult){
+    console.log(judgeResult);
+
+    let thead1 = $(document.createElement('thead'))
+        .append($(document.createElement('tr'))
+            .append($(document.createElement('th')).append('Kryterium'))
+            .append($(document.createElement('th')).append('Ocena')));
+
+
+    let tbody1 = $(document.createElement('tbody'))
+        .append($(document.createElement('tr'))
+            .append($(document.createElement('td')).append('Jakość wykonania'))
+            .append($(document.createElement('td')).append(judgeResult.judge_quality)))
+
+        .append($(document.createElement('tr'))
+            .append($(document.createElement('td')).append('Kontakt z serwisantem'))
+            .append($(document.createElement('td')).append(judgeResult.judge_contact)))
+
+        .append($(document.createElement('tr'))
+            .append($(document.createElement('td')).append('Czas wykonywania'))
+            .append($(document.createElement('td')).append(judgeResult.judge_time)))
+
+        .append($(document.createElement('tr'))
+            .append($(document.createElement('th')).append('Ocena ogólna'))
+            .append($(document.createElement('th')).append(judgeResult.judge_sum+'/6')));
+
+    let table1 = $(document.createElement('table')).addClass('table table-striped table-bordered thead-inverse')
+        .append(thead1).append(tbody1);
+    let tablesCol1 = $(document.createElement('div')).addClass('col-md-6').append(table1);
+
+    let thead2 = $(document.createElement('thead'))
+        .append($(document.createElement('tr'))
+            .append($(document.createElement('th')).append('Kryterium'))
+            .append($(document.createElement('th')).append('Ocena')));
+
+
+    let tbody2 = $(document.createElement('tbody'))
+        .append($(document.createElement('tr'))
+            .append($(document.createElement('td')).append('Problem naprawiony'))
+            .append($(document.createElement('td')).css('background',judgeResult.repaired === 1 ? '#78ff80' : '#ff7878')
+                .append(judgeResult.repaired === 1 ? 'TAK' : 'NIE')))
+
+        .append($(document.createElement('tr'))
+            .append($(document.createElement('td')).append('Kontakt technika po zakończeniu'))
+            .append($(document.createElement('td')).css('background',judgeResult.response_after === 1 ? '#78ff80' : '#ff7878')
+                .append(judgeResult.response_after === 1 ? 'TAK' : 'NIE')));
+
+    let table2 = $(document.createElement('table')).addClass('table table-striped table-bordered thead-inverse')
+        .append(thead2).append(tbody2);
+    let tablesCol2 = $(document.createElement('div')).addClass('col-md-6').append(table2);
+
+    let tablesRow = $(document.createElement('div')).addClass('row').append(tablesCol1).append(tablesCol2);
+
+    let commentCol = $(document.createElement('div')).addClass('col-md-12')
+        .append($(document.createElement('label')).append('Komentarz:'))
+        .append($(document.createElement('div')).addClass('well well-sm').append(judgeResult.comment));
+    let commentRow = $(document.createElement('div')).addClass('row').append(commentCol);
+    return  $(document.createElement('div')).append(tablesRow).append($(document.createElement('hr'))).append(commentRow);
 
 }
 </script>
