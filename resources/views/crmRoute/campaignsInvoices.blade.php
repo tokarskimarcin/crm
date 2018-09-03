@@ -430,7 +430,7 @@
                             penalty = parseInt(penalty[0]);
                             let row2 = '';
                             if(penalty > 0){
-                                let penaltyLabel = $(document.createElement('label')).text('Naliczono karę na kworę');
+                                let penaltyLabel = $(document.createElement('label')).text('Naliczono karę na kwotę');
                                 let penaltyInput = $(document.createElement('input')).addClass('form-control').attr('id','penaltyInput').attr('type','number').attr('value',penalty);
                                 let inputPenaltyGroup = $(document.createElement('div')).addClass('col-md-12').append(penaltyLabel).append(penaltyInput);
                                  row2 = $(document.createElement('div')).addClass('row').append(inputPenaltyGroup).css('margin-top','1em');

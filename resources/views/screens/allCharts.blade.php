@@ -19,12 +19,13 @@
     }
 
     #my_charts {
-        width: 100vw;
+        width: 720px;
+        /*width: 100vw;*/
         /*height: 100vh;*/
     }
 
     .chart {
-        height: 100vh;
+        height: 480px;
         font-size: xx-large;
         color: grey;
         text-align: center;
@@ -59,7 +60,7 @@
                 if(departmentsAveragesForEveryHourChartsData[id] !== undefined){
                     if(departmentsAveragesForEveryHourChartsData[id].length>1) {
                         var data = google.visualization.arrayToDataTable(departmentsAveragesForEveryHourChartsData[id]);
-                        drawChart(data, id, 'dep_'+i);
+                        drawChart(data, id, 'dep_'+i,0.8,false);
                     }else{
                         $('#dep_'+i).text(departmentsAveragesForEveryHour[i].departmentName+' Brak danych');
                     }
