@@ -128,6 +128,7 @@ class FinancesController extends Controller
 
     private function getFreeDays($dividedMonth) {
 
+//        dd($dividedMonth);
         $fieldArr = [
             '1' => 'mondayPaid',
             '2' => 'tuesdayPaid',
@@ -148,28 +149,69 @@ class FinancesController extends Controller
             }
         }
 
-//        dd($unsafeWeeksArr);
-
         $freeDaysSafe = Schedule::select(DB::raw('
             id_user,
-            SUM(CASE WHEN mondayPaid = 0 THEN 1 ELSE 0 END) + SUM(CASE WHEN tuesdayPaid = 0 THEN 1 ELSE 0 END) + SUM(CASE WHEN mondayPaid = 0 THEN 1 ELSE 0 END)
-            as notPaidMonday
+            SUM(CASE WHEN mondayPaid = 0 THEN 1 ELSE 0 END) + SUM(CASE WHEN tuesdayPaid = 0 THEN 1 ELSE 0 END) + SUM(CASE WHEN wednesdayPaid = 0 THEN 1 ELSE 0 END) + SUM(CASE WHEN thursdayPaid = 0 THEN 1 ELSE 0 END) + SUM(CASE WHEN fridayPaid = 0 THEN 1 ELSE 0 END) + SUM(CASE WHEN saturdayPaid = 0 THEN 1 ELSE 0 END) + SUM(CASE WHEN sundayPaid = 0 THEN 1 ELSE 0 END)
+            as notPaidDays
         '))
             ->groupBy('id_user')
             ->whereIn('week_num', $safeWeeksArr)
             ->get();
 
-        $unsafeWeekString1 = 'SUM(CASE WHEN ';
-        for($i = $unsafeWeeksArr[0]['firstDay'])
+        $unsafeWeekString1 = '';
+        $unsafeWeekString2 = '';
+//        dd($unsafeWeeksArr);
+        for($i = $dividedMonth[0]['firstDayNr']; $i < 8; $i++) {
+            if($i != 7) {
+                $unsafeWeekString1 .= 'SUM(CASE WHEN ' . $fieldArr[$i] . ' = 0 THEN 1 ELSE 0 END) + ';
+            }
+            else {
+                $unsafeWeekString1 .= 'SUM(CASE WHEN ' . $fieldArr[$i] . ' = 0 THEN 1 ELSE 0 END)';
+            }
+        }
 
-        $freeDaysUnsafe = Schedule::select(DB::raw('
-            
+        $max = $dividedMonth[count($dividedMonth) - 1]['lastDayNr'];
+        for($i = 1; $i <= $max; $i++) {
+            if($i != $max) {
+                $unsafeWeekString2 .= 'SUM(CASE WHEN ' . $fieldArr[$i] . ' = 0 THEN 1 ELSE 0 END) + ';
+            }
+            else {
+                $unsafeWeekString2 .= 'SUM(CASE WHEN ' . $fieldArr[$i] . ' = 0 THEN 1 ELSE 0 END)';
+            }
+        }
+
+        $freeDaysUnsafe1 = Schedule::select(DB::raw('
+            id_user,
+            ' . $unsafeWeekString1 . ' as notPaidDays
         '))
             ->groupBy('id_user')
             ->where('week_num', '=', $unsafeWeeksArr[0])
             ->get();
 
-        dd($freeDaysSafe->where('notPaidMonday', '!=', 0));
+        $freeDaysUnsafe2 = Schedule::select(DB::raw('
+            id_user,
+            ' . $unsafeWeekString2 . ' as notPaidDays
+        '))
+            ->groupBy('id_user')
+            ->where('week_num', '=', $unsafeWeeksArr[1])
+            ->get();
+
+
+        $finalArr = [];
+        $idArr = array_merge($freeDaysSafe->pluck('id_user')->toArray(), $freeDaysUnsafe1->pluck('id_user')->toArray());
+        $fullIdArr = array_merge($idArr, $freeDaysUnsafe2->pluck('id_user')->toArray());
+        $fullIdUniqueArray = array_unique($fullIdArr); //array of all user ids
+
+        foreach($fullIdUniqueArray as $userId) {
+
+            $element1 = $freeDaysSafe->where('id_user', '=', $userId)->count() != 0 ? $freeDaysSafe->where('id_user', '=', $userId)->first()->notPaidDays : 0;
+            $element2 = $freeDaysUnsafe1->where('id_user', '=', $userId)->count() != 0 ? $freeDaysUnsafe1->where('id_user', '=', $userId)->first()->notPaidDays : 0;
+            $element3 = $freeDaysUnsafe2->where('id_user', '=', $userId)->count() != 0 ? $freeDaysUnsafe2->where('id_user', '=', $userId)->first()->notPaidDays : 0;
+            array_push($finalArr, ['id_user' => $userId, 'freeDays' => $element1 + $element2 + $element3]);
+        }
+
+        return $finalArr;
+
     }
 
     public function viewPaymentCadrePost(Request $request)
@@ -218,17 +260,8 @@ class FinancesController extends Controller
             ->groupBy('users.id')
             ->orderBy('users.last_name')->get();
 
-        $data = $this->getFreeDays($dividedMonth);
+        $freeDaysData = $this->getFreeDays($dividedMonth); //[id_user, freeDays]
 
-        $free = Schedule::select(DB::raw('
-            id_user,
-            SUM(CASE WHEN mondayPaid = 0 THEN 1 ELSE 0 END) + SUM(CASE WHEN tuesdayPaid = 0 THEN 1 ELSE 0 END) + SUM(CASE WHEN mondayPaid = 0 THEN 1 ELSE 0 END)
-            as notPaidMonday
-        '))
-            ->groupBy('id_user')
-            ->get();
-
-        dd($free->where('notPaidMonday', '!=', 0));
         /**
          * Pobranie danych osób którzy nie pracowali całego miesiąca
          */
@@ -354,6 +387,21 @@ class FinancesController extends Controller
             }
         }
 
+        foreach($salary as $onePerson) {
+            $flag = false;
+            foreach($freeDaysData as $freeDayData) {
+                if($onePerson->id == $freeDayData['id_user']) {
+                    $flag = true;
+                    $onePerson->salary -= $onePerson->average_salary * $freeDayData['freeDays'];
+                    $onePerson->freeDays = $freeDayData['freeDays'];
+                }
+            }
+            if(!$flag) {
+                $onePerson->freeDays = 0;
+            }
+
+        }
+
         /**
          *  Pobranie informacji o departamentach
          */
@@ -362,6 +410,8 @@ class FinancesController extends Controller
             ->join('departments','departments.id','department_info.id_dep')
             ->join('department_type','department_type.id','department_info.id_dep_type')
             ->get();
+
+//        dd($salary->where('freeDays', '!=', 0));
 
         return view('finances.viewPaymentCadre')
             ->with('month',$date_to_post)
