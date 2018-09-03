@@ -61,6 +61,7 @@
                             <th style="width: 20%;">Data:</th>
                             <th style="width: 40%;">Tytuł:</th>
                             <th style="width: 20%;">Stan realizacji</th>
+                            <th style="width: 10%;">Ocena</th>
                             <th style="width: 10%;">Akcja</th>
                         </tr>
                         </thead>
@@ -77,8 +78,7 @@
 @section('script')
 <script src="{{ asset('/js/dataTables.bootstrap.min.js')}}"></script>
 <script>
-
-table = $('#datatable').DataTable({
+let table = $('#datatable').DataTable({
     "autoWidth": false,
     "processing": true,
     "serverSide": true,
@@ -158,27 +158,27 @@ table = $('#datatable').DataTable({
                                         'Zgłoszenie zostało usunięte',
                                         'Zgłoszenie zostało usunięte',
                                         'success'
-                                    )
+                                    );
                                     table.ajax.reload();
                                 }else if(response == 2){
                                     swal(
                                         'Zgłoszenie może usunąć tylko osoba zgłaszająca.',
                                         'Zgłoszenie może usunąć tylko osoba zgłaszająca.',
                                         'error'
-                                    )
+                                    );
                                 }
                                 else if(response == 0){
                                     swal(
                                         'Zgłoszenia nie można usunąć, ponieważ jest już w trakcie realizacji.',
                                         'Zgłoszenia nie można usunąć.',
                                         'error'
-                                    )
+                                    );
                                 }else{
                                     swal(
                                         'Problem skontaktuj się z admininstratorem.',
                                         'Problem skontaktuj się z admininstratorem.',
                                         'error'
-                                    )
+                                    );
                                 }
                             }
                         });
@@ -217,6 +217,9 @@ let table2 = $('#datatable2').DataTable({
                 }
             }
         },
+        {"data": function (data, type, dataToSet) {
+                return 'Brak';
+            }, name: 'mark'},
         {"data": function (data, type, dataToSet) {
                 return '<a class="btn btn-default  btn-block" href="show_notification/'+data.id+'" >Pokaż</a>';
             },"orderable": false, "searchable": false },
