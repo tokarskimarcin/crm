@@ -32,7 +32,7 @@
                         <th style="width: 40%;">Tytuł:</th>
                         <th style="width: 20%;">Stan realizacji</th>
                         <th style="width: 10%;">Szczegóły</th>
-                        <th style="width: 5%;">Oceń</th>
+                        <th style="width: 5%;">Ocena</th>
                         <th style="width: 10%;">Akcja</th>
                     </tr>
                 </thead>
@@ -62,7 +62,7 @@
                             <th style="width: 40%;">Tytuł:</th>
                             <th style="width: 20%;">Stan realizacji</th>
                             <th style="width: 10%;">Ocena</th>
-                            <th style="width: 10%;">Akcja</th>
+                            <th style="width: 10%;">Podgląd</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -72,6 +72,22 @@
                 </div>
             </div>
         </div>
+
+        <div id="modalJudgeResult" class="modal fade" tabindex="-1" role="dialog">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title">Ocena</h4>
+                    </div>
+                    <div class="modal-body">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Zamknij</button>
+                    </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal-dialog -->
+        </div><!-- /.modal -->
     @endif
 
 @endsection
@@ -218,13 +234,56 @@ let table2 = $('#datatable2').DataTable({
             }
         },
         {"data": function (data, type, dataToSet) {
+            if(data.jr_id == null){
                 return 'Brak';
-            }, name: 'mark'},
+            }else{
+                let span = $(document.createElement('span'));
+                if(data.comment !== 'Brak komentarza'){
+                    span.addClass('glyphicon glyphicon-comment');
+                }
+                span.append(' '+data.judge_sum);
+                let button = $(document.createElement('button')).addClass('judgeResultButton btn btn-block btn-primary').append(span).attr('data-jrid',data.jr_id);
+                return button.prop('outerHTML');
+            }
+            }, name: 'judgeResult',"orderable": false, "searchable": false},
         {"data": function (data, type, dataToSet) {
-                return '<a class="btn btn-default  btn-block" href="show_notification/'+data.id+'" >Pokaż</a>';
+                return '<a class="btn btn-default  btn-block" href="show_notification/'+data.id+'" ><span class="glyphicon glyphicon-search"></span></a>';
             },"orderable": false, "searchable": false },
     ]
 });
 
+$('.panel-body').click(function (e) {
+   if($(e.target).hasClass('judgeResultButton')){
+       judgeResultButtonHandler(e);
+   }
+
+});
+function judgeResultButtonHandler(e) {
+    $.ajax({
+        url: "{{ route('api.notificationJudgeResult') }}",
+        type: 'POST',
+        headers: {'X-CSRF-TOKEN': '{{ csrf_token() }}'},
+        data: {
+        'judgeResultId': $(e.target).data('jrid')
+        },
+        success: function (response) {
+
+        },
+        error: function (jqXHR, textStatus, thrownError) {
+            console.log(jqXHR);
+            console.log('textStatus: ' + textStatus);
+            console.log('hrownError: ' + thrownError);
+            swal({
+                type: 'error',
+                title: 'Błąd ' + jqXHR.status,
+                text: 'Wystąpił błąd: ' + thrownError+' "'+jqXHR.responseJSON.message+'"',
+            });
+        }
+    })
+}
+
+function createJudgeResultModalBody(){
+
+}
 </script>
 @endsection
