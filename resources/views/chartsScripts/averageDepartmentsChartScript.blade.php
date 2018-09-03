@@ -22,8 +22,8 @@
         return departmentsChartsData;
     }
 
-    function drawChart(data, id, srcElementToDraw, size = 1) {
-        let resizeFactor = window.innerHeight/1280;
+    function drawChart(data, id, srcElementToDraw, size = 1, resizeByResolution = true) {
+        let resizeFactor = resizeByResolution ? window.innerHeight/1280 : 1;
         var options = {
             title: departmentsNames[id],
             lineWidth: 8*resizeFactor*size,
