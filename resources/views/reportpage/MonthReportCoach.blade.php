@@ -36,7 +36,7 @@
                 </div>
                 <div class="col-md-3">
                     <div class="form-group">
-                        <label>Tylko nowi konsultanci (30RBH):</label>
+                        <label>Nowi konsultanci ~30RBH:</label>
                         <select class="form-control" name="onlyNewUser" id="onlyNewUser">
                             <option value="0" @if(isset($onlyNewUser) && $onlyNewUser == 0) selected  @endif>Nie</option>
                             <option value="1" @if(isset($onlyNewUser) && $onlyNewUser == 1) selected @endif>Tak</option>
