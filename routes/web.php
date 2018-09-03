@@ -15,8 +15,8 @@ Route::POST('/stopWork', 'HomeController@stopWork');
 Route::POST('/register_hour', 'WorkHoursController@registerHour');
 
 //********************AJAX*********************** */
-Route::post('/userPrivilage', 'AdminController@userPrivilagesAjax')->name('api.privilageAjax');
-Route::post('/userPrivilagesAjax', 'AdminController@userPrivilagesAjaxData')->name('api.privilageAjaxData');
+Route::post('/userPrivilage', 'AdminPanel\LinksController@userPrivilage')->name('api.privilageAjax');
+Route::post('/userPrivilagesAjax', 'AdminPanel\LinksController@userPrivilagesAjaxData')->name('api.privilageAjaxData');
 
 Route::post('/delete_picture', 'AuditController@delete_picture')->name('api.delete_picture');
 Route::post('/add', 'AuditController@ajax')->name('api.ajax');
@@ -906,8 +906,8 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
     /** KONIEC AUDYTY **/
 
     //dodawanie usuwanie przywilejów dla użytkowników
-    Route::get('/userPrivilages', 'AdminController@userPrivilagesGET');
-    Route::post('/userPrivilages', 'AdminController@userPrivilagesPOST');
+    Route::get('/userPrivilages', 'AdminPanel\LinksController@userPrivilagesGET');
+    Route::post('/userPrivilages', 'AdminPanel\LinksController@userPrivilagesPOST');
 
     /** CRM **/
     Route::get('/specificRoute/{id}', 'CrmRouteController@specificRouteGet');

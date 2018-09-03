@@ -6,9 +6,12 @@ use App\ActivityRecorder;
 use App\LinkGroups;
 use App\Links;
 use App\PrivilageRelation;
+use App\PrivilageUserRelation;
+use App\User;
 use App\UserTypes;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\URL;
@@ -181,6 +184,97 @@ class LinksController extends Controller
             Session::flash('message_error', "Błąd wykonywania zapytania SQL.");
             return Redirect::back();
         }
+
+    }
+
+    /** Show view to add or remove privilages
+     * @return mixed
+     */
+    public function userPrivilagesGET() {
+        $all_users = User::all();
+        $all_privilage_users = PrivilageUserRelation::all();
+        $all_links = Links::select('id', 'name')
+            ->get();
+        return view('admin.userPrivilage')->with('all_users', $all_users)->with('all_privilage_users', $all_privilage_users)->with('all_links', $all_links);
+    }
+
+    /** get Datatable info to view userPrivilages ['Left column']
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse|mixed
+     */
+    public function userPrivilage(Request $request) {
+        $privilage_people = $request->privilage_people;
+        $all_users = User::select(
+                'users.id as user_id',
+                'users.first_name as first_name',
+                'users.last_name as last_name')
+            ->where('users.status_work', '=', 1);
+        if($privilage_people == "true") { //checkbox is checked
+            $all_users = $all_users
+                ->join('privilage_user_relation', 'users.id', '=', 'privilage_user_relation.user_id')
+                ->distinct('user_id');
+        }
+        return datatables($all_users->get())->make(true);
+    }
+
+    /** Get info with link is avaible for selected user
+     * @param Request $request
+     * @return mixed
+     */
+    public function userPrivilagesAjaxData(Request $request) {
+        $user_id = $request->id_of_user;
+        $all = PrivilageUserRelation::
+            select(
+                'privilage_user_relation.link_id as link_id',
+                'links.name')
+            ->join('links', 'privilage_user_relation.link_id', 'links.id')
+            ->where('privilage_user_relation.user_id', '=', $user_id)
+            ->get();
+        return $all;
+    }
+
+    /** Save and remove privilages
+     * @param Request $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function userPrivilagesPOST(Request $request) {
+        $data = [];
+        $remove_id = $request->remove_privilage_id; //link_id
+        $user_id = $request->user_id; //user_id
+        $adding = $request->isAdding;
+        if($adding == 'false') {
+            if(!(is_null($remove_id) || is_null($user_id))) {
+                try{
+                    PrivilageUserRelation::
+                    where('user_id', '=', $user_id)
+                        ->where('link_id', '=', $remove_id)
+                        ->delete();
+                    $data['ID użytkownika'] = $user_id;
+                    $data['ID linku'] = $remove_id;
+                    new ActivityRecorder($data,191,3);
+                    Session::flash('message_ok', "Uprawnienia dodane!");
+                }catch (\Exception $exception){
+                    Session::flash('message_error', "Problem wykonania SQL Line: 257");
+                    redirect()->back();
+                }
+            }
+        }
+        else {
+            $new_privilage_number = $request->add_new_privilage; // link_id
+            $new_privilage = new PrivilageUserRelation();
+            $new_privilage->link_id = $new_privilage_number;
+            $new_privilage->user_id = $user_id;
+            try {
+                $new_privilage->save();
+                $data['ID użytkownika'] = $user_id;
+                $data['ID linku'] = $new_privilage_number;
+                new ActivityRecorder($data,191,1);
+            }catch (\Exception $exception){
+                Session::flash('message_error', "Problem wykonania SQL Line: 273");
+                redirect()->back();
+            }
+        }
+        return redirect()->back();
 
     }
 }
