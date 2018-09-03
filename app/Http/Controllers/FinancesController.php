@@ -170,14 +170,6 @@ class FinancesController extends Controller
             ->groupBy('users.id')
             ->orderBy('users.last_name')->get();
 
-        $free = Schedule::select(DB::raw('
-            id_user,
-            SUM(CASE WHEN mondayPaid = 0 THEN 1 ELSE 0 END) + SUM(CASE WHEN tuesdayPaid = 0 THEN 1 ELSE 0 END) + SUM(CASE WHEN mondayPaid = 0 THEN 1 ELSE 0 END)
-            as notPaidMonday
-        '))
-            ->groupBy('id_user')
-            ->get();
-
         /**
          * Pobranie danych osób którzy nie pracowali całego miesiąca
          */
