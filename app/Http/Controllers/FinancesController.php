@@ -223,7 +223,6 @@ class FinancesController extends Controller
         $month = substr($date, 5, 2);
 
         $dividedMonth = $this->monthPerRealWeekDivision($month, $year);
-//        dd($dividedMonth);
         $agencies = Agencies::all();
         $salary = DB::table(DB::raw("users"))
             ->whereNotIn('users.user_type_id',[1,2,9])
@@ -255,7 +254,6 @@ class FinancesController extends Controller
             ->join('work_hours', 'work_hours.id_user', 'users.id')
             ->join('departments','departments.id','department_info.id_dep')
             ->join('department_type','department_type.id','department_info.id_dep_type')
-            ->leftJoin('schedule', 'schedule.id_user' , '=', 'users.id')
             ->where('work_hours.date', 'like', $date)
             ->groupBy('users.id')
             ->orderBy('users.last_name')->get();
