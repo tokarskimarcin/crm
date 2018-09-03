@@ -95,4 +95,92 @@ class LinksController extends Controller
         Session::flash('message_ok', "Zmiany zapisano!");
         return Redirect::back();
     }
+
+
+    /** Show view to add new link
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function createLinkGet(){
+        $link_groups = LinkGroups::all();
+        return view('admin.create_link')
+            ->with('link_groups', $link_groups);
+    }
+
+    /** Save new link
+     * @param Request $request
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function createLinkPost(Request $request){
+        $data = [];
+        $link = new Links();
+        $linkGroupCheck = LinkGroups::find($request->group_link_id);
+        if ($linkGroupCheck == null) {
+            return view('errors.404');
+        }
+
+        $data['Nazwa linku'] = $request->name;
+        $data['Link'] = $request->link;
+        $data['ID grupy'] = $request->group_link_id;
+        $link->name = $request->name;
+        $link->link = $request->link;
+        $link->group_link_id = $request->group_link_id;
+
+        try{
+            $link->save();
+            new ActivityRecorder($data, 72, 1);
+            Session::flash('message_ok', "Link został dodany!");
+            return Redirect::back();
+        }catch (\Exception $exception){
+            Session::flash('message_error', "Błąd wykonywania zapytania SQL.");
+            return Redirect::back();
+        }
+
+
+        new ActivityRecorder($data, 72, 1);
+        Session::flash('message_ok', "Link został dodany!");
+        return Redirect::back();
+    }
+
+    /** Save new group
+     * @param Request $request
+     * @return mixed
+     */
+    public function addGroup(Request $request) {
+        $data = [];
+        $newGroupName = trim($request->addLinkGroup, ' ');
+        $newGroup = new LinkGroups();
+        $data['Nazwa dodanej grupy'] = $newGroupName;
+        $newGroup->name = $newGroupName;
+        try {
+            $newGroup->save();
+            new ActivityRecorder($data, 72, 1);
+            Session::flash('message_ok', "Grupa został dodana");
+            return Redirect::back();
+        }catch (\Exception $exception){
+            Session::flash('message_error', "Błąd wykonywania zapytania SQL.");
+            return Redirect::back();
+        }
+
+    }
+
+    /** Remove group
+     * @param Request $request
+     * @return mixed
+     */
+    public function removeGroup(Request $request) {
+        $data = [];
+        $groupID = $request->removeLinkGroup;
+        $data['ID grupy'] = $groupID;
+        $groupToDelete = LinkGroups::where('id', '=', $groupID)->first();
+        try {
+            $groupToDelete->delete();
+            new ActivityRecorder($data, 72, 3);
+            Session::flash('message_ok', "Grupa został usunięta");
+            return Redirect::back();
+        }catch (\Exception $exception){
+            Session::flash('message_error', "Błąd wykonywania zapytania SQL.");
+            return Redirect::back();
+        }
+
+    }
 }

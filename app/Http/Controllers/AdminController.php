@@ -413,55 +413,55 @@ class AdminController extends Controller
 //        }
 //    }
 
-    public function createLinkGet(){
-        $link_groups = LinkGroups::all();
-
-        return view('admin.create_link')
-            ->with('link_groups', $link_groups);
-    }
-
-    public function createLinkPost(Request $request){
-        $data = [];
-        $link = new Links();
-        $linkGroupCheck = LinkGroups::find($request->group_link_id);
-        if ($linkGroupCheck == null) {
-            return view('errors.404');
-        }
-
-        $data['Nazwa linku'] = $request->name;
-        $data['Link'] = $request->link;
-        $data['ID grupy'] = $request->group_link_id;
-        $link->name = $request->name;
-        $link->link = $request->link;
-        $link->group_link_id = $request->group_link_id;
-
-        $link->save();
-
-        new ActivityRecorder($data, 72, 1);
-        Session::flash('message_ok', "Link został dodany!");
-        return Redirect::back();
-    }
-
-    public function addGroup(Request $request) {
-        $data = [];
-        $newGroupName = trim($request->addLinkGroup, ' ');
-        $newGroup = new LinkGroups();
-        $data['Nazwa dodanej grupy'] = $newGroupName;
-        $newGroup->name = $newGroupName;
-        $newGroup->save();
-        new ActivityRecorder($data, 72, 1);
-        return Redirect::back();
-    }
-
-    public function removeGroup(Request $request) {
-        $data = [];
-        $groupID = $request->removeLinkGroup;
-        $data['ID grupy'] = $groupID;
-        $groupToDelete = LinkGroups::where('id', '=', $groupID)->first();
-        $groupToDelete->delete();
-        new ActivityRecorder($data, 72, 3);
-        return Redirect::back();
-    }
+//    public function createLinkGet(){
+//        $link_groups = LinkGroups::all();
+//
+//        return view('admin.create_link')
+//            ->with('link_groups', $link_groups);
+//    }
+//
+//    public function createLinkPost(Request $request){
+//        $data = [];
+//        $link = new Links();
+//        $linkGroupCheck = LinkGroups::find($request->group_link_id);
+//        if ($linkGroupCheck == null) {
+//            return view('errors.404');
+//        }
+//
+//        $data['Nazwa linku'] = $request->name;
+//        $data['Link'] = $request->link;
+//        $data['ID grupy'] = $request->group_link_id;
+//        $link->name = $request->name;
+//        $link->link = $request->link;
+//        $link->group_link_id = $request->group_link_id;
+//
+//        $link->save();
+//
+//        new ActivityRecorder($data, 72, 1);
+//        Session::flash('message_ok', "Link został dodany!");
+//        return Redirect::back();
+//    }
+//
+//    public function addGroup(Request $request) {
+//        $data = [];
+//        $newGroupName = trim($request->addLinkGroup, ' ');
+//        $newGroup = new LinkGroups();
+//        $data['Nazwa dodanej grupy'] = $newGroupName;
+//        $newGroup->name = $newGroupName;
+//        $newGroup->save();
+//        new ActivityRecorder($data, 72, 1);
+//        return Redirect::back();
+//    }
+//
+//    public function removeGroup(Request $request) {
+//        $data = [];
+//        $groupID = $request->removeLinkGroup;
+//        $data['ID grupy'] = $groupID;
+//        $groupToDelete = LinkGroups::where('id', '=', $groupID)->first();
+//        $groupToDelete->delete();
+//        new ActivityRecorder($data, 72, 3);
+//        return Redirect::back();
+//    }
 
     public function firewallGet() {
         $firewall = Firewall::all();

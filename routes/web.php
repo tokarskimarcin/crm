@@ -448,11 +448,11 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
     Route::get('/set_multiple_department', 'AdminPanel\DepartmentsController@multipleDepartmentGet');
     Route::Post('/set_multiple_department', 'AdminPanel\DepartmentsController@multipleDepartmentPost');
 
-    Route::get('/create_link', 'AdminController@createLinkGet');
-    Route::Post('/create_link', 'AdminController@createLinkPost');
+    Route::get('/create_link', 'AdminPanel\LinksController@createLinkGet');
+    Route::Post('/create_link', 'AdminPanel\LinksController@createLinkPost');
 
-    Route::Post('/addGroup', 'AdminController@addGroup');
-    Route::Post('/removeGroup', 'AdminController@removeGroup');
+    Route::Post('/addGroup', 'AdminPanel\LinksController@addGroup');
+    Route::Post('/removeGroup', 'AdminPanel\LinksController@removeGroup');
 
     Route::get('/firewall_ip', 'AdminController@firewallGet');
     Route::POST('/firewall_ip', 'AdminController@firewallPost');
