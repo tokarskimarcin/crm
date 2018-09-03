@@ -97,7 +97,7 @@ Route::POST('/datatableShowInProgressNotifications', 'NotificationController@dat
 Route::POST('/datatableShowFinishedNotifications', 'NotificationController@datatableShowFinishedNotifications')->name('api.datatableShowFinishedNotifications'); //tu zmienic z ORM
 
 //locker / Multiple departments
-Route::POST('/locker', 'AdminController@lockerPost')->name('api.locker');
+Route::POST('/locker', 'AdminPanel\LockerController@lockerPost')->name('api.locker');
 
 //firewall delete users
 Route::POST('/firewallDeleteUser', 'AdminController@firewallDeleteUser')->name('api.firewallDeleteUser');
@@ -432,12 +432,12 @@ Auth::routes();
 Route::middleware(['check-permission', 'check-firewall'])->group(function () {
     Route::get('/', 'HomeController@index');
     // Admin_Panel --Start--
-    Route::get('/admin_privilage', 'AdminPanel\ManagementPanelController@adminPrivilage');
+    Route::get('/admin_privilage', 'AdminPanel\ManagementPrivilagesController@adminPrivilage');
 
     Route::get('/admin_privilage_show/{id}', 'AdminPanel\LinksController@adminPrivilageShow');
     Route::Post('/admin_privilage_edit/{id}', 'AdminPanel\LinksController@adminPrivilageEdit');
 
-    Route::get('/locker', 'AdminController@lockerGet');
+    Route::get('/locker', 'AdminPanel\LockerController@lockerGet');
 
     Route::get('/add_department', 'AdminController@addDepartmentGet');
     Route::Post('/add_department', 'AdminController@addDepartmentPost');

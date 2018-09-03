@@ -129,20 +129,20 @@ class AdminController extends Controller
 //    }
 
 
-    private function getDepartment()
-    {
-        $departments = DB::table('department_info')
-            ->join('departments', 'department_info.id_dep', '=', 'departments.id')
-            ->join('department_type', 'department_info.id_dep_type', '=', 'department_type.id')
-            ->select(DB::raw(
-                'department_info.*,
-                    departments.name as department_name,
-                    department_info.type,
-                    department_type.name as department_type_name
-                   '))
-            ->orderBy('department_info.id', 'asc')->get();
-        return $departments;
-    }
+//    private function getDepartment()
+//    {
+//        $departments = DB::table('department_info')
+//            ->join('departments', 'department_info.id_dep', '=', 'departments.id')
+//            ->join('department_type', 'department_info.id_dep_type', '=', 'department_type.id')
+//            ->select(DB::raw(
+//                'department_info.*,
+//                    departments.name as department_name,
+//                    department_info.type,
+//                    department_type.name as department_type_name
+//                   '))
+//            ->orderBy('department_info.id', 'asc')->get();
+//        return $departments;
+//    }
 
     public function lockerGet() {
         $department_info = Department_info::all();

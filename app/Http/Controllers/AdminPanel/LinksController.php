@@ -15,7 +15,10 @@ use Illuminate\Support\Facades\URL;
 
 class LinksController extends Controller
 {
-    //Show Link to Edit
+    /** Show linkt to edit
+     * @param $linkID
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
     public function adminPrivilageShow($linkID)
     {
         if ($linkID == null) {
@@ -38,7 +41,6 @@ class LinksController extends Controller
             ->where('links.id',$linkID)
             ->get();
         $link_info      = $link->first();
-
         return view('admin.admin_privilage_show')
             ->with('groups',$link_groups)
             ->with('link',$link)
@@ -46,16 +48,20 @@ class LinksController extends Controller
             ->with('link_info',$link_info);
     }
 
-
-    public function adminPrivilageEdit($id,Request $request)
+    /** Edit selected LINK
+     * @param $id Link ID
+     * @param Request $request
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function adminPrivilageEdit($linkID,Request $request)
     {
         $url_array          = explode('/',URL::previous());
         $urlValidation      = end($url_array);
-        if ($urlValidation != $id) {
+        if ($urlValidation != $linkID) {
             return view('errors.404');
         }
         $data                   = [];
-        $link                   = Links::findOrFail($id);
+        $link                   = Links::findOrFail($linkID);
         $link->link             = $request->link_adress;
         $link->name             = $request->link_name;
         $link->group_link_id    = $request->link_group;
@@ -69,15 +75,15 @@ class LinksController extends Controller
         $user_tab = $request->link_privilages;
         if($request->link_privilages == null )
         {
-            PrivilageRelation::where('link_id', $id)
+            PrivilageRelation::where('link_id', $linkID)
                 ->delete();
         }else{
-            PrivilageRelation::where('link_id', $id)
+            PrivilageRelation::where('link_id', $linkID)
                 ->whereNotIn('user_type_id',$request->link_privilages)
                 ->delete();
             foreach ($user_tab as $item) {
-                PrivilageRelation::updateOrCreate(array('user_type_id'=>$item,'link_id'=>$id));
-                $data['item' . $item] = 'id' . $id;
+                PrivilageRelation::updateOrCreate(array('user_type_id'=>$item,'link_id'=>$linkID));
+                $data['item' . $item] = 'id' . $linkID;
             }
 
         }

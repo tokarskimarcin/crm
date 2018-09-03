@@ -9,7 +9,7 @@ use App\LinkGroups;
 use App\Links;
 use App\Http\Controllers\Controller;
 
-class ManagementPanelController extends Controller
+class ManagementPrivilagesController extends Controller
 {
     //Show admin panel
     public function adminPrivilage()
