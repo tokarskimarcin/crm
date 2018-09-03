@@ -279,16 +279,26 @@ class ScheduleController extends Controller
 
     public function saveSchedule(Request $request)
     {
-        if(isset($request->isPaid)) {
-            $paid = $request->isPaid;
-        }
-        else {
-            $paid = ['true', 'true', 'true', 'true', 'true', 'true', 'true'];
-        }
 
         $start_hours = $request->start_hours;
         $stop_hours = $request->stop_hours;
         $reasons = $request->reasons;
+
+        if(isset($request->isPaid)) {
+            $paid = $request->isPaid;
+        }
+        else {
+            $paid = array();
+            for($i = 0 ; $i < count($reasons); $i++) {
+                if($reasons[$i]) {
+                    array_push($paid, 'false');
+                }
+                else {
+                    array_push($paid, 'true');
+                }
+            }
+        }
+
         $id_user = $request->id_user;
         for($i=0;$i<7;$i++)
         {
