@@ -153,7 +153,7 @@ class DepartmentsController
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
     public function multipleDepartmentGet() {
-        $users = User::onlyCadre()->activeUser()->get();
+        $users = User::onlyCadre()->activeUser()->orderBy('last_name')->get();
         return view('admin.multipleDepartments')
             ->with('users', $users);
     }
@@ -165,7 +165,7 @@ class DepartmentsController
     public function multipleDepartmentPost(Request $request) {
         $data = [];
         if($request->request_type == 'select_user'){
-            $users = User::onlyCadre()->activeUser()->get();
+            $users = User::onlyCadre()->activeUser()->orderBy('last_name')->get();
 
             $user = User::find($request->user_department);
             if ($user == null) {
@@ -209,7 +209,7 @@ class DepartmentsController
                     );
                 }
             }
-            $users = User::onlyCadre()->activeUser()->get();
+            $users = User::onlyCadre()->activeUser()->orderBy('last_name')->get();
             $data['Przydzielone ID oddziały'] = rtrim($data['Przydzielone ID oddziały'], ',');
             $data['Przydzielone ID oddziały'] .= ']';
             new ActivityRecorder($data, 70, 2);

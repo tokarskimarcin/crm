@@ -463,71 +463,71 @@ class AdminController extends Controller
 //        return Redirect::back();
 //    }
 
-    public function firewallGet() {
-        $firewall = Firewall::all();
-        return view('admin.firewall')
-            ->with('firewall', $firewall);
-    }
-
-    public function firewallPost(Request $request) {
-        $data = [];
-
-        $firewallSotry =  Firewall::where('ip_address',$request->new_ip)->first();
-        if(empty($firewallSotry)){
-            $firewall = new Firewall();
-        }else{
-            $firewall = $firewallSotry;
-        }
-        $data['IP'] = $request->new_ip;
-        $firewall->ip_address = $request->new_ip;
-        $firewall->whitelisted = 1;
-        $firewall->save();
-
-        new ActivityRecorder($data, 88,1);
-        Session::flash('message_ok', "Adres IP został dodany!");
-        return Redirect::back();
-    }
-
-    public function firewallPrivilegesGet() {
-        $firewall_privileges = FirewallPrivileges::all();
-        $users = User::whereNotIn('user_type_id', [1,2])
-            ->where('status_work', '=', 1)
-            ->orderBy('last_name')
-            ->get();
-
-        return view('admin.firewallPrivileges')
-            ->with('firewall_privileges', $firewall_privileges)
-            ->with('users', $users);
-    }
-
-    public function firewallPrivilegesPost(Request $request) {
-        $data = [];
-        $obj = new FirewallPrivileges();
-
-        $data['ID użytkownika'] = $request->user_selected;
-        $obj->user_id = $request->user_selected;
-        $obj->save();
-
-        new ActivityRecorder($data, 89, 1);
-        Session::flash('message_ok', "Użytkownik został dodany!");
-        return Redirect::back();
-    }
-
-    public function firewallDeleteUser(Request $request) {
-        if ($request->ajax()) {
-            $user = User::find($request->user_id);
-
-            if ($user == null) {
-                return 0;
-            } else {
-                FirewallPrivileges::where('user_id', '=', $request->user_id)->delete();
-                $data['ID użytkownika'] = $request->user_id;
-                $data['Użytkownik'] = $user->first_name.' '.$user->last_name;
-                new ActivityRecorder($data,89,3);
-                return 1;
-            }
-        }
-    }
+//    public function firewallGet() {
+//        $firewall = Firewall::all();
+//        return view('admin.firewall')
+//            ->with('firewall', $firewall);
+//    }
+//
+//    public function firewallPost(Request $request) {
+//        $data = [];
+//
+//        $firewallSotry =  Firewall::where('ip_address',$request->new_ip)->first();
+//        if(empty($firewallSotry)){
+//            $firewall = new Firewall();
+//        }else{
+//            $firewall = $firewallSotry;
+//        }
+//        $data['IP'] = $request->new_ip;
+//        $firewall->ip_address = $request->new_ip;
+//        $firewall->whitelisted = 1;
+//        $firewall->save();
+//
+//        new ActivityRecorder($data, 88,1);
+//        Session::flash('message_ok', "Adres IP został dodany!");
+//        return Redirect::back();
+//    }
+//
+//    public function firewallPrivilegesGet() {
+//        $firewall_privileges = FirewallPrivileges::all();
+//        $users = User::whereNotIn('user_type_id', [1,2])
+//            ->where('status_work', '=', 1)
+//            ->orderBy('last_name')
+//            ->get();
+//
+//        return view('admin.firewallPrivileges')
+//            ->with('firewall_privileges', $firewall_privileges)
+//            ->with('users', $users);
+//    }
+//
+//    public function firewallPrivilegesPost(Request $request) {
+//        $data = [];
+//        $obj = new FirewallPrivileges();
+//
+//        $data['ID użytkownika'] = $request->user_selected;
+//        $obj->user_id = $request->user_selected;
+//        $obj->save();
+//
+//        new ActivityRecorder($data, 89, 1);
+//        Session::flash('message_ok', "Użytkownik został dodany!");
+//        return Redirect::back();
+//    }
+//
+//    public function firewallDeleteUser(Request $request) {
+//        if ($request->ajax()) {
+//            $user = User::find($request->user_id);
+//
+//            if ($user == null) {
+//                return 0;
+//            } else {
+//                FirewallPrivileges::where('user_id', '=', $request->user_id)->delete();
+//                $data['ID użytkownika'] = $request->user_id;
+//                $data['Użytkownik'] = $user->first_name.' '.$user->last_name;
+//                new ActivityRecorder($data,89,3);
+//                return 1;
+//            }
+//        }
+//    }
 
     public function check_all_tests() {
         return view('admin.all_tests');

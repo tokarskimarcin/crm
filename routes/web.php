@@ -100,7 +100,7 @@ Route::POST('/datatableShowFinishedNotifications', 'NotificationController@datat
 Route::POST('/locker', 'AdminPanel\LockerController@lockerPost')->name('api.locker');
 
 //firewall delete users
-Route::POST('/firewallDeleteUser', 'AdminController@firewallDeleteUser')->name('api.firewallDeleteUser');
+Route::POST('/firewallDeleteUser', 'AdminPanel\FireWallController@firewallDeleteUser')->name('api.firewallDeleteUser');
 
 //notifications moving
 Route::POST('/getNotficationsJanky', 'NotificationController@getNotficationsJanky')->name('api.getNotficationsJanky');
@@ -454,11 +454,11 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
     Route::Post('/addGroup', 'AdminPanel\LinksController@addGroup');
     Route::Post('/removeGroup', 'AdminPanel\LinksController@removeGroup');
 
-    Route::get('/firewall_ip', 'AdminController@firewallGet');
-    Route::POST('/firewall_ip', 'AdminController@firewallPost');
+    Route::get('/firewall_ip', 'AdminPanel\FireWallController@firewallGet');
+    Route::POST('/firewall_ip', 'AdminPanel\FireWallController@firewallPost');
 
-    Route::get('/firewall_privileges', 'AdminController@firewallPrivilegesGet');
-    Route::POST('/firewall_privileges', 'AdminController@firewallPrivilegesPost');
+    Route::get('/firewall_privileges', 'AdminPanel\FireWallController@firewallPrivilegesGet');
+    Route::POST('/firewall_privileges', 'AdminPanel\FireWallController@firewallPrivilegesPost');
 
     Route::get('/check_all_tests', 'AdminController@check_all_tests');
 
