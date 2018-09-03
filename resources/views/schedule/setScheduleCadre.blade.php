@@ -167,6 +167,7 @@ function getStartAndEndDate($week, $year) {
         day = day.split(" ");
         var start_date = moment(day[0], "YYYY.MM.DD");
         var paidArr = [d.mondayPaid, d.tuesdayPaid, d.wednesdayPaid, d.thursdayPaid, d.fridayPaid, d.saturdayPaid, d.sundayPaid];
+        var leader = d.leader;
         var table = '<table class="table-bordered" style="width: 100%">'+
             '<thead>' +
             '<tr>';
@@ -244,7 +245,15 @@ function getStartAndEndDate($week, $year) {
                 time = moment('07'+':'+'45','HH:mm');
             }
         table+=
-            '<td>'+
+            '<td>';
+            if(leader) {
+                table += '<input type="checkbox" name="leader" id="leader" style="display: inline-block; margin-right: 0.5em;" checked>';
+            }
+            else {
+                table += '<input type="checkbox" name="leader" id="leader" style="display: inline-block; margin-right: 0.5em;">';
+            }
+
+            table += '<label for="leader">Lider zmiany</label>' +
             '<button type="submit" id='+d.id+' class="btn btn-primary saved" name="save_schedule">Zapisz</button>'+
             '</td>'+
         '</tr>';
@@ -350,11 +359,12 @@ function getStartAndEndDate($week, $year) {
                 var id_user = closestTR.attr('id');
                 var schedule_id =  $(this).attr('id');
                 var checkbox;
+                var leader;
                 var valid = true;
                 var time = true;
                 for(var i=0;i<week_array.length;i++)
                 {
-                    console.log(closestTR.find(`.${week_array[i]}_paid`));
+                    leader = closestTR.find('#leader').prop('checked');
                     checkbox = closestTR.find('.'+week_array[i]+"_reasonCheck");
                     $start_hour_array.push(closestTR.find("select[name="+week_array[i]+"_start_work]").val());
                     $stop_hour_array.push(closestTR.find("select[name="+week_array[i]+"_stop_work]").val());
@@ -389,7 +399,7 @@ function getStartAndEndDate($week, $year) {
                         headers: {
                             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                         },
-                        data:{"isPaid":isPaid_array,"start_hours":$start_hour_array,"stop_hours":$stop_hour_array,"reasons":$reason_array,"id_user":id_user,"schedule_id":schedule_id},
+                        data:{"leader":leader,"isPaid":isPaid_array,"start_hours":$start_hour_array,"stop_hours":$stop_hour_array,"reasons":$reason_array,"id_user":id_user,"schedule_id":schedule_id},
                         success: function(response) {
                                 swal({
                                     title: 'Godziny zostały zarejestrowane!',

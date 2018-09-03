@@ -116,6 +116,7 @@ class ScheduleController extends Controller
         $request->session()->put('number_of_week', $number_of_week);
         $request->session()->put('year', $request->schedule_year);
         $schedule_analitics = $this->setWeekDays($number_of_week,$request);
+//        dd($schedule_analitics);
         return view('schedule.setScheduleCadre')
             ->with('number_of_week',$number_of_week)
             ->with('userTypes', $userTypes)
@@ -359,6 +360,13 @@ class ScheduleController extends Controller
             $schedule->sunday_stop = $stop_hours[6];
             $schedule->sunday_comment =  $reasons[6];
             $schedule->sundayPaid = $paid[6] == 'false' ? 0 : 1;
+
+            if(isset($request->leader)) {
+                $schedule->leader = $request->leader == 'false' ? 0 : 1;
+            }
+            else {
+                $schedule->leader = 0;
+            }
 
             $schedule->save();
 
