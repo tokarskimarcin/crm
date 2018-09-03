@@ -434,8 +434,8 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
     // Admin_Panel --Start--
     Route::get('/admin_privilage', 'AdminPanel\ManagementPanelController@adminPrivilage');
 
-    Route::get('/admin_privilage_show/{id}', 'AdminController@admin_privilage_show');
-    Route::Post('/admin_privilage_edit/{id}', 'AdminController@admin_privilage_edit');
+    Route::get('/admin_privilage_show/{id}', 'AdminPanel\LinksController@adminPrivilageShow');
+    Route::Post('/admin_privilage_edit/{id}', 'AdminPanel\LinksController@adminPrivilageEdit');
 
     Route::get('/locker', 'AdminController@lockerGet');
 
