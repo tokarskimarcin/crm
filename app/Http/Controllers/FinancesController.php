@@ -7,6 +7,7 @@ use App\Agencies;
 use App\Department_info;
 use App\Department_types;
 use App\Departments;
+use App\DoublingQueryLogs;
 use App\JankyPenatlyProc;
 use App\PaymentAgencyStory;
 use App\PenaltyBonus;
@@ -686,8 +687,40 @@ class FinancesController extends Controller
                                 'updated_at' => date('Y-m-d H:m:s:i')));
                         }
                     }
-                    PaymentAgencyStory::insert($data);
-                    $accept_payment->save();
+
+                    if(session()->has('isPaymentAgencyStoryQueryRunning')){
+                        if(session('isPaymentAgencyStoryQueryRunning')){
+                            $DOUBLING_QUERY_LOG = new DoublingQueryLogs();
+                            $DOUBLING_QUERY_LOG->table_name = 'PaymentAgencyStory';
+                            $DOUBLING_QUERY_LOG->save();
+                        }else{
+                            session(['isPaymentAgencyStoryQueryRunning' => true]);
+                            PaymentAgencyStory::insert($data);
+                            session()->forget('isPaymentAgencyStoryQueryRunning');
+                        }
+                    }else{
+                        session(['isPaymentAgencyStoryQueryRunning' => true]);
+                        PaymentAgencyStory::insert($data);
+                        session()->forget('isPaymentAgencyStoryQueryRunning');
+                    }
+
+                    if(session()->has('isAcceptedPaymentQueryRunning')){
+                        if(session('isAcceptedPaymentQueryRunning')){
+                            $DOUBLING_QUERY_LOG = new DoublingQueryLogs();
+                            $DOUBLING_QUERY_LOG->table_name = 'AcceptedPayment';
+                            $DOUBLING_QUERY_LOG->save();
+                        }else{
+                            session(['isAcceptedPaymentQueryRunning' => true]);
+                            $accept_payment->save();
+                            session()->forget('isAcceptedPaymentQueryRunning');
+                        }
+                    }else{
+                        session(['isAcceptedPaymentQueryRunning' => true]);
+                        $accept_payment->save();
+                        session()->forget('isAcceptedPaymentQueryRunning');
+                    }
+
+
                     $LogData = array_merge(['T ' => ' Zapisanie wypłat '],$accept_payment->toArray());
                     new ActivityRecorder($LogData, 24, 1);
                     return $data;
