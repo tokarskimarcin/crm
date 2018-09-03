@@ -445,8 +445,8 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
     Route::get('/edit_department', 'AdminPanel\DepartmentsController@editDepartmentGet');
     Route::Post('/edit_department', 'AdminPanel\DepartmentsController@editDepartmentPost');
 
-    Route::get('/set_multiple_department', 'AdminController@multipleDepartmentGet');
-    Route::Post('/set_multiple_department', 'AdminController@multipleDepartmentPost');
+    Route::get('/set_multiple_department', 'AdminPanel\DepartmentsController@multipleDepartmentGet');
+    Route::Post('/set_multiple_department', 'AdminPanel\DepartmentsController@multipleDepartmentPost');
 
     Route::get('/create_link', 'AdminController@createLinkGet');
     Route::Post('/create_link', 'AdminController@createLinkPost');

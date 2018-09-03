@@ -338,80 +338,80 @@ class AdminController extends Controller
 //        return Redirect::back();
 //    }
 
-    public function multipleDepartmentGet() {
-        $users = User::where('status_work', '=', 1)
-            ->whereNotIn('user_type_id',[1,2])
-            ->orderBy('last_name')
-            ->get();
-
-        return view('admin.multipleDepartments')
-            ->with('users', $users);
-    }
-
-    public function multipleDepartmentPost(Request $request) {
-        $data = [];
-        if($request->request_type == 'select_user'){
-          $users = User::where('status_work', '=', 1)
-              ->whereNotIn('user_type_id',[1,2])
-              ->orderBy('last_name')
-              ->get();
-
-          $user = User::find($request->user_department);
-          if ($user == null) {
-              return view('errors.404');
-          }
-          $user_id_post = $user->id;
-          $user_dep = DB::table('multiple_departments')
-              ->select(DB::raw('
-                  department_info_id
-              '))
-              ->where('user_id', '=', $user->id)
-              ->get();
-
-          $department_info = Department_info::all();
-
-          return view('admin.multipleDepartments')
-              ->with('department_info', $department_info)
-              ->with('user_id_post', $user_id_post)
-              ->with('user_dep', $user_dep)
-              ->with('users', $users);
-
-        } else if ($request->request_type == 'save_changes') {
-          $userCheck = User::find($request->user_department_post);
-          if ($userCheck == null) {
-              return view('errors.404');
-          }
-          $department_info = Department_info::orderBy('id', 'desc')->limit(1)->get();
-          $last_id = $department_info[0]->id;
-
-          DB::table('multiple_departments')
-              ->where('user_id', '=', $request->user_department_post)
-              ->delete();
-
-          $data['Edycja użytkownika'] = $userCheck->last_name.' '.$userCheck->first_name;
-          $data['ID użytkownika'] = $userCheck->id;
-          $data['Przydzielone ID oddziały'] = '[';
-          for($i = 1; $i <= $last_id; $i++) {
-              $actual_dep = 'dep' . $i;
-              if($request->$actual_dep == $i){
-                  $data['Przydzielone ID oddziały'] .= $request->$actual_dep.',';
-                DB::table('multiple_departments')->insert(
-                  ['user_id' => $request->user_department_post, 'department_info_id' => $request->$actual_dep]
-                );
-              }
-          }
-          $users = User::where('status_work', '=', 1)
-              ->whereNotIn('user_type_id',[1,2])
-              ->orderBy('last_name')
-              ->get();
-          $data['Przydzielone ID oddziały'] = rtrim($data['Przydzielone ID oddziały'], ',');
-          $data['Przydzielone ID oddziały'] .= ']';
-          new ActivityRecorder($data, 70, 2);
-          return view('admin.multipleDepartments')
-              ->with('success', 'Zmiany zapisano pomyślnie!')
-              ->with('users', $users);
-        }
-    }
+//    public function multipleDepartmentGet() {
+//        $users = User::where('status_work', '=', 1)
+//            ->whereNotIn('user_type_id',[1,2])
+//            ->orderBy('last_name')
+//            ->get();
+//
+//        return view('admin.multipleDepartments')
+//            ->with('users', $users);
+//    }
+//
+//    public function multipleDepartmentPost(Request $request) {
+//        $data = [];
+//        if($request->request_type == 'select_user'){
+//          $users = User::where('status_work', '=', 1)
+//              ->whereNotIn('user_type_id',[1,2])
+//              ->orderBy('last_name')
+//              ->get();
+//
+//          $user = User::find($request->user_department);
+//          if ($user == null) {
+//              return view('errors.404');
+//          }
+//          $user_id_post = $user->id;
+//          $user_dep = DB::table('multiple_departments')
+//              ->select(DB::raw('
+//                  department_info_id
+//              '))
+//              ->where('user_id', '=', $user->id)
+//              ->get();
+//
+//          $department_info = Department_info::all();
+//
+//          return view('admin.multipleDepartments')
+//              ->with('department_info', $department_info)
+//              ->with('user_id_post', $user_id_post)
+//              ->with('user_dep', $user_dep)
+//              ->with('users', $users);
+//
+//        } else if ($request->request_type == 'save_changes') {
+//          $userCheck = User::find($request->user_department_post);
+//          if ($userCheck == null) {
+//              return view('errors.404');
+//          }
+//          $department_info = Department_info::orderBy('id', 'desc')->limit(1)->get();
+//          $last_id = $department_info[0]->id;
+//
+//          DB::table('multiple_departments')
+//              ->where('user_id', '=', $request->user_department_post)
+//              ->delete();
+//
+//          $data['Edycja użytkownika'] = $userCheck->last_name.' '.$userCheck->first_name;
+//          $data['ID użytkownika'] = $userCheck->id;
+//          $data['Przydzielone ID oddziały'] = '[';
+//          for($i = 1; $i <= $last_id; $i++) {
+//              $actual_dep = 'dep' . $i;
+//              if($request->$actual_dep == $i){
+//                  $data['Przydzielone ID oddziały'] .= $request->$actual_dep.',';
+//                DB::table('multiple_departments')->insert(
+//                  ['user_id' => $request->user_department_post, 'department_info_id' => $request->$actual_dep]
+//                );
+//              }
+//          }
+//          $users = User::where('status_work', '=', 1)
+//              ->whereNotIn('user_type_id',[1,2])
+//              ->orderBy('last_name')
+//              ->get();
+//          $data['Przydzielone ID oddziały'] = rtrim($data['Przydzielone ID oddziały'], ',');
+//          $data['Przydzielone ID oddziały'] .= ']';
+//          new ActivityRecorder($data, 70, 2);
+//          return view('admin.multipleDepartments')
+//              ->with('success', 'Zmiany zapisano pomyślnie!')
+//              ->with('users', $users);
+//        }
+//    }
 
     public function createLinkGet(){
         $link_groups = LinkGroups::all();

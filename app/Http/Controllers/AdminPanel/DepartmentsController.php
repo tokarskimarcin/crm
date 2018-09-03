@@ -13,6 +13,7 @@ use App\ActivityRecorder;
 use App\Department_info;
 use App\Department_types;
 use App\Departments;
+use App\MultipleDepartments;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
@@ -144,6 +145,77 @@ class DepartmentsController
                 Session::flash('message_error', "Problem podczas wykonywania SQL");
                 return Redirect::back();
             }
+        }
+    }
+
+
+    /** Show page to select user and departments
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function multipleDepartmentGet() {
+        $users = User::onlyCadre()->activeUser()->get();
+        return view('admin.multipleDepartments')
+            ->with('users', $users);
+    }
+
+    /** Save or show user and avaible department
+     * @param Request $request
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function multipleDepartmentPost(Request $request) {
+        $data = [];
+        if($request->request_type == 'select_user'){
+            $users = User::onlyCadre()->activeUser()->get();
+
+            $user = User::find($request->user_department);
+            if ($user == null) {
+                return view('errors.404');
+            }
+            $user_id_post = $user->id;
+            $user_dep = MultipleDepartments::
+                select('department_info_id')
+                ->where('user_id', '=', $user->id)
+                ->get();
+
+            $department_info = Department_info::all();
+
+            return view('admin.multipleDepartments')
+                ->with('department_info', $department_info)
+                ->with('user_id_post', $user_id_post)
+                ->with('user_dep', $user_dep)
+                ->with('users', $users);
+
+        } else if ($request->request_type == 'save_changes') {
+            $userCheck = User::find($request->user_department_post);
+            if ($userCheck == null) {
+                return view('errors.404');
+            }
+            $department_info = Department_info::orderBy('id', 'desc')->limit(1)->get();
+            $last_id = $department_info[0]->id;
+
+            MultipleDepartments::
+                where('user_id', '=', $request->user_department_post)
+                ->delete();
+
+            $data['Edycja użytkownika'] = $userCheck->last_name.' '.$userCheck->first_name;
+            $data['ID użytkownika'] = $userCheck->id;
+            $data['Przydzielone ID oddziały'] = '[';
+            for($i = 1; $i <= $last_id; $i++) {
+                $actual_dep = 'dep' . $i;
+                if($request->$actual_dep == $i){
+                    $data['Przydzielone ID oddziały'] .= $request->$actual_dep.',';
+                    MultipleDepartments::insert(
+                        ['user_id' => $request->user_department_post, 'department_info_id' => $request->$actual_dep]
+                    );
+                }
+            }
+            $users = User::onlyCadre()->activeUser()->get();
+            $data['Przydzielone ID oddziały'] = rtrim($data['Przydzielone ID oddziały'], ',');
+            $data['Przydzielone ID oddziały'] .= ']';
+            new ActivityRecorder($data, 70, 2);
+            return view('admin.multipleDepartments')
+                ->with('success', 'Zmiany zapisano pomyślnie!')
+                ->with('users', $users);
         }
     }
 }
