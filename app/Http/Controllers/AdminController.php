@@ -260,7 +260,7 @@ class AdminController extends Controller
         $hrEmployee = User::where('user_type_id', '=', '5')->where('status_work', '=', '1')->get();
         $regionalManagers = User::where('user_type_id', '=', '17')->where('status_work', '=', '1')->get();
         $department_info = Department_info::all();
-        $department_types = Department_types:editDepartmentGet:all();
+        $department_types = Department_types::editDepartmentGetall();
         $selected_department = Department_info::find($request->selected_department_info_id);
         $regionalManagersInstructors = User::where('user_type_id', '=', 21)->where('status_work', '=', 1)->get();
 
