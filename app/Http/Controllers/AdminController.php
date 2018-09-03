@@ -35,29 +35,29 @@ use App\MedicalPackage;
 
 class AdminController extends Controller
 {
-    public function admin_privilage()
-    {
-        $link_groups = LinkGroups::all();
-        $Department_types = Department_types::all();
-        $Department_info = $this->getDepartment();
-        $Departments = Departments::all();
-        $links =  DB::table('links')
-            ->leftjoin('link_groups', 'link_groups.id', '=', 'links.group_link_id')
-            ->select(DB::raw('
-              links.id,
-              links.link,
-              links.name,
-              link_groups.name as link_groups_name'
-            ))
-            ->get();
-
-        return view('admin.admin_privilage')
-            ->with('groups',$link_groups)
-            ->with('links',$links)
-            ->with('department_types',$Department_types)
-            ->with('department_info',$Department_info)
-            ->with('departments',$Departments);
-    }
+//    public function admin_privilage()
+//    {
+//        $link_groups = LinkGroups::all();
+//        $Department_types = Department_types::all();
+//        $Department_info = $this->getDepartment();
+//        $Departments = Departments::all();
+//        $links =  DB::table('links')
+//            ->leftjoin('link_groups', 'link_groups.id', '=', 'links.group_link_id')
+//            ->select(DB::raw('
+//              links.id,
+//              links.link,
+//              links.name,
+//              link_groups.name as link_groups_name'
+//            ))
+//            ->get();
+//
+//        return view('admin.admin_privilage')
+//            ->with('groups',$link_groups)
+//            ->with('links',$links)
+//            ->with('department_types',$Department_types)
+//            ->with('department_info',$Department_info)
+//            ->with('departments',$Departments);
+//    }
     public function admin_privilage_show($id)
     {
         $checkLink = Links::find($id);
@@ -139,7 +139,8 @@ class AdminController extends Controller
                     departments.name as department_name,
                     department_info.type,
                     department_type.name as department_type_name
-                   '))->orderBy('department_info.id', 'asc')->get();
+                   '))
+            ->orderBy('department_info.id', 'asc')->get();
         return $departments;
     }
 

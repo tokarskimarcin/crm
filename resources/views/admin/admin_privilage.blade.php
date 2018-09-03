@@ -105,8 +105,8 @@
                                     @foreach($department_info as $item)
                                         <tr>
                                             <td>{{$item->id}}</td>
-                                            <td>{{$item->department_name}}</td>
-                                            <td>{{$item->department_type_name}}</td>
+                                            <td>{{$item->departments->name}}</td>
+                                            <td>{{$item->department_type->name}}</td>
                                             <td>{{$item->type}}</td>
                                             <td>{{$item->commission_avg}}</td>
                                             <td>{{$item->commission_hour}}</td>
@@ -120,7 +120,6 @@
                                 </table>
                             </div>
                         </div>
-
 
 
                         <div class="col-lg-12">

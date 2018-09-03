@@ -432,7 +432,7 @@ Auth::routes();
 Route::middleware(['check-permission', 'check-firewall'])->group(function () {
     Route::get('/', 'HomeController@index');
     // Admin_Panel --Start--
-    Route::get('/admin_privilage', 'AdminController@admin_privilage');
+    Route::get('/admin_privilage', 'AdminPanel\ManagementPanelController@adminPrivilage');
 
     Route::get('/admin_privilage_show/{id}', 'AdminController@admin_privilage_show');
     Route::Post('/admin_privilage_edit/{id}', 'AdminController@admin_privilage_edit');
@@ -1034,3 +1034,4 @@ Route::post('/changeLimits', 'CrmRouteController@changeLimitsAjax')->name('api.c
 Route::get('/getAllTask', 'MyUserTestController@getAllTask');
 
 
+Route::get('/Admin/Departments', 'AdminPanel\DepartmentsController@index');
