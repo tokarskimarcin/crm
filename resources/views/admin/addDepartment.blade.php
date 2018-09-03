@@ -117,6 +117,16 @@
             </div>
 
             <div class="form-group">
+                <label for="regionalManagersInstructors">Wybierz kierownika regionalnego szkoleniowca</label>
+                <select class="form-control" name="regionalManagersInstructors" id="regionalManagersInstructors">
+                    <option value="0">Wybierz</option>
+                    @foreach($regionalManagersInstructors as $h)
+                        <option value="{{$h->id}}">{{$h->first_name . ' ' . $h->last_name}}</option>
+                    @endforeach
+                </select>
+            </div>
+
+            <div class="form-group">
                 <label for="pbx_id">Id z programu PBX:<span style="color:red;">*</span></label>
                 <input type="text" class="form-control" id="pbx_id" name="pbx_id" placeholder="PBX ID">
             </div>

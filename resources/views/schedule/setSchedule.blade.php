@@ -109,6 +109,46 @@ function getStartAndEndDate($week, $year) {
                                 </div>
                                     <div class="col-md-12">
                                         @if (isset($number_of_week))
+                                            <div class="table-responsive">
+                                                <table class="table table-bordered">
+                                                    <div class="panel-heading alert gray-nav" style="border:1px solid #d3d3d3;"><h4><b>Analiza Grafik Plan</b></h4></div>
+                                                    <tr>
+                                                        <td align="center"><b>Godzina</b></td>
+                                                        <?php $week_array = ['Pon','Wt','Śr','Czw','Pt','Sob','Nie']; ?>
+                                                        @for($i=8;$i<21;$i++)
+                                                            @if($i <=9)
+                                                                <td align="center"><b>0{{$i}}</b></td>
+                                                            @else
+                                                                <td align="center"><b>{{$i}}</b></td>
+                                                            @endif
+                                                        @endfor
+                                                    </tr>
+                                                    @foreach($schedule_analitics as $item =>$key)
+                                                        <?php $lp = 8;
+                                                        $number_day_of_week = 0;?>
+                                                        @foreach($key as $item2 =>$key2)
+                                                            @if($lp == 8)
+                                                                <tr>
+                                                                    <td>{{$week_array[$number_day_of_week++]}}</td>
+                                                                    @endif
+                                                                    @if($lp<= 21)
+                                                                        @if($key2 > Auth::user()->department_info->size)
+                                                                            <td align="center" style="background-color: #ffee29"><b>{{$key2}}</b></td>
+                                                                        @elseif($key2 < Auth::user()->department_info->size*0.8 && $key2!=0)
+                                                                            <td align="center" style="background-color: #ff7070"><b>{{$key2}}</b></td>
+                                                                        @else
+                                                                            <td align="center"><b>{{$key2}}</b></td>
+                                                                        @endif
+                                                                        <?php $lp++; ?>
+                                                                    @endif
+                                                                    @if($lp >20)
+                                                                        <?php $lp = 8; ?>
+                                                                </tr>
+                                                            @endif
+                                                        @endforeach
+                                                    @endforeach
+                                                </table>
+                                            </div>
                                           <div class="table-responsive">
                                             <table id="datatable" class="table table-striped table-bordered" cellspacing="0" width="100%">
                                                 <thead style="color: white; background: #666564;">
@@ -293,7 +333,7 @@ function getStartAndEndDate($week, $year) {
                            }
                         });
                         return name;
-                    }, "name": "rola"
+                    }, "name": "rola", "searchable": "false"
                 }
             ],
             select: true

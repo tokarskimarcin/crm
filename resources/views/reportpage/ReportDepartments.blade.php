@@ -38,37 +38,73 @@
     </div>
     <form method="POST" action="{{ URL::to('/pageReportDepartments') }}">
         <input type="hidden" name="_token" value="{{ csrf_token() }}">
+        @if(isset($director_departments))
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="alert alert-info">
+                        <strong>Raport dla oddziałów:</strong> <br>
+                        @foreach($director_departments as $dep)
+                            {{$dep->departments->name}} {{$dep->department_type->name}},
+                        @endforeach
+                    </div>
+                </div>
+            </div>
+        @endif
         <div class="row">
             <div class="col-md-4">
                 <div class="form-group">
                     <label>Oddział:</label>
 
                     @if(Auth::user()->user_type_id != 4)
+
                     <select class="form-control" name="selected_dep">
                         <optgroup label="Oddziały">
                             @foreach($departments as $dep)
                                 <option value="{{$dep->id}}" @if(($wiev_type == 'department') && $dep->id == $dep_id) selected @endif>{{$dep->departments->name . ' ' . $dep->department_type->name}}</option>
                             @endforeach
                         </optgroup>
-                        <optgroup label="Dyrektor Regionalny HR">
+                        <optgroup label="Kierownik Regionalny HR">
                             @foreach($directorsHR as $director)
-                                <option
+                                @php
+                                    $allDepartments = $departments->where('director_hr_id', '=', $director->id);
+                                @endphp
+                                <option data-toggle="tooltip" data-placement="right" title="@foreach($allDepartments as $dep){{$dep->departments->name}} {{$dep->department_type->name}}, @endforeach"
                                         @if($wiev_type == 'director' && ('10' . $director->id == $dep_id)) selected @endif
                                 value="10{{ $director->id }}">{{ $director->last_name . ' ' . $director->first_name }}</option>
                             @endforeach
                         </optgroup>
+                        <optgroup label="Szkoleniowiec Regionalny">
+                            @foreach($regionalManagersInstructors as $regionalManagersInstructor)
+                                @php
+                                    $allDepartments = $departments->where('instructor_regional_id', '=', $regionalManagersInstructor->id);
+                                @endphp
+                                <option data-toggle="tooltip" data-placement="right" title="@foreach($allDepartments as $dep){{$dep->departments->name}} {{$dep->department_type->name}}, @endforeach"
+                                        @if($wiev_type == 'director' && ('10' . $regionalManagersInstructor->id == $dep_id)) selected @endif
+                                        value="10{{ $regionalManagersInstructor->id }}">{{ $regionalManagersInstructor->last_name . ' ' . $regionalManagersInstructor->first_name }}</option>
+                            @endforeach
+                        </optgroup>
                         <optgroup label="Kierownik Regionalny">
                             @foreach($regionalManagers as $director)
-                                <option
+                                @php
+                                    $allDepartments = $departments->where('regionalManager_id', '=', $director->id);
+                                @endphp
+                                <option data-toggle="tooltip" data-placement="right" title="@foreach($allDepartments as $dep){{$dep->departments->name}} {{$dep->department_type->name}}, @endforeach"
                                         @if($wiev_type == 'director' && ('10' . $director->id == $dep_id)) selected @endif
                                 value="10{{ $director->id }}">{{ $director->last_name . ' ' . $director->first_name }}</option>
                             @endforeach
                         </optgroup>
                         <optgroup label="Dyrektorzy">
                             @foreach($directors as $director)
-                                <option
+                                @php
+                                    $allDepartments = $departments->where('director_id', '=', $director->id);
+                                @endphp
+                                <option data-toggle="tooltip" data-placement="right" title="@foreach($allDepartments as $dep){{$dep->departments->name}} {{$dep->department_type->name}}, @endforeach"
                                     @if($wiev_type == 'director' && ('10' . $director->id == $dep_id)) selected @endif
-                                value="10{{ $director->id }}">{{ $director->last_name . ' ' . $director->first_name }}</option>
+                                value="10{{ $director->id }}">{{ $director->last_name . ' ' . $director->first_name }} <span class="glyphicon glyphicon-info-sign" data-toggle="tooltip" data-placement="right" title="
+                                @foreach($allDepartments as $dep)
+                                    {{$dep->departments->name}} {{$dep->department_type->name}},
+                                @endforeach
+                                            "></span></option>
                             @endforeach
                         </optgroup>
                             <optgroup label="Suma oddziałów">

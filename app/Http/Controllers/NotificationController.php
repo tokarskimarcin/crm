@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\NotificationChangesDisplayedFlags;
 use Illuminate\Http\Request;
 use App\NotificationTypes;
 use App\Department_info;
@@ -46,6 +47,13 @@ class NotificationController extends Controller
         $notification->created_at = date("Y-m-d H:i:s");
         $notification->save();
 
+        $notification_changes_displayed_flags = new NotificationChangesDisplayedFlags();
+        $notification_changes_displayed_flags->notification_id = $notification->id;
+        $notification_changes_displayed_flags->comment_added_by_reporter_displayed = true;
+        $notification_changes_displayed_flags->comment_added_by_realizator_displayed = true;
+        $notification_changes_displayed_flags->status_change_displayed = true;
+        $notification_changes_displayed_flags->save();
+
         new ActivityRecorder(array_merge(['T'=>'Dodanie nowego zgłoszenia problemu'],$notification->toArray()), 35, 1);
         Session::flash('message_ok', "Problem zgłoszony pomyślnie!");
         return Redirect::back();
@@ -59,6 +67,12 @@ class NotificationController extends Controller
             return view('errors.404');
         } else {
             $user = User::find($notification->displayed_by);
+
+            $notificationChangesDisplayedFlags = NotificationChangesDisplayedFlags::where('notification_id','=',$notification->id)->first();
+            if(!empty($notificationChangesDisplayedFlags)){
+                $notificationChangesDisplayedFlags->comment_added_by_realizator_displayed = true;
+                $notificationChangesDisplayedFlags->save();
+            }
 
             return view('notifications.showNotification')
                 ->with('user', $user)
@@ -84,6 +98,13 @@ class NotificationController extends Controller
             if (!in_array($status, $default_array)) {
                 return view('errors.404');
             }
+            if($notification->status != $status){
+                $notificationChangesDisplayedFlags = NotificationChangesDisplayedFlags::where('notification_id','=',$notification->id)->first();
+                if(!empty($notificationChangesDisplayedFlags)){
+                    $notificationChangesDisplayedFlags->status_change_displayed = false;
+                    $notificationChangesDisplayedFlags->save();
+                }
+            }
             $notification->status = $status;
             $notification->displayed_by = Auth::user()->id;
             $notification->updated_at = date("Y-m-d H:i:s");
@@ -93,15 +114,16 @@ class NotificationController extends Controller
             } else if ($request->status == 3) {
                 $stop = date("Y-m-d H:i:s");
                 $notification->data_stop = $stop;
-                $notification->save();
 
-                $sec = DB::table('notifications')
-                    ->select(DB::raw('
-                        SEC_TO_TIME(TIME_TO_SEC(data_stop) - TIME_TO_SEC(data_start)) as time
-                    '))
-                    ->where('id', '=', $id)
-                    ->get();
-              $notification->sec= $sec[0]->time;
+                $date_start =\DateTime::createFromFormat('Y-m-d H:i:s',$notification->data_start);
+                $date_stop = \DateTime::createFromFormat('Y-m-d H:i:s',$notification->data_stop);
+                $interval = $date_start->diff($date_stop);
+                $clockTimeDuration = ($interval->h < 10 ? '0'.$interval->h : $interval->h)
+                    .':'.($interval->i < 10 ? '0'.$interval->i : $interval->i)
+                    .':'.($interval->s < 10 ? '0'.$interval->s : $interval->s);
+
+                $notification->sec= $clockTimeDuration;
+                $notification->realization_days_duration = $interval->d + $interval->m*30; //estimation
             }
 
             $notification->save();
@@ -126,10 +148,14 @@ class NotificationController extends Controller
                 notifications.created_at,
                 departments.name as dep_name,
                 department_type.name as dep_name_type,
-                users.first_name,
-                users.last_name
+                data_start,
+                data_stop,
+                u.first_name,
+                u.last_name,
+                CONCAT(u1.first_name, " ", u1.last_name) as displayedBy
             '))
-            ->join('users', 'users.id', '=', 'notifications.user_id')
+            ->join('users as u', 'u.id', '=', 'notifications.user_id')
+            ->leftJoin('users as u1', 'u1.id', '=', 'notifications.displayed_by')
             ->join('department_info', 'department_info.id', '=', 'notifications.department_info_id')
             ->join('departments', 'departments.id', '=', 'department_info.id_dep')
             ->join('department_type', 'department_type.id', '=', 'department_info.id_dep_type')
@@ -166,6 +192,17 @@ class NotificationController extends Controller
             return view('errors.404');
         }
 
+        $notificationsChangesDisplayedFlags = NotificationChangesDisplayedFlags::where('notification_id',$checkNotification->id)->first();
+        if(!empty($notificationsChangesDisplayedFlags)){
+            if(Auth::user()->id == $checkNotification->user_id){
+                $notificationsChangesDisplayedFlags->comment_added_by_realizator_displayed = false;
+            }
+            if(Auth::user()->id == $checkNotification->displayed_by){
+                $notificationsChangesDisplayedFlags->comment_added_by_reporter_displayed = false;
+            }
+            $notificationsChangesDisplayedFlags->save();
+        }
+
         $comment->user_id = Auth::user()->id;
         $comment->content = $request->content;
         $comment->notification_id = $id;
@@ -196,7 +233,17 @@ class NotificationController extends Controller
     }
     public function myNotifications() {
         $notifications = Notifications::where('displayed_by', '=', Auth::user()->id)->count();
-        return view('admin.myNotifications')->with('notifications', $notifications);
+        $unratedNotifications = Notifications::select('status','jr.id')
+            ->leftJoin('judge_results as jr','jr.notification_id','=','notifications.id')
+            ->where('notifications.user_id','=',Auth::user()->id)
+            ->where('status','=',3)
+            ->whereNull('jr.id')
+            ->count();
+        $notRepairedNotifications = Notifications::where('status','=',2)->where('displayed_by',Auth::user()->id)->count();
+        return view('admin.myNotifications')
+            ->with('notifications', $notifications)
+            ->with('unratedNotifications', $unratedNotifications)
+            ->with('notRepairedNotifications', $notRepairedNotifications);
     }
 
     public function judgeNotificationGet($id){
@@ -277,7 +324,7 @@ class NotificationController extends Controller
         $result->save();
 
         new ActivityRecorder(array_merge(['T'=>'Dodanie oceny zgłoszenia'],$result->toArray()),76,1);
-        return view('admin.myNotifications')
+        return $this->myNotifications()
             ->with('message_ok', 'Twoja opinia została przesłana!');
     }
 
@@ -286,11 +333,13 @@ class NotificationController extends Controller
             ->select(DB::raw('
                 notifications.*,
                 users.first_name as first_name,
-                users.last_name as last_name
+                users.last_name as last_name,
+                jr.id as judge_result
             '))
             ->leftJoin('users', 'users.id', '=', 'notifications.displayed_by')
+            ->leftJoin('judge_results as jr','jr.notification_id','=','notifications.id')
             ->where('status','!=',0)
-            ->where('user_id', '=', Auth::user()->id)
+            ->where('notifications.user_id', '=', Auth::user()->id)
             ->get();
 
         return datatables($data)->make(true);
@@ -324,7 +373,7 @@ class NotificationController extends Controller
                 AVG(judge_time) as user_time,
                 AVG(judge_sum) as user_judge_sum,
                 SUM(CASE WHEN response_after = 1 THEN 1 ELSE 0 END) as response_after,
-                AVG(TIME_TO_SEC(notifications.sec)) / 3600 as notifications_time_sum
+                AVG(TIME_TO_SEC(notifications.sec) + (IFNULL(realization_days_duration, 0)*24*3600)) / 3600 as notifications_time_sum
             '))
             ->leftJoin('users', 'users.id', '=', 'judge_results.it_id')
             ->leftJoin('notifications', 'notifications.id', '=', 'judge_results.notification_id')
@@ -420,6 +469,12 @@ class NotificationController extends Controller
 
         if ($notification == null) {
             return view('errors.404');
+        }
+        $notificationChangesDisplayedFlags = NotificationChangesDisplayedFlags::where('notification_id','=',$notification->id)->first();
+        if(!empty($notificationChangesDisplayedFlags)){
+            $notificationChangesDisplayedFlags->comment_added_by_reporter_displayed = true;
+            $notificationChangesDisplayedFlags->status_change_displayed = true;
+            $notificationChangesDisplayedFlags->save();
         }
 
         $it_user = User::find($notification->displayed_by);

@@ -116,6 +116,7 @@ class ScheduleController extends Controller
         $request->session()->put('number_of_week', $number_of_week);
         $request->session()->put('year', $request->schedule_year);
         $schedule_analitics = $this->setWeekDays($number_of_week,$request);
+//        dd($schedule_analitics);
         return view('schedule.setScheduleCadre')
             ->with('number_of_week',$number_of_week)
             ->with('userTypes', $userTypes)
@@ -278,6 +279,13 @@ class ScheduleController extends Controller
 
     public function saveSchedule(Request $request)
     {
+        if(isset($request->isPaid)) {
+            $paid = $request->isPaid;
+        }
+        else {
+            $paid = ['true', 'true', 'true', 'true', 'true', 'true', 'true'];
+        }
+
         $start_hours = $request->start_hours;
         $stop_hours = $request->stop_hours;
         $reasons = $request->reasons;
@@ -321,30 +329,44 @@ class ScheduleController extends Controller
             $schedule->monday_start = $start_hours[0];
             $schedule->monday_stop = $stop_hours[0];
             $schedule->monday_comment =  $reasons[0];
+            $schedule->mondayPaid =  $paid[0] == 'false' ? 0 : 1;
 
             $schedule->tuesday_start = $start_hours[1];
             $schedule->tuesday_stop = $stop_hours[1];
             $schedule->tuesday_comment =  $reasons[1];
+            $schedule->tuesdayPaid =  $paid[1] == 'false' ? 0 : 1;
 
             $schedule->wednesday_start = $start_hours[2];
             $schedule->wednesday_stop = $stop_hours[2];
             $schedule->wednesday_comment =  $reasons[2];
+            $schedule->wednesdayPaid =  $paid[2] == 'false' ? 0 : 1;
 
             $schedule->thursday_start = $start_hours[3];
             $schedule->thursday_stop = $stop_hours[3];
             $schedule->thursday_comment =  $reasons[3];
+            $schedule->thursdayPaid =  $paid[3] == 'false' ? 0 : 1;
 
             $schedule->friday_start = $start_hours[4];
             $schedule->friday_stop = $stop_hours[4];
             $schedule->friday_comment =  $reasons[4];
+            $schedule->fridayPaid =  $paid[4] == 'false' ? 0 : 1;
 
             $schedule->saturday_start = $start_hours[5];
             $schedule->saturday_stop = $stop_hours[5];
             $schedule->saturday_comment =  $reasons[5];
+            $schedule->saturdayPaid =  $paid[5] == 'false' ? 0 : 1;
 
             $schedule->sunday_start = $start_hours[6];
             $schedule->sunday_stop = $stop_hours[6];
             $schedule->sunday_comment =  $reasons[6];
+            $schedule->sundayPaid = $paid[6] == 'false' ? 0 : 1;
+
+            if(isset($request->leader)) {
+                $schedule->leader = $request->leader == 'false' ? 0 : 1;
+            }
+            else {
+                $schedule->leader = 0;
+            }
 
             $schedule->save();
 
