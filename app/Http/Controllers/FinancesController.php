@@ -10,7 +10,6 @@ use App\Departments;
 use App\JankyPenatlyProc;
 use App\PaymentAgencyStory;
 use App\PenaltyBonus;
-use App\Schedule;
 use App\SuccessorHistory;
 use App\SummaryPayment;
 use App\User;
@@ -35,105 +34,11 @@ class FinancesController extends Controller
     {
         return view('finances.viewPaymentCadre');
     }
-
-    private function monthPerRealWeekDivision($month, $year) {
-        $dataStart = date('Y-m-' . '01', strtotime($year . '-' . $month)); //first day of given month
-        $loopDate = $dataStart;
-        $days_in_month = date('t', strtotime($year . '-' . $month));
-        $firstWeekNumber = date('W', strtotime($year . '-' . $month . '-01')); //first week number of given month
-        $unoWeekNumber = date('W', strtotime($year . '-' . $month . '-01')); //first week number of given month
-        $monthNumber = date('m', strtotime($year . '-' . $month . '-01'));
-
-        $loopDateMonthNumber = date('m', strtotime($loopDate));
-
-        $weeks = [$firstWeekNumber]; //array of weeks number in this month
-
-        for ($i = 1; $i <= $days_in_month; $i++) {
-            $loop_day = ($i < 10) ? '0' . $i : $i;
-            $loop_date = $year . '-' . $month . '-' . $loop_day;
-            $loopDateWeekNumber = date('W', strtotime($loop_date));
-
-            if($loopDateWeekNumber != $unoWeekNumber) {
-                array_push($weeks, $loopDateWeekNumber);
-                $unoWeekNumber = $loopDateWeekNumber;
-            }
-        }
-
-        $weeksDivided = array();
-
-        for($j = 0; $j < count($weeks); $j++) {
-            $flag = 1;
-
-            if($j == 0) {
-            $from = date("Y-m-d", strtotime("{$year}-W{$weeks[$j]}-1")); //Returns the date of monday in week
-            $to = date("Y-m-d", strtotime("{$year}-W{$weeks[$j]}-7"));   //Returns the date of sunday in week
-
-                for($k = 1; $k <= 8; $k++) {
-                    if($k == 1) {
-                        $currentMonthNumber = date('m', strtotime($from));
-                        if($monthNumber == $currentMonthNumber && $flag != 0) {
-                            $firstDayNr = date("N", strtotime("{$year}-W{$weeks[$j]}-1"));
-                            $lastDayNr = date("N", strtotime("{$year}-W{$weeks[$j]}-7"));
-                            array_push($weeksDivided, ['weekNumber' => $weeks[$j], 'firstDay' => $from, 'lastDay' => $to, 'firstDayNr' => $firstDayNr, 'lastDayNr' => $lastDayNr]);
-                            $flag = 0;
-                        }
-                    }
-                    else {
-                        $days = $k - 1;
-                        $currentMonthNumber = date('m', strtotime($from . '+ ' . $days . ' days'));
-                        if($monthNumber == $currentMonthNumber  && $flag != 0) {
-                            $firstDayNr = date("N", strtotime($from . '+ ' . $days . ' days'));
-                            $lastDayNr = date("N", strtotime("{$year}-W{$weeks[$j]}-7"));
-                            array_push($weeksDivided, ['weekNumber' => $weeks[$j], 'firstDay' => date('Y-m-d', strtotime($from . '+ ' . $days . ' days')), 'lastDay' => $to, 'firstDayNr' => $firstDayNr, 'lastDayNr' => $lastDayNr]);
-                            $flag = 0;
-                        }
-                    }
-                }
-            }
-            else if($j == count($weeks) - 1) {
-                $from = date("Y-m-d", strtotime("{$year}-W{$weeks[$j]}-1")); //Returns the date of monday in week
-                $to = date("Y-m-d", strtotime("{$year}-W{$weeks[$j]}-7"));   //Returns the date of sunday in week
-                if(date('m', strtotime($to)) != $monthNumber) { //last week day is not in given month
-                    for($k = 1; $k <= 7; $k++) {
-                        $days = $k;
-                        $currentMonthNumber = date('m', strtotime($from . '+ ' . $days . ' days'));
-                        if($monthNumber != $currentMonthNumber  && $flag != 0) {
-                            $corrDays = $days - 1;
-                            $firstDayNr = date("N", strtotime("{$year}-W{$weeks[$j]}-1"));
-                            $lastDayNr = date("N", strtotime($from . '+ ' . $corrDays . ' days'));
-                            array_push($weeksDivided, ['weekNumber' => $weeks[$j], 'firstDay' => $from, 'lastDay' => date('Y-m-d', strtotime($from . '+ ' . $corrDays . ' days')), 'firstDayNr' => $firstDayNr, 'lastDayNr' => $lastDayNr]);
-                            $flag = 0;
-                        }
-                    }
-                }
-                else { //last week day contain in given month
-                    $from = date("Y-m-d", strtotime("{$year}-W{$weeks[$j]}-1")); //Returns the date of monday in week
-                    $to = date("Y-m-d", strtotime("{$year}-W{$weeks[$j]}-7"));   //Returns the date of sunday in week
-                    $firstDayNr = date("N", strtotime("{$year}-W{$weeks[$j]}-1"));
-                    $lastDayNr = date("N", strtotime("{$year}-W{$weeks[$j]}-7"));
-                    array_push($weeksDivided, ['weekNumber' => $weeks[$j], 'firstDay' => $from, 'lastDay' => $to, 'firstDayNr' => $firstDayNr, 'lastDayNr' => $lastDayNr]);
-                }
-            }
-            else {
-                $from = date("Y-m-d", strtotime("{$year}-W{$weeks[$j]}-1")); //Returns the date of monday in week
-                $to = date("Y-m-d", strtotime("{$year}-W{$weeks[$j]}-7"));   //Returns the date of sunday in week
-                $firstDayNr = date("N", strtotime("{$year}-W{$weeks[$j]}-1"));
-                $lastDayNr = date("N", strtotime("{$year}-W{$weeks[$j]}-7"));
-                array_push($weeksDivided, ['weekNumber' => $weeks[$j], 'firstDay' => $from, 'lastDay' => $to, 'firstDayNr' => $firstDayNr, 'lastDayNr' => $lastDayNr]);
-            }
-        }
-//        dd($weeksDivided);
-        return $weeksDivided;
-    }
-
     public function viewPaymentCadrePost(Request $request)
     {
 
         $date_to_post = $request->search_money_month;
         $date = $request->search_money_month.'%';
-        $year = substr($date, 0, 4);
-        $month = substr($date, 5, 2);
-
         $agencies = Agencies::all();
         $salary = DB::table(DB::raw("users"))
             ->whereNotIn('users.user_type_id',[1,2,9])
@@ -152,11 +57,8 @@ class FinancesController extends Controller
             `users`.`additional_salary`,
             `users`.`student`,
             `users`.`documents`,
-            ROUND(salary / DAY(LAST_DAY("' . $request->search_money_month.'-01' .'")),2) as average_salary,
             (SELECT SUM(`penalty_bonus`.`amount`) FROM `penalty_bonus` WHERE `penalty_bonus`.`id_user`=`users`.`id` AND `penalty_bonus`.`event_date` LIKE "'.$date.'" AND `penalty_bonus`.`type`=1 AND `penalty_bonus`.`status`=1) as `penalty`,
-            (SELECT SUM(`penalty_bonus`.`amount`) FROM `penalty_bonus` WHERE `penalty_bonus`.`id_user`=`users`.`id` AND `penalty_bonus`.`event_date` LIKE  "'.$date.'" AND `penalty_bonus`.`type`=2 AND `penalty_bonus`.`status`=1) as `bonus`
-
-            ')
+            (SELECT SUM(`penalty_bonus`.`amount`) FROM `penalty_bonus` WHERE `penalty_bonus`.`id_user`=`users`.`id` AND `penalty_bonus`.`event_date` LIKE  "'.$date.'" AND `penalty_bonus`.`type`=2 AND `penalty_bonus`.`status`=1) as `bonus`')
             ->where(function ($query) use ($date){
                 $query->orwhere(DB::raw('SUBSTRING(promotion_date,1,7)'),'<', substr($date,0,strlen($date)-1))
                     ->orwhere('users.promotion_date','=',null);
@@ -165,11 +67,10 @@ class FinancesController extends Controller
             ->join('work_hours', 'work_hours.id_user', 'users.id')
             ->join('departments','departments.id','department_info.id_dep')
             ->join('department_type','department_type.id','department_info.id_dep_type')
-            ->leftJoin('schedule', 'schedule.id_user' , '=', 'users.id')
+
             ->where('work_hours.date', 'like', $date)
             ->groupBy('users.id')
             ->orderBy('users.last_name')->get();
-
         /**
          * Pobranie danych osób którzy nie pracowali całego miesiąca
          */
