@@ -2477,6 +2477,7 @@ class CrmRouteController extends Controller
 
     public function removeCampaignCommentAjax(Request $request){
         ClientRouteInfo::where('id','=',$request->campaignId)->update(['comment' => null]);
+        new ActivityRecorder(['T'=>'Usunięcie uwagi w informacji o kampaniach','campaign_ids' => $request->campaignId],215,3);
         return 'success';
     }
 
@@ -2502,19 +2503,23 @@ class CrmRouteController extends Controller
 
         $clientRouteInfoRecords = ClientRouteInfo::where('status', '=', 1)->whereIn('id', $ids)->get();
 
+        $data = (object)[];
         if($nrPBX !=''){
+            $data->nrPBX = $nrPBX;
             foreach($clientRouteInfoRecords as $record) {
                 $record->pbx_campaign_id = $nrPBX;
                 $record->save();
             }
         }
         if($baseDivision !=''){
+            $data->baseDivision = $baseDivision;
             foreach($clientRouteInfoRecords as $record) {
                 $record->baseDivision = $baseDivision;
                 $record->save();
             }
         }
         if($limit != '') {
+            $data->limits = $limit;
             foreach($clientRouteInfoRecords as $record) {
                 $record->limits = $limit;
                 $record->save();
@@ -2522,6 +2527,7 @@ class CrmRouteController extends Controller
         }
 
         if($comment != '') {
+            $data->comment = $comment;
             foreach($clientRouteInfoRecords as $record) {
                 $record->comment = $comment;
                 $record->save();
@@ -2535,6 +2541,7 @@ class CrmRouteController extends Controller
         }
 
         if($department != '') {
+            $data->department_info_id = $department;
             foreach($clientRouteInfoRecords as $record) {
                 $record->department_info_id = $department;
                 $record->save();
@@ -2542,6 +2549,7 @@ class CrmRouteController extends Controller
         }
 
         if($verification != '') {
+            $data->verification = $verification;
             foreach($clientRouteInfoRecords as $record) {
                 $record->verification = $verification;
                 $record->save();
@@ -2549,6 +2557,7 @@ class CrmRouteController extends Controller
         }
 
         if($liveInvitations != '') {
+            $data->actual_success = $liveInvitations;
             foreach($clientRouteInfoRecords as $record) {
                 $record->actual_success = $liveInvitations;
                 $record->save();
@@ -2568,7 +2577,7 @@ class CrmRouteController extends Controller
             $log .= $record->id . ', ';
         }
 
-        new ActivityRecorder(['T'=>'Edycja informacji o kampaniach','campaign_ids' => '['.implode(",",$clientRouteInfoRecords->pluck('id')->toArray()).']'],215,2);
+        new ActivityRecorder(['T'=>'Edycja informacji o kampaniach','campaign_ids' => $clientRouteInfoRecords->pluck('id')->toArray(), 'data_changed' => (array)$data],215,2);
 
         return $adnotation;
     }
