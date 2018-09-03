@@ -144,199 +144,199 @@ class AdminController extends Controller
 //        return $departments;
 //    }
 
-    public function lockerGet() {
-        $department_info = Department_info::all();
+//    public function lockerGet() {
+//        $department_info = Department_info::all();
+//
+//        return view('admin.locker')
+//            ->with('department_info', $department_info);
+//    }
+//
+//    public function lockerPost(Request $request) {
+//        if($request->ajax()) {
+//            $data = [];
+//            $department_info_id = Department_info::find($request->department_info_id);
+//            if ($department_info_id == null) {
+//                return 0;
+//            } else {
+//                $department_info_id->blocked = $request->type;
+//                $department_info_id->save();
+//                $data['T'] = 'Zmiana status oddziału';
+//                $data['ID oddziału'] = $department_info_id->id;
+//                $data['Status'] = $request->type;
+//                new ActivityRecorder($data, 50, 4);
+//                return 1;
+//            }
+//        }
+//    }
 
-        return view('admin.locker')
-            ->with('department_info', $department_info);
-    }
+//    public function addDepartmentGet() {
+//        $department_types = Department_types::all();
+//        $departments = Departments::all();
+//        $menagers = User::whereIn('user_type_id', ['7','15'])->where('status_work', '=', '1')->get();
+//        $hr = User::where('user_type_id', '=', '5')->where('status_work', '=', '1')->get();
+//        $hrDirectors = User::where('user_type_id', '=', '14')->where('status_work', '=', '1')->get();
+//        $regionalManagers = User::where('user_type_id', '=', '17')->where('status_work', '=', '1')->get();
+//        $regionalManagersInstructors = User::where('user_type_id', '=', 21)->where('status_work', '=', 1)->get();
+//        return view('admin.addDepartment')
+//            ->with('departments', $departments)
+//            ->with('department_types', $department_types)
+//            ->with('menagers', $menagers)
+//            ->with('hrEmployee', $hr)
+//            ->with('hrDirectors', $hrDirectors)
+//            ->with('regionalManagers', $regionalManagers)
+//            ->with('regionalManagersInstructors', $regionalManagersInstructors);
+//    }
 
-    public function lockerPost(Request $request) {
-        if($request->ajax()) {
-            $data = [];
-            $department_info_id = Department_info::find($request->department_info_id);
-            if ($department_info_id == null) {
-                return 0;
-            } else {
-                $department_info_id->blocked = $request->type;
-                $department_info_id->save();
-                $data['T'] = 'Zmiana status oddziału';
-                $data['ID oddziału'] = $department_info_id->id;
-                $data['Status'] = $request->type;
-                new ActivityRecorder($data, 50, 4);
-                return 1;
-            }
-        }
-    }
+//    public function addDepartmentPost(Request $request) {
+//        $department_info = new Department_info();
+//
+//        //tutaj sprawdzenie czy oddział jest dodawany do istniejącego miasta czy stworzono  nowy
+//        if ($request->department != '-1') {
+//            $id_dep = $request->department;
+//        } else {
+//            $department = new Departments();
+//
+//            $department->name = $request->city;
+//            $department->desc = $request->desc;
+//            $department->save();
+//
+//            $departments = DB::table('departments')
+//                ->orderBy('id', 'desc')
+//                ->limit(1)
+//                ->get();
+//
+//            $id_dep = $departments[0]->id;
+//        }
+//
+//        $department_info->id_dep = $id_dep;
+//        $department_info->id_dep_type = $request->id_dep_type;
+//        $department_info->size = ($request->size != null) ? $request->size : 0 ;
+//        $department_info->commission_avg = ($request->commission_avg) ? $request->commission_avg : 0 ;
+//        $department_info->commission_hour = ($request->commission_hour) ? $request->commission_hour : 0 ;
+//        $department_info->commission_step = ($request->commission_step) ? $request->commission_step : 0 ;
+//        $department_info->commission_start_money = ($request->commission_start_money) ? $request->commission_start_money : 0 ;
+//        $department_info->commission_janky = ($request->commission_janky) ? $request->commission_janky : 0 ;
+//        $department_info->dep_aim = ($request->dep_aim) ? $request->dep_aim : 0 ;
+//        $department_info->dep_aim_week = ($request->dep_aim_week) ? $request->dep_aim_week : 0 ;
+//        $department_info->type = ($request->type != 'Wybierz') ? $request->type : '' ;
+//        $department_info->janky_system_id = ($request->janky_system_id) ? $request->janky_system_id : 0 ;
+//        $department_info->pbx_id = ($request->pbx_id) ? $request->pbx_id : 0 ;
+//        $department_info->working_hours_normal = ($request->work_hour > 0) ? $request->work_hour : 0 ;
+//        $department_info->working_hours_week = ($request->work_hour_weekend > 0) ? $request->work_hour_weekend : 0 ;
+//        $department_info->blocked = 0;
+//        $department_info->menager_id = ($request->menager != 0) ? $request->menager : null ;
+//        $department_info->director_id = ($request->director != 0) ? $request->director : null ;
+//        $department_info->director_hr_id = ($request->director_hr != 0) ? $request->director_hr : null;
+//        $department_info->hr_id = ($request->hrEmployee != 0) ? $request->hrEmployee : null ;
+//        $department_info->hr_id_second = ($request->hrEmployee2 != 0) ? $request->hrEmployee2 : null ;
+//        $department_info->regionalManager_id = ($request->regionalManager != 0) ? $request->regionalManager : null ;
+//        $department_info->instructor_regional_id = ($request->regionalManagersInstructors != 0) ? $request->regionalManagersInstructors : null ;
+//
+//        $department_info->save();
+//
+//        new ActivityRecorder("Dodano oddział o numerze ID: " . $id_dep,51,1);
+//
+//        Session::flash('message_ok', "Oddział został dodany!");
+//        return Redirect::back();
+//
+//    }
 
-    public function addDepartmentGet() {
-        $department_types = Department_types::all();
-        $departments = Departments::all();
-        $menagers = User::whereIn('user_type_id', ['7','15'])->where('status_work', '=', '1')->get();
-        $hr = User::where('user_type_id', '=', '5')->where('status_work', '=', '1')->get();
-        $hrDirectors = User::where('user_type_id', '=', '14')->where('status_work', '=', '1')->get();
-        $regionalManagers = User::where('user_type_id', '=', '17')->where('status_work', '=', '1')->get();
-        $regionalManagersInstructors = User::where('user_type_id', '=', 21)->where('status_work', '=', 1)->get();
-        return view('admin.addDepartment')
-            ->with('departments', $departments)
-            ->with('department_types', $department_types)
-            ->with('menagers', $menagers)
-            ->with('hrEmployee', $hr)
-            ->with('hrDirectors', $hrDirectors)
-            ->with('regionalManagers', $regionalManagers)
-            ->with('regionalManagersInstructors', $regionalManagersInstructors);
-    }
-
-    public function addDepartmentPost(Request $request) {
-        $department_info = new Department_info();
-
-        //tutaj sprawdzenie czy oddział jest dodawany do istniejącego miasta czy stworzono  nowy
-        if ($request->department != '-1') {
-            $id_dep = $request->department;
-        } else {
-            $department = new Departments();
-
-            $department->name = $request->city;
-            $department->desc = $request->desc;
-            $department->save();
-
-            $departments = DB::table('departments')
-                ->orderBy('id', 'desc')
-                ->limit(1)
-                ->get();
-
-            $id_dep = $departments[0]->id;
-        }
-
-        $department_info->id_dep = $id_dep;
-        $department_info->id_dep_type = $request->id_dep_type;
-        $department_info->size = ($request->size != null) ? $request->size : 0 ;
-        $department_info->commission_avg = ($request->commission_avg) ? $request->commission_avg : 0 ;
-        $department_info->commission_hour = ($request->commission_hour) ? $request->commission_hour : 0 ;
-        $department_info->commission_step = ($request->commission_step) ? $request->commission_step : 0 ;
-        $department_info->commission_start_money = ($request->commission_start_money) ? $request->commission_start_money : 0 ;
-        $department_info->commission_janky = ($request->commission_janky) ? $request->commission_janky : 0 ;
-        $department_info->dep_aim = ($request->dep_aim) ? $request->dep_aim : 0 ;
-        $department_info->dep_aim_week = ($request->dep_aim_week) ? $request->dep_aim_week : 0 ;
-        $department_info->type = ($request->type != 'Wybierz') ? $request->type : '' ;
-        $department_info->janky_system_id = ($request->janky_system_id) ? $request->janky_system_id : 0 ;
-        $department_info->pbx_id = ($request->pbx_id) ? $request->pbx_id : 0 ;
-        $department_info->working_hours_normal = ($request->work_hour > 0) ? $request->work_hour : 0 ;
-        $department_info->working_hours_week = ($request->work_hour_weekend > 0) ? $request->work_hour_weekend : 0 ;
-        $department_info->blocked = 0;
-        $department_info->menager_id = ($request->menager != 0) ? $request->menager : null ;
-        $department_info->director_id = ($request->director != 0) ? $request->director : null ;
-        $department_info->director_hr_id = ($request->director_hr != 0) ? $request->director_hr : null;
-        $department_info->hr_id = ($request->hrEmployee != 0) ? $request->hrEmployee : null ;
-        $department_info->hr_id_second = ($request->hrEmployee2 != 0) ? $request->hrEmployee2 : null ;
-        $department_info->regionalManager_id = ($request->regionalManager != 0) ? $request->regionalManager : null ;
-        $department_info->instructor_regional_id = ($request->regionalManagersInstructors != 0) ? $request->regionalManagersInstructors : null ;
-
-        $department_info->save();
-
-        new ActivityRecorder("Dodano oddział o numerze ID: " . $id_dep,51,1);
-
-        Session::flash('message_ok', "Oddział został dodany!");
-        return Redirect::back();
-
-    }
-
-    //edycja oddziałów
-    public function editDepartmentGet() {
-        $department_info = Department_info::all();
-        $user = User::all();
-
-        return view('admin.editDepartment')
-            ->with('department_info', $department_info)
-            ->with('user', $user);
-    }
-
-    //edycja oddziałów
-    public function editDepartmentPost(Request $request) {
-        //$request->type okkreśla czy oddział jest wybierany czy edytowany
-        //1 - wybranie oddziału
-        //2 - edycja oddziału
-        $menagers = User::whereIn('user_type_id', ['7','15','17'])->where('status_work', '=', '1')->get();
-        $hrDirectors = User::where('user_type_id', '=', '14')->where('status_work', '=', '1')->get();
-        $hrEmployee = User::where('user_type_id', '=', '5')->where('status_work', '=', '1')->get();
-        $regionalManagers = User::where('user_type_id', '=', '17')->where('status_work', '=', '1')->get();
-        $department_info = Department_info::all();
-        $department_types = Department_types::all();
-        $selected_department = Department_info::find($request->selected_department_info_id);
-        $regionalManagersInstructors = User::where('user_type_id', '=', 21)->where('status_work', '=', 1)->get();
-
-        if ($selected_department == null || ($request->post_type != 1 && $request->post_type != 2)) {
-            return view('errors.404');
-        }
-        if ($request->post_type == 1 ) {
-
-          return view('admin.editDepartment')
-              ->with('selected_department', $selected_department)
-              ->with('department_types', $department_types)
-              ->with('department_info', $department_info)
-              ->with('hrEmployee', $hrEmployee)
-              ->with('menagers', $menagers)
-              ->with('hrDirectors', $hrDirectors)
-              ->with('regionalManagers', $regionalManagers)
-              ->with('regionalManagersInstructors', $regionalManagersInstructors);
-        }
-
-        if ($request->post_type == 2) {
-            //Edycja opisu oddziału znajsuje sie w Departments
-            $departments = Departments::find($selected_department->departments->id);
-            $departments->desc = $request->desc;
-            $departments->save();
-
-            if($request->type != 'Wybierz' && $request->type != 'Badania/Wysyłka')
-            {
-                if($selected_department->type != $request->type){
-                    if( $request->type == 'Badania'){
-                        DB::table('users')
-                            ->where('department_info_id',$request->selected_department_info_id)
-                            ->where('user_type_id',1)
-                            ->update(['dating_type' => 0]);
-                    }else{
-                        DB::table('users')
-                            ->where('department_info_id',$request->selected_department_info_id)
-                            ->where('user_type_id',1)
-                            ->update(['dating_type' => 1]);
-                    }
-                }
-            }
-
-            $selected_department->size = ($request->size != null) ? $request->size : 0 ;
-            $selected_department->commission_avg = ($request->commission_avg) ? $request->commission_avg : 0 ;
-            $selected_department->commission_hour = ($request->commission_hour) ? $request->commission_hour : 0 ;
-            $selected_department->commission_step = ($request->commission_step) ? $request->commission_step : 0 ;
-            $selected_department->commission_start_money = ($request->commission_start_money) ? $request->commission_start_money : 0 ;
-            $selected_department->commission_janky = ($request->commission_janky) ? $request->commission_janky : 0 ;
-            $selected_department->dep_aim = ($request->dep_aim) ? $request->dep_aim : 0 ;
-            $selected_department->dep_aim_week = ($request->dep_aim_week) ? $request->dep_aim_week : 0 ;
-            $selected_department->type = ($request->type != 'Wybierz') ? $request->type : '' ;
-            $selected_department->janky_system_id = ($request->janky_system_id) ? $request->janky_system_id : 0 ;
-            $selected_department->pbx_id = ($request->pbx_id != null) ? $request->pbx_id : 0 ;
-            $selected_department->working_hours_normal = ($request->work_hour > 0) ? $request->work_hour : 0 ;
-            $selected_department->working_hours_week = ($request->work_hour_weekend > 0) ? $request->work_hour_weekend : 0 ;
-            $selected_department->menager_id = ($request->menager != 0) ? $request->menager : null ;
-            $selected_department->director_id = ($request->director != 0) ? $request->director : null ;
-            $selected_department->director_hr_id = ($request->director_hr != 0) ? $request->director_hr : null;
-            $selected_department->hr_id = ($request->hrEmployee != 0) ? $request->hrEmployee : null ;
-            $selected_department->hr_id_second = ($request->hrEmployee2 != 0) ? $request->hrEmployee2 : null ;
-            $selected_department->regionalManager_id = ($request->regionalManager != 0) ? $request->regionalManager : null ;
-            $selected_department->instructor_regional_id = ($request->regionalManagersInstructors != 0) ? $request->regionalManagersInstructors : null ;
-            $selected_department->save();
-        }
-
-        $data = [
-            'Edycja danych oddziału' => '',
-            'Id oddziału' => $request->selected_department_info_id
-        ];
-
-        new ActivityRecorder($data,66,2);
-
-        Session::flash('message_ok', "Zmiany zapisano pomyślnie!");
-        return Redirect::back();
-    }
+//    //edycja oddziałów
+//    public function editDepartmentGet() {
+//        $department_info = Department_info::all();
+//        $user = User::all();
+//
+//        return view('admin.editDepartment')
+//            ->with('department_info', $department_info)
+//            ->with('user', $user);
+//    }
+//
+//    //edycja oddziałów
+//    public function editDepartmentPost(Request $request) {
+//        //$request->type okkreśla czy oddział jest wybierany czy edytowany
+//        //1 - wybranie oddziału
+//        //2 - edycja oddziału
+//        $menagers = User::whereIn('user_type_id', ['7','15','17'])->where('status_work', '=', '1')->get();
+//        $hrDirectors = User::where('user_type_id', '=', '14')->where('status_work', '=', '1')->get();
+//        $hrEmployee = User::where('user_type_id', '=', '5')->where('status_work', '=', '1')->get();
+//        $regionalManagers = User::where('user_type_id', '=', '17')->where('status_work', '=', '1')->get();
+//        $department_info = Department_info::all();
+//        $department_types = Department_types::all();
+//        $selected_department = Department_info::find($request->selected_department_info_id);
+//        $regionalManagersInstructors = User::where('user_type_id', '=', 21)->where('status_work', '=', 1)->get();
+//
+//        if ($selected_department == null || ($request->post_type != 1 && $request->post_type != 2)) {
+//            return view('errors.404');
+//        }
+//        if ($request->post_type == 1 ) {
+//
+//          return view('admin.editDepartment')
+//              ->with('selected_department', $selected_department)
+//              ->with('department_types', $department_types)
+//              ->with('department_info', $department_info)
+//              ->with('hrEmployee', $hrEmployee)
+//              ->with('menagers', $menagers)
+//              ->with('hrDirectors', $hrDirectors)
+//              ->with('regionalManagers', $regionalManagers)
+//              ->with('regionalManagersInstructors', $regionalManagersInstructors);
+//        }
+//
+//        if ($request->post_type == 2) {
+//            //Edycja opisu oddziału znajsuje sie w Departments
+//            $departments = Departments::find($selected_department->departments->id);
+//            $departments->desc = $request->desc;
+//            $departments->save();
+//
+//            if($request->type != 'Wybierz' && $request->type != 'Badania/Wysyłka')
+//            {
+//                if($selected_department->type != $request->type){
+//                    if( $request->type == 'Badania'){
+//                        DB::table('users')
+//                            ->where('department_info_id',$request->selected_department_info_id)
+//                            ->where('user_type_id',1)
+//                            ->update(['dating_type' => 0]);
+//                    }else{
+//                        DB::table('users')
+//                            ->where('department_info_id',$request->selected_department_info_id)
+//                            ->where('user_type_id',1)
+//                            ->update(['dating_type' => 1]);
+//                    }
+//                }
+//            }
+//
+//            $selected_department->size = ($request->size != null) ? $request->size : 0 ;
+//            $selected_department->commission_avg = ($request->commission_avg) ? $request->commission_avg : 0 ;
+//            $selected_department->commission_hour = ($request->commission_hour) ? $request->commission_hour : 0 ;
+//            $selected_department->commission_step = ($request->commission_step) ? $request->commission_step : 0 ;
+//            $selected_department->commission_start_money = ($request->commission_start_money) ? $request->commission_start_money : 0 ;
+//            $selected_department->commission_janky = ($request->commission_janky) ? $request->commission_janky : 0 ;
+//            $selected_department->dep_aim = ($request->dep_aim) ? $request->dep_aim : 0 ;
+//            $selected_department->dep_aim_week = ($request->dep_aim_week) ? $request->dep_aim_week : 0 ;
+//            $selected_department->type = ($request->type != 'Wybierz') ? $request->type : '' ;
+//            $selected_department->janky_system_id = ($request->janky_system_id) ? $request->janky_system_id : 0 ;
+//            $selected_department->pbx_id = ($request->pbx_id != null) ? $request->pbx_id : 0 ;
+//            $selected_department->working_hours_normal = ($request->work_hour > 0) ? $request->work_hour : 0 ;
+//            $selected_department->working_hours_week = ($request->work_hour_weekend > 0) ? $request->work_hour_weekend : 0 ;
+//            $selected_department->menager_id = ($request->menager != 0) ? $request->menager : null ;
+//            $selected_department->director_id = ($request->director != 0) ? $request->director : null ;
+//            $selected_department->director_hr_id = ($request->director_hr != 0) ? $request->director_hr : null;
+//            $selected_department->hr_id = ($request->hrEmployee != 0) ? $request->hrEmployee : null ;
+//            $selected_department->hr_id_second = ($request->hrEmployee2 != 0) ? $request->hrEmployee2 : null ;
+//            $selected_department->regionalManager_id = ($request->regionalManager != 0) ? $request->regionalManager : null ;
+//            $selected_department->instructor_regional_id = ($request->regionalManagersInstructors != 0) ? $request->regionalManagersInstructors : null ;
+//            $selected_department->save();
+//        }
+//
+//        $data = [
+//            'Edycja danych oddziału' => '',
+//            'Id oddziału' => $request->selected_department_info_id
+//        ];
+//
+//        new ActivityRecorder($data,66,2);
+//
+//        Session::flash('message_ok', "Zmiany zapisano pomyślnie!");
+//        return Redirect::back();
+//    }
 
     public function multipleDepartmentGet() {
         $users = User::where('status_work', '=', 1)

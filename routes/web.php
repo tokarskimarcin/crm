@@ -439,11 +439,11 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
 
     Route::get('/locker', 'AdminPanel\LockerController@lockerGet');
 
-    Route::get('/add_department', 'AdminController@addDepartmentGet');
-    Route::Post('/add_department', 'AdminController@addDepartmentPost');
+    Route::get('/add_department', 'AdminPanel\DepartmentsController@addDepartmentGet');
+    Route::Post('/add_department', 'AdminPanel\DepartmentsController@addDepartmentPost');
 
-    Route::get('/edit_department', 'AdminController@editDepartmentGet');
-    Route::Post('/edit_department', 'AdminController@editDepartmentPost');
+    Route::get('/edit_department', 'AdminPanel\DepartmentsController@editDepartmentGet');
+    Route::Post('/edit_department', 'AdminPanel\DepartmentsController@editDepartmentPost');
 
     Route::get('/set_multiple_department', 'AdminController@multipleDepartmentGet');
     Route::Post('/set_multiple_department', 'AdminController@multipleDepartmentPost');
