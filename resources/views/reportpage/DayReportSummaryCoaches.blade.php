@@ -10,7 +10,7 @@
     <form method="POST" action="{{ URL::to('/pageSummaryDayReportCoaches') }}" id="my_dep_form">
         <input type="hidden" name="_token" value="{{ csrf_token() }}">
         <div class="row">
-            <div class="col-md-3">
+            <div class="col-md-6">
                 <div class="form-group">
                     <label>Oddział:</label>
                     <select class="form-control" name="dep_id" id="dep_id">
@@ -21,7 +21,7 @@
                     </select>
                 </div>
             </div>
-            <div class="col-md-3">
+            <div class="col-md-6">
                 <div class="form-group">
                     <label>Wybierz miesiąc:</label>
                     <select class="form-control" id="month_selected" name="month_selected">
@@ -31,7 +31,7 @@
                     </select>
                 </div>
             </div>
-            <div class="col-md-2">
+            <div class="col-md-4">
                 <div class="form-group">
                     <label>Wybierz dzień:</label>
                     <select class="form-control" id="day_select" name="day_select">
@@ -45,16 +45,16 @@
                     </select>
                 </div>
             </div>
-            <div class="col-md-2">
+            <div class="col-md-4">
                 <div class="form-group">
-                    <label>Nowi konsultanci (30RBH):</label>
+                    <label>Nowi konsultanci ~30RBH:</label>
                     <select class="form-control" name="onlyNewUser" id="onlyNewUser">
                         <option value="0" @if(isset($onlyNewUser) && $onlyNewUser == 0) selected  @endif>Nie</option>
                         <option value="1" @if(isset($onlyNewUser) && $onlyNewUser == 1) selected @endif>Tak</option>
                     </select>
                 </div>
             </div>
-            <div class="col-md-2">
+            <div class="col-md-4">
                 <div class="form-group">
                     <input id="get_dep" style="margin-top: 25px; width: 100%" type="submit" class="btn btn-info" value="Generuj raport">
                 </div>
