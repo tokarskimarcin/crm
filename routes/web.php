@@ -214,7 +214,7 @@ Route::POST('/delete_notification', 'NotificationController@delete_notification'
 Route::POST('/getMedicalPackagesAdminData', 'AdminController@getMedicalPackagesAdminData')->name('api.getMedicalPackagesAdminData');
 Route::POST('/getMedicalPackageData', 'AdminController@getMedicalPackageData')->name('api.getMedicalPackageData');
 Route::POST('/saveMedicalPackageData', 'AdminController@saveMedicalPackageData')->name('api.saveMedicalPackageData');
-Route::POST('/logInfoDatatable', 'AdminController@datatableLogInfoAjax')->name('api.datatableLogInfo');
+Route::POST('/datatableLogInfoAjax', 'AdminPanel\LogsController@datatableLogInfoAjax')->name('api.datatableLogInfo');
 
 
 Route::POST('/getDaysInMonth', 'StatisticsController@getDaysInMonth')->name('api.getDaysInMonth');
@@ -466,7 +466,7 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
 
     Route::get('/edit_medical_package', 'AdminController@edit_medical_package');
 
-    Route::get('/logInfo', 'AdminController@logInfoGet');
+    Route::get('/logInfo', 'AdminPanel\LogsController@logInfoGet');
     // Admin_Panel --Stop--
 
     // Password change --START--
