@@ -11,6 +11,7 @@ use App\DoublingQueryLogs;
 use App\JankyPenatlyProc;
 use App\PaymentAgencyStory;
 use App\PenaltyBonus;
+use App\Schedule;
 use App\SuccessorHistory;
 use App\SummaryPayment;
 use App\User;
@@ -251,7 +252,6 @@ class FinancesController extends Controller
             ->join('work_hours', 'work_hours.id_user', 'users.id')
             ->join('departments','departments.id','department_info.id_dep')
             ->join('department_type','department_type.id','department_info.id_dep_type')
-
             ->where('work_hours.date', 'like', $date)
             ->groupBy('users.id')
             ->orderBy('users.last_name')->get();
