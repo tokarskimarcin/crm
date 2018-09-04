@@ -7,9 +7,11 @@ use App\Agencies;
 use App\Department_info;
 use App\Department_types;
 use App\Departments;
+use App\DoublingQueryLogs;
 use App\JankyPenatlyProc;
 use App\PaymentAgencyStory;
 use App\PenaltyBonus;
+use App\Schedule;
 use App\SuccessorHistory;
 use App\SummaryPayment;
 use App\User;
@@ -34,11 +36,194 @@ class FinancesController extends Controller
     {
         return view('finances.viewPaymentCadre');
     }
+
+    private function monthPerRealWeekDivision($month, $year) {
+        $dataStart = date('Y-m-' . '01', strtotime($year . '-' . $month)); //first day of given month
+        $loopDate = $dataStart;
+        $days_in_month = date('t', strtotime($year . '-' . $month));
+        $firstWeekNumber = date('W', strtotime($year . '-' . $month . '-01')); //first week number of given month
+        $unoWeekNumber = date('W', strtotime($year . '-' . $month . '-01')); //first week number of given month
+        $monthNumber = date('m', strtotime($year . '-' . $month . '-01'));
+
+        $loopDateMonthNumber = date('m', strtotime($loopDate));
+
+        $weeks = [$firstWeekNumber]; //array of weeks number in this month
+
+        for ($i = 1; $i <= $days_in_month; $i++) {
+            $loop_day = ($i < 10) ? '0' . $i : $i;
+            $loop_date = $year . '-' . $month . '-' . $loop_day;
+            $loopDateWeekNumber = date('W', strtotime($loop_date));
+
+            if($loopDateWeekNumber != $unoWeekNumber) {
+                array_push($weeks, $loopDateWeekNumber);
+                $unoWeekNumber = $loopDateWeekNumber;
+            }
+        }
+
+        $weeksDivided = array();
+
+        for($j = 0; $j < count($weeks); $j++) {
+            $flag = 1;
+
+            if($j == 0) {
+            $from = date("Y-m-d", strtotime("{$year}-W{$weeks[$j]}-1")); //Returns the date of monday in week
+            $to = date("Y-m-d", strtotime("{$year}-W{$weeks[$j]}-7"));   //Returns the date of sunday in week
+
+                for($k = 1; $k <= 8; $k++) {
+                    if($k == 1) {
+                        $currentMonthNumber = date('m', strtotime($from));
+                        if($monthNumber == $currentMonthNumber && $flag != 0) {
+                            $firstDayNr = date("N", strtotime("{$year}-W{$weeks[$j]}-1"));
+                            $lastDayNr = date("N", strtotime("{$year}-W{$weeks[$j]}-7"));
+                            array_push($weeksDivided, ['weekNumber' => $weeks[$j], 'firstDay' => $from, 'lastDay' => $to, 'firstDayNr' => $firstDayNr, 'lastDayNr' => $lastDayNr]);
+                            $flag = 0;
+                        }
+                    }
+                    else {
+                        $days = $k - 1;
+                        $currentMonthNumber = date('m', strtotime($from . '+ ' . $days . ' days'));
+                        if($monthNumber == $currentMonthNumber  && $flag != 0) {
+                            $firstDayNr = date("N", strtotime($from . '+ ' . $days . ' days'));
+                            $lastDayNr = date("N", strtotime("{$year}-W{$weeks[$j]}-7"));
+                            array_push($weeksDivided, ['weekNumber' => $weeks[$j], 'firstDay' => date('Y-m-d', strtotime($from . '+ ' . $days . ' days')), 'lastDay' => $to, 'firstDayNr' => $firstDayNr, 'lastDayNr' => $lastDayNr]);
+                            $flag = 0;
+                        }
+                    }
+                }
+            }
+            else if($j == count($weeks) - 1) {
+                $from = date("Y-m-d", strtotime("{$year}-W{$weeks[$j]}-1")); //Returns the date of monday in week
+                $to = date("Y-m-d", strtotime("{$year}-W{$weeks[$j]}-7"));   //Returns the date of sunday in week
+                if(date('m', strtotime($to)) != $monthNumber) { //last week day is not in given month
+                    for($k = 1; $k <= 7; $k++) {
+                        $days = $k;
+                        $currentMonthNumber = date('m', strtotime($from . '+ ' . $days . ' days'));
+                        if($monthNumber != $currentMonthNumber  && $flag != 0) {
+                            $corrDays = $days - 1;
+                            $firstDayNr = date("N", strtotime("{$year}-W{$weeks[$j]}-1"));
+                            $lastDayNr = date("N", strtotime($from . '+ ' . $corrDays . ' days'));
+                            array_push($weeksDivided, ['weekNumber' => $weeks[$j], 'firstDay' => $from, 'lastDay' => date('Y-m-d', strtotime($from . '+ ' . $corrDays . ' days')), 'firstDayNr' => $firstDayNr, 'lastDayNr' => $lastDayNr]);
+                            $flag = 0;
+                        }
+                    }
+                }
+                else { //last week day contain in given month
+                    $from = date("Y-m-d", strtotime("{$year}-W{$weeks[$j]}-1")); //Returns the date of monday in week
+                    $to = date("Y-m-d", strtotime("{$year}-W{$weeks[$j]}-7"));   //Returns the date of sunday in week
+                    $firstDayNr = date("N", strtotime("{$year}-W{$weeks[$j]}-1"));
+                    $lastDayNr = date("N", strtotime("{$year}-W{$weeks[$j]}-7"));
+                    array_push($weeksDivided, ['weekNumber' => $weeks[$j], 'firstDay' => $from, 'lastDay' => $to, 'firstDayNr' => $firstDayNr, 'lastDayNr' => $lastDayNr]);
+                }
+            }
+            else {
+                $from = date("Y-m-d", strtotime("{$year}-W{$weeks[$j]}-1")); //Returns the date of monday in week
+                $to = date("Y-m-d", strtotime("{$year}-W{$weeks[$j]}-7"));   //Returns the date of sunday in week
+                $firstDayNr = date("N", strtotime("{$year}-W{$weeks[$j]}-1"));
+                $lastDayNr = date("N", strtotime("{$year}-W{$weeks[$j]}-7"));
+                array_push($weeksDivided, ['weekNumber' => $weeks[$j], 'firstDay' => $from, 'lastDay' => $to, 'firstDayNr' => $firstDayNr, 'lastDayNr' => $lastDayNr]);
+            }
+        }
+//        dd($weeksDivided);
+        return $weeksDivided;
+    }
+
+    private function getFreeDays($dividedMonth) {
+
+//        dd($dividedMonth);
+        $fieldArr = [
+            '1' => 'mondayPaid',
+            '2' => 'tuesdayPaid',
+            '3' => 'wednesdayPaid',
+            '4' => 'thursdayPaid',
+            '5' => 'fridayPaid',
+            '6' => 'saturdayPaid',
+            '7' => 'sundayPaid'
+                ];
+        $safeWeeksArr = []; //safe weeks arr
+        $unsafeWeeksArr = [];
+        for($i = 0; $i < count($dividedMonth); $i++) {
+            if($i != 0 && $i != count($dividedMonth) - 1) {
+                array_push($safeWeeksArr, $dividedMonth[$i]['weekNumber']);
+            }
+            else {
+                array_push($unsafeWeeksArr, $dividedMonth[$i]['weekNumber']);
+            }
+        }
+
+        $freeDaysSafe = Schedule::select(DB::raw('
+            id_user,
+            SUM(CASE WHEN mondayPaid = 0 THEN 1 ELSE 0 END) + SUM(CASE WHEN tuesdayPaid = 0 THEN 1 ELSE 0 END) + SUM(CASE WHEN wednesdayPaid = 0 THEN 1 ELSE 0 END) + SUM(CASE WHEN thursdayPaid = 0 THEN 1 ELSE 0 END) + SUM(CASE WHEN fridayPaid = 0 THEN 1 ELSE 0 END) + SUM(CASE WHEN saturdayPaid = 0 THEN 1 ELSE 0 END) + SUM(CASE WHEN sundayPaid = 0 THEN 1 ELSE 0 END)
+            as notPaidDays
+        '))
+            ->groupBy('id_user')
+            ->whereIn('week_num', $safeWeeksArr)
+            ->get();
+
+        $unsafeWeekString1 = '';
+        $unsafeWeekString2 = '';
+//        dd($unsafeWeeksArr);
+        for($i = $dividedMonth[0]['firstDayNr']; $i < 8; $i++) {
+            if($i != 7) {
+                $unsafeWeekString1 .= 'SUM(CASE WHEN ' . $fieldArr[$i] . ' = 0 THEN 1 ELSE 0 END) + ';
+            }
+            else {
+                $unsafeWeekString1 .= 'SUM(CASE WHEN ' . $fieldArr[$i] . ' = 0 THEN 1 ELSE 0 END)';
+            }
+        }
+
+        $max = $dividedMonth[count($dividedMonth) - 1]['lastDayNr'];
+        for($i = 1; $i <= $max; $i++) {
+            if($i != $max) {
+                $unsafeWeekString2 .= 'SUM(CASE WHEN ' . $fieldArr[$i] . ' = 0 THEN 1 ELSE 0 END) + ';
+            }
+            else {
+                $unsafeWeekString2 .= 'SUM(CASE WHEN ' . $fieldArr[$i] . ' = 0 THEN 1 ELSE 0 END)';
+            }
+        }
+
+        $freeDaysUnsafe1 = Schedule::select(DB::raw('
+            id_user,
+            ' . $unsafeWeekString1 . ' as notPaidDays
+        '))
+            ->groupBy('id_user')
+            ->where('week_num', '=', $unsafeWeeksArr[0])
+            ->get();
+
+        $freeDaysUnsafe2 = Schedule::select(DB::raw('
+            id_user,
+            ' . $unsafeWeekString2 . ' as notPaidDays
+        '))
+            ->groupBy('id_user')
+            ->where('week_num', '=', $unsafeWeeksArr[1])
+            ->get();
+
+
+        $finalArr = [];
+        $idArr = array_merge($freeDaysSafe->pluck('id_user')->toArray(), $freeDaysUnsafe1->pluck('id_user')->toArray());
+        $fullIdArr = array_merge($idArr, $freeDaysUnsafe2->pluck('id_user')->toArray());
+        $fullIdUniqueArray = array_unique($fullIdArr); //array of all user ids
+
+        foreach($fullIdUniqueArray as $userId) {
+
+            $element1 = $freeDaysSafe->where('id_user', '=', $userId)->count() != 0 ? $freeDaysSafe->where('id_user', '=', $userId)->first()->notPaidDays : 0;
+            $element2 = $freeDaysUnsafe1->where('id_user', '=', $userId)->count() != 0 ? $freeDaysUnsafe1->where('id_user', '=', $userId)->first()->notPaidDays : 0;
+            $element3 = $freeDaysUnsafe2->where('id_user', '=', $userId)->count() != 0 ? $freeDaysUnsafe2->where('id_user', '=', $userId)->first()->notPaidDays : 0;
+            array_push($finalArr, ['id_user' => $userId, 'freeDays' => $element1 + $element2 + $element3]);
+        }
+
+        return $finalArr;
+
+    }
+
     public function viewPaymentCadrePost(Request $request)
     {
 
         $date_to_post = $request->search_money_month;
         $date = $request->search_money_month.'%';
+        $year = substr($date, 0, 4);
+        $month = substr($date, 5, 2);
+
+        $dividedMonth = $this->monthPerRealWeekDivision($month, $year);
         $agencies = Agencies::all();
         $salary = DB::table(DB::raw("users"))
             ->whereNotIn('users.user_type_id',[1,2,9])
@@ -57,6 +242,7 @@ class FinancesController extends Controller
             `users`.`additional_salary`,
             `users`.`student`,
             `users`.`documents`,
+             ROUND(salary / DAY(LAST_DAY("' . $request->search_money_month.'-01' .'")),2) as average_salary,
             (SELECT SUM(`penalty_bonus`.`amount`) FROM `penalty_bonus` WHERE `penalty_bonus`.`id_user`=`users`.`id` AND `penalty_bonus`.`event_date` LIKE "'.$date.'" AND `penalty_bonus`.`type`=1 AND `penalty_bonus`.`status`=1) as `penalty`,
             (SELECT SUM(`penalty_bonus`.`amount`) FROM `penalty_bonus` WHERE `penalty_bonus`.`id_user`=`users`.`id` AND `penalty_bonus`.`event_date` LIKE  "'.$date.'" AND `penalty_bonus`.`type`=2 AND `penalty_bonus`.`status`=1) as `bonus`')
             ->where(function ($query) use ($date){
@@ -67,10 +253,12 @@ class FinancesController extends Controller
             ->join('work_hours', 'work_hours.id_user', 'users.id')
             ->join('departments','departments.id','department_info.id_dep')
             ->join('department_type','department_type.id','department_info.id_dep_type')
-
             ->where('work_hours.date', 'like', $date)
             ->groupBy('users.id')
             ->orderBy('users.last_name')->get();
+
+        $freeDaysData = $this->getFreeDays($dividedMonth); //[id_user, freeDays]
+
         /**
          * Pobranie danych osób którzy nie pracowali całego miesiąca
          */
@@ -194,6 +382,21 @@ class FinancesController extends Controller
                     $value->salary = $item;
                 }
             }
+        }
+
+        foreach($salary as $onePerson) {
+            $flag = false;
+            foreach($freeDaysData as $freeDayData) {
+                if($onePerson->id == $freeDayData['id_user']) {
+                    $flag = true;
+                    $onePerson->salary -= $onePerson->average_salary * $freeDayData['freeDays'];
+                    $onePerson->freeDays = $freeDayData['freeDays'];
+                }
+            }
+            if(!$flag) {
+                $onePerson->freeDays = 0;
+            }
+
         }
 
         /**
@@ -686,8 +889,40 @@ class FinancesController extends Controller
                                 'updated_at' => date('Y-m-d H:m:s:i')));
                         }
                     }
-                    PaymentAgencyStory::insert($data);
-                    $accept_payment->save();
+
+                    if(session()->has('isPaymentAgencyStoryQueryRunning')){
+                        if(session('isPaymentAgencyStoryQueryRunning')){
+                            $DOUBLING_QUERY_LOG = new DoublingQueryLogs();
+                            $DOUBLING_QUERY_LOG->table_name = 'PaymentAgencyStory';
+                            $DOUBLING_QUERY_LOG->save();
+                        }else{
+                            session(['isPaymentAgencyStoryQueryRunning' => true]);
+                            PaymentAgencyStory::insert($data);
+                            session()->forget('isPaymentAgencyStoryQueryRunning');
+                        }
+                    }else{
+                        session(['isPaymentAgencyStoryQueryRunning' => true]);
+                        PaymentAgencyStory::insert($data);
+                        session()->forget('isPaymentAgencyStoryQueryRunning');
+                    }
+
+                    if(session()->has('isAcceptedPaymentQueryRunning')){
+                        if(session('isAcceptedPaymentQueryRunning')){
+                            $DOUBLING_QUERY_LOG = new DoublingQueryLogs();
+                            $DOUBLING_QUERY_LOG->table_name = 'AcceptedPayment';
+                            $DOUBLING_QUERY_LOG->save();
+                        }else{
+                            session(['isAcceptedPaymentQueryRunning' => true]);
+                            $accept_payment->save();
+                            session()->forget('isAcceptedPaymentQueryRunning');
+                        }
+                    }else{
+                        session(['isAcceptedPaymentQueryRunning' => true]);
+                        $accept_payment->save();
+                        session()->forget('isAcceptedPaymentQueryRunning');
+                    }
+
+
                     $LogData = array_merge(['T ' => ' Zapisanie wypłat '],$accept_payment->toArray());
                     new ActivityRecorder($LogData, 24, 1);
                     return $data;
