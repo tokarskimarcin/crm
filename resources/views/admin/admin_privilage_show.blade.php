@@ -9,6 +9,9 @@
     @if (Session::has('message_ok'))
        <div class="alert alert-success">{{ Session::get('message_ok') }}</div>
     @endif
+    @if (Session::has('message_error'))
+        <div class="alert alert-success">{{ Session::get('message_ok') }}</div>
+    @endif
     <div class="panel panel-default">
         <div class="panel-heading">
             Uprawnienia grup i użytkowników
