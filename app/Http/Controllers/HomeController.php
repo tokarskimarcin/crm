@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\DoublingQueryLogs;
 use App\NotificationChangesDisplayedFlags;
 use App\Work_Hour;
 use Illuminate\Http\Request;
@@ -63,7 +64,23 @@ class HomeController extends Controller
             $work_hour->click_start = $this->actuall_hour;
             $work_hour->id_user = Auth::id();
             $work_hour->created_at = date('Y-m-d H:i:s');
-            $work_hour->save();
+
+            if(session()->has('isWork_HourQueryRunning')){
+                if(session('isWork_HourQueryRunning')){
+                    $DOUBLING_QUERY_LOG = new DoublingQueryLogs();
+                    $DOUBLING_QUERY_LOG->table_name = 'Work_Hour';
+                    $DOUBLING_QUERY_LOG->save();
+                }else{
+                    session(['isWork_HourQueryRunning' => true]);
+                    $work_hour->save();
+                    session()->forget('isWork_HourQueryRunning');
+                }
+            }else{
+                session(['isWork_HourQueryRunning' => true]);
+                $work_hour->save();
+                session()->forget('isWork_HourQueryRunning');
+            }
+
             return 'success';
         }else{
             return 'fail';

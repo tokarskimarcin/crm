@@ -183,7 +183,7 @@
                globalVariables: {
                    datatableHeight: '75vh' //this variable defines height of table
                }
-           }
+           };
 
            /*******END OF GLOBAL VARIABLES*********/
 
@@ -649,6 +649,16 @@
                "rowCallback": function( row, data, index ) {
                    if(data.comment+'' != 'null' && data.comment !== ''){
                        $(row).css('background-color', '#fffc8b');
+                   }
+
+                   if(data.nrPBX == null){
+                       for(let i =6; i <=8; i++){
+                           $($(row).children()[i]).css('background-color', '#ff7878');
+                       }
+                   }else if(data.loseSuccess >= 0){
+                       for(let i =6; i <=8; i++){
+                           $($(row).children()[i]).css('background-color', '#78ff80');
+                       }
                    }
                    row.setAttribute('data-id', data.id);
                    APP.arrays.clientRouteInfoIdArr.forEach(specificId => { //when someone change table page, we have to reassign classes to rows.

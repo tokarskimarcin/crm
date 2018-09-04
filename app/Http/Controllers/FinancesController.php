@@ -7,6 +7,7 @@ use App\Agencies;
 use App\Department_info;
 use App\Department_types;
 use App\Departments;
+use App\DoublingQueryLogs;
 use App\JankyPenatlyProc;
 use App\PaymentAgencyStory;
 use App\PenaltyBonus;
@@ -241,11 +242,8 @@ class FinancesController extends Controller
             `users`.`additional_salary`,
             `users`.`student`,
             `users`.`documents`,
-            ROUND(salary / DAY(LAST_DAY("' . $request->search_money_month.'-01' .'")),2) as average_salary,
             (SELECT SUM(`penalty_bonus`.`amount`) FROM `penalty_bonus` WHERE `penalty_bonus`.`id_user`=`users`.`id` AND `penalty_bonus`.`event_date` LIKE "'.$date.'" AND `penalty_bonus`.`type`=1 AND `penalty_bonus`.`status`=1) as `penalty`,
-            (SELECT SUM(`penalty_bonus`.`amount`) FROM `penalty_bonus` WHERE `penalty_bonus`.`id_user`=`users`.`id` AND `penalty_bonus`.`event_date` LIKE  "'.$date.'" AND `penalty_bonus`.`type`=2 AND `penalty_bonus`.`status`=1) as `bonus`
-
-            ')
+            (SELECT SUM(`penalty_bonus`.`amount`) FROM `penalty_bonus` WHERE `penalty_bonus`.`id_user`=`users`.`id` AND `penalty_bonus`.`event_date` LIKE  "'.$date.'" AND `penalty_bonus`.`type`=2 AND `penalty_bonus`.`status`=1) as `bonus`')
             ->where(function ($query) use ($date){
                 $query->orwhere(DB::raw('SUBSTRING(promotion_date,1,7)'),'<', substr($date,0,strlen($date)-1))
                     ->orwhere('users.promotion_date','=',null);
@@ -408,8 +406,6 @@ class FinancesController extends Controller
             ->join('departments','departments.id','department_info.id_dep')
             ->join('department_type','department_type.id','department_info.id_dep_type')
             ->get();
-
-//        dd($salary->where('freeDays', '!=', 0));
 
         return view('finances.viewPaymentCadre')
             ->with('month',$date_to_post)
@@ -892,8 +888,40 @@ class FinancesController extends Controller
                                 'updated_at' => date('Y-m-d H:m:s:i')));
                         }
                     }
-                    PaymentAgencyStory::insert($data);
-                    $accept_payment->save();
+
+                    if(session()->has('isPaymentAgencyStoryQueryRunning')){
+                        if(session('isPaymentAgencyStoryQueryRunning')){
+                            $DOUBLING_QUERY_LOG = new DoublingQueryLogs();
+                            $DOUBLING_QUERY_LOG->table_name = 'PaymentAgencyStory';
+                            $DOUBLING_QUERY_LOG->save();
+                        }else{
+                            session(['isPaymentAgencyStoryQueryRunning' => true]);
+                            PaymentAgencyStory::insert($data);
+                            session()->forget('isPaymentAgencyStoryQueryRunning');
+                        }
+                    }else{
+                        session(['isPaymentAgencyStoryQueryRunning' => true]);
+                        PaymentAgencyStory::insert($data);
+                        session()->forget('isPaymentAgencyStoryQueryRunning');
+                    }
+
+                    if(session()->has('isAcceptedPaymentQueryRunning')){
+                        if(session('isAcceptedPaymentQueryRunning')){
+                            $DOUBLING_QUERY_LOG = new DoublingQueryLogs();
+                            $DOUBLING_QUERY_LOG->table_name = 'AcceptedPayment';
+                            $DOUBLING_QUERY_LOG->save();
+                        }else{
+                            session(['isAcceptedPaymentQueryRunning' => true]);
+                            $accept_payment->save();
+                            session()->forget('isAcceptedPaymentQueryRunning');
+                        }
+                    }else{
+                        session(['isAcceptedPaymentQueryRunning' => true]);
+                        $accept_payment->save();
+                        session()->forget('isAcceptedPaymentQueryRunning');
+                    }
+
+
                     $LogData = array_merge(['T ' => ' Zapisanie wypłat '],$accept_payment->toArray());
                     new ActivityRecorder($LogData, 24, 1);
                     return $data;
