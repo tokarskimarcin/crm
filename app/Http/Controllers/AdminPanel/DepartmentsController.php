@@ -27,7 +27,7 @@ class DepartmentsController
     public function addDepartmentGet() {
         $department_types               = Department_types::all();
         $departments                    = Departments::all();
-        $menagers                       = User::whereIn('user_type_id', ['7','15'])
+        $menagers                       = User::whereIn('user_type_id', [7,15,17,13])
             ->where('status_work', '=', '1')->get();
         $hr                             = User::where('user_type_id', '=', '5')
             ->where('status_work', '=', '1')->get();
@@ -84,7 +84,7 @@ class DepartmentsController
         //$request->type okkreśla czy oddział jest wybierany czy edytowany
         //1 - wybranie oddziału
         //2 - edycja oddziału
-        $menagers                       = User::whereIn('user_type_id', ['7','15','17'])->where('status_work', '=', '1')->get();
+        $menagers                       = User::whereIn('user_type_id', [7,15,17,13])->where('status_work', '=', '1')->get();
         $hrDirectors                    = User::where('user_type_id', '=', '14')->where('status_work', '=', '1')->get();
         $hrEmployee                     = User::where('user_type_id', '=', '5')->where('status_work', '=', '1')->get();
         $regionalManagers               = User::where('user_type_id', '=', '17')->where('status_work', '=', '1')->get();
