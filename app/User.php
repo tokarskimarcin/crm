@@ -34,6 +34,9 @@ class User extends Authenticatable
     public function scopeOnlyConsultant($query){
         return $query->whereIn('user_type_id',[1,2]);
     }
+    public function scopeOnlyCadre($query){
+        return $query->whereNotIn('user_type_id',[1,2]);
+    }
     public function scopeActiveUser($query){
         return $query->where('status_work',1);
     }

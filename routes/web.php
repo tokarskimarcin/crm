@@ -15,8 +15,8 @@ Route::POST('/stopWork', 'HomeController@stopWork');
 Route::POST('/register_hour', 'WorkHoursController@registerHour');
 
 //********************AJAX*********************** */
-Route::post('/userPrivilage', 'AdminController@userPrivilagesAjax')->name('api.privilageAjax');
-Route::post('/userPrivilagesAjax', 'AdminController@userPrivilagesAjaxData')->name('api.privilageAjaxData');
+Route::post('/userPrivilage', 'AdminPanel\LinksController@userPrivilage')->name('api.privilageAjax');
+Route::post('/userPrivilagesAjax', 'AdminPanel\LinksController@userPrivilagesAjaxData')->name('api.privilageAjaxData');
 
 Route::post('/delete_picture', 'AuditController@delete_picture')->name('api.delete_picture');
 Route::post('/add', 'AuditController@ajax')->name('api.ajax');
@@ -98,10 +98,10 @@ Route::POST('/datatableShowInProgressNotifications', 'NotificationController@dat
 Route::POST('/datatableShowFinishedNotifications', 'NotificationController@datatableShowFinishedNotifications')->name('api.datatableShowFinishedNotifications'); //tu zmienic z ORM
 
 //locker / Multiple departments
-Route::POST('/locker', 'AdminController@lockerPost')->name('api.locker');
+Route::POST('/locker', 'AdminPanel\LockerController@lockerPost')->name('api.locker');
 
 //firewall delete users
-Route::POST('/firewallDeleteUser', 'AdminController@firewallDeleteUser')->name('api.firewallDeleteUser');
+Route::POST('/firewallDeleteUser', 'AdminPanel\FireWallController@firewallDeleteUser')->name('api.firewallDeleteUser');
 
 //notifications moving
 Route::POST('/getNotficationsJanky', 'NotificationController@getNotficationsJanky')->name('api.getNotficationsJanky');
@@ -215,7 +215,7 @@ Route::POST('/delete_notification', 'NotificationController@delete_notification'
 Route::POST('/getMedicalPackagesAdminData', 'AdminController@getMedicalPackagesAdminData')->name('api.getMedicalPackagesAdminData');
 Route::POST('/getMedicalPackageData', 'AdminController@getMedicalPackageData')->name('api.getMedicalPackageData');
 Route::POST('/saveMedicalPackageData', 'AdminController@saveMedicalPackageData')->name('api.saveMedicalPackageData');
-Route::POST('/logInfoDatatable', 'AdminController@datatableLogInfoAjax')->name('api.datatableLogInfo');
+Route::POST('/datatableLogInfoAjax', 'AdminPanel\LogsController@datatableLogInfoAjax')->name('api.datatableLogInfo');
 
 
 Route::POST('/getDaysInMonth', 'StatisticsController@getDaysInMonth')->name('api.getDaysInMonth');
@@ -433,33 +433,33 @@ Auth::routes();
 Route::middleware(['check-permission', 'check-firewall'])->group(function () {
     Route::get('/', 'HomeController@index');
     // Admin_Panel --Start--
-    Route::get('/admin_privilage', 'AdminController@admin_privilage');
+    Route::get('/admin_privilage', 'AdminPanel\ManagementPrivilagesController@adminPrivilage');
 
-    Route::get('/admin_privilage_show/{id}', 'AdminController@admin_privilage_show');
-    Route::Post('/admin_privilage_edit/{id}', 'AdminController@admin_privilage_edit');
+    Route::get('/admin_privilage_show/{id}', 'AdminPanel\LinksController@adminPrivilageShow');
+    Route::Post('/admin_privilage_edit/{id}', 'AdminPanel\LinksController@adminPrivilageEdit');
 
-    Route::get('/locker', 'AdminController@lockerGet');
+    Route::get('/locker', 'AdminPanel\LockerController@lockerGet');
 
-    Route::get('/add_department', 'AdminController@addDepartmentGet');
-    Route::Post('/add_department', 'AdminController@addDepartmentPost');
+    Route::get('/add_department', 'AdminPanel\DepartmentsController@addDepartmentGet');
+    Route::Post('/add_department', 'AdminPanel\DepartmentsController@addDepartmentPost');
 
-    Route::get('/edit_department', 'AdminController@editDepartmentGet');
-    Route::Post('/edit_department', 'AdminController@editDepartmentPost');
+    Route::get('/edit_department', 'AdminPanel\DepartmentsController@editDepartmentGet');
+    Route::Post('/edit_department', 'AdminPanel\DepartmentsController@editDepartmentPost');
 
-    Route::get('/set_multiple_department', 'AdminController@multipleDepartmentGet');
-    Route::Post('/set_multiple_department', 'AdminController@multipleDepartmentPost');
+    Route::get('/set_multiple_department', 'AdminPanel\DepartmentsController@multipleDepartmentGet');
+    Route::Post('/set_multiple_department', 'AdminPanel\DepartmentsController@multipleDepartmentPost');
 
-    Route::get('/create_link', 'AdminController@createLinkGet');
-    Route::Post('/create_link', 'AdminController@createLinkPost');
+    Route::get('/create_link', 'AdminPanel\LinksController@createLinkGet');
+    Route::Post('/create_link', 'AdminPanel\LinksController@createLinkPost');
 
-    Route::Post('/addGroup', 'AdminController@addGroup');
-    Route::Post('/removeGroup', 'AdminController@removeGroup');
+    Route::Post('/addGroup', 'AdminPanel\LinksController@addGroup');
+    Route::Post('/removeGroup', 'AdminPanel\LinksController@removeGroup');
 
-    Route::get('/firewall_ip', 'AdminController@firewallGet');
-    Route::POST('/firewall_ip', 'AdminController@firewallPost');
+    Route::get('/firewall_ip', 'AdminPanel\FireWallController@firewallGet');
+    Route::POST('/firewall_ip', 'AdminPanel\FireWallController@firewallPost');
 
-    Route::get('/firewall_privileges', 'AdminController@firewallPrivilegesGet');
-    Route::POST('/firewall_privileges', 'AdminController@firewallPrivilegesPost');
+    Route::get('/firewall_privileges', 'AdminPanel\FireWallController@firewallPrivilegesGet');
+    Route::POST('/firewall_privileges', 'AdminPanel\FireWallController@firewallPrivilegesPost');
 
     Route::get('/check_all_tests', 'AdminController@check_all_tests');
 
@@ -467,7 +467,7 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
 
     Route::get('/edit_medical_package', 'AdminController@edit_medical_package');
 
-    Route::get('/logInfo', 'AdminController@logInfoGet');
+    Route::get('/logInfo', 'AdminPanel\LogsController@logInfoGet');
     // Admin_Panel --Stop--
 
     // Password change --START--
@@ -907,8 +907,8 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
     /** KONIEC AUDYTY **/
 
     //dodawanie usuwanie przywilejów dla użytkowników
-    Route::get('/userPrivilages', 'AdminController@userPrivilagesGET');
-    Route::post('/userPrivilages', 'AdminController@userPrivilagesPOST');
+    Route::get('/userPrivilages', 'AdminPanel\LinksController@userPrivilagesGET');
+    Route::post('/userPrivilages', 'AdminPanel\LinksController@userPrivilagesPOST');
 
     /** CRM **/
     Route::get('/specificRoute/{id}', 'CrmRouteController@specificRouteGet');
@@ -1035,3 +1035,4 @@ Route::post('/changeLimits', 'CrmRouteController@changeLimitsAjax')->name('api.c
 Route::get('/getAllTask', 'MyUserTestController@getAllTask');
 
 
+Route::get('/Admin/Departments', 'AdminPanel\DepartmentsController@index');
