@@ -287,7 +287,6 @@ function getStartAndEndDate($week, $year) {
         var stop_date =  moment(year).add(week_number, 'weeks').startOf('isoweek').format('DD MM YYYY');
 
         let userTypes = @json($userTypes);
-        console.log(userTypes);
 
         table = $('#datatable').DataTable({
             "autoWidth": false,
@@ -374,6 +373,7 @@ function getStartAndEndDate($week, $year) {
                 var id_user = closestTR.attr('id');
                 var schedule_id =  $(this).attr('id');
                 var checkbox;
+                var paid = [];
                 var valid = true;
                 var time = true;
                 for(var i=0;i<week_array.length;i++)
@@ -382,6 +382,12 @@ function getStartAndEndDate($week, $year) {
                     $start_hour_array.push(closestTR.find("select[name="+week_array[i]+"_start_work]").val());
                     $stop_hour_array.push(closestTR.find("select[name="+week_array[i]+"_stop_work]").val());
                     $reason_array.push(closestTR.find("input[name="+week_array[i]+"_reason]").val());
+                    if(checkbox.is(':checked')) {
+                        paid.push('false');
+                    }
+                    else {
+                        paid.push('true');
+                    }
                     if(($start_hour_array[i] == "null" || $stop_hour_array[i] == "null") && !checkbox.is(':checked'))
                     {
                         valid = false;
@@ -411,7 +417,7 @@ function getStartAndEndDate($week, $year) {
                         headers: {
                             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                         },
-                        data:{"start_hours":$start_hour_array,"stop_hours":$stop_hour_array,"reasons":$reason_array,"id_user":id_user,"schedule_id":schedule_id},
+                        data:{"isPaid": paid,"start_hours":$start_hour_array,"stop_hours":$stop_hour_array,"reasons":$reason_array,"id_user":id_user,"schedule_id":schedule_id},
                         success: function(response) {
                                 swal({
                                     title: 'Godziny zostały zarejestrowane!',
