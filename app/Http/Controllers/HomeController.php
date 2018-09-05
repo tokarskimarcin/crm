@@ -158,6 +158,18 @@ class HomeController extends Controller
         }
     }
 
+    public function cadreSupportUnratedNotifications(Request $request) {
+        if($request->ajax()) {
+            $unratedNotifications = Notifications::select('status','jr.id')
+                ->leftJoin('judge_results as jr','jr.notification_id','=','notifications.id')
+                ->where('notifications.user_id','=',Auth::user()->id)
+                ->where('status','=',3)
+                ->whereNull('jr.id')
+                ->count();
+            return $unratedNotifications;
+        }
+    }
+
     public function itCountNotifications(Request $request) {
         if($request->ajax()) {
             $notifications_count = Notifications::where('status', 1)->count();
