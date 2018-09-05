@@ -33,7 +33,7 @@
     transition: opacity 0.3s;
 }
 
-.VCtooltip.VCtooltip-grey .tooltiptext{
+.VCtooltip.VCtooltip-gray .tooltiptext{
     background-color: #555;
     color: white;
 }
@@ -57,7 +57,7 @@
     bottom: 125%;
     left: 0;
 }
-.VCtooltip.VCtooltip-top.VCtooltip-grey .tooltiptext::after{
+.VCtooltip.VCtooltip-top.VCtooltip-gray .tooltiptext::after{
     border-color: #555 transparent transparent transparent !important;
 }
 
@@ -72,7 +72,7 @@
     top: 125%;
     left: 0;
 }
-.VCtooltip.VCtooltip-bottom.VCtooltip-grey .tooltiptext::after{
+.VCtooltip.VCtooltip-bottom.VCtooltip-gray .tooltiptext::after{
     border-color: transparent transparent #555 transparent !important;
 }
 
@@ -87,7 +87,7 @@
     top: 0;
     left: 100%;
 }
-.VCtooltip.VCtooltip-right.VCtooltip-grey .tooltiptext::after{
+.VCtooltip.VCtooltip-right.VCtooltip-gray .tooltiptext::after{
     border-color: transparent #555 transparent transparent !important;
 }
 
@@ -102,7 +102,7 @@
     top: 0;
     right: 105%;
 }
-.VCtooltip.VCtooltip-left.VCtooltip-grey .tooltiptext::after{
+.VCtooltip.VCtooltip-left.VCtooltip-gray .tooltiptext::after{
     border-color: transparent transparent transparent #555;
 }
 
@@ -113,6 +113,6 @@
     opacity: 1;
 }
 
-.VCtooltip.VCtooltip-grey li{
+.VCtooltip.VCtooltip-gray li{
 
 }
