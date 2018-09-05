@@ -10,7 +10,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet"/>
     <link href="{{ asset('/css/fixedColumns.dataTables.min.css')}}" rel="stylesheet">
     <link href="{{asset('/css/fixedHeader.dataTables.min.css')}}" rel="stylesheet">
-
+    <link rel="stylesheet" href="{{asset('/assets/css/VCtooltip.css')}}">
 
 @endsection
 @section('content')
@@ -107,7 +107,8 @@
                 </div>
                 <div class="alert alert-info">
                     Moduł planowanie wyprzedzenia zawiera tabelę pokazującą różnicę pomiędzy <i>zaproszeniami live</i> a ustalonymi <i>limitami</i> z zakładki <strong>informacje o kampaniach</strong> dla poszczególnych oddziałów dla określonych dni.
-                    Kolumny można sumować w następujący sposób: Po pierwsze należy zaznaczyć pierwszą komórkę z sumy, przytrzymać lewy shift a następnie kliknąć ostatnią komórkę sumy.
+                    Kolumny można sumować w następujący sposób: Po pierwsze należy zaznaczyć pierwszą komórkę z sumy, przytrzymać lewy shift a następnie kliknąć ostatnią komórkę sumy. <br>
+                    Legenda do poszczególnej symulacji wyników pojawia się po najechaniu kursorem na przycisk <button class="btn btn-primary"><span class="glyphicon glyphicon-blackboard"></span> Symuluj</button>
                 </div>
                 <div class="panel-body">
                     <div class="row">
@@ -166,16 +167,18 @@
                                 </div>
                                 <div class="row factorsSection" style="margin-top:1em; display:none">
                                     <div class="col-md-6">
-                                        <label>Mnożnik sobót <span class="glyphicon glyphicon-info-sign" data-toggle="tooltip" data-placement="right"
-                                                                   title="W przypadku, gdy średnie wyniki sobót wynoszą 0 to, te wyniki wyliczane są ze średnich dziennych pomnożonych o określony MNOŻNIK SOBÓT"></span></label>
+                                        <label>Mnożnik sobót <span class="glyphicon glyphicon-info-sign VCtooltip VCtooltip-right">
+                                                <span class="tooltiptext">W przypadku, gdy średnie wyniki sobót wynoszą 0 to, te wyniki wyliczane są ze średnich dziennych pomnożonych o określony MNOŻNIK SOBÓT</span>
+                                            </span></label>
                                         <div class="input-group">
                                             <input id="saturdayFactor" class="form-control" type="text" value="95" style="text-align: right;">
                                             <span class="input-group-addon" id="basic-addon1">%</span>
                                         </div>
                                     </div>
                                     <div class="col-md-6">
-                                        <label>Mnożnik niedziel <span class="glyphicon glyphicon-info-sign" data-toggle="tooltip" data-placement="right"
-                                                                      title="W przypadku, gdy średnie wyniki niedziel wynoszą 0 to, te wyniki wyliczane są ze średnich sobót pomnożonych o określony MNOŻNIK NIEDZIEL"></span></label>
+                                        <label>Mnożnik niedziel <span class="glyphicon glyphicon-info-sign VCtooltip VCtooltip-right">
+                                                <span class="tooltiptext">W przypadku, gdy średnie wyniki niedziel wynoszą 0 to, te wyniki wyliczane są ze średnich sobót pomnożonych o określony MNOŻNIK NIEDZIEL</span>
+                                            </span></label>
                                         <div class="input-group">
                                             <input id="sundayFactor" class="form-control" type="text" value="80" style="text-align: right;">
                                             <span class="input-group-addon" id="basic-addon1">%</span>
@@ -187,7 +190,8 @@
                                         <button class="btn btn-block btn-default" id="workFreeDaysButton" data-toggle="modal" data-target="#workFreeDaysModal"><span class="glyphicon glyphicon-calendar"></span> Dni wolne</button>
                                     </div>
                                     <div class="col-md-6">
-                                        <button id="simulationButton" class="btn btn-block btn-primary"><span class="glyphicon glyphicon-blackboard"></span> Symuluj</button>
+                                        <button id="simulationButton" class="btn btn-block btn-primary VCtooltip VCtooltip-top"><span class="glyphicon glyphicon-blackboard"></span> Symuluj
+                                            <span class="tooltiptext">Wybierz symulację</span></button>
                                     </div>
                                 </div>
                             </div>
@@ -1240,8 +1244,12 @@
 
                 if($('#removeSimulationButton').is(':visible'))
                     $('#removeSimulationButton').click();
-                // sections assigned to simulations are hidden or shown depending on selected simulation
+
                 let simulationIndex = $(e.target).val();
+                // tooltip text is set as legend by selected simulation
+                $('#simulationButton .tooltiptext').text('').append(simulations[simulationIndex].tooltiptextLegend);
+
+                // sections assigned to simulations are hidden or shown depending on selected simulation
                 $.each(simulations,function (index, item) {
                     $.each(item.sectionsToShow,function (index, sectionToShow) {
                         $('.'+sectionToShow).hide();
@@ -1457,12 +1465,17 @@
             }
 
             //  simulations template
-            function Simulation( name, availableSelectedDays, sectionsToShow, isChangingAheadPlanningData, simulateCallback, validateCallback) {
+            function Simulation( name, availableSelectedDays, sectionsToShow, isChangingAheadPlanningData, simulateCallback, validateCallback, tooltiptextLegend = function (thisObj) {
+                return 'Brak informacji';
+            }) {
                 return {
                     name: name,
                     availableSelectedDays: availableSelectedDays,
                     sectionsToShow: sectionsToShow,
                     isChangingAheadPlanningData: isChangingAheadPlanningData,
+                    tooltiptextLegend: function (){
+                        return tooltiptextLegend(name)
+                    },
                     simulate: function () {
                         simulateCallback(this);
                     },
@@ -1637,6 +1650,11 @@
                     }else{
                         return true;
                     }
+                },
+                function (name) {
+                    return $('<div>').addClass('alert alert-info').append($('<strong>').append(name+':'))
+                        .append(' symulowanie planowania wyprzedzenia na wybrany dzień przy założeniu, że dzienne wyniki bedą wynosić tyle, ile wynosi średnia wyliczona na podstawie danych z określonego okresu w zależności od wybranego ')
+                        .append($('<strong>').append('Rodzaju symulacji'));
                 }
             ));
             simulations.push(Simulation(
@@ -1719,16 +1737,23 @@
                     }else{
                         return true;
                     }
+                },
+                function (name) {
+                    return $('<div>').addClass('alert alert-info').append($('<strong>').append(name+':'))
+                        .append(' wyliczenie średnich, dziennych wyników jakie muszą uzyskiwać poszczególne oddziały do wybranego ostatniego dnia dzwonienia ')
+                        .append($('<strong>').append('(1#)'))
+                        .append(',  aby limity były wyrobione na wybrany inny dzień ')
+                        .append($('<strong>').append('(2#)'));
                 }
             ));
             /*  ---------------------- end creating available simulations ---------------------- */
 
             // fill simulation select with created simulation objects
             $.each(simulations,function(index, item){
-                $('#simulation').append($('<option>', {
-                    value: index,
-                    text: item.name
-                }));
+                $('#simulation').append($('<option>')
+                    .val(index)
+                    .append(item.name)
+                );
                 $('#simulation').selectpicker('refresh');
             });
 
