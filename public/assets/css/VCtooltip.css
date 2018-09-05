@@ -7,26 +7,26 @@
 
 /* Tooltip text */
 .VCtooltip .tooltiptext {
-    white-space: initial;
     visibility: hidden;
     width: -moz-max-content;
     width: -webkit-max-content;
     min-width: 10vw;
     max-width: 40vw;
     background-color: white;
-    color: black;
-    text-align: left;
     padding: 1em;
     border-radius: 6px;
     box-shadow: 0 0 10px gray;/*
-    text-shadow: 0 0 5px gray;*/
 
     /* Position the tooltip text */
     position: absolute;
     z-index: 1000;
+
+    /* Format text in tooltip*/
+    text-align: left;
+    white-space: initial;
     line-height: initial;
     font-family: 'Roboto', sans-serif;
-    /*margin-left: -60px;*/
+    color: black;
 
     /* Fade in tooltip */
     opacity: 0;
@@ -37,24 +37,20 @@
     background-color: #555;
     color: white;
 }
-/*.VCtooltip.VCtooltip-grey .tooltiptext::after{
-    border-color: #555 transparent transparent transparent;
-}*/
 
 /* Tooltip arrow */
 .VCtooltip .tooltiptext::after {
     content: "";
     position: absolute;
     margin-left: -5px;
-    border-width: 5px;
-    border-style: solid;
-    border-color: white transparent transparent transparent;
+    border: 5px solid transparent;
+    border-top-color: white;
 }
 
 /* Tooltip arrow top*/
 .VCtooltip.VCtooltip-top .tooltiptext::after{
     bottom: -10px;
-    left: 25%;
+    left: 25px;
     border-color: white transparent transparent transparent;
 }
 .VCtooltip.VCtooltip-top .tooltiptext{
@@ -69,7 +65,7 @@
 /* Tooltip arrow bottom*/
 .VCtooltip.VCtooltip-bottom .tooltiptext::after{
     top: -10px;
-    left: 25%;
+    left: 25px;
     border-color: transparent transparent white transparent;
 }
 .VCtooltip.VCtooltip-bottom .tooltiptext{
@@ -118,5 +114,5 @@
 }
 
 .VCtooltip.VCtooltip-grey li{
-    
+
 }

@@ -108,7 +108,7 @@
                 <div class="alert alert-info">
                     Moduł planowanie wyprzedzenia zawiera tabelę pokazującą różnicę pomiędzy <i>zaproszeniami live</i> a ustalonymi <i>limitami</i> z zakładki <strong>informacje o kampaniach</strong> dla poszczególnych oddziałów dla określonych dni.
                     Kolumny można sumować w następujący sposób: Po pierwsze należy zaznaczyć pierwszą komórkę z sumy, przytrzymać lewy shift a następnie kliknąć ostatnią komórkę sumy. <br>
-                    Legenda do poszczególnej symulacji wyników pojawia się po najechaniu kursorem na przycisk <button id="simulationButton" class="btn btn-primary"><span class="glyphicon glyphicon-blackboard"></span> Symuluj</button>
+                    Legenda do poszczególnej symulacji wyników pojawia się po najechaniu kursorem na przycisk <button class="btn btn-primary"><span class="glyphicon glyphicon-blackboard"></span> Symuluj</button>
                 </div>
                 <div class="panel-body">
                     <div class="row">
@@ -190,7 +190,7 @@
                                         <button class="btn btn-block btn-default" id="workFreeDaysButton" data-toggle="modal" data-target="#workFreeDaysModal"><span class="glyphicon glyphicon-calendar"></span> Dni wolne</button>
                                     </div>
                                     <div class="col-md-6">
-                                        <button id="simulationButton" class="btn btn-block btn-primary VCtooltip VCtooltip-right"><span class="glyphicon glyphicon-blackboard"></span> Symuluj
+                                        <button id="simulationButton" class="btn btn-block btn-primary VCtooltip VCtooltip-top"><span class="glyphicon glyphicon-blackboard"></span> Symuluj
                                             <span class="tooltiptext">Wybierz symulację</span></button>
                                     </div>
                                 </div>
