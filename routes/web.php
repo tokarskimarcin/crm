@@ -1034,5 +1034,6 @@ Route::post('/changeLimits', 'CrmRouteController@changeLimitsAjax')->name('api.c
 
 Route::get('/getAllTask', 'MyUserTestController@getAllTask');
 
+Route::Get('/test','TestsController@testGet');
 
 Route::get('/Admin/Departments', 'AdminPanel\DepartmentsController@index');
