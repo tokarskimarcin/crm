@@ -1007,7 +1007,7 @@ class CoachingController extends Controller
         $all_coach_list = User::
         whereIn('main_department_id', $manager_departments->pluck('id')->toarray())
             ->where('status_work', '=', 1)
-            ->whereIn('user_type_id', [4, 12, 5])
+            ->whereIn('user_type_id', [4, 12, 5, 19])
             ->get();
         $group_status = collect();
         foreach ($all_coach_list as $item) {

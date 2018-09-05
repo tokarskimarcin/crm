@@ -1629,4 +1629,7 @@ class TestsController extends Controller
         }
     }
 
+    public function testGet(){
+        return view('test');
+    }
 }
