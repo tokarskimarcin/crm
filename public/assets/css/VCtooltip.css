@@ -2,45 +2,117 @@
 .VCtooltip {
     position: relative;
     display: inline-block;
-    border-bottom: 1px dotted black; /* If you want dots under the hoverable text */
+    /*border-bottom: 1px dotted black;*/ /* If you want dots under the hoverable text */
 }
 
 /* Tooltip text */
 .VCtooltip .tooltiptext {
     visibility: hidden;
-    width: 120px;
-    background-color: #e6e6e6;
-    /*color: #fff;*/
-    text-align: center;
-    padding: 5px 0;
+    width: -moz-max-content;
+    width: -webkit-max-content;
+    min-width: 10vw;
+    max-width: 40vw;
+    background-color: white;
+    padding: 1em;
     border-radius: 6px;
+    box-shadow: 0 0 10px gray;/*
 
     /* Position the tooltip text */
     position: absolute;
-    z-index: 1;
-    bottom: 125%;
-    left: 50%;
-    margin-left: -60px;
+    z-index: 1000;
+
+    /* Format text in tooltip*/
+    text-align: left;
+    white-space: initial;
+    line-height: initial;
+    font-family: 'Roboto', sans-serif;
+    color: black;
 
     /* Fade in tooltip */
     opacity: 0;
     transition: opacity 0.3s;
 }
 
+.VCtooltip.VCtooltip-gray .tooltiptext{
+    background-color: #555;
+    color: white;
+}
+
 /* Tooltip arrow */
 .VCtooltip .tooltiptext::after {
     content: "";
     position: absolute;
-    top: 100%;
-    left: 50%;
     margin-left: -5px;
-    border-width: 5px;
-    border-style: solid;
-    border-color: #555 transparent transparent transparent;
+    border: 5px solid transparent;
+    border-top-color: white;
 }
+
+/* Tooltip arrow top*/
+.VCtooltip.VCtooltip-top .tooltiptext::after{
+    bottom: -10px;
+    left: 25px;
+    border-color: white transparent transparent transparent;
+}
+.VCtooltip.VCtooltip-top .tooltiptext{
+    bottom: 125%;
+    left: 0;
+}
+.VCtooltip.VCtooltip-top.VCtooltip-gray .tooltiptext::after{
+    border-color: #555 transparent transparent transparent !important;
+}
+
+
+/* Tooltip arrow bottom*/
+.VCtooltip.VCtooltip-bottom .tooltiptext::after{
+    top: -10px;
+    left: 25px;
+    border-color: transparent transparent white transparent;
+}
+.VCtooltip.VCtooltip-bottom .tooltiptext{
+    top: 125%;
+    left: 0;
+}
+.VCtooltip.VCtooltip-bottom.VCtooltip-gray .tooltiptext::after{
+    border-color: transparent transparent #555 transparent !important;
+}
+
+/* Tooltip arrow right*/
+.VCtooltip.VCtooltip-right .tooltiptext::after{
+    top: 10px;
+    left: -4px;
+    border-color: transparent white transparent transparent;
+}
+.VCtooltip.VCtooltip-right .tooltiptext{
+    margin-left: 10px;
+    top: 0;
+    left: 100%;
+}
+.VCtooltip.VCtooltip-right.VCtooltip-gray .tooltiptext::after{
+    border-color: transparent #555 transparent transparent !important;
+}
+
+
+/* Tooltip arrow left*/
+.VCtooltip.VCtooltip-left .tooltiptext::after{
+    top: 10px;
+    right: -10px;
+    border-color:transparent transparent transparent white;
+}
+.VCtooltip.VCtooltip-left .tooltiptext{
+    top: 0;
+    right: 105%;
+}
+.VCtooltip.VCtooltip-left.VCtooltip-gray .tooltiptext::after{
+    border-color: transparent transparent transparent #555;
+}
+
 
 /* Show the tooltip text when you mouse over the tooltip container */
 .VCtooltip:hover .tooltiptext {
     visibility: visible;
     opacity: 1;
+}
+
+.VCtooltip.VCtooltip-gray li{
+
 }
