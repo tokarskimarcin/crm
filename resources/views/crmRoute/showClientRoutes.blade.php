@@ -243,11 +243,11 @@
                             <table id="datatable2" class="thead-inverse table table-striped row-border" cellspacing="0" width="100%">
                                 <thead>
                                 <tr>
+                                    <th>ID</th>
                                     <th>Tydzień</th>
                                     <th>Klient</th>
                                     <th>Data I pokazu</th>
                                     <th>Trasa</th>
-                                    {{--<th>Hotel i godziny</th>--}}
                                     <th>Edycja (Hoteli i godzin)</th>
                                     <th>Edycja (Trasy)</th>
                                     <th>Edycja parametrów (Kampanii)</th>
@@ -794,11 +794,17 @@
                     "url": "//cdn.datatables.net/plug-ins/1.10.16/i18n/Polish.json"
                 },
                 columns: [
+                    {
+                        "data": function (data, type, dataToSet) {
+                            return data.client_route_id
+                        }, "name": "id"
+                    },
                     {"data": "weekOfYear"},
                     {"data": "clientName"},
                     {"data": "date"},
                     {
                         "data": function (data, type, dataToSet) {
+                            console.log(data);
                             let finalName = '';
                             if (data.type == '1') {
                                 finalName = data.route_name + ' (B)';
