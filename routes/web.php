@@ -90,6 +90,7 @@ Route::POST('/change_department', 'HomeController@changeDepartment')->name('api.
 
 Route::POST('/it_support', 'HomeController@itSupport')->name('api.itSupport');
 Route::POST('/it_support_not_repaired_notifications', 'HomeController@itSupportNotRepairedNotifications')->name('api.itSupportNotRepairedNotifications');
+Route::POST('/cadre_support_unrated_notifications', 'HomeController@cadreSupportUnratedNotifications')->name('api.cadreSupportUnratedNotifications');
 Route::POST('/cadre_support', 'HomeController@cadreSupport')->name('api.cadreSupport');
 Route::POST('/count_notifications_it', 'HomeController@itCountNotifications')->name('api.itCountNotifications');
 Route::POST('/count_notifications_cadre', 'HomeController@cadreCountNotifications')->name('api.cadreCountNotifications');
