@@ -205,16 +205,34 @@ class WorkHoursController extends Controller
                 })
                 ->select(DB::raw(
                     "STR_TO_DATE('$start_date', '%Y-%m-%d') as start_date,
-                     work_hours.id as id,
+                    DAYOFWEEK('$start_date') as dayOFWeek,                   
+                    work_hours.id as id,
                     users.first_name,
                     users.last_name,
                     work_hours.click_start,
-                    IF(HOUR(click_start) >= 9, 0, 1) as onTime,
+                    HOUR(click_start) onTime,
                     work_hours.click_stop,
                     work_hours.register_start,
                     work_hours.register_stop,
                     work_hours.date,
                     schedule.id_user as hasShedule,
+                    schedule.monday_start,
+                    schedule.monday_stop,
+                    schedule.tuesday_start,
+                    schedule.tuesday_stop,
+                    schedule.wednesday_start,
+                    schedule.wednesday_stop,
+                    schedule.thursday_start,
+                    schedule.thursday_stop,
+                    schedule.friday_start,
+                    schedule.friday_stop,
+                    schedule.saturday_start,
+                    schedule.saturday_stop,
+                    schedule.sunday_start,
+                    schedule.sunday_stop,
+                    null as scheduleToDayStart,
+                    null as scheduleToDayStop,
+                    null as freeDay,
                     user_type_id,
                     SEC_TO_TIME(TIME_TO_SEC(register_stop) - TIME_TO_SEC(register_start) ) as time"));
             if($dep_info != '*')
@@ -224,10 +242,60 @@ class WorkHoursController extends Controller
             if($engraved == 'true') { //show only engravered users. If user is in schedule table for given week number then id_user is not null.
                 $query = $query->where('schedule.id_user', '!=', null);
             }
-
             $query = $query->wherenotin('users.user_type_id',[1,2,9])
             ->where('users.id','!=',11)
-            ->where('users.status_work',1);
+            ->where('users.status_work',1)
+            ->get();
+            $query = $query->map(function ($item){
+               if($item->hasShedule != null){
+                       switch ($item->dayOFWeek) {
+                           case 1:
+                               $item->scheduleToDayStart = $item->sunday_start;
+                               $item->scheduleToDayStop = $item->sunday_stop;
+                               break;
+                           case 2:
+                               $item->scheduleToDayStart = $item->monday_start;
+                               $item->scheduleToDayStop = $item->monday_stop;
+                                   break;
+                           case 3:
+                               $item->scheduleToDayStart = $item->tuesday_start;
+                               $item->scheduleToDayStop = $item->tuesday_stop;
+                               break;
+                           case 4:
+                               $item->scheduleToDayStart = $item->wednesday_start;
+                               $item->scheduleToDayStop = $item->wednesday_stop;
+                               break;
+                           case 5:
+                               $item->scheduleToDayStart = $item->thursday_start;
+                               $item->scheduleToDayStop = $item->thursday_stop;
+                               break;
+                           case 6:
+                               $item->scheduleToDayStart = $item->friday_start;
+                               $item->scheduleToDayStop = $item->friday_stop;
+                               break;
+                           case 7:
+                               $item->scheduleToDayStart = $item->saturday_start;
+                               $item->scheduleToDayStop = $item->saturday_stop;
+                               break;
+                           default: break;
+                       }
+                       if($item->click_start == null){
+                           $item->onTime = 1; //Brak klikniecia start pomimo zagrafikowania
+                       }
+                       else if($item->click_start > $item->scheduleToDayStart ){
+                           $item->onTime = 3; // spóźniony do pracy
+                       }else if($item->click_start <= $item->scheduleToDayStart){
+                           $item->onTime = 2; // na czas
+                       }
+                       if($item->scheduleToDayStart == null){
+                           $item->onTime = 0;
+                           $item->freeDay = 1; //Wolny dzień lub brak grafiku na dany dzień
+                       }
+               }else{
+                   $item->onTime = 0; // Brak Grafiku
+               }
+               return $item;
+            });
 
             return datatables($query)->make(true);
         }
