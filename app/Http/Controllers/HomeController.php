@@ -181,31 +181,37 @@ class HomeController extends Controller
     public function cadreSupport(Request $request) {
         if($request->ajax()) {
             $notifications = Notifications::where(function ($query){
-                $query->where('user_id',Auth::user()->id)->orWhere('displayed_by',Auth::user()->id);})
+                $query->where('user_id',Auth::user()->id)
+                ->where(function ($querySecond){
+                    $querySecond->where('status_change_displayed','<>',1)->orWhere('comment_added_by_realizator_displayed','<>',1);
+                });
+            })->orWhere(function ($query){
+                $query->where('displayed_by',Auth::user()->id)->where('comment_added_by_reporter_displayed','<>',1);})
                 ->select('notifications.*')
                 ->rightJoin('notifications_changes_displayed_flags as ncdf','ncdf.notification_id','=','notifications.id')
-                ->where(function ($query){
-                    $query->where('status_change_displayed','<>',1)
-                        ->orWhere('comment_added_by_realizator_displayed','<>',1)
-                        ->orWhere('comment_added_by_reporter_displayed','<>',1);})
-                ->with('notifications_changes_displayed_flags')
                 ->with('notifications_changes_displayed_flags')
                 ->with('comments')
                 ->with('user')
                 ->get();
+
+            /*->where(function ($query){
+                $query->where('status_change_displayed','<>',1)
+                    ->orWhere('comment_added_by_realizator_displayed','<>',1)
+                    ->orWhere('comment_added_by_reporter_displayed','<>',1);})*/
             return $notifications;
         }
     }
     public function cadreCountNotifications(Request $request) {
         if($request->ajax()) {
             $notifications = Notifications::where(function ($query){
-                $query->where('user_id',Auth::user()->id)->orWhere('displayed_by',Auth::user()->id);})
+                $query->where('user_id',Auth::user()->id)
+                    ->where(function ($querySecond){
+                        $querySecond->where('status_change_displayed','<>',1)->orWhere('comment_added_by_realizator_displayed','<>',1);
+                    });
+            })->orWhere(function ($query){
+                $query->where('displayed_by',Auth::user()->id)->where('comment_added_by_reporter_displayed','<>',1);})
                 ->select('notifications.*')
                 ->rightJoin('notifications_changes_displayed_flags as ncdf','ncdf.notification_id','=','notifications.id')
-                ->where(function ($query){
-                    $query->where('status_change_displayed','<>',1)
-                        ->orWhere('comment_added_by_realizator_displayed','<>',1)
-                        ->orWhere('comment_added_by_reporter_displayed','<>',1);})
                 ->with('notifications_changes_displayed_flags')
                 ->get();
             $counter = 0;
