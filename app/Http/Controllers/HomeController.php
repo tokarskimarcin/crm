@@ -145,6 +145,7 @@ class HomeController extends Controller
         if($request->ajax()) {
             $notifications = Notifications::with('user')
             ->with('notification_type')
+                ->where('user_id','<>',Auth::user()->id)
                 ->where('status', 1)->orderBy('notification_type_id', 'asc')->get();
 
             return $notifications;
@@ -172,7 +173,8 @@ class HomeController extends Controller
 
     public function itCountNotifications(Request $request) {
         if($request->ajax()) {
-            $notifications_count = Notifications::where('status', 1)->count();
+            $notifications_count = Notifications::where('status', 1)
+                ->where('user_id','<>',Auth::user()->id)->count();
 
             return $notifications_count;
         }
@@ -217,7 +219,7 @@ class HomeController extends Controller
             $counter = 0;
             foreach($notifications as $notification){
                 if($notification->user_id == Auth::user()->id){
-                    if($notification->notifications_changes_displayed_flags->comment_added_by_reporter_displayed == 0){
+                    if($notification->notifications_changes_displayed_flags->comment_added_by_realizator_displayed == 0){
                         $counter++;
                     }
                     if($notification->notifications_changes_displayed_flags->status_change_displayed == 0){
@@ -225,7 +227,7 @@ class HomeController extends Controller
                     }
                 }
                 if($notification->displayed_by == Auth::user()->id ){
-                    if($notification->notifications_changes_displayed_flags->comment_added_by_realizator_displayed == 0){
+                    if($notification->notifications_changes_displayed_flags->comment_added_by_reporter_displayed == 0){
                         $counter++;
                     }
                 }
