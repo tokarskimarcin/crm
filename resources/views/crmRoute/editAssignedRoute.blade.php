@@ -228,6 +228,7 @@
                                    cellspacing="0" width="100%">
                                 <thead>
                                 <tr>
+                                    <th>ID</th>
                                     <th>Nazwa</th>
                                     <th>Akcja</th>
                                 </tr>
@@ -676,6 +677,11 @@
 
                         },
                 "columns": [
+                    {
+                        "data": function (data, type, dataToSet) {
+                            return data.id;
+                        }, "name": "id", "orderable": true
+                    },
                     {
                         "data": function (data, type, dataToSet) {
                             return '<span id="' + data.id + '">' + data.name + '</span>';
