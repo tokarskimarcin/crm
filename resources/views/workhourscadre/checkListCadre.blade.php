@@ -95,6 +95,7 @@
                                         <th>Nazwisko</th>
                                         <th>Start</th>
                                         <th>Zarejestrowane</th>
+                                        <th>wg Grafiku</th>
                                         <th>Rola</th>
                                         <th>Suma</th>
                                         <th>Grafik</th>
@@ -120,14 +121,13 @@
 
         function myFunction() {
             table.ajax.reload();
-
         }
-            $('.form_date').datetimepicker({
-                language:  'pl',
-                autoclose: 1,
-                minView : 2,
-                pickTime: false,
-            });
+        $('.form_date').datetimepicker({
+            language:  'pl',
+            autoclose: 1,
+            minView : 2,
+            pickTime: false,
+        });
 
         $(document).ready( function () {
 
@@ -152,8 +152,13 @@
                     });
                 },
                 "rowCallback": function( row, data, index ) {
-                    if(data.onTime == 0){
-                        $(row).css('background-color', '#ff9da2');
+                    if(data.onTime == 2){ // na czas w pracy
+                        $(row).css('background-color', '#83e05c');
+                    }
+                    else if(data.onTime == 3){ // spóźniony do pracy
+                        $(row).css('background-color', 'rgb(255, 217, 50)');
+                    }else if(data.onTime == 1){
+                        $(row).css('background-color', '#ff0f00');
                     }
                 },
                 "ajax": {
@@ -174,12 +179,13 @@
                     {"data":"first_name"},
                     {"data":"last_name"},
                     {"data": function (data, type, dataToSet) {
+                        console.log(data);
                         if(data.click_start == null)
                             data.click_start = "Brak infromacji";
                         if(data.click_stop == null)
                             data.click_stop = "Brak infromacji";
                         return data.click_start + "</br><span class='fa fa-arrow-circle-o-down fa-fw'></span> </br> " + data.click_stop;
-                    },"name": "work_hours.click_start"},
+                    },"name": "click_start"},
 
                     {"data": function (data, type, dataToSet) {
                         if(data.register_start == null)
@@ -187,7 +193,15 @@
                         if(data.register_stop == null)
                             data.register_stop = "Brak infromacji";
                         return data.register_start + "</br><span class='fa fa-arrow-circle-o-down fa-fw'></span> </br> " + data.register_stop;
-                    },"name": "work_hours.register_start"},
+                    },"name": "register_start"},
+                    {"data": function (data, type, dataToSet) {
+                            if(data.scheduleToDayStart == null)
+                                data.scheduleToDayStart = "Brak infromacji";
+                            if(data.scheduleToDayStop == null)
+                                data.scheduleToDayStop = "Brak infromacji";
+                            data.freeDay == 1 ?  data.scheduleToDayStart = data.scheduleToDayStop = "Wolne" : 0;
+                            return data.scheduleToDayStart + "</br><span class='fa fa-arrow-circle-o-down fa-fw'></span> </br> " + data.scheduleToDayStop;
+                        },"name": "scheduleToDayStart"},
                     {"data": function (data, type, dataToSet) {
                             let name = "Brak danych";
                             userTypes.forEach(function(item) {
@@ -196,7 +210,7 @@
                                 }
                             });
                             return name;
-                    },"name": "users.user_type_id", "searchable": false},
+                    },"name": "user_type_id", "searchable": false},
                     {"data":function (data, type, dataToSet) {
                         if(data.time == null)
                             data.time = "Brak infromacji";
