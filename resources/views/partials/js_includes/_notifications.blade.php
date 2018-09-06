@@ -162,8 +162,8 @@ $(document).ready(function(){
                                 if(notification.user_id == loggedUserId){
                                     console.log('user_id == loggeduser');
                                     let href = '{{URL::to('/view_notification/')}}'+'/' + notification.id;
-                                    if(notification.notifications_changes_displayed_flags.comment_added_by_reporter_displayed === 0){
-                                        console.log('comment_added_by_reporter_displayed');
+                                    if(notification.notifications_changes_displayed_flags.comment_added_by_realizator_displayed === 0){
+                                        console.log('comment_added_by_realizator_displayed');
                                         if(notification.comments[notification.comments.length-1].created_at.split(' ')[0] == '{{date('Y-m-d')}}'){
                                             time = notification.comments[notification.comments.length-1].created_at.split(' ')[1];
                                         }else{
@@ -204,8 +204,8 @@ $(document).ready(function(){
                                 if(notification.displayed_by == loggedUserId){
                                     console.log('displayed_by == loggeduser');
                                     let href = '{{URL::to('/show_notification/')}}'+'/' + notification.id;
-                                    if(notification.notifications_changes_displayed_flags.comment_added_by_realizator_displayed === 0){
-                                        console.log('comment_added_by_realizator_displayed');
+                                    if(notification.notifications_changes_displayed_flags.comment_added_by_reporter_displayed === 0){
+                                        console.log('comment_added_by_reporter_displayed');
                                         if(notification.comments[notification.comments.length-1].created_at.split(' ')[0] == '{{date('Y-m-d')}}'){
                                             time = notification.comments[notification.comments.length-1].created_at.split(' ')[1];
                                         }else{
