@@ -23,13 +23,22 @@
     @foreach($data as  $item)
         <tr>
             <td  style="border:1px solid #231f20;text-align:center;padding:3px">{{$item->dep_name.' '.$item->dep_name_type}}</td>
-            <td  style="border:1px solid #231f20;text-align:center;padding:3px">{{$item->sum_choise_stageOne+$item->sum_absent_stageOne}}</td>
-            <td  style="border:1px solid #231f20;text-align:center;padding:3px">{{$item->sum_choise_stageOne}}</td>
-            <td  style="border:1px solid #231f20;text-align:center;padding:3px">{{$item->sum_absent_stageOne}}</td>
-            <td  style="border:1px solid #231f20;text-align:center;padding:3px">{{$item->sum_choise_stageTwo+$item->sum_absent_stageTwo}}</td>
+            <td  style="border:1px solid #231f20;text-align:center;padding:3px;background-color: #CCC">{{$item->sum_choise_stageOne+$item->sum_absent_stageOne}}</td>
+            <td  style="border:1px solid #231f20;text-align:center;padding:3px;background-color: #CCC">{{$item->sum_choise_stageOne}}</td>
+            <td  style="border:1px solid #231f20;text-align:center;padding:3px;background-color: #CCC">{{$item->sum_absent_stageOne}}</td>
+            <td  style="border:1px solid #231f20;text-align:center;padding:3px;">{{$item->sum_choise_stageTwo+$item->sum_absent_stageTwo}}</td>
             <td  style="border:1px solid #231f20;text-align:center;padding:3px">{{$item->sum_choise_stageTwo}}</td>
-            <td  style="border:1px solid #231f20;text-align:center;padding:3px">{{$item->sum_absent_stageTwo}}</td>
+            <td  style="border:1px solid #231f20;text-align:center;padding:3px;}}">{{$item->sum_absent_stageTwo}}</td>
         </tr>
     @endforeach
+    <tr>
+        <td colspan="1" style="border:1px solid #231f20;text-align:center;padding:3px"><b>TOTAL</b></td>
+        <td  style="border:1px solid #231f20;text-align:center;padding:3px;background-color: #CCC">{{$data->sum('sum_choise_stageOne') + $data->sum('sum_absent_stageOne')}}</td>
+        <td  style="border:1px solid #231f20;text-align:center;padding:3px;background-color: #CCC">{{$data->sum('sum_choise_stageOne')}}</td>
+        <td  style="border:1px solid #231f20;text-align:center;padding:3px;background-color: #CCC">{{$data->sum('sum_absent_stageOne')}}</td>
+        <td  style="border:1px solid #231f20;text-align:center;padding:3px">{{$data->sum('sum_choise_stageTwo') + $data->sum('sum_absent_stageTwo')}}</td>
+        <td  style="border:1px solid #231f20;text-align:center;padding:3px">{{$data->sum('sum_choise_stageTwo')}}</td>
+        <td  style="border:1px solid #231f20;text-align:center;padding:3px">{{$data->sum('sum_absent_stageTwo')}}</td>
+    </tr>
     </tbody>
 </table>
