@@ -58,8 +58,9 @@
                     <table id="datatable2" class="table table-striped table-bordered thead-inverse" cellspacing="0" width="100%">
                         <thead>
                         <tr>
-                            <th style="width: 20%;">Data:</th>
-                            <th style="width: 40%;">Tytuł:</th>
+                            <th style="width: 10%;">Data:</th>
+                            <th style="width: 20%;">Zgłoszony przez:</th>
+                            <th style="width: 30%;">Tytuł:</th>
                             <th style="width: 20%;">Stan realizacji</th>
                             <th style="width: 10%;">Ocena</th>
                             <th style="width: 10%;">Podgląd</th>
@@ -221,6 +222,7 @@ let table2 = $('#datatable2').DataTable({
     order: [[0,'desc']]
     ,"columns":[
         {"data": "created_at"},
+        {"data": "user_name"},
         {"data": "title"},
         {"data": function (data, type, dataToSet) {
                 var status = data.status;
