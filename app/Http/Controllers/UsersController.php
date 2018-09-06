@@ -359,7 +359,7 @@ class UsersController extends Controller
 
             $userTypes = UserTypes::all();
             $allActiveUser = User::activeUser()->onlyConsultant()->get();
-            if($user->successorUserId != null or $user->user_type_id = 9)
+            if($user->successorUserId != null || $user->user_type_id == 9)
                 $succesorVisableStatus = "";
             else
                 $succesorVisableStatus = "hidden";
