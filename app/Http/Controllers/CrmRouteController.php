@@ -771,7 +771,8 @@ class CrmRouteController extends Controller
                     'hour',
                     'city.name as city_name',
                     'voivodeship.name as voivode_name',
-                    'hotel_price'
+                    'hotel_price',
+                    'client_route_info.comment_for_report'
                 )
                 ->where('cr.status', '=', 1)
                 ->where('cr.id', '=', $id)
@@ -834,7 +835,8 @@ class CrmRouteController extends Controller
                 'client_route_info.hour as hour',
                 'client_route.client_id as client_id',
                 'client_route_info.weekOfYear as weekOfYear',
-                'client_route_info.hotel_price')
+                'client_route_info.hotel_price',
+                'client_route_info.comment_for_report')
                 ->join('client_route', 'client_route.id', '=', 'client_route_info.client_route_id')
                 ->join('city', 'city.id', '=', 'client_route_info.city_id')
                 ->join('voivodeship', 'voivodeship.id', '=', 'client_route_info.voivode_id')
@@ -952,7 +954,8 @@ class CrmRouteController extends Controller
                             'hotel_id' => $clientRouteInfo->hotelId,
                             'hour' => $clientRouteInfo->time == "" ? null : $clientRouteInfo->time,
                             'user_reservation' => $campaign->userReservation == 'Brak' ? '' : $campaign->userReservation,
-                            'hotel_price' => $campaign->hotelPrice == 0 ? null : $campaign->hotelPrice
+                            'hotel_price' => $campaign->hotelPrice == 0 ? null : $campaign->hotelPrice,
+                            'comment_for_report' => $campaign->comment
                         ]);
                         $lp++;
                     }

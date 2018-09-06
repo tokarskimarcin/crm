@@ -121,9 +121,13 @@
                             <input id="user_reservation" name="user_reservation" type="text" class="form-control price-input" @if(!empty($campaign[0]->user_reservation)) value="{{$campaign[0]->user_reservation}}" @else value="Brak"@endif>
 
                         </div>
-                        <div class="col-lg-6">
+                        <div class="col-lg-2">
                             <label for="hotel-price" style="margin-right: 10px;">Cena za hotel: </label>
                             <input id="hotel-price" name="hotel-price" type="text" class="form-control hotel-price-input" @if(!empty($campaign[0]->hotel_price)) value="{{$campaign[0]->hotel_price}}" @else value="0"@endif>
+                        </div>
+                        <div class="col-lg-4">
+                            <label for="comment" style="margin-right: 10px;">Uwaga do raportu : </label>
+                            <input id="comment" name="comment" type="text" class="form-control comment-input" @if(!empty($campaign[0]->comment_for_report)) value="{{$campaign[0]->comment_for_report}}" @else value="Brak" @endif required>
                         </div>
                     </div>
 
@@ -181,7 +185,7 @@
                     hotelInfoArr.push(hotelObj);
                 @endif
             @endforeach
-                console.log(hotelInfoArr);
+
             let newTable = $('.datatable');
             newTable.each(function(key, value) {
                 let searchName = '';
@@ -242,6 +246,7 @@
                                     'id',"orderable": false, visible: false
                             },
                             {"data":function (data, type, dataToSet) {
+                                console.log(data);
                                     return data.name;
                                 },"name":"name","orderable": false
                             },
@@ -301,8 +306,10 @@
                     const userReservationVal = userReservationInput.value;
                     const hotelPriceInput = campaignContainer.querySelector('#hotel-price');
                     const hotelPriceVal = hotelPriceInput.value;
+                    const commentInput = campaignContainer.querySelector('.comment-input');
+                    const commentVal = commentInput.value;
 
-                    const campaignObject = new CampaignObject(campaignContainer.querySelectorAll('.campaignDirstClientRouteInfoId')[0].value, timeHotelArr, userReservationVal, hotelPriceVal);
+                    const campaignObject = new CampaignObject(campaignContainer.querySelectorAll('.campaignDirstClientRouteInfoId')[0].value, timeHotelArr, userReservationVal, hotelPriceVal, commentVal);
 
                     if(isValid === false) {
                         swal('Wypełnij wszystkie pola');
@@ -376,17 +383,19 @@
             submitButton.addEventListener('click', submitHandler);
 
             //This object will store every info about given campaign.
-            function CampaignObject(campaignFirstClientRouteInfoId, timeHotelArr, userReservation, hotelPrice) {
+            function CampaignObject(campaignFirstClientRouteInfoId, timeHotelArr, userReservation, hotelPrice, commentVal) {
                 this.campaignFirstClientRouteInfoId = campaignFirstClientRouteInfoId;
                 this.timeHotelArr = timeHotelArr;
                 this.userReservation = userReservation;
                 this.hotelPrice = hotelPrice;
+                this.commentVal = commentVal;
                 this.pushJSON = function() {
                     let obj = {
                         campaignFirstClientRouteInfoId: this.campaignFirstClientRouteInfoId,
                         timeHotelArr: this.timeHotelArr,
                         userReservation: this.userReservation,
-                        hotelPrice: this.hotelPrice
+                        hotelPrice: this.hotelPrice,
+                        comment: this.commentVal
                     };
                     campaignInfoArray.push(obj);
 
