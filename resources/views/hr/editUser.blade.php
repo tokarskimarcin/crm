@@ -231,12 +231,15 @@
                                                 @foreach($userTypes as $user_type)
                                                     <option value="{{$user_type->id}}" @if($user_type->id == $user->user_type_id) selected @endif>{{$user_type->name}}</option>
                                                 @endforeach
+                                            @elseif($user->user_type_id == 9)
+                                                @foreach($userTypes->whereIn('id',[9]) as $user_type)
+                                                    <option value="{{$user_type->id}}" @if($user_type->id == $user->user_type_id) selected @endif>{{$user_type->name}}</option>
+                                                @endforeach
                                             @else
-                                                @foreach($userTypes->whereNotIn('id',[3]) as $user_type)
+                                                @foreach($userTypes->whereNotIn('id',[3,9]) as $user_type)
                                                     <option value="{{$user_type->id}}" @if($user_type->id == $user->user_type_id) selected @endif>{{$user_type->name}}</option>
                                                 @endforeach
                                             @endif
-
                                         </select>
                                     </div>
                                 </div>
@@ -320,9 +323,15 @@
                                     <div class="form-group">
                                         <label class="myLabel">Uprawnienia:</label>
                                         <select class="form-control" style="font-size:18px;" id="user_type" name="user_type">
-                                            @foreach($userTypes->whereNotIn('id',[3,7,13,6]) as $user_type)
-                                                <option value="{{$user_type->id}}" @if($user_type->id == $user->user_type_id) selected @endif>{{$user_type->name}}</option>
-                                            @endforeach
+                                            @if(in_array(Auth::user()->user_type_id,[4,9,12]))
+                                                @foreach($userTypes->whereIn('id',[1,2]) as $user_type)
+                                                    <option value="{{$user_type->id}}" @if($user_type->id == $user->user_type_id) selected @endif>{{$user_type->name}}</option>
+                                                @endforeach
+                                            @else
+                                                @foreach($userTypes->whereNotIn('id',[3,7,13,6]) as $user_type)
+                                                    <option value="{{$user_type->id}}" @if($user_type->id == $user->user_type_id) selected @endif>{{$user_type->name}}</option>
+                                                @endforeach
+                                            @endif
                                         </select>
                                     </div>
                                 </div>
@@ -554,7 +563,7 @@
             });
             $('#add_submit').click((e) => {
 
-//Pobranie danych z inputów
+            //Pobranie danych z inputów
             let first_name = $('#first_name').val();
             let last_name = $('#last_name').val();
             let username = $('#username').val();
@@ -576,6 +585,12 @@
             let description = $('#description').val();
             let successorUserId = $('#successorUserId').val();
 
+            if('{{$type}}' === '1' && user_type == 9){
+                swal('Nie można nadać uprawnień sukcesora podczas edycji konta!',
+                    'Należy stworzyć konto kadrowe z uprawnieniami sukcesora i przypisać do niego już stworzone konto konsultanta. ' +
+                    'Konsultant podczas dzwonienia ma być zalogowany na konto konsulanta, natomiast pełniąc funkcję sukcesora logować się na konto sukcesora.');
+                return false;
+            }
             if (first_name.trim().length == 0) {
                 swal('Podaj imie!');
                 return false;
@@ -659,7 +674,7 @@
                 swal('Wybierz oddział!');
                 return false;
             }else{
-                if(user_type == 9  && ( successorUserId != null &&  successorUserId.split(" ")[0] == 'Wybierz')){
+                if(user_type == 9  && ( successorUserId != null && successorUserId.split(" ")[0] == 'Wybierz')){
                     swal('Wybierz konto konsultanta dla sukcesora!');
                     return false;
                 }
@@ -1057,7 +1072,6 @@
             });
 
         });
-
     </script>
 
     @include('hr.medicalPackageAddTemplates')

@@ -40,6 +40,7 @@
         <td  style="border:1px solid #231f20;text-align:center;padding:3px;background-color: #CCC">{{$data->sum('sum_absent_stageOne')}}</td>
         <td  style="border:1px solid #231f20;text-align:center;padding:3px">{{$data->sum('sum_choise_stageTwo') + $data->sum('sum_absent_stageTwo')}}</td>
         <td  style="border:1px solid #231f20;text-align:center;padding:3px">{{$data->sum('sum_choise_stageTwo')}}</td>
+        <td  style="border:1px solid #231f20;text-align:center;padding:3px;}}">{{$data->sum('sum_absent_stageTwo')}}</td>
         <td  style="border:1px solid #231f20;text-align:center;padding:3px;background-color: #f5e79e">{{$data->sum('countHireUserFromFirstTrainingGroup')}}</td>
     </tr>
     </tbody>

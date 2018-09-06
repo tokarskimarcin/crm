@@ -70,6 +70,12 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="col-lg-12">
+                            <div class="form-group">
+                                <input type="checkbox" id="onlyEngraved" style="display: inline-block; margin-right: 0.5em;">
+                                <label for="onlyEngraved">Pokaż tylko zagrafikowanych</label>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -89,7 +95,10 @@
                                         <th>Nazwisko</th>
                                         <th>Start</th>
                                         <th>Zarejestrowane</th>
+                                        <th>wg Grafiku</th>
+                                        <th>Rola</th>
                                         <th>Suma</th>
+                                        <th>Grafik</th>
                                     </tr>
                                     </thead>
                                     <tbody>
@@ -112,16 +121,18 @@
 
         function myFunction() {
             table.ajax.reload();
-
         }
-            $('.form_date').datetimepicker({
-                language:  'pl',
-                autoclose: 1,
-                minView : 2,
-                pickTime: false,
-            });
+        $('.form_date').datetimepicker({
+            language:  'pl',
+            autoclose: 1,
+            minView : 2,
+            pickTime: false,
+        });
 
         $(document).ready( function () {
+
+            let userTypes = @json($userTypes);
+            let engravedCheckboxElement = document.querySelector('#onlyEngraved');
 
             table = $('#datatable').DataTable({
                 "processing": true,
@@ -140,12 +151,23 @@
                         forceParse: 0
                     });
                 },
+                "rowCallback": function( row, data, index ) {
+                    if(data.onTime == 2){ // na czas w pracy
+                        $(row).css('background-color', '#83e05c');
+                    }
+                    else if(data.onTime == 3){ // spóźniony do pracy
+                        $(row).css('background-color', 'rgb(255, 217, 50)');
+                    }else if(data.onTime == 1){
+                        $(row).css('background-color', '#ff0f00');
+                    }
+                },
                 "ajax": {
                     'url': "{{ route('api.checkList') }}",
                     'type': 'POST',
                     'data': function ( d ) {
                         d.start_date = $('#start_date').val();
                         d.dep_info =$("select[name='department_id_info']").val();
+                        d.engraved = engravedCheckboxElement.checked;
                     },
                     'headers': {'X-CSRF-TOKEN': '{{ csrf_token() }}'}
                 },
@@ -157,12 +179,13 @@
                     {"data":"first_name"},
                     {"data":"last_name"},
                     {"data": function (data, type, dataToSet) {
+                        console.log(data);
                         if(data.click_start == null)
                             data.click_start = "Brak infromacji";
                         if(data.click_stop == null)
                             data.click_stop = "Brak infromacji";
                         return data.click_start + "</br><span class='fa fa-arrow-circle-o-down fa-fw'></span> </br> " + data.click_stop;
-                    },"name": "work_hours.click_start"},
+                    },"name": "click_start"},
 
                     {"data": function (data, type, dataToSet) {
                         if(data.register_start == null)
@@ -170,14 +193,48 @@
                         if(data.register_stop == null)
                             data.register_stop = "Brak infromacji";
                         return data.register_start + "</br><span class='fa fa-arrow-circle-o-down fa-fw'></span> </br> " + data.register_stop;
-                    },"name": "work_hours.register_start"},
+                    },"name": "register_start"},
+                    {"data": function (data, type, dataToSet) {
+                            if(data.scheduleToDayStart == null)
+                                data.scheduleToDayStart = "Brak infromacji";
+                            if(data.scheduleToDayStop == null)
+                                data.scheduleToDayStop = "Brak infromacji";
+                            data.freeDay == 1 ?  data.scheduleToDayStart = data.scheduleToDayStop = "Wolne" : 0;
+                            return data.scheduleToDayStart + "</br><span class='fa fa-arrow-circle-o-down fa-fw'></span> </br> " + data.scheduleToDayStop;
+                        },"name": "scheduleToDayStart"},
+                    {"data": function (data, type, dataToSet) {
+                            let name = "Brak danych";
+                            userTypes.forEach(function(item) {
+                                if(item.id == data.user_type_id) {
+                                    name = item.name;
+                                }
+                            });
+                            return name;
+                    },"name": "user_type_id", "searchable": false},
                     {"data":function (data, type, dataToSet) {
                         if(data.time == null)
                             data.time = "Brak infromacji";
                         return data.time;
                     }, "name": "time","searchable": false },
+                    {"data":function (data, type, dataToSet) {
+                            let hasEngraver = null;
+                            if(data.hasShedule != null) {
+                                hasEngraver = 'Tak';
+                            }
+                            else {
+                                hasEngraver = 'Nie';
+                            }
+                            return hasEngraver;
+                    }, "name": "grafik","searchable": false,"visible": false },
                 ],
             });
+
+            function checkboxChangeHandler(e) {
+                table.ajax.reload();
+            }
+
+            engravedCheckboxElement.addEventListener('change', checkboxChangeHandler);
+
         });
 
         $('#datatable tbody').on('click', '.button-save', function () {
