@@ -70,6 +70,12 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="col-lg-12">
+                            <div class="form-group">
+                                <input type="checkbox" id="onlyEngraved" style="display: inline-block; margin-right: 0.5em;">
+                                <label for="onlyEngraved">Pokaż tylko zagrafikowanych</label>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -89,7 +95,9 @@
                                         <th>Nazwisko</th>
                                         <th>Start</th>
                                         <th>Zarejestrowane</th>
+                                        <th>Rola</th>
                                         <th>Suma</th>
+                                        <th>Grafik</th>
                                     </tr>
                                     </thead>
                                     <tbody>
@@ -123,6 +131,9 @@
 
         $(document).ready( function () {
 
+            let userTypes = @json($userTypes);
+            let engravedCheckboxElement = document.querySelector('#onlyEngraved');
+
             table = $('#datatable').DataTable({
                 "processing": true,
                 "serverSide": true,
@@ -140,12 +151,18 @@
                         forceParse: 0
                     });
                 },
+                "rowCallback": function( row, data, index ) {
+                    if(data.onTime == 0){
+                        $(row).css('background-color', '#ff9da2');
+                    }
+                },
                 "ajax": {
                     'url': "{{ route('api.checkList') }}",
                     'type': 'POST',
                     'data': function ( d ) {
                         d.start_date = $('#start_date').val();
                         d.dep_info =$("select[name='department_id_info']").val();
+                        d.engraved = engravedCheckboxElement.checked;
                     },
                     'headers': {'X-CSRF-TOKEN': '{{ csrf_token() }}'}
                 },
@@ -171,13 +188,39 @@
                             data.register_stop = "Brak infromacji";
                         return data.register_start + "</br><span class='fa fa-arrow-circle-o-down fa-fw'></span> </br> " + data.register_stop;
                     },"name": "work_hours.register_start"},
+                    {"data": function (data, type, dataToSet) {
+                            let name = "Brak danych";
+                            userTypes.forEach(function(item) {
+                                if(item.id == data.user_type_id) {
+                                    name = item.name;
+                                }
+                            });
+                            return name;
+                    },"name": "users.user_type_id", "searchable": false},
                     {"data":function (data, type, dataToSet) {
                         if(data.time == null)
                             data.time = "Brak infromacji";
                         return data.time;
                     }, "name": "time","searchable": false },
+                    {"data":function (data, type, dataToSet) {
+                            let hasEngraver = null;
+                            if(data.hasShedule != null) {
+                                hasEngraver = 'Tak';
+                            }
+                            else {
+                                hasEngraver = 'Nie';
+                            }
+                            return hasEngraver;
+                    }, "name": "grafik","searchable": false,"visible": false },
                 ],
             });
+
+            function checkboxChangeHandler(e) {
+                table.ajax.reload();
+            }
+
+            engravedCheckboxElement.addEventListener('change', checkboxChangeHandler);
+
         });
 
         $('#datatable tbody').on('click', '.button-save', function () {
