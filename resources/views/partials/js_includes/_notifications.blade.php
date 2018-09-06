@@ -51,6 +51,8 @@ function countNotificationsCadre() {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 },
                 success: function (response) {
+                    console.log(response);
+                    console.log(resolve);
                     var container = document.getElementById('show_notification_cadre_count');
                     if (container != null) {
                         container.style.visibility = "hidden";
@@ -140,6 +142,7 @@ $(document).ready(function(){
                 success: function(response) {
                     console.log(response);
                     let loggedUserId = ({{Auth::user()->id}});
+                    console.log(loggedUserId);
                     countNotificationsCadre().then(function (unratedNotifications) {
                         if(unratedNotifications > 0){
                             let title = 'Masz zakończone zgłoszenia, które nie są ocenione';
@@ -150,16 +153,17 @@ $(document).ready(function(){
                         }
                         clickDisabled = true;
                         setTimeout(function(){clickDisabled = false;}, 2000);
-                        if(response == 0) {
+                        if(response.length == 0) {
                             $("#cadre_notifications").append("<li style='padding-top:0.5em; padding-bottom:0.5em; padding-left:1em'>Brak nowych powiadomień</li>");
                         }else{
                             $.each(response, function (index, notification) {
                                 let time ='';
                                 let text = notification.title +" ("+notification.user.last_name+" - ";
                                 if(notification.user_id == loggedUserId){
+                                    console.log('user_id == loggeduser');
                                     let href = '{{URL::to('/view_notification/')}}'+'/' + notification.id;
-                                    if(notification.notifications_changes_displayed_flags.comment_added_by_reporter_displayed === 0){
-
+                                    if(notification.notifications_changes_displayed_flags.comment_added_by_realizator_displayed === 0){
+                                        console.log('comment_added_by_realizator_displayed');
                                         if(notification.comments[notification.comments.length-1].created_at.split(' ')[0] == '{{date('Y-m-d')}}'){
                                             time = notification.comments[notification.comments.length-1].created_at.split(' ')[1];
                                         }else{
@@ -169,6 +173,7 @@ $(document).ready(function(){
                                         $("#cadre_notifications").append(createNotification('Dodano komentarz', text, href,'fa fa-comments'));
                                     }
                                     if(notification.notifications_changes_displayed_flags.status_change_displayed === 0){
+                                        console.log('status_change_displayed');
                                         if(notification.status == 1){
                                             if(notification.created_at.split(' ')[0] == '{{date('Y-m-d')}}'){
                                                 time = notification.created_at.split(' ')[1];
@@ -197,8 +202,10 @@ $(document).ready(function(){
                                     }
                                 }
                                 if(notification.displayed_by == loggedUserId){
+                                    console.log('displayed_by == loggeduser');
                                     let href = '{{URL::to('/show_notification/')}}'+'/' + notification.id;
-                                    if(notification.notifications_changes_displayed_flags.comment_added_by_realizator_displayed === 0){
+                                    if(notification.notifications_changes_displayed_flags.comment_added_by_reporter_displayed === 0){
+                                        console.log('comment_added_by_reporter_displayed');
                                         if(notification.comments[notification.comments.length-1].created_at.split(' ')[0] == '{{date('Y-m-d')}}'){
                                             time = notification.comments[notification.comments.length-1].created_at.split(' ')[1];
                                         }else{
