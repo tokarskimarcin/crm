@@ -46,8 +46,9 @@ class WorkHoursController extends Controller
     }
     public function checkListCadre()
     {
+        $userTypes = UserTypes::all();
         $departments = $this->getDepartment();
-        return view('workhourscadre.checkListCadre')->with('departments', $departments);;
+        return view('workhourscadre.checkListCadre')->with('departments', $departments)->with('userTypes', $userTypes);
     }
 
     public function usersLive()
@@ -190,29 +191,44 @@ class WorkHoursController extends Controller
     {
         if($request->ajax()) {
             $start_date = $request->start_date;
+            $start_date_month = date('W', strtotime($start_date));
             $dep_info = $request->dep_info;
+            $engraved = $request->engraved; //true || false
             $query = DB::table('users')
                 ->leftjoin("work_hours", function ($join) use ($start_date) {
                     $join->on("users.id", "=", "work_hours.id_user")
                     ->where("work_hours.date", "=", $start_date);
-                })->select(DB::raw(
+                })
+                ->leftjoin('schedule', function($join) use ($start_date_month) {
+                    $join->on('users.id', '=', 'schedule.id_user')
+                    ->where('schedule.week_num', '=', $start_date_month);
+                })
+                ->select(DB::raw(
                     "STR_TO_DATE('$start_date', '%Y-%m-%d') as start_date,
                      work_hours.id as id,
                     users.first_name,
                     users.last_name,
                     work_hours.click_start,
+                    IF(HOUR(click_start) >= 9, 0, 1) as onTime,
                     work_hours.click_stop,
                     work_hours.register_start,
                     work_hours.register_stop,
                     work_hours.date,
+                    schedule.id_user as hasShedule,
+                    user_type_id,
                     SEC_TO_TIME(TIME_TO_SEC(register_stop) - TIME_TO_SEC(register_start) ) as time"));
             if($dep_info != '*')
             {
                 $query = $query->where('users.department_info_id', '=', $dep_info);
             }
+            if($engraved == 'true') { //show only engravered users. If user is in schedule table for given week number then id_user is not null.
+                $query = $query->where('schedule.id_user', '!=', null);
+            }
+
             $query = $query->wherenotin('users.user_type_id',[1,2,9])
             ->where('users.id','!=',11)
             ->where('users.status_work',1);
+
             return datatables($query)->make(true);
         }
     }
