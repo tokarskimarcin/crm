@@ -25,5 +25,11 @@
             <td  style="border:1px solid #231f20;text-align:center;padding:3px">{{$item->procScore}} %</td>
         </tr>
     @endforeach
+        <tr>
+            <td colspan="1" style="border:1px solid #231f20;text-align:center;padding:3px"><b>TOTAL</b></td>
+            <td  style="border:1px solid #231f20;text-align:center;padding:3px">{{$data->sum('sum_choise_stageOne')}}</td>
+            <td  style="border:1px solid #231f20;text-align:center;padding:3px">{{$data->sum('countHireUserFromFirstTrainingGroup')}}</td>
+            <td  style="border:1px solid #231f20;text-align:center;padding:3px">{{$data->sum('sum_choise_stageOne') != 0 ? round(($data->sum('countHireUserFromFirstTrainingGroup')/$data->sum('sum_choise_stageOne'))*100,2) : 0}}%</td>
+        </tr>
     </tbody>
 </table>

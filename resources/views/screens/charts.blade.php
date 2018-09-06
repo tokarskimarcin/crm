@@ -59,18 +59,17 @@
     setInterval(myfunc, 10000);
     function myfunc() {
         let id = departmentsAveragesForEveryHour[iterator].dep_info_id;
-        if(id !== -1) { //id of all deps averages data
-            if (departmentsAveragesForEveryHourChartsData[id].length > 1) {
-                var data = google.visualization.arrayToDataTable(departmentsAveragesForEveryHourChartsData[id]);
-                drawChart(data, id, 'my_chart');
-            } else {
-                $('#my_chart').text(departmentsAveragesForEveryHour[iterator].departmentName + ' Brak danych');
-            }
-        }else{
-            iterator++;
+        if (departmentsAveragesForEveryHourChartsData[id].length > 1) {
+            var data = google.visualization.arrayToDataTable(departmentsAveragesForEveryHourChartsData[id]);
+            drawChart(data, id, 'my_chart');
+        } else {
+            $('#my_chart').text(departmentsAveragesForEveryHour[iterator].departmentName + ' Brak danych');
         }
         iterator++;
-        if(iterator === departmentsAveragesForEveryHour.length) {
+        if(departmentsAveragesForEveryHour[iterator].dep_info_id === -1){
+            iterator++;
+        }
+        if(iterator >= departmentsAveragesForEveryHour.length) {
             iterator = 0;
         }
     }
