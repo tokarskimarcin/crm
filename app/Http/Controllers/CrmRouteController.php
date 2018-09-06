@@ -4128,8 +4128,11 @@ class CrmRouteController extends Controller
             ->where('client_route.status', '=', 1)
             ->where('client_route_info.status', '=', 1)
             ->get();
+
+        $voivodes = Voivodes::all();
         return view('crmRoute.hotelConfirmation')
-            ->with('allClients',$allClients);
+            ->with('allClients',$allClients)
+            ->with('voivodes', $voivodes);
     }
 
     public function getConfirmHotelInfo(Request $request){

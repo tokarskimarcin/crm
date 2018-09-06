@@ -34,6 +34,7 @@
 
 
     </style>
+    <div class="tu"></div>
 
     {{--Header page --}}
     <div class="row">
@@ -141,7 +142,9 @@
     <script src="{{ asset('/js/dataTables.buttons.min.js')}}"></script>
     <script src="{{ asset('/js/jszip.min.js')}}"></script>
     <script src="{{ asset('/js/buttons.html5.min.js')}}"></script>
+    <script src="{{asset('/js/modules/hotelInfo.blade.js')}}"></script>
     <script>
+        let voivodes = @json($voivodes);
 
         $('.form_date').datetimepicker({
             language: 'pl',
@@ -170,6 +173,17 @@
         new SelectOption(2,'Anulowano',"#ffebe6  !important")];
 
         $(document).ready(function () {
+
+
+            let tu = document.querySelector('.tu');
+            console.log(tu);
+            let myHotelInfo = new CreateHotelInfo('tu', 1);
+            myHotelInfo.createDOMContent();
+            let myEl = myHotelInfo.getDOMElement();
+            tu.appendChild(myEl);
+
+
+
             $('#date_start,#clientInfo,#confirmStatus').on('change',function () {
                 table.ajax.reload();
             });
