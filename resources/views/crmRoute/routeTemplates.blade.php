@@ -358,7 +358,7 @@
                         for(let i = 0; i < response.length; i++) {
                             let responseOption = document.createElement('option');
                             responseOption.value = response[i].id;
-                            responseOption.textContent = response[i].name;
+                            responseOption.textContent = response[i].name + ' (' + response[i].max_hour + ')';
                             placeToAppend.appendChild(responseOption);
                         }
                     }
@@ -520,7 +520,7 @@
                 console.assert(element.matches('.citySelect'), 'Element in appendCityOptions method is not city select');
                 let cityOpt = document.createElement('option');
                 cityOpt.value = data.city_id;
-                cityOpt.textContent = data.city_name;
+                cityOpt.textContent = data.city_name + ' (' + data.max_hour + ')';
                 element.appendChild(cityOpt);
             }
 

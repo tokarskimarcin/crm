@@ -3840,7 +3840,7 @@ class CrmRouteController extends Controller
     public function allCitiesInGivenVoivodeAjax(Request $request) {
         if($request->ajax()) {
             $voivodeId = $request->id;
-            $allCitiesFromGivenVoivode = Cities::select('id', 'name')
+            $allCitiesFromGivenVoivode = Cities::select('id', 'name', 'max_hour')
                 ->where('voivodeship_id', '=', $voivodeId)
                 ->get();
 
