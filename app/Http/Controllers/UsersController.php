@@ -181,6 +181,7 @@ class UsersController extends Controller
                 return Redirect::back();
             }
             $user->successorUserId = $request->successorUserId;
+            $user->save();
         }
         $userEmployment->pbx_id = $request->login_phone;
         $userEmployment->pbx_id_add_date = $request->start_date;
@@ -358,7 +359,7 @@ class UsersController extends Controller
 
             $userTypes = UserTypes::all();
             $allActiveUser = User::activeUser()->onlyConsultant()->get();
-            if($user->successorUserId != null)
+            if($user->successorUserId != null or $user->user_type_id = 9)
                 $succesorVisableStatus = "";
             else
                 $succesorVisableStatus = "hidden";
@@ -554,11 +555,32 @@ class UsersController extends Controller
             $user->department_info_id = $request->department_info_id;
             $user->main_department_id = $request->department_info_id;
         }
-        $type_redirect = 0; // 0 - brak zaminay, 1 - przekierowanie do konsultanta, 2 - do kadry
-        if ($request->user_type != null && $request->user_type != 0) {
-            if ($user->user_type_id == 1 || $user->user_type_id == 2) {
-                    if ($request->user_type > 2) {// AWANS
 
+        $type_redirect = 0; // 0 - brak zamiany typu konta, 1 - przekierowanie do konsultanta, 2 - do kadry
+        if ($request->user_type != null && $request->user_type != 0) {
+            if($request->user_type != 9) { // uprawnienia nie mogą być zmieniane na sukcesora -- tylko podczas tworzenia konta można nadać takie uprawnienia
+                if($user->user_type_id == 9 ){ // uprawnienia nie mogą być zmieniane z sukcesora na inne
+                    new ActivityRecorder(array_merge(['T'=>'Próba zmiany uprawnień z sukcesora'], ['user' =>$user->toArray()]),32,5);
+                    return view('errors.404');
+                }
+                if ($user->user_type_id == 1 || $user->user_type_id == 2) {
+                    if ($request->user_type > 2) {// AWANS
+                        if (in_array(Auth::user()->user_type_id, [4, 9, 12])) { //jeżeli trenerzy i sukcesorzy próbują kogoś awansować to zwróć 404
+                            new ActivityRecorder(array_merge(['T'=>'Próba zmiany uprawnień, do których użytkownik nie miał dostępu'], ['user' =>$user->toArray()]),10,5);
+                            return view('errors.404');
+                        }
+
+                        $successorAccount = User::where('successorUserId',$user->id)->first();
+
+                        if(!empty($successorAccount)){
+                            //jeżeli konsultant ma konto sukcesora to podczas awansu konsultanta,
+                            // konto sukcesora zmienia status na niepracujace
+                            $successorAccount->status_work = 0;
+                            $successorAccount->save();
+                            $successorHistory = SuccessorHistory::where('user_id',$successorAccount->id)->first();
+                            $successorHistory->date_stop = date('Y-m-d');
+                            $successorHistory->save();
+                        }
                         if ($userEmployment) { //gdy mamy historie w bazie danych
                             $userEmployment->pbx_id_remove_date = $date;
                             $userEmployment->save();
@@ -574,22 +596,23 @@ class UsersController extends Controller
                             $userEmployment5->pbx_id_remove_date = $date;
                             $userEmployment5->save();
                         }
-                        if($request->user_type != 9){ //jezeli awansuje na sukcesora to nr pbx ma zostać
-                            $user->login_phone = null;
-                        }
+                        $user->login_phone = null;
                         $user->promotion_date = date('Y-m-d');
                         $type_redirect = 2;
+                    }
+                    $user->user_type_id = $request->user_type;
+                } else if ($user->user_type_id > 2) {
+                        if ($request->user_type < 3) {
+                            //Degradacja
+                            $user->login_phone = null;
+                            $user->degradation_date = date('Y-m-d');
+                            $type_redirect = 1;
+                        }
+                        $user->user_type_id = $request->user_type;
                 }
-
-                $user->user_type_id = $request->user_type;
-            } else if ($user->user_type_id > 2) {
-                if ($request->user_type < 3) {
-                    //Degradacja
-                    $user->login_phone = null;
-                    $user->degradation_date = date('Y-m-d');
-                    $type_redirect = 1;
-                }
-                $user->user_type_id = $request->user_type;
+            } else {
+                new ActivityRecorder(array_merge(['T'=>'Próba zmiany uprawnień na sukcesora'], ['user' =>$user->toArray()]),10,5);
+                return view('errors.404');
             }
         }
         if ($request->status_work == "1") {

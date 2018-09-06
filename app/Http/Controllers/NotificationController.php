@@ -349,13 +349,12 @@ class NotificationController extends Controller
         $data = DB::table('notifications')
             ->select(DB::raw('
                 notifications.*,
-                users.first_name as first_name,
-                users.last_name as last_name,
+                concat(users.first_name," ",users.last_name ) as user_name,
                 jr.id as jr_id,
                 jr.comment,
                 jr.judge_sum
             '))
-            ->leftJoin('users', 'users.id', '=', 'notifications.displayed_by')
+            ->leftJoin('users', 'users.id', '=', 'notifications.user_id')
             ->leftJoin('judge_results as jr', 'jr.notification_id', '=', 'notifications.id')
             ->where('status','!=',0)
             ->where('displayed_by', '=', Auth::user()->id)
