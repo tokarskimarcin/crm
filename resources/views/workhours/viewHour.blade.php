@@ -54,7 +54,7 @@
                                         @php
                                             $months=3;
                                             if(Auth::user()->user_type_id == 3){
-                                                $months=4;
+                                                $months=7;
                                             }
                                         @endphp
                                         @for ($i = 0; $i < $months; $i++)
