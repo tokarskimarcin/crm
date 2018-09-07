@@ -4561,6 +4561,9 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
             }
         }
 
+        if(Auth::user()->id == 6964){
+            dd($data);
+        }
         return view('reportpage.weekReportDepartmentSummary')
             ->with([
                 'departments'   => $departments,
@@ -4682,6 +4685,7 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
             $item->count_bad_check = (is_object($day_janky)) ? $day_janky->count_bad_check : 0 ;
             return $item;
         });
+
         return [
             'data_start' => $data_start,
             'data_stop' => $data_stop,
