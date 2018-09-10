@@ -108,6 +108,7 @@
                             <th>Miasto</th>
                             <th>Ulica</th>
                             <th>Kod Pocztowy</th>
+                            <th>Sugerowany Tel</th>
                             <th>Wybierz</th>
                             <th>Podgląd</th>
                         </tr>
@@ -354,6 +355,17 @@
                             {"data": function(data, type, dataToSet) {
                                     return data.zip_code;
                                 },"name":"zip_code", "orderable": false, "width": "10%"
+                            },
+                            {"data": function(data, type, dataToSet) {
+                                let tel = null;
+                                if(data.contact != null) {
+                                    tel = data.contact;
+                                }
+                                else {
+                                    tel = 'Brak';
+                                }
+                                    return tel;
+                                },"name":"telephone", "orderable": false, "width": "10%"
                             },
                             {"data":function (data, type, dataToSet) {
                                     /* var cityId = cityElementOfGivenContainer;

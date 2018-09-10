@@ -1852,10 +1852,17 @@ class CrmRouteController extends Controller
          hotels.zip_code,
          hotels.comment,
          voivodeship.name as voivodeName,
-         city.name as cityName
+         city.name as cityName,
+         hotels_contacts.contact as contact
         '))
             ->join('city','city.id','city_id')
-            ->join('voivodeship','voivodeship.id','voivode_id')->orderBy('id');
+            ->join('voivodeship','voivodeship.id','voivode_id')
+            ->leftJoin('hotels_contacts', function($join) {
+                $join->on('hotels.id', '=', 'hotels_contacts.hotel_id')
+                    ->where('type', '=', 'phone')
+                    ->where('suggested', '=', 1);
+            })
+            ->orderBy('id');
 
         if($hotelId != 0){
             $hotels->where('hotels.id','=',$hotelId);
