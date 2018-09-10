@@ -1041,3 +1041,4 @@ Route::Get('/test','TestsController@testGet');
 Route::get('/Admin/Departments', 'AdminPanel\DepartmentsController@index');
 
 Route::post('/hotelConfirmationHotelInfoAjax', 'CrmRouteController@hotelConfirmationHotelInfoAjax')->name('api.hotelConfirmationHotelInfoAjax');
+Route::post('/checkForTheSameRoute', 'CrmRouteController@checkForTheSameRoute')->name('api.checkForTheSameRoute');

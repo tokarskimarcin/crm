@@ -53,6 +53,43 @@ class CrmRouteController extends Controller
             ->with('voivodes', $voivodes);
     }
 
+    //This method checks if there is the same route template in database.
+    public function checkForTheSameRoute(Request $request) {
+        $allData = json_decode($request->alldata);
+        $allData = array_reverse($allData);
+
+        $allCities = Cities::select('id','name')->get();
+        $reverseNameArr = [];
+        $dayFlag = $allData[0]->day;
+
+        foreach($allData as $record) {
+            $name = '';
+            $name .=  $allCities->where('id', '=', $record->city)->first()->name . ' + ';
+            if($record->day != $dayFlag) {
+                $name = substr($name, 0,strlen($name) - 3) . ' | ';
+            }
+            array_push($reverseNameArr, $name);
+        }
+
+        $fullName = '';
+        $nameArr = array_reverse($reverseNameArr);
+
+        foreach($nameArr as $key => $value) {
+            $fullName .= $value;
+        }
+
+        $fullName = substr($fullName, 0,strlen($fullName) - 3); // removing last | in name
+
+        $route = Route::where('name', '=', $fullName)->get();
+
+        if($route->count() > 0) {
+            return 1;
+        }
+        else {
+            return 0;
+        }
+    }
+
     /**
      * This method saves new route template to database
      */
