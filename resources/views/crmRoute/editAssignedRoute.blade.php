@@ -243,14 +243,31 @@
                     </div>
                     <div class="client-wrapper">
                         <div class="client-container">
-                            <button class="btn btn-primary" style="margin-top:1em;font-size:1.1em;font-weight:bold;"
-                                    id="redirect"><span class='glyphicon glyphicon-repeat'></span> Powrót
-                            </button>
-                            <button class="btn btn-success"
-                                    style="margin-top:1em;margin-bottom:1em;font-size:1.1em;font-weight:bold;"
-                                    id="save"><span class='glyphicon glyphicon-save'></span> Zapisz
-                            </button>
-                            <button class="btn btn-danger" id="remove-route" style="margin-bottom:1em;font-size:1.1em;font-weight:bold;"><span class='glyphicon glyphicon-minus'></span> Usuń trasę</button>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <button class="btn btn-primary" style="margin-top:1em;font-size:1.1em;font-weight:bold;width: 100%;"
+                                            id="redirect"><span class='glyphicon glyphicon-repeat'></span> Powrót
+                                    </button>
+                                </div>
+                                <div class="col-md-12">
+                                    <button class="btn btn-success"
+                                            style="margin-top:1em;margin-bottom:1em;font-size:1.1em;font-weight:bold; width: 100%;"
+                                            id="save"><span class='glyphicon glyphicon-save'></span> Zapisz
+                                    </button>
+                                </div>
+                                <div class="col-md-6">
+                                    <button class="btn btn-danger" id="remove-route" style="width: 100%;margin-bottom:1em;font-size:1.1em;font-weight:bold;"><span class='glyphicon glyphicon-minus'></span> Usuń trasę</button>
+                                </div>
+                                <div class="col-md-6">
+                                    @if(isset($client_route))
+                                        @if($client_route->isCanceled == 0)
+                                            <button class="btn btn-warning" id="cancel-route" style="width: 100%;margin-bottom:1em;font-size:1.1em;font-weight:bold;"><span class='glyphicon glyphicon-minus'></span>Odwołaj trasę</button>
+                                        @else
+                                            <button class="btn btn-warning" id="cancel-route" style="width: 100%;margin-bottom:1em;font-size:1.1em;font-weight:bold;"><span class='glyphicon glyphicon-plus'></span>Przywróć trasę</button>
+                                        @endif
+                                    @endif
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1800,6 +1817,19 @@
             function buttonHandler(e) {
                 if (e.target.matches('#redirect')) {
                     location.href = "{{URL::to('/showClientRoutes')}}";
+                }
+                else if(e.target.matches('#cancel-route')) { //This is responsible for canceling route
+                    const ourHeaders = new Headers();
+                    ourHeaders.append('X-CSRF-TOKEN', $('meta[name="csrf-token"]').attr('content'));
+
+                    fetch('{{url()->current()}}', {
+                        method: 'put',
+                        headers: ourHeaders,
+                        credentials: "same-origin"
+                    })
+                        .then(resp => location.href = '/showClientRoutes')
+                        .catch(err => console.log(err))
+
                 }
                 else if(e.target.matches('.addNewShowButton')) { //user clicks on "add new show" button
                     e.preventDefault();

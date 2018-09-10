@@ -105,6 +105,8 @@
                                     <li class="list-group-item"><strong>Aktywne</strong> oznaczone jako <button class="btn btn-success" style="font-weight:bold;">Aktywna</button> - Trasa jest gotowa do użycia (wszystkie godziny oraz hotele muszą być określone aby mogła być aktywna), pobierane są informacje z PBX odnośnie takich kampanii, wyświetlają się we wszystkich statystykach</li>
                                     <li class="list-group-item"><strong>Zakończone</strong> oznaczone jako <button class="btn btn-info" style="font-weight:bold;">Zakończona</button> - Trasa automatycznie zmienia stan z Aktywnej na Zakończoną, gdy data ostatniego pokazu zostaje osiągnięta</li>
                                 </ul>--}}
+                                <br>
+                                Trasy anulowane mają kolor <span style="background-color: #ff8c88;">czerwony</span>.
                                 Trasy mające przyciski edycji o różnych kolorach dzielą się na: </br>
                                 <div class="row">
                                     <div class="col-md-5">
@@ -774,6 +776,9 @@
                             row.classList.add('colorRow');
                         }
                     });
+                    if(data.canceled == 1) {
+                        $(row).css("background-color", '#ff8c88');
+                    }
 
                     return row;
                 },

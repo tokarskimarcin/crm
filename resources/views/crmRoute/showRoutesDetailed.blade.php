@@ -56,7 +56,8 @@
                     Moduł <span style="font-weight: bold;">Szczegółowe informacje o kampaniach</span> wyświetla informacje o poszczególnych pokazo-godzinach,
                     które mogą być zbiorczo edytowane. Tabela z rekordami może być filtrowana dostępnymi polami wielokrotnego wyboru.
                     Aby edytować rekordy, należy je zaznaczyć i nacisnąć przycisk <span style="font-weight: bold;">Edytuj rekord(y)</span>.
-                    Jeśli liczba <i>zaproszeń live</i> przekracza zakładane <i>limity</i>, w kolumnie <i>straty</i> wyswietli się 0.
+                    Jeśli liczba <i>zaproszeń live</i> przekracza zakładane <i>limity</i>, w kolumnie <i>straty</i> wyswietli się 0. <br>
+                    Pokazy anulowane mają cały wiersz w kolorze <span style="background-color: #ffc0bd;">czerwonym</span>.
                 </div>
                 <div class="row">
                     <div class="col-md-2">
@@ -714,6 +715,9 @@
                        });
 
                    });
+                   if(data.canceled == 1) {
+                       $(row).css("background-color", '#ffc0bd');
+                   }
                },
                "fnDrawCallback": function(settings) {
                    $('#datatable tbody tr').on('click', function(e) {

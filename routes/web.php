@@ -266,6 +266,7 @@ Route::post('/allCitiesInGivenVoivodeAjax', 'CrmRouteController@allCitiesInGiven
 Route::post('/deleteRouteTemplate', 'CrmRouteController@deleteRouteTemplate')->name('api.deleteRouteTemplate');
 Route::post('/removeCampaignComment','CrmRouteController@removeCampaignCommentAjax')->name('api.removeCampaignComment');
 Route::delete('editAssignedRoute/{id}', 'CrmRouteController@deleteGivenRouteAjax')->name('api.deleteGivenRouteAjax');
+Route::put('editAssignedRoute/{id}', 'CrmRouteController@cancelRoute')->name('api.cancelRoute');
 Route::post('/engraverForConfirmingAjax', 'CrmRouteController@engraverForConfirmingDatatable')->name('api.engraverForConfirmingDatatable');
 Route::post('/engraverForConfirmingUpdate', 'CrmRouteController@engraverForConfirmingUpdate')->name('api.engraverForConfirmingUpdate');
 

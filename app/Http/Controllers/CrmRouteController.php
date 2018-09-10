@@ -302,7 +302,12 @@ class CrmRouteController extends Controller
 
     public function editAssignedRouteGet($id) {
         $voivodes = Voivodes::all();
-        $client_route = ClientRoute::select('client.name as name', 'client.id as clientId', 'client_route.type as clientType')
+        $client_route = ClientRoute::select(
+            'client.name as name',
+            'client.id as clientId',
+            'client_route.type as clientType',
+            'client_route.canceled as isCanceled'
+        )
             ->OnlyActiveClientRoutes()
             ->join('client', 'client_route.client_id', '=', 'client.id')
             ->where('client_route.id', '=', $id)
@@ -321,8 +326,6 @@ class CrmRouteController extends Controller
             ->orderBy('date')
             ->orderBy('show_order')
             ->get();
-
-//        dd($client_route_info);
 
         return view('crmRoute.editAssignedRoute')
             ->with('voivodes', $voivodes)
@@ -1123,7 +1126,8 @@ class CrmRouteController extends Controller
                 'date',
                 'client_route.type',
                 'client_route_id',
-                'limits')
+                'limits',
+                'canceled')
             ->join('client_route' ,'client_route.id','=','client_route_id')
             ->join('client' ,'client.id','=','client_route.client_id')
             ->join('city' ,'city.id','=', 'city_id')
@@ -2445,7 +2449,8 @@ class CrmRouteController extends Controller
         0 as totalScore,
         client_route.type as typ,
         hotels.name as hotelName,
-        hotels.street as hotelAdress
+        hotels.street as hotelAdress,
+        client_route.canceled
         '))
         ->join('client_route','client_route.id','client_route_info.client_route_id')
         ->leftJoin('hotels', 'client_route_info.hotel_id', '=', 'hotels.id')
@@ -4452,6 +4457,23 @@ class CrmRouteController extends Controller
         array_push($dataArr, $hotelContactInfos);
 
         return $dataArr;
+    }
+
+    /**
+     * @param $id
+     * This method change route canceled status.
+     */
+    public function cancelRoute($id) {
+        $info = ClientRoute::where('id', '=', $id)->first();
+
+        if($info->canceled == 0 || is_null($info->canceled)) {
+            ClientRoute::where('id', '=', $id)->update(['canceled' => 1]);
+            Session::flash('adnotation', 'Trasa została anulowana!');
+        }
+        else {
+            ClientRoute::where('id', '=', $id)->update(['canceled' => 0]);
+            Session::flash('adnotation', 'Trasa została przywrócona!');
+        }
     }
 
 }
