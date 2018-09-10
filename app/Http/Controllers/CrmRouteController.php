@@ -4506,10 +4506,24 @@ class CrmRouteController extends Controller
         if($info->canceled == 0 || is_null($info->canceled)) {
             ClientRoute::where('id', '=', $id)->update(['canceled' => 1]);
             Session::flash('adnotation', 'Trasa została anulowana!');
+            $log = [
+                'T' => 'Anulowanie trasy',
+                'Id trasy' => $id
+            ];
+
+            new ActivityRecorder($log,230, 3);
+
         }
         else {
             ClientRoute::where('id', '=', $id)->update(['canceled' => 0]);
             Session::flash('adnotation', 'Trasa została przywrócona!');
+
+            $log = [
+                'T' => 'Przywrócenie trasy',
+                'Id trasy' => $id
+            ];
+
+            new ActivityRecorder($log,230, 4);
         }
     }
 
