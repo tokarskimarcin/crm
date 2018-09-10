@@ -109,9 +109,9 @@
                     <table id="datatable" class="thead-inverse table table-striped table-bordered" style="max-width:100%;">
                         <thead>
                         <tr>
-                            <th>Tydzien</th>
+                            <th>Tydz.</th>
                             <th>Data</th>
-                            <th>Godzina</th>
+                            <th>Godz.</th>
                             <th>Kampania</th>
                             <th>Podział bazy</th>
                             <th>Sprawdzenie</th>
@@ -122,6 +122,8 @@
                             <th>Oddział</th>
                             <th>Uwagi</th>
                             <th>Nr kampanii (PBX)</th>
+                            <th>Nazwa Hotelu</th>
+                            <th>Adres Hotelu</th>
                         </tr>
                         </thead>
                     </table>
@@ -375,9 +377,12 @@
 
                    if(addFlag == true) {
                        let givenRow = document.querySelector('[data-id="' + idItem + '"]');
+                       console.log(givenRow);
                        let givenRowData = givenRow.cells[1].textContent;
                        let givenRowKampania = givenRow.cells[3].textContent;
                        let givenRowProjekt = givenRow.cells[9].textContent;
+                       let hotelName = givenRow.cells[12].textContent;
+                       let hotelAdress = givenRow.cells[13].textContent;
                        let tr = document.createElement('tr');
                        let td1 = document.createElement('td');
                        td1.textContent = givenRowData;
@@ -388,6 +393,14 @@
                        let td3 = document.createElement('td');
                        td3.textContent = givenRowProjekt;
                        tr.appendChild(td3);
+
+                       let td4 = document.createElement('td');
+                       td4.textContent = hotelName;
+                       tr.appendChild(td4);
+
+                       let td5 = document.createElement('td');
+                       td5.textContent = hotelAdress;
+                       tr.appendChild(td5);
 
                        let rowObject = {
                            id: idItem,
@@ -413,6 +426,8 @@
                let th1 = document.createElement('th');
                let th2 = document.createElement('th');
                let th3 = document.createElement('th');
+               let th4 = document.createElement('th');
+               let th5 = document.createElement('th');
 
                th1.textContent = "Data";
                tr1.appendChild(th1);
@@ -422,6 +437,12 @@
 
                th3.textContent = "Projekt";
                tr1.appendChild(th3);
+
+               th4.textContent = "Nazwa hotelu";
+               tr1.appendChild(th4);
+
+               th5.textContent = "Adres";
+               tr1.appendChild(th5);
 
                theadElement.appendChild(tr1);
 
@@ -825,8 +846,15 @@
                             }
                        },"name":"comment","orderable" : false
                    },
-                   {"data":"nrPBX", "visible":false}
-
+                   {"data":"nrPBX", "visible":false},
+                   {"data":function (data, type, dataToSet) {
+                           return data.hotelName;
+                       },"name":"hotelName"
+                   },
+                   {"data":function (data, type, dataToSet) {
+                           return data.hotelAdress;
+                       },"name":"hotelAdress"
+                   }
                ],
                order: [[1, 'asc'], [9, 'asc'],[3, 'desc'], [2, 'asc']],
                rowGroup: {
