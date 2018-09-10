@@ -4420,7 +4420,8 @@ class CrmRouteController extends Controller
             'city.name as city_name',
             'voivodeship.name as voivode_name',
             'hotels.payment_method_id',
-            'hotels.street'
+            'hotels.street',
+            'hotels.parking'
             )
             ->join('city', 'hotels.city_id', '=', 'city.id')
             ->join('voivodeship', 'hotels.voivode_id', '=', 'voivodeship.id')

@@ -495,7 +495,6 @@
                        listElement.appendChild(interiorElement);
                        telephonesBox.appendChild(listElement);
                    }
-
                });
            }
 
