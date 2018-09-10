@@ -1038,3 +1038,5 @@ Route::get('/getAllTask', 'MyUserTestController@getAllTask');
 Route::Get('/test','TestsController@testGet');
 
 Route::get('/Admin/Departments', 'AdminPanel\DepartmentsController@index');
+
+Route::post('/hotelConfirmationHotelInfoAjax', 'CrmRouteController@hotelConfirmationHotelInfoAjax')->name('api.hotelConfirmationHotelInfoAjax');

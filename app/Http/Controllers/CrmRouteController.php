@@ -4130,6 +4130,7 @@ class CrmRouteController extends Controller
             ->get();
 
         $voivodes = Voivodes::all();
+
         return view('crmRoute.hotelConfirmation')
             ->with('allClients',$allClients)
             ->with('voivodes', $voivodes);
@@ -4405,6 +4406,41 @@ class CrmRouteController extends Controller
                 ]);
         }
         return 'Zmiany zostały zapisane!';
+    }
+
+    public function hotelConfirmationHotelInfoAjax(Request $request) {
+
+        $hotelId = $request->hotelId;
+        $dataArr = []; //this array collect info about hotel
+
+        $item = Hotel::select(
+            'hotels.id',
+            'hotels.name as hotel_name',
+            'hotels.comment',
+            'city.name as city_name',
+            'voivodeship.name as voivode_name',
+            'hotels.payment_method_id',
+            'hotels.street'
+            )
+            ->join('city', 'hotels.city_id', '=', 'city.id')
+            ->join('voivodeship', 'hotels.voivode_id', '=', 'voivodeship.id')
+            ->where('hotels.id', '=', $hotelId)
+            ->first();
+
+        array_push($dataArr, $item);
+
+        //This variable hold info about contacts to hotel
+        $hotelContactInfos = HotelsContacts::select(
+            'contact',
+            'type',
+            'suggested'
+        )
+            ->where('hotel_id', '=', $hotelId)
+            ->get();
+
+        array_push($dataArr, $hotelContactInfos);
+
+        return $dataArr;
     }
 
 }
