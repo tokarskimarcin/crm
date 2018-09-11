@@ -107,7 +107,7 @@
 
                 </div>
                 <div class="row">
-                    <table id="datatable" class="thead-inverse table table-striped table-bordered" style="max-width:100%;">
+                    <table id="datatable" class="thead-inverse table table-striped table-bordered compact" style="max-width:100%;">
                         <thead>
                         <tr>
                             <th>Tydz.</th>
@@ -773,7 +773,7 @@
                    },
                    {"data": function (data, type, dataToSet) {
                            if(data.baseDivision != null) {
-                               return '<textarea class="form-control baseDivision" cols="10" readonly>'+data.baseDivision+'</textarea>';
+                               return '<textarea class="form-control baseDivision" cols="5" rows="1" readonly>'+data.baseDivision+'</textarea>';
                            }
                            else {
                                return "";
