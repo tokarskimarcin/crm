@@ -33,6 +33,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\URL;
+use League\Flysystem\FileNotFoundException;
 use function MongoDB\BSON\toJSON;
 use PhpParser\Node\Expr\Array_;
 use Session;
@@ -3846,9 +3847,9 @@ class CrmRouteController extends Controller
     }
 
     public function getCampaignsInvoices($id = 0){
+        $invoiceStatuses = InvoiceStatus::all();
         if($id <= 0) {
             $clients = Clients::all();
-            $invoiceStatuses = InvoiceStatus::all();
             return view('crmRoute.campaignsInvoices')
                 ->with('routeId', $id)
                 ->with('clients', $clients)
@@ -3859,6 +3860,7 @@ class CrmRouteController extends Controller
         }else{
             $client = ClientRoute::find($id);
             return view('crmRoute.campaignsInvoices')
+                ->with('invoiceStatuses', $invoiceStatuses)
                 ->with('routeId', $id)
                 ->with('client', $client)
                 ->with('validCampaignInvoiceExtensions',json_encode($this->validCampaignInvoiceExtensions));
@@ -3922,7 +3924,12 @@ class CrmRouteController extends Controller
     public function downloadCampaignInvoicePDF($id){
         $clientRouteCampaign = ClientRouteCampaigns::find($id);
         $url = $clientRouteCampaign->invoice_path;
-        return Storage::download($url);
+        try{
+            return Storage::download($url);
+        }catch(FileNotFoundException $e){
+            session()->put('error', 'Nie znaleziono pliku na serwerze. Spróbuj wysłać ponownie');
+            return Redirect::back();
+        }
     }
 
     public function getCampaignsInvoicesDatatableAjax(Request $request){

@@ -20,6 +20,13 @@
             <div class="panel-body">
                 <div class="row">
                     <div class="col-md-12">
+                        <div class="alert alert-info"><strong>Lista klientów</strong> zawiera wszystkich klientów dostępnych jak i "wyłączonych" (podświetlonych na czerwono).
+                            Klienci wyłączeni nie pokazują się na żadnej liście do wyboru np. w <strong>Pliku klientów</strong> podczas tworzenia trasy etc.
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
                         <button data-toggle="modal" class="btn btn-default" id="clientModal" data-target="#ModalClient"
                                 data-id="1" title="Nowy Klient" style="margin-bottom: 14px">
                             <span class="glyphicon glyphicon-plus"></span> <span>Dodaj Klienta</span>
@@ -57,7 +64,13 @@
                 <h4 class="modal-title" id="modal_title">Parametry klientów<span id="modal_category"></span></h4>
             </div>
             <div class="modal-body">
-
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="alert alert-info">W tym panelu znajdują sie listy <strong>Upominków</strong> i <strong>Rodzaji spotkań</strong>
+                            jakie mogą zostać przypisane poszczególnemu klientowi.
+                            Wyłączenie jednej pozycji z tych list wyklucza pojawienie się na liście do wyboru podczas edycji lub dodawania nowego klienta</div>
+                    </div>
+                </div>
                 <div class="panel panel-default">
                     <div class="panel-heading">
                         Upominki
