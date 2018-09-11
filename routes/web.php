@@ -333,6 +333,7 @@ Route::post('/pbxReportDetailedAjax', 'StatisticsController@pbxReportDetailedAja
 /* STATISTICS ROUTES AJAX */
 Route::post('/getDepartmentsAveragesForEveryHourAjax', 'StatisticsController@getDepartmentsAveragesForEveryHourAjax')->name('api.getDepartmentsAveragesForEveryHourAjax');
 Route::post('/getDepartmentsAveragesForEveryDayAjax', 'StatisticsController@getDepartmentsAveragesForEveryDayAjax')->name('api.getDepartmentsAveragesForEveryDayAjax');
+Route::post('/departmentsConfirmationStatisticsAjax', 'Statistics\DepartmentsConfirmationStatisticsController@departmentsConfirmationStatisticsAjax')->name('api.departmentsConfirmationStatisticsAjax');
 /* END STATISTICS ROUTES AJAX */
 
 //********************END AJAX*********************** */
@@ -631,6 +632,9 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
 
     Route::get('/pageReportDepartments', 'StatisticsController@pageReportDepartmentsGet');
     Route::post('/pageReportDepartments', 'StatisticsController@pageReportDepartmentsPost');
+
+
+    Route::get('/departmentsConfirmationGet', 'Statistics\DepartmentsConfirmationStatisticsController@departmentsConfirmationGet');
     //Statistics Stop
 
     //Report Page Start
@@ -1034,7 +1038,5 @@ Route::get('/checkPenatly', 'AutoScriptController@checkPenatly');
 Route::post('/changeLimits', 'CrmRouteController@changeLimitsAjax')->name('api.changeLimits');
 
 Route::get('/getAllTask', 'MyUserTestController@getAllTask');
-
-Route::Get('/test','TestsController@testGet');
 
 Route::get('/Admin/Departments', 'AdminPanel\DepartmentsController@index');
