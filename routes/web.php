@@ -415,6 +415,8 @@ Route::get('/dayReportDepartments', 'StatisticsController@MailDayDepartmentsRepo
 Route::get('/dayReportCoaches', 'StatisticsController@MailDayReportCoaches');
 Route::get('/hourReportCoaches', 'StatisticsController@MailHourReportCoaches');
 
+Route::get('/monthReportUnpaidInvoices', 'StatisticsController@monthReportUnpaidInvoicesGet');
+
 //Emaile dotyczące raportów kampani
 Route::get('/mailDayReportCampaign', 'StatisticsController@mailDayReportCampaign');
 Route::get('/mailWeekReportCampaign', 'StatisticsController@mailWeekReportCampaign');
@@ -961,6 +963,8 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
     Route::get('/hotelConfirmationGet', 'CrmRouteController@hotelConfirmationGet');
 
     Route::get('/engraverForConfirming', 'CrmRouteController@engraverForConfirmingGet');
+
+
     /** KONIEC CRM **/
 
 });
@@ -1042,5 +1046,5 @@ Route::get('/Admin/Departments', 'AdminPanel\DepartmentsController@index');
 
 Route::post('/hotelConfirmationHotelInfoAjax', 'CrmRouteController@hotelConfirmationHotelInfoAjax')->name('api.hotelConfirmationHotelInfoAjax');
 Route::post('/checkForTheSameRoute', 'CrmRouteController@checkForTheSameRoute')->name('api.checkForTheSameRoute');
-Route::get('/monthReportUnpaidInvoices', 'StatisticsController@monthReportUnpaidInvoicesGet');
+
 Route::get('/mailMonthReportUnpaidInvoices', 'StatisticsController@mailMonthReportUnpaidInvoices');

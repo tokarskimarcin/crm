@@ -4406,7 +4406,8 @@ class CrmRouteController extends Controller
         client_route_info.department_info_id as depId,
         department_type.name as departmentName2,
         city.name as cityName,
-        client_route.type as typ
+        client_route.type as typ,
+        client_route.canceled
         '))
             ->join('client_route','client_route.id','client_route_info.client_route_id')
             ->leftjoin('client','client.id','client_route.client_id')
