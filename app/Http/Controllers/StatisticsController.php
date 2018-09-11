@@ -1514,18 +1514,10 @@ class StatisticsController extends Controller
         $date_stop = date('Y-m-d');
         $dateHireCandidate = RecruitmentStory::getReportTrainingDataAndHire($date_start,$date_stop);
         $date =  RecruitmentStory::getReportTrainingData($date_start,$date_stop);
-        $date = $date->map(function ($item) use($dateHireCandidate) {
-            $dateHireCandidateDepartment = $dateHireCandidate->where('departmentInfoId',$item->dep_id);
-
-            if(!$dateHireCandidateDepartment->isEmpty()){
-                $item->countHireUserFromFirstTrainingGroup = $dateHireCandidateDepartment->count();
-            }
-            $item->procScore = $item->sum_choise_stageOne != 0 ? round(($item->countHireUserFromFirstTrainingGroup/$item->sum_choise_stageOne)*100,2) : 0;
-            return $item;
-        })->sortByDesc('procScore');
+        $date =  $this::mapTrainingGroupInfoAndHireCandidate($date,$dateHireCandidate);
         return view('reportpage.recruitmentReport.DayReportRecruitmentTrainingGroupFirstAndHire')
             ->with([
-                'data' => $date,
+                'data' => $date->sortByDesc('procScore'),
                 'start_date' => $date_start
             ]);
     }
@@ -1538,18 +1530,10 @@ class StatisticsController extends Controller
         $date_stop = $date;
         $dateHireCandidate = RecruitmentStory::getReportTrainingDataAndHire($date_start,$date_stop);
         $date =  RecruitmentStory::getReportTrainingData($date_start,$date_stop);
-        $date = $date->map(function ($item) use($dateHireCandidate) {
-            $dateHireCandidateDepartment = $dateHireCandidate->where('departmentInfoId',$item->dep_id);
-
-            if(!$dateHireCandidateDepartment->isEmpty()){
-                $item->countHireUserFromFirstTrainingGroup = $dateHireCandidateDepartment->count();
-            }
-            $item->procScore = $item->sum_choise_stageOne != 0 ? round(($item->countHireUserFromFirstTrainingGroup/$item->sum_choise_stageOne)*100,2) : 0;
-            return $item;
-        })->sortByDesc('procScore');
+        $date =  $this::mapTrainingGroupInfoAndHireCandidate($date,$dateHireCandidate);
         return view('reportpage.recruitmentReport.DayReportRecruitmentTrainingGroupFirstAndHire')
             ->with([
-                'data' => $date,
+                'data' => $date->sortByDesc('procScore'),
                 'start_date' => $date_start
             ]);
     }
@@ -1562,16 +1546,9 @@ class StatisticsController extends Controller
         $date_stop = date('Y-m-d', time() - 24 * 3600);
         $dateHireCandidate = RecruitmentStory::getReportTrainingDataAndHire($date_start,$date_stop);
         $date =  RecruitmentStory::getReportTrainingData($date_start,$date_stop);
-        $date = $date->map(function ($item) use($dateHireCandidate) {
-            $dateHireCandidateDepartment = $dateHireCandidate->where('departmentInfoId',$item->dep_id);
-            if(!$dateHireCandidateDepartment->isEmpty()){
-                $item->countHireUserFromFirstTrainingGroup = $dateHireCandidateDepartment->count();
-            }
-            $item->procScore = $item->sum_choise_stageOne != 0 ? round(($item->countHireUserFromFirstTrainingGroup/$item->sum_choise_stageOne)*100,2) : 0;
-            return $item;
-        })->sortByDesc('procScore');
+        $date =  $this::mapTrainingGroupInfoAndHireCandidate($date,$dateHireCandidate);
         $data = [
-            'data' => $date,
+            'data' => $date->sortByDesc('procScore'),
             'start_date' => $date_start
         ];
         $title = 'Raport Dzienny Szkoleń / Zatrudnionych kandydatów'. $date_start;
@@ -1587,18 +1564,10 @@ class StatisticsController extends Controller
         $date_stop = date("Y-m-d",strtotime('-1 Day'));
         $dateHireCandidate = RecruitmentStory::getReportTrainingDataAndHire($date_start,$date_stop);
         $date =  RecruitmentStory::getReportTrainingData($date_start,$date_stop);
-        $date = $date->map(function ($item) use($dateHireCandidate) {
-            $dateHireCandidateDepartment = $dateHireCandidate->where('departmentInfoId',$item->dep_id);
-
-            if(!$dateHireCandidateDepartment->isEmpty()){
-                $item->countHireUserFromFirstTrainingGroup = $dateHireCandidateDepartment->count();
-            }
-            $item->procScore = $item->sum_choise_stageOne != 0 ? round(($item->countHireUserFromFirstTrainingGroup/$item->sum_choise_stageOne)*100,2) : 0;
-            return $item;
-        })->sortByDesc('procScore');
+        $date =  $this::mapTrainingGroupInfoAndHireCandidate($date,$dateHireCandidate);
         return view('reportpage.recruitmentReport.WeekReportRecruitmentTrainingGroupFirstAndHire')
             ->with([
-                'data' => $date,
+                'data' => $date->sortByDesc('procScore'),
                 'start_date' => $date_start,
                 'stop_date' => $date_stop
             ]);
@@ -1612,18 +1581,10 @@ class StatisticsController extends Controller
         $date_stop = $request->date_stop;
         $dateHireCandidate = RecruitmentStory::getReportTrainingDataAndHire($date_start,$date_stop);
         $date =  RecruitmentStory::getReportTrainingData($date_start,$date_stop);
-        $date = $date->map(function ($item) use($dateHireCandidate) {
-            $dateHireCandidateDepartment = $dateHireCandidate->where('departmentInfoId',$item->dep_id);
-
-            if(!$dateHireCandidateDepartment->isEmpty()){
-                $item->countHireUserFromFirstTrainingGroup = $dateHireCandidateDepartment->count();
-            }
-            $item->procScore = $item->sum_choise_stageOne != 0 ? round(($item->countHireUserFromFirstTrainingGroup/$item->sum_choise_stageOne)*100,2) : 0;
-            return $item;
-        })->sortByDesc('procScore');
+        $date =  $this::mapTrainingGroupInfoAndHireCandidate($date,$dateHireCandidate);
         return view('reportpage.recruitmentReport.WeekReportRecruitmentTrainingGroupFirstAndHire')
             ->with([
-                'data' => $date,
+                'data' => $date->sortByDesc('procScore'),
                 'start_date' => $date_start,
                 'stop_date' => $date_stop
             ]);
@@ -1637,17 +1598,9 @@ class StatisticsController extends Controller
         $date_stop = date("Y-m-d",strtotime('-1 Day'));
         $dateHireCandidate = RecruitmentStory::getReportTrainingDataAndHire($date_start,$date_stop);
         $date =  RecruitmentStory::getReportTrainingData($date_start,$date_stop);
-        $date = $date->map(function ($item) use($dateHireCandidate) {
-            $dateHireCandidateDepartment = $dateHireCandidate->where('departmentInfoId',$item->dep_id);
-
-            if(!$dateHireCandidateDepartment->isEmpty()){
-                $item->countHireUserFromFirstTrainingGroup = $dateHireCandidateDepartment->count();
-            }
-            $item->procScore = $item->sum_choise_stageOne != 0 ? round(($item->countHireUserFromFirstTrainingGroup/$item->sum_choise_stageOne)*100,2) : 0;
-            return $item;
-        })->sortByDesc('procScore');
+        $date =  $this::mapTrainingGroupInfoAndHireCandidate($date,$dateHireCandidate);
         $data = [
-            'data' => $date,
+            'data' => $date->sortByDesc('procScore'),
             'start_date' => $date_start,
             'stop_date' => $date_stop
         ];
@@ -1668,19 +1621,10 @@ class StatisticsController extends Controller
         $date_stop  = $month_end->format('Y-m-d');
         $dateHireCandidate = RecruitmentStory::getReportTrainingDataAndHire($date_start,$date_stop);
         $date =  RecruitmentStory::getReportTrainingData($date_start,$date_stop);
-        $date = $date->map(function ($item) use($dateHireCandidate) {
-            $dateHireCandidateDepartment = $dateHireCandidate->where('departmentInfoId',$item->dep_id);
-
-            if(!$dateHireCandidateDepartment->isEmpty()){
-                $item->countHireUserFromFirstTrainingGroup = $dateHireCandidateDepartment->count();
-            }
-            $item->procScore = $item->sum_choise_stageOne != 0 ? round(($item->countHireUserFromFirstTrainingGroup/$item->sum_choise_stageOne)*100,2) : 0;
-
-            return $item;
-        })->sortByDesc('procScore');
+        $date =  $this::mapTrainingGroupInfoAndHireCandidate($date,$dateHireCandidate);
         return view('reportpage.recruitmentReport.MonthReportRecruitmentTrainingGroupFirstAndHire')
             ->with([
-                'data' => $date,
+                'data' => $date->sortByDesc('procScore'),
                 'start_date' => $date_start,
                 'stop_date' => $date_stop
             ]);
@@ -1694,18 +1638,10 @@ class StatisticsController extends Controller
         $date_stop = $request->date_stop;
         $dateHireCandidate = RecruitmentStory::getReportTrainingDataAndHire($date_start,$date_stop);
         $date =  RecruitmentStory::getReportTrainingData($date_start,$date_stop);
-        $date = $date->map(function ($item) use($dateHireCandidate) {
-            $dateHireCandidateDepartment = $dateHireCandidate->where('departmentInfoId',$item->dep_id);
-
-            if(!$dateHireCandidateDepartment->isEmpty()){
-                $item->countHireUserFromFirstTrainingGroup = $dateHireCandidateDepartment->count();
-            }
-            $item->procScore = $item->sum_choise_stageOne != 0 ? round(($item->countHireUserFromFirstTrainingGroup/$item->sum_choise_stageOne)*100,2) : 0;
-            return $item;
-        })->sortByDesc('procScore');
+        $date =  $this::mapTrainingGroupInfoAndHireCandidate($date,$dateHireCandidate);
         return view('reportpage.recruitmentReport.MonthReportRecruitmentTrainingGroupFirstAndHire')
             ->with([
-                'data' => $date,
+                'data' => $date->sortByDesc('procScore'),
                 'start_date' => $date_start,
                 'stop_date' => $date_stop
             ]);
@@ -1721,18 +1657,9 @@ class StatisticsController extends Controller
         $date_stop  = $month_end->format('Y-m-d');
         $dateHireCandidate = RecruitmentStory::getReportTrainingDataAndHire($date_start,$date_stop);
         $date =  RecruitmentStory::getReportTrainingData($date_start,$date_stop);
-        $date = $date->map(function ($item) use($dateHireCandidate) {
-            $dateHireCandidateDepartment = $dateHireCandidate->where('departmentInfoId',$item->dep_id);
-
-            if(!$dateHireCandidateDepartment->isEmpty()){
-                $item->countHireUserFromFirstTrainingGroup = $dateHireCandidateDepartment->count();
-            }
-            $item->procScore = $item->sum_choise_stageOne != 0 ? round(($item->countHireUserFromFirstTrainingGroup/$item->sum_choise_stageOne)*100,2) : 0;
-
-            return $item;
-        })->sortByDesc('procScore');
+        $date =  $this::mapTrainingGroupInfoAndHireCandidate($date,$dateHireCandidate);
         $data = [
-            'data' => $date,
+            'data' => $date->sortByDesc('procScore'),
             'start_date' => $date_start,
             'stop_date' => $date_stop
         ];
@@ -1747,10 +1674,12 @@ class StatisticsController extends Controller
     public function pageDayReportTrainingGroup(){
         $date_start = date('Y-m-d');
         $date_stop = date('Y-m-d');
-
+        $dataTrainingGroup = RecruitmentStory::getReportTrainingData($date_start,$date_stop);
+        $dateHireCandidate = RecruitmentStory::getReportTrainingDataAndHire($date_start,$date_stop);
+        $dataTrainingGroup = $this::mapTrainingGroupInfoAndHireCandidate($dataTrainingGroup,$dateHireCandidate);
         return view('reportpage.recruitmentReport.DayReportRecruitmentTrainingGroup')
             ->with([
-                'data' => RecruitmentStory::getReportTrainingData($date_start,$date_stop),
+                'data' => $dataTrainingGroup,
                 'start_date' => $date_start
             ]);
     }
@@ -1759,10 +1688,13 @@ class StatisticsController extends Controller
         $date = $request->date;
         $date_start = $date;
         $date_stop = $date;
+        $dataTrainingGroup = RecruitmentStory::getReportTrainingData($date_start,$date_stop);
+        $dateHireCandidate = RecruitmentStory::getReportTrainingDataAndHire($date_start,$date_stop);
+        $dataTrainingGroup = $this::mapTrainingGroupInfoAndHireCandidate($dataTrainingGroup,$dateHireCandidate);
 
         return view('reportpage.recruitmentReport.DayReportRecruitmentTrainingGroup')
             ->with([
-                'data' => RecruitmentStory::getReportTrainingData($date_start,$date_stop),
+                'data' => $dataTrainingGroup,
                 'start_date' => $date_start
             ]);
     }
@@ -1773,8 +1705,11 @@ class StatisticsController extends Controller
     public function MaildayReportTrainingGroup() {
         $date_start = date('Y-m-d', time() - 24 * 3600);
         $date_stop = date('Y-m-d', time() - 24 * 3600);
+        $dataTrainingGroup = RecruitmentStory::getReportTrainingData($date_start,$date_stop);
+        $dateHireCandidate = RecruitmentStory::getReportTrainingDataAndHire($date_start,$date_stop);
+        $dataTrainingGroup = $this::mapTrainingGroupInfoAndHireCandidate($dataTrainingGroup,$dateHireCandidate);
         $data = [
-            'data' => RecruitmentStory::getReportTrainingData($date_start,$date_stop),
+            'data' => $dataTrainingGroup,
             'start_date' => $date_start
         ];
         $title = 'Raport Dzienny Szkoleń '. $date_start;
@@ -1787,10 +1722,12 @@ class StatisticsController extends Controller
     public function pageWeekReportTrainingGroup(){
         $date_start = date("Y-m-d",strtotime('-7 Days'));
         $date_stop = date("Y-m-d",strtotime('-1 Day'));
-
+        $dataTrainingGroup = RecruitmentStory::getReportTrainingData($date_start,$date_stop);
+        $dateHireCandidate = RecruitmentStory::getReportTrainingDataAndHire($date_start,$date_stop);
+        $dataTrainingGroup = $this::mapTrainingGroupInfoAndHireCandidate($dataTrainingGroup,$dateHireCandidate);
         return view('reportpage.recruitmentReport.WeekReportRecruitmentTrainingGroup')
             ->with([
-                'data' => RecruitmentStory::getReportTrainingData($date_start,$date_stop),
+                'data' => $dataTrainingGroup,
                 'date_start' => $date_start,
                 'date_stop' => $date_stop
             ]);
@@ -1799,10 +1736,12 @@ class StatisticsController extends Controller
     public function pageWeekReportTrainingGroupPost(Request $request) {
         $date_start = $request->date_start;
         $date_stop = $request->date_stop;
-
+        $dataTrainingGroup = RecruitmentStory::getReportTrainingData($date_start,$date_stop);
+        $dateHireCandidate = RecruitmentStory::getReportTrainingDataAndHire($date_start,$date_stop);
+        $dataTrainingGroup = $this::mapTrainingGroupInfoAndHireCandidate($dataTrainingGroup,$dateHireCandidate);
         return view('reportpage.recruitmentReport.WeekReportRecruitmentTrainingGroup')
             ->with([
-                'data' => RecruitmentStory::getReportTrainingData($date_start,$date_stop),
+                'data' => $dataTrainingGroup,
                 'date_start' => $date_start,
                 'date_stop' => $date_stop
             ]);
@@ -1814,8 +1753,11 @@ class StatisticsController extends Controller
     public function MailweekReportTrainingGroup() {
         $date_start = date("Y-m-d",strtotime('-7 Days'));
         $date_stop = date("Y-m-d",strtotime('-1 Day'));
+        $dataTrainingGroup = RecruitmentStory::getReportTrainingData($date_start,$date_stop);
+        $dateHireCandidate = RecruitmentStory::getReportTrainingDataAndHire($date_start,$date_stop);
+        $dataTrainingGroup = $this::mapTrainingGroupInfoAndHireCandidate($dataTrainingGroup,$dateHireCandidate);
         $data = [
-            'data' => RecruitmentStory::getReportTrainingData($date_start,$date_stop),
+            'data' => $dataTrainingGroup,
             'date_start' => $date_start,
             'date_stop' => $date_stop
         ];
@@ -1831,22 +1773,39 @@ class StatisticsController extends Controller
         $month_end = new DateTime("last day of this month");
         $date_start =  $month_ini->format('Y-m-d');
         $date_stop  = $month_end->format('Y-m-d');
-
+        $data = RecruitmentStory::getReportTrainingData($date_start,$date_stop);
+        $dateHireCandidate = RecruitmentStory::getReportTrainingDataAndHire($date_start,$date_stop);
+        $data = $this::mapTrainingGroupInfoAndHireCandidate($data,$dateHireCandidate);
         return view('reportpage.recruitmentReport.MonthReportRecruitmentTrainingGroup')
             ->with([
-                'data' => RecruitmentStory::getReportTrainingData($date_start,$date_stop),
+                'data' => $data,
                 'date_start' => $date_start,
                 'date_stop' => $date_stop
             ]);
     }
 
+    public function mapTrainingGroupInfoAndHireCandidate($trainingGroupCollect,$dateHireCandidate){
+       return $trainingGroupCollect->map(function ($item) use ($dateHireCandidate){
+            $dateHireCandidateDepartment = $dateHireCandidate->where('departmentInfoId',$item->dep_id);
+
+            if(!$dateHireCandidateDepartment->isEmpty()){
+                $item->countHireUserFromFirstTrainingGroup = $dateHireCandidateDepartment->count();
+            }
+            $item->procScore = $item->sum_choise_stageOne != 0 ? round(($item->countHireUserFromFirstTrainingGroup/$item->sum_choise_stageOne)*100,2) : 0;
+            return $item;
+        });
+    }
+
     public function pageMonthReportTrainingGroupPost(Request $request) {
         $date_start = $request->date_start;
         $date_stop = $request->date_stop;
+        $data = RecruitmentStory::getReportTrainingData($date_start,$date_stop);
+        $dateHireCandidate = RecruitmentStory::getReportTrainingDataAndHire($date_start,$date_stop);
+        $data = $this::mapTrainingGroupInfoAndHireCandidate($data,$dateHireCandidate);
 
         return view('reportpage.recruitmentReport.MonthReportRecruitmentTrainingGroup')
             ->with([
-                'data' => RecruitmentStory::getReportTrainingData($date_start,$date_stop),
+                'data' => $data,
                 'date_start' => $date_start,
                 'date_stop' => $date_stop
             ]);
@@ -1860,8 +1819,11 @@ class StatisticsController extends Controller
         $month_end = new DateTime("last day of last month");
         $date_start =  $month_ini->format('Y-m-d');
         $date_stop  = $month_end->format('Y-m-d');
+        $dataTrainingGroup = RecruitmentStory::getReportTrainingData($date_start,$date_stop);
+        $dateHireCandidate = RecruitmentStory::getReportTrainingDataAndHire($date_start,$date_stop);
+        $dataTrainingGroup = $this::mapTrainingGroupInfoAndHireCandidate($dataTrainingGroup,$dateHireCandidate);
         $data = [
-            'data' => RecruitmentStory::getReportTrainingData($date_start,$date_stop),
+            'data' => $dataTrainingGroup,
             'date_start' => $date_start,
             'date_stop' => $date_stop
         ];
@@ -4599,6 +4561,9 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
             }
         }
 
+        if(Auth::user()->id == 6964){
+            dd($data);
+        }
         return view('reportpage.weekReportDepartmentSummary')
             ->with([
                 'departments'   => $departments,
@@ -4720,6 +4685,7 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
             $item->count_bad_check = (is_object($day_janky)) ? $day_janky->count_bad_check : 0 ;
             return $item;
         });
+
         return [
             'data_start' => $data_start,
             'data_stop' => $data_stop,

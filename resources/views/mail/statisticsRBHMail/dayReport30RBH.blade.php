@@ -45,8 +45,8 @@
             @endforeach
             <tr>
                 <td style="background-color: #c67979;border:1px solid #231f20;text-align:center;padding:3px" colspan="2">Suma</td>
-                <td style="background-color: #c67979;border:1px solid #231f20;text-align:center;padding:3px">{{$item->sum('secondStop') != 0 ? round($item->sum('success')/($item->sum('secondStop')/3600),2): 0}}</td>
-                <td style="background-color: #c67979;border:1px solid #231f20;text-align:center;padding:3px">{{$item->sum('bad_talks') != 0 ? round($item->sum('all_checked_talks')/$item->sum('bad_talks'),2): 0}} %</td>
+                <td style="background-color: #c67979;border:1px solid #231f20;text-align:center;padding:3px">{{$sumSecond30RBH != 0 ? round($item->sum('success')/($sumSecond30RBH/3600),2): 0}}</td>
+                <td style="background-color: #c67979;border:1px solid #231f20;text-align:center;padding:3px">{{$item->sum('all_checked_talks') != 0 ? round($item->sum('bad_talks')/($item->sum('all_checked_talks'))*100,2): 0}} %</td>
                 <td style="background-color: #c67979;border:1px solid #231f20;text-align:center;padding:3px">{{$item->sum('received_calls')}}</td>
                 <td style="background-color: #c67979;border:1px solid #231f20;text-align:center;padding:3px">{{$item->sum('success')}}</td>
                 <td style="background-color: #c67979;border:1px solid #231f20;text-align:center;padding:3px">{{$item->sum('received_calls') != 0 ? round($item->sum('success')/($item->sum('received_calls')) * 100,2): 0}} %</td>

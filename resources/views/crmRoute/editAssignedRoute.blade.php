@@ -706,28 +706,28 @@
                 const givenDayContainer = dayContainer.closest('.singleDayContainer');
                 const date = givenDayContainer.querySelector('.day-info').textContent;
 
-                if(globalSwalFlag) {
+                // if(globalSwalFlag) {
                     getVoivodeshipRoundWithDistanceLimitAjax().done(function () {
                         removeShowDeferred.resolve();
                     });
-                }
-                else {
-                    swal({
-                        title: 'Ładowawnie...',
-                        text: 'To może chwilę zająć',
-                        showConfirmButton: false,
-                        allowOutsideClick: false,
-                        allowEscapeKey: false,
-                        allowEnterKey: false,
-                        onOpen: () => {
-                            swal.showLoading();
-                            getVoivodeshipRoundWithDistanceLimitAjax().done((response) => {
-                                swal.close();
-                                removeShowDeferred.resolve();
-                            });
-                        }
-                    });
-                }
+                // }
+                // else {
+                //     swal({
+                //         title: 'Ładowawnie...',
+                //         text: 'To może chwilę zająć',
+                //         showConfirmButton: false,
+                //         allowOutsideClick: false,
+                //         allowEscapeKey: false,
+                //         allowEnterKey: false,
+                //         onOpen: () => {
+                //             swal.showLoading();
+                //             getVoivodeshipRoundWithDistanceLimitAjax().done((response) => {
+                //                 swal.close();
+                //                 removeShowDeferred.resolve();
+                //             });
+                //         }
+                //     });
+                // }
                 function getVoivodeshipRoundWithDistanceLimitAjax() {
                     return $.ajax({
                         type: "POST",
@@ -823,30 +823,30 @@
                 console.assert(!isNaN(parseInt(limit)), 'limit in showInExtreme is not number!');
                 console.assert((!isNaN(parseInt(nextCityId))) && (nextCityId != 0), 'nextCityId in showInExtreme is not number!');
 
-                if(globalSwalFlag) {
+                // if(globalSwalFlag) {
                     getVoivodeshipRoundWithDistanceLimitAjax().done(function () {
                         newShowDeferred.resolve();
                         removeShowDeferred.resolve();
                     });
-                }
-                else {
-                    swal({
-                        title: 'Ładowawnie...',
-                        text: 'To może chwilę zająć',
-                        showConfirmButton: false,
-                        allowOutsideClick: false,
-                        allowEscapeKey: false,
-                        allowEnterKey: false,
-                        onOpen: () => {
-                            swal.showLoading();
-                            getVoivodeshipRoundWithDistanceLimitAjax().done((response) => {
-                                swal.close();
-                                newShowDeferred.resolve();
-                                removeShowDeferred.resolve();
-                            });
-                        }
-                    });
-                }
+                // }
+                // else {
+                //     swal({
+                //         title: 'Ładowawnie...',
+                //         text: 'To może chwilę zająć',
+                //         showConfirmButton: false,
+                //         allowOutsideClick: false,
+                //         allowEscapeKey: false,
+                //         allowEnterKey: false,
+                //         onOpen: () => {
+                //             swal.showLoading();
+                //             getVoivodeshipRoundWithDistanceLimitAjax().done((response) => {
+                //                 swal.close();
+                //                 newShowDeferred.resolve();
+                //                 removeShowDeferred.resolve();
+                //             });
+                //         }
+                //     });
+                // }
                 function getVoivodeshipRoundWithDistanceLimitAjax() {
                     return $.ajax({
                         type: "POST",
@@ -909,28 +909,29 @@
                 console.assert(!isNaN(parseInt(voivodeId)) && voivodeId != 0, 'voivodeId in showWithoutDistanceAjax is not number!');
                 console.assert(citySelect.matches('.citySelect'), 'citySelect in showWithoutDistanceAjax method is not city select');
 
-                if(globalSwalFlag) {
+                // if (globalSwalFlag) {
                     getCitiesNamesAjax().done(function () {
                         newShowDeferred.resolve();
                     });
-                }
-                else {
-                    swal({
-                        title: 'Ładowawnie...',
-                        text: 'To może chwilę zająć',
-                        showConfirmButton: false,
-                        allowOutsideClick: false,
-                        allowEscapeKey: false,
-                        allowEnterKey: false,
-                        onOpen: () => {
-                            swal.showLoading();
-                            getCitiesNamesAjax().done((response) => {
-                                swal.close();
-                                newShowDeferred.resolve();
-                            });
-                        }
-                    });
-                }
+                // }
+                // else {
+                //     swal({
+                //         title: 'Ładowawnie...',
+                //         text: 'To może chwilę zająć',
+                //         showConfirmButton: false,
+                //         allowOutsideClick: false,
+                //         allowEscapeKey: false,
+                //         allowEnterKey: false,
+                //         onOpen: () => {
+                //             swal.showLoading();
+                //             getCitiesNamesAjax().done((response) => {
+                //                 swal.close();
+                //                 newShowDeferred.resolve();
+                //             });
+                //         }
+                //     });
+                // }
+
 
                 function getCitiesNamesAjax() {
                     return $.ajax({

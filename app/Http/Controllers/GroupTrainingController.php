@@ -26,7 +26,7 @@ class GroupTrainingController extends Controller
      */
     public function add_group_training()
     {
-        $cadre = User::whereIN('user_type_id',[4,5,12])
+        $cadre = User::whereIN('user_type_id',[4,5,12,19])
             ->where('department_info_id',Auth::user()->department_info_id)
             ->where('status_work','=',1)
             ->get();

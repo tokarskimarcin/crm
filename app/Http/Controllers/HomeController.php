@@ -145,6 +145,7 @@ class HomeController extends Controller
         if($request->ajax()) {
             $notifications = Notifications::with('user')
             ->with('notification_type')
+                ->where('user_id','<>',Auth::user()->id)
                 ->where('status', 1)->orderBy('notification_type_id', 'asc')->get();
 
             return $notifications;
@@ -158,9 +159,22 @@ class HomeController extends Controller
         }
     }
 
+    public function cadreSupportUnratedNotifications(Request $request) {
+        if($request->ajax()) {
+            $unratedNotifications = Notifications::select('status','jr.id')
+                ->leftJoin('judge_results as jr','jr.notification_id','=','notifications.id')
+                ->where('notifications.user_id','=',Auth::user()->id)
+                ->where('status','=',3)
+                ->whereNull('jr.id')
+                ->count();
+            return $unratedNotifications;
+        }
+    }
+
     public function itCountNotifications(Request $request) {
         if($request->ajax()) {
-            $notifications_count = Notifications::where('status', 1)->count();
+            $notifications_count = Notifications::where('status', 1)
+                ->where('user_id','<>',Auth::user()->id)->count();
 
             return $notifications_count;
         }
@@ -169,37 +183,43 @@ class HomeController extends Controller
     public function cadreSupport(Request $request) {
         if($request->ajax()) {
             $notifications = Notifications::where(function ($query){
-                $query->where('user_id',Auth::user()->id)->orWhere('displayed_by',Auth::user()->id);})
+                $query->where('user_id',Auth::user()->id)
+                ->where(function ($querySecond){
+                    $querySecond->where('status_change_displayed','<>',1)->orWhere('comment_added_by_realizator_displayed','<>',1);
+                });
+            })->orWhere(function ($query){
+                $query->where('displayed_by',Auth::user()->id)->where('comment_added_by_reporter_displayed','<>',1);})
                 ->select('notifications.*')
                 ->rightJoin('notifications_changes_displayed_flags as ncdf','ncdf.notification_id','=','notifications.id')
-                ->where(function ($query){
-                    $query->where('status_change_displayed','<>',1)
-                        ->orWhere('comment_added_by_realizator_displayed','<>',1)
-                        ->orWhere('comment_added_by_reporter_displayed','<>',1);})
-                ->with('notifications_changes_displayed_flags')
                 ->with('notifications_changes_displayed_flags')
                 ->with('comments')
                 ->with('user')
                 ->get();
+
+            /*->where(function ($query){
+                $query->where('status_change_displayed','<>',1)
+                    ->orWhere('comment_added_by_realizator_displayed','<>',1)
+                    ->orWhere('comment_added_by_reporter_displayed','<>',1);})*/
             return $notifications;
         }
     }
     public function cadreCountNotifications(Request $request) {
         if($request->ajax()) {
             $notifications = Notifications::where(function ($query){
-                $query->where('user_id',Auth::user()->id)->orWhere('displayed_by',Auth::user()->id);})
+                $query->where('user_id',Auth::user()->id)
+                    ->where(function ($querySecond){
+                        $querySecond->where('status_change_displayed','<>',1)->orWhere('comment_added_by_realizator_displayed','<>',1);
+                    });
+            })->orWhere(function ($query){
+                $query->where('displayed_by',Auth::user()->id)->where('comment_added_by_reporter_displayed','<>',1);})
                 ->select('notifications.*')
                 ->rightJoin('notifications_changes_displayed_flags as ncdf','ncdf.notification_id','=','notifications.id')
-                ->where(function ($query){
-                    $query->where('status_change_displayed','<>',1)
-                        ->orWhere('comment_added_by_realizator_displayed','<>',1)
-                        ->orWhere('comment_added_by_reporter_displayed','<>',1);})
                 ->with('notifications_changes_displayed_flags')
                 ->get();
             $counter = 0;
             foreach($notifications as $notification){
                 if($notification->user_id == Auth::user()->id){
-                    if($notification->notifications_changes_displayed_flags->comment_added_by_reporter_displayed == 0){
+                    if($notification->notifications_changes_displayed_flags->comment_added_by_realizator_displayed == 0){
                         $counter++;
                     }
                     if($notification->notifications_changes_displayed_flags->status_change_displayed == 0){
@@ -207,7 +227,7 @@ class HomeController extends Controller
                     }
                 }
                 if($notification->displayed_by == Auth::user()->id ){
-                    if($notification->notifications_changes_displayed_flags->comment_added_by_realizator_displayed == 0){
+                    if($notification->notifications_changes_displayed_flags->comment_added_by_reporter_displayed == 0){
                         $counter++;
                     }
                 }
