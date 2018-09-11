@@ -266,6 +266,7 @@ Route::post('/allCitiesInGivenVoivodeAjax', 'CrmRouteController@allCitiesInGiven
 Route::post('/deleteRouteTemplate', 'CrmRouteController@deleteRouteTemplate')->name('api.deleteRouteTemplate');
 Route::post('/removeCampaignComment','CrmRouteController@removeCampaignCommentAjax')->name('api.removeCampaignComment');
 Route::delete('editAssignedRoute/{id}', 'CrmRouteController@deleteGivenRouteAjax')->name('api.deleteGivenRouteAjax');
+Route::put('editAssignedRoute/{id}', 'CrmRouteController@cancelRoute')->name('api.cancelRoute');
 Route::post('/engraverForConfirmingAjax', 'CrmRouteController@engraverForConfirmingDatatable')->name('api.engraverForConfirmingDatatable');
 Route::post('/engraverForConfirmingUpdate', 'CrmRouteController@engraverForConfirmingUpdate')->name('api.engraverForConfirmingUpdate');
 
@@ -414,6 +415,8 @@ Route::get('/weekReportDepartmentsRanking', 'StatisticsController@WeekReportDepa
 Route::get('/dayReportDepartments', 'StatisticsController@MailDayDepartmentsReport');
 Route::get('/dayReportCoaches', 'StatisticsController@MailDayReportCoaches');
 Route::get('/hourReportCoaches', 'StatisticsController@MailHourReportCoaches');
+
+Route::get('/monthReportUnpaidInvoices', 'StatisticsController@monthReportUnpaidInvoicesGet');
 
 //Emaile dotyczące raportów kampani
 Route::get('/mailDayReportCampaign', 'StatisticsController@mailDayReportCampaign');
@@ -964,6 +967,8 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
     Route::get('/hotelConfirmationGet', 'CrmRouteController@hotelConfirmationGet');
 
     Route::get('/engraverForConfirming', 'CrmRouteController@engraverForConfirmingGet');
+
+
     /** KONIEC CRM **/
 
 });
@@ -1040,3 +1045,8 @@ Route::post('/changeLimits', 'CrmRouteController@changeLimitsAjax')->name('api.c
 Route::get('/getAllTask', 'MyUserTestController@getAllTask');
 
 Route::get('/Admin/Departments', 'AdminPanel\DepartmentsController@index');
+
+Route::post('/hotelConfirmationHotelInfoAjax', 'CrmRouteController@hotelConfirmationHotelInfoAjax')->name('api.hotelConfirmationHotelInfoAjax');
+Route::post('/checkForTheSameRoute', 'CrmRouteController@checkForTheSameRoute')->name('api.checkForTheSameRoute');
+
+Route::get('/mailMonthReportUnpaidInvoices', 'StatisticsController@mailMonthReportUnpaidInvoices');
