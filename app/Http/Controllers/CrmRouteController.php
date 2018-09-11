@@ -282,6 +282,7 @@ class CrmRouteController extends Controller
                     $clientRouteInfo->city_id = $show->city;
                     $clientRouteInfo->voivode_id = $show->voivode;
                     $clientRouteInfo->date = $show->date;
+                    $clientRouteInfo->confirmDate = Date('Y-m-d', strtotime($show->date . ' -1 days'));
                     $clientRouteInfo->status = 1;
                     $clientRouteInfo->show_order = $show->order;
                     $clientRouteInfo->verification = 0; // 0 - not set, 1 - set
@@ -4356,19 +4357,19 @@ class CrmRouteController extends Controller
                 }
 
                 if($item->czw != '') {
-                    array_push($dataArr, Date('Y-m-d', strtotime($firstDayOfGivenWeek . '+ 4 days')));
+                    array_push($dataArr, Date('Y-m-d', strtotime($firstDayOfGivenWeek . '+ 3 days')));
                 }
 
                 if($item->pt != '') {
-                    array_push($dataArr, Date('Y-m-d', strtotime($firstDayOfGivenWeek . '+ 5 days')));
+                    array_push($dataArr, Date('Y-m-d', strtotime($firstDayOfGivenWeek . '+ 4 days')));
                 }
 
                 if($item->sob != '') {
-                    array_push($dataArr, Date('Y-m-d', strtotime($firstDayOfGivenWeek . '+ 6 days')));
+                    array_push($dataArr, Date('Y-m-d', strtotime($firstDayOfGivenWeek . '+ 5 days')));
                 }
 
                 if($item->nd != '') {
-                    array_push($dataArr, Date('Y-m-d', strtotime($firstDayOfGivenWeek . '+ 7 days')));
+                    array_push($dataArr, Date('Y-m-d', strtotime($firstDayOfGivenWeek . '+ 6 days')));
                 }
             }
             $user->date = $dataArr;
