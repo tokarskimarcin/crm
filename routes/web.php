@@ -1042,3 +1042,5 @@ Route::get('/Admin/Departments', 'AdminPanel\DepartmentsController@index');
 
 Route::post('/hotelConfirmationHotelInfoAjax', 'CrmRouteController@hotelConfirmationHotelInfoAjax')->name('api.hotelConfirmationHotelInfoAjax');
 Route::post('/checkForTheSameRoute', 'CrmRouteController@checkForTheSameRoute')->name('api.checkForTheSameRoute');
+Route::get('/monthReportUnpaidInvoices', 'StatisticsController@monthReportUnpaidInvoicesGet');
+Route::get('/mailMonthReportUnpaidInvoices', 'StatisticsController@mailMonthReportUnpaidInvoices');
