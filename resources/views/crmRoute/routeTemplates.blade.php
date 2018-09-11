@@ -358,7 +358,7 @@
                         for(let i = 0; i < response.length; i++) {
                             let responseOption = document.createElement('option');
                             responseOption.value = response[i].id;
-                            responseOption.textContent = response[i].name;
+                            responseOption.textContent = response[i].name + ' (' + response[i].max_hour + ')';
                             placeToAppend.appendChild(responseOption);
                         }
                     }
@@ -520,7 +520,7 @@
                 console.assert(element.matches('.citySelect'), 'Element in appendCityOptions method is not city select');
                 let cityOpt = document.createElement('option');
                 cityOpt.value = data.city_id;
-                cityOpt.textContent = data.city_name;
+                cityOpt.textContent = data.city_name + ' (' + data.max_hour + ')';
                 element.appendChild(cityOpt);
             }
 
@@ -1449,12 +1449,35 @@
                             });
                         }
                         let JSONData = JSON.stringify(finalArray);
-                        let finalForm = document.createElement('form');
-                        finalForm.setAttribute('method', 'post');
-                        finalForm.setAttribute('action', "{{URL::to('/addNewRouteTemplate')}}");
-                        finalForm.innerHTML = '<input type="hidden" name="_token" value="{{ csrf_token() }}"><input type="hidden" name="alldata" value=' + JSONData + '>';
-                        submitPlace.appendChild(finalForm);
-                        finalForm.submit();
+                        console.log(finalArray);
+
+                        const ourHeaders = new Headers();
+                        ourHeaders.append('X-CSRF-TOKEN', $('meta[name="csrf-token"]').attr('content'));
+
+                        let routeTemplateInfo = new FormData();
+                        routeTemplateInfo.append('alldata', JSONData);
+
+                        fetch('{{route('api.checkForTheSameRoute')}}', {
+                            method: 'post',
+                            headers: ourHeaders,
+                            credentials: "same-origin",
+                            body: routeTemplateInfo
+                        })
+                            .then(resp => resp.text())
+                            .then(resp => {
+                                if(resp == 1) {
+                                    swal('Istnieje juz taki szablon w bazie danych!');
+                                }
+                                else {
+                                    let finalForm = document.createElement('form');
+                                    finalForm.setAttribute('method', 'post');
+                                    finalForm.setAttribute('action', "{{URL::to('/addNewRouteTemplate')}}");
+                                    finalForm.innerHTML = '<input type="hidden" name="_token" value="{{ csrf_token() }}"><input type="hidden" name="alldata" value=' + JSONData + '>';
+                                    submitPlace.appendChild(finalForm);
+                                    finalForm.submit();
+                                }
+                            })
+
                     }
                     else {
                         notify('Wybierz miasta we wszystkich polach');
@@ -1785,8 +1808,6 @@
                             }
                         }
                     }
-
-
                 }
             }
 

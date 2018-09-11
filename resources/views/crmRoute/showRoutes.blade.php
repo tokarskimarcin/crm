@@ -48,6 +48,7 @@
                                    cellspacing="0" width="100%">
                                 <thead>
                                 <tr>
+                                    <th>ID</th>
                                     <th>Nazwa</th>
                                     <th>Akcja</th>
                                 </tr>
@@ -88,6 +89,11 @@
                 "language": {
                     "url": "//cdn.datatables.net/plug-ins/1.10.16/i18n/Polish.json"
                 }, "columns": [
+                    {
+                        "data": function (data, type, dataToSet) {
+                            return data.id;
+                        }, "name": "id", "orderable": true
+                    },
                     {
                         "data": function (data, type, dataToSet) {
                             return data.name;
