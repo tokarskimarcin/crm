@@ -4128,7 +4128,8 @@ class CrmRouteController extends Controller
             client.name as clientName,
             client_gift_type.name as clientGiftName,
             client_meeting_type.name clientMeetingName,
-            hotels.id as hotelID       
+            hotels.id as hotelID,
+            client_route_info.comment_for_report       
         '))
             ->join('client_route','client_route.id','client_route_info.client_route_id')
             ->join('client','client.id','client_route.client_id')
@@ -4142,6 +4143,7 @@ class CrmRouteController extends Controller
             ->where('client_route_info.weekOfYear','like',$selectedWeek)
             ->where('client_route_info.status', '=', 1)
             ->where(DB::raw('YEAR(client_route_info.date)'),'like',$year)
+            ->orderBy('clientRouteID') //routes are close to each other in report
             ->orderBy('date')
             ->orderBy('cityName')
             ->orderBy('hour')

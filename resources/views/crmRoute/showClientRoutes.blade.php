@@ -80,6 +80,7 @@
                 <th>Kontakt</th>
                 <th>Cena</th>
                 <th>Typ płatności</th>
+                <th>Uwaga</th>
             </tr>
         </thead>
         <tbody>
@@ -492,6 +493,7 @@
                                         '</td><td>' + returnblank(value.hotelContact) +
                                         '</td><td>' + returnblank(value.toPay) +
                                         '</td><td>' + returnblank(value.paymentMethod)+
+                                        '</td><td>' + returnblank(value.comment_for_report)+
                                     '</td></tr>';
                             });
                             $('#tabelka tbody').empty();
