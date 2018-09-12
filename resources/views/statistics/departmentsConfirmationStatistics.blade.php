@@ -16,30 +16,13 @@
 
 @extends('layouts.main')
 @section('style')
+    <link rel="stylesheet" href="{{asset('/vendor/datatables/css/jquery.dataTables.css')}}">
     <link rel="stylesheet" href="{{asset('/assets/css/VCtooltip.css')}}">
     <style>
         .DTFC_LeftHeadWrapper thead tr, .DTFC_LeftBodyWrapper thead tr{
             background: white;
 
         }
-
-        /*.DTFC_LeftBodyLiner{
-            overflow: visible !important;
-        }*/
-        /*.DTFC_LeftBodyWrapper{
-            top: -1px !important;
-        }
-
-        .dataTables_scrollBody{
-            left: 1px;
-        }*/
-        /*#departmentsConfirmationDatatable thead{
-            display: none;
-        }*//*
-
-        .DTFC_LeftBodyLiner tbody{
-            height: 100% !importanwt;
-        }*/
 
         .green{
             background: #d9ead3 !important;
@@ -75,7 +58,7 @@
         <div class="panel-heading">
             Panel ze statystykami dla poszczególnych oddziałów w wybranym miesiącu
         </div>
-        <div class="panel-body">
+        <div class="panel-body">{{asset('/vendor/datatables/css/jquery.dataTables.css')}}
             <div class="row">
                 <div class="col-md-4">
                     <div class="checkbox">
@@ -214,8 +197,6 @@
                                 FUNCTIONS.setColumnClass([8,11],'red', VARIABLES.DATA_TABLES.departmentsConfirmation.table);
                                 FUNCTIONS.insertGroupRows(groupColumns[0], this, 19, {background:'#444444', color:'white', 'font-weight':'bold'});
                                 FUNCTIONS.insertGroupRows(groupColumns[1], this, 19, {background:'#ffe599', 'font-weight':'bold'});
-
-                                FUNCTIONS.EVENT_HANDLERS.scrollBodyHandler();
                             }
                         }),
                         getData: function () {
@@ -251,13 +232,6 @@
             let FUNCTIONS = {
                 /* functions groups should be before other functions which aren't grouped*/
                 EVENT_HANDLERS: {
-                    scrollBodyHandler: function(){
-                        $('.dataTables_scrollBody').scroll(function (e) {
-                            if($(e.target).scrollTop() < $('#departmentsConfirmationDatatable').find('thead').height()){
-                                $(e.target).scrollTop($('#departmentsConfirmationDatatable').find('thead').height());
-                            }
-                        });
-                    }
                 },
                 AJAXs:{
                     departmentsConfirmationStatisticsAjax: function(dataToSend) {
@@ -284,12 +258,14 @@
                         });
                     }
                 },
+                @php
                 /*function inserts rows in datatable
                 * @integer column - column number after which the data should be grouped
                 * @DataTable dataTable - datatable in which rows should be inserted
                 * @integer colspan - number of how many columns should be span
                 * @object cssOptionsTr - param for jQuery .css() method
                 * */
+                @endphp
                 insertGroupRows: function(column, dataTable, colspan, cssOptionsTr = null){
                     let api = dataTable.api();
                     let rows = api.rows({page: 'current'}).nodes();
@@ -305,9 +281,11 @@
                         }
                     });
                 },
+                @php
                 /*universal function for datatables that reload data in given datatable
                 * @DataTable dataTable
                 * */
+                @endphp
                 ajaxReload: function(dataTable){
                     let processing = $('#'+dataTable.table.attr('id')+'_processing');
                     processing.show();
@@ -316,10 +294,12 @@
                         processing.hide();
                     });
                 },
+                @php
                 /*universal function for datatables that sets given data in given datatable
                 * @array data - data for insert
                 * @DataTable dataTable
                 * */
+                @endphp
                 setTableData: function(data, dataTable){
                     dataTable.clear();
                     if($.isArray(data)) {
@@ -329,11 +309,13 @@
                         dataTable.draw();
                     }
                 },
+                @php
                 /*universal function for tables that adds class name to column
                 * @integer, @array column - column(s) number(s)
                 * @string className - data for insert
                 * @jQuery table
                 * */
+                @endphp
                 setColumnClass: function (column, className, table) {
                     table.find('tbody').children().each(function (index, tr) {
                         $(tr).children().each(function (index, td) {
