@@ -1160,7 +1160,12 @@
                             if(cell.textContent == '0') {
                                 cell.style.background = "#b9f4b7";
                             }
-                        })
+                        });
+                        $('.dataTables_scrollBody').scroll(function (e) {
+                            if($(e.tdepartmentsConfirmationDatatablearget).scrollTop() < $('#datatable').find('thead').height()){
+                                $(e.target).scrollTop($('#datatable').find('thead').height());
+                            }
+                        });
                     }, order: [[2,'asc']]
                     ,"columns": [
                         {"data": "numberOfWeek", orderable: false},

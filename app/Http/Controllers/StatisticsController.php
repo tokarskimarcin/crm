@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\CandidateSource;
+use App\ClientRoute;
+use App\ClientRouteCampaigns;
 use App\CoachChange;
 use App\CoachHistory;
 use App\Departments;
@@ -4871,7 +4873,7 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
     */
 
     private function sendMailByVerona($mail_type, $data, $mail_title, $default_users = null,$depTypeId = [1,2]) {
-
+//            dd($data);
         if ($default_users !== null) {
             $email = [];
             $mail_type_pom = $mail_type;
@@ -4891,6 +4893,7 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
             $mail_type = $mail_without_folder[count($mail_without_folder)-1];
             $mail_type2 = ucfirst($mail_type);
             $mail_type2 = 'page' . $mail_type2;
+//            dd($mail_type2);
             $accepted_users = DB::table('users')
                 ->select(DB::raw('
             users.first_name,
@@ -4948,6 +4951,7 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
 
         $mail_type = $mail_type_pom;
       /* UWAGA !!! ODKOMENTOWANIE TEGO POWINNO ZACZĄC WYSYŁAĆ MAILE*/
+//      dd($mail_type);
        Mail::send('mail.' . $mail_type, $data, function($message) use ($accepted_users, $mail_title)
        {
            $message->from('noreply.verona@gmail.com', 'Verona Consulting');
@@ -5574,5 +5578,53 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
 
         //dd($departmentsAveragesForEveryDay);
         return $departmentsAveragesForEveryDay;
+    }
+
+    public function monthReportUnpaidInvoicesGet()
+    {
+
+        $info = ClientRouteCampaigns::select(
+            'penalty',
+            'invoice_send_date',
+            'client.invoice_name',
+            'payment_phone',
+            'payment_mail',
+            'hotels.name'
+        )
+            ->join('client_route_info', 'client_route_campaigns.client_route_info_id', '=', 'client_route_info.id')
+            ->join('client_route', 'client_route_info.client_route_id', '=', 'client_route.id')
+            ->join('client', 'client_route.client_id', '=', 'client.id')
+            ->join('hotels', 'client_route_info.hotel_id', '=', 'hotels.id')
+            ->OnlyUnpaidInvoices()
+            ->get();
+        $data = [
+            'info' => $info
+        ];
+
+        return view('reportpage.MonthReportUnpaidInvoices')->with('info', $data['info']);
+    }
+
+    public function mailMonthReportUnpaidInvoices() {
+        $info = ClientRouteCampaigns::select(
+            'penalty',
+            'invoice_send_date',
+            'client.invoice_name',
+            'payment_phone',
+            'payment_mail',
+            'hotels.name'
+        )
+            ->join('client_route_info', 'client_route_campaigns.client_route_info_id', '=', 'client_route_info.id')
+            ->join('client_route', 'client_route_info.client_route_id', '=', 'client_route.id')
+            ->join('client', 'client_route.client_id', '=', 'client.id')
+            ->join('hotels', 'client_route_info.hotel_id', '=', 'hotels.id')
+            ->OnlyUnpaidInvoices()
+            ->get();
+
+        $data = [
+            'info' => $info
+        ];
+
+        $title = 'Raport miesięczny niezapłaconych faktur';
+        $this->sendMailByVerona('monthReportUnpaidInvoices', $data, $title,null,[2]);
     }
 }

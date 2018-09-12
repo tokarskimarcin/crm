@@ -14,4 +14,8 @@ class ClientRouteCampaigns extends Model
             ->where('client_route_info.status', '=', 1)
             ->whereIn('client_route_info.client_route_id', $clientRouteIdsArr);
     }
+
+    public function scopeOnlyUnpaidInvoices($query) {
+        $query->where('client_route_campaigns.invoice_status_id', '=', 3);
+    }
 }
