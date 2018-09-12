@@ -53,7 +53,8 @@
                     Moduł <strong>Grafik dla potwierdzeń</strong> wyświetla informacje o pokazo-godzinach. <br>
                     W kolumnie <i>"Potwierdzająca osoba"</i> dostępne są osoby, które wg. grafiku są dostępne dla danej daty potwierdzenia dla danego oddziału. <br>
                     Gdy wiersz jest podświetlony na <span style="background-color: indianred;">czerwono</span>, oznacza to, że osoba potwierdzająca w dniu potwierdzania nie nacisneła przycisku start do godziny 9:00 lub wogóle go nie nacisneła. <br>
-                    Dla otrzymania lepszego wyglądu tabeli zaleca się <i>wyłącznie</i> panelu nawigacyjnego naciskając przycisk <u>"OFF"</u> w górnym lewym rogu strony.
+                    Dla otrzymania lepszego wyglądu tabeli zaleca się <i>wyłącznie</i> panelu nawigacyjnego naciskając przycisk <u>"OFF"</u> w górnym lewym rogu strony. <br>
+                    Pokazy <u>anulowane</u> mają cały wiersz w kolorze <span style="background-color: #fdff78;">żółtym</span>.
                 </div>
                 <div class="row">
                     <div class="col-md-2">
@@ -376,6 +377,9 @@
                        }
 
                    });
+                   if(data.canceled == 1) {
+                       $(row).css("background-color", '#fdff78');
+                   }
                },
                "fnDrawCallback": function(settings) {
                    $('#datatable tbody tr').on('change', function(e) {

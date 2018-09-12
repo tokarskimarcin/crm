@@ -33,6 +33,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\URL;
+use League\Flysystem\FileNotFoundException;
 use function MongoDB\BSON\toJSON;
 use PhpParser\Node\Expr\Array_;
 use Session;
@@ -51,6 +52,43 @@ class CrmRouteController extends Controller
 
         return view('crmRoute.routeTemplates')
             ->with('voivodes', $voivodes);
+    }
+
+    //This method checks if there is the same route template in database.
+    public function checkForTheSameRoute(Request $request) {
+        $allData = json_decode($request->alldata);
+        $allData = array_reverse($allData);
+
+        $allCities = Cities::select('id','name')->get();
+        $reverseNameArr = [];
+        $dayFlag = $allData[0]->day;
+
+        foreach($allData as $record) {
+            $name = '';
+            $name .=  $allCities->where('id', '=', $record->city)->first()->name . ' + ';
+            if($record->day != $dayFlag) {
+                $name = substr($name, 0,strlen($name) - 3) . ' | ';
+            }
+            array_push($reverseNameArr, $name);
+        }
+
+        $fullName = '';
+        $nameArr = array_reverse($reverseNameArr);
+
+        foreach($nameArr as $key => $value) {
+            $fullName .= $value;
+        }
+
+        $fullName = substr($fullName, 0,strlen($fullName) - 3); // removing last | in name
+
+        $route = Route::where('name', '=', $fullName)->get();
+
+        if($route->count() > 0) {
+            return 1;
+        }
+        else {
+            return 0;
+        }
     }
 
     /**
@@ -302,7 +340,12 @@ class CrmRouteController extends Controller
 
     public function editAssignedRouteGet($id) {
         $voivodes = Voivodes::all();
-        $client_route = ClientRoute::select('client.name as name', 'client.id as clientId', 'client_route.type as clientType')
+        $client_route = ClientRoute::select(
+            'client.name as name',
+            'client.id as clientId',
+            'client_route.type as clientType',
+            'client_route.canceled as isCanceled'
+        )
             ->OnlyActiveClientRoutes()
             ->join('client', 'client_route.client_id', '=', 'client.id')
             ->where('client_route.id', '=', $id)
@@ -321,8 +364,6 @@ class CrmRouteController extends Controller
             ->orderBy('date')
             ->orderBy('show_order')
             ->get();
-
-//        dd($client_route_info);
 
         return view('crmRoute.editAssignedRoute')
             ->with('voivodes', $voivodes)
@@ -771,7 +812,8 @@ class CrmRouteController extends Controller
                     'hour',
                     'city.name as city_name',
                     'voivodeship.name as voivode_name',
-                    'hotel_price'
+                    'hotel_price',
+                    'client_route_info.comment_for_report'
                 )
                 ->where('cr.status', '=', 1)
                 ->where('cr.id', '=', $id)
@@ -834,7 +876,8 @@ class CrmRouteController extends Controller
                 'client_route_info.hour as hour',
                 'client_route.client_id as client_id',
                 'client_route_info.weekOfYear as weekOfYear',
-                'client_route_info.hotel_price')
+                'client_route_info.hotel_price',
+                'client_route_info.comment_for_report')
                 ->join('client_route', 'client_route.id', '=', 'client_route_info.client_route_id')
                 ->join('city', 'city.id', '=', 'client_route_info.city_id')
                 ->join('voivodeship', 'voivodeship.id', '=', 'client_route_info.voivode_id')
@@ -952,7 +995,8 @@ class CrmRouteController extends Controller
                             'hotel_id' => $clientRouteInfo->hotelId,
                             'hour' => $clientRouteInfo->time == "" ? null : $clientRouteInfo->time,
                             'user_reservation' => $campaign->userReservation == 'Brak' ? '' : $campaign->userReservation,
-                            'hotel_price' => $campaign->hotelPrice == 0 ? null : $campaign->hotelPrice
+                            'hotel_price' => $campaign->hotelPrice == 0 ? null : $campaign->hotelPrice,
+                            'comment_for_report' => $campaign->comment
                         ]);
                         $lp++;
                     }
@@ -1120,7 +1164,8 @@ class CrmRouteController extends Controller
                 'date',
                 'client_route.type',
                 'client_route_id',
-                'limits')
+                'limits',
+                'canceled')
             ->join('client_route' ,'client_route.id','=','client_route_id')
             ->join('client' ,'client.id','=','client_route.client_id')
             ->join('city' ,'city.id','=', 'city_id')
@@ -1849,10 +1894,17 @@ class CrmRouteController extends Controller
          hotels.zip_code,
          hotels.comment,
          voivodeship.name as voivodeName,
-         city.name as cityName
+         city.name as cityName,
+         hotels_contacts.contact as contact
         '))
             ->join('city','city.id','city_id')
-            ->join('voivodeship','voivodeship.id','voivode_id')->orderBy('id');
+            ->join('voivodeship','voivodeship.id','voivode_id')
+            ->leftJoin('hotels_contacts', function($join) {
+                $join->on('hotels.id', '=', 'hotels_contacts.hotel_id')
+                    ->where('type', '=', 'phone')
+                    ->where('suggested', '=', 1);
+            })
+            ->orderBy('id');
 
         if($hotelId != 0){
             $hotels->where('hotels.id','=',$hotelId);
@@ -2433,9 +2485,13 @@ class CrmRouteController extends Controller
         client_route_info.comment as comment,
         city.name as cityName,
         0 as totalScore,
-        client_route.type as typ
+        client_route.type as typ,
+        hotels.name as hotelName,
+        hotels.street as hotelAdress,
+        client_route.canceled
         '))
         ->join('client_route','client_route.id','client_route_info.client_route_id')
+        ->leftJoin('hotels', 'client_route_info.hotel_id', '=', 'hotels.id')
         ->leftjoin('client','client.id','client_route.client_id')
         ->leftjoin('city','city.id','client_route_info.city_id')
         ->leftjoin('department_info','department_info.id','client_route_info.department_info_id')
@@ -3837,7 +3893,7 @@ class CrmRouteController extends Controller
     public function allCitiesInGivenVoivodeAjax(Request $request) {
         if($request->ajax()) {
             $voivodeId = $request->id;
-            $allCitiesFromGivenVoivode = Cities::select('id', 'name')
+            $allCitiesFromGivenVoivode = Cities::select('id', 'name', 'max_hour')
                 ->where('voivodeship_id', '=', $voivodeId)
                 ->get();
 
@@ -3846,9 +3902,9 @@ class CrmRouteController extends Controller
     }
 
     public function getCampaignsInvoices($id = 0){
+        $invoiceStatuses = InvoiceStatus::all();
         if($id <= 0) {
             $clients = Clients::all();
-            $invoiceStatuses = InvoiceStatus::all();
             return view('crmRoute.campaignsInvoices')
                 ->with('routeId', $id)
                 ->with('clients', $clients)
@@ -3859,6 +3915,7 @@ class CrmRouteController extends Controller
         }else{
             $client = ClientRoute::find($id);
             return view('crmRoute.campaignsInvoices')
+                ->with('invoiceStatuses', $invoiceStatuses)
                 ->with('routeId', $id)
                 ->with('client', $client)
                 ->with('validCampaignInvoiceExtensions',json_encode($this->validCampaignInvoiceExtensions));
@@ -3922,7 +3979,12 @@ class CrmRouteController extends Controller
     public function downloadCampaignInvoicePDF($id){
         $clientRouteCampaign = ClientRouteCampaigns::find($id);
         $url = $clientRouteCampaign->invoice_path;
-        return Storage::download($url);
+        try{
+            return Storage::download($url);
+        }catch(FileNotFoundException $e){
+            session()->put('error', 'Nie znaleziono pliku na serwerze. Spróbuj wysłać ponownie');
+            return Redirect::back();
+        }
     }
 
     public function getCampaignsInvoicesDatatableAjax(Request $request){
@@ -4073,7 +4135,8 @@ class CrmRouteController extends Controller
             client.name as clientName,
             client_gift_type.name as clientGiftName,
             client_meeting_type.name clientMeetingName,
-            hotels.id as hotelID       
+            hotels.id as hotelID,
+            client_route_info.comment_for_report       
         '))
             ->join('client_route','client_route.id','client_route_info.client_route_id')
             ->join('client','client.id','client_route.client_id')
@@ -4087,6 +4150,7 @@ class CrmRouteController extends Controller
             ->where('client_route_info.weekOfYear','like',$selectedWeek)
             ->where('client_route_info.status', '=', 1)
             ->where(DB::raw('YEAR(client_route_info.date)'),'like',$year)
+            ->orderBy('clientRouteID') //routes are close to each other in report
             ->orderBy('date')
             ->orderBy('cityName')
             ->orderBy('hour')
@@ -4125,8 +4189,12 @@ class CrmRouteController extends Controller
             ->where('client_route.status', '=', 1)
             ->where('client_route_info.status', '=', 1)
             ->get();
+
+        $voivodes = Voivodes::all();
+
         return view('crmRoute.hotelConfirmation')
-            ->with('allClients',$allClients);
+            ->with('allClients',$allClients)
+            ->with('voivodes', $voivodes);
     }
 
     public function getConfirmHotelInfo(Request $request){
@@ -4345,7 +4413,8 @@ class CrmRouteController extends Controller
         client_route_info.department_info_id as depId,
         department_type.name as departmentName2,
         city.name as cityName,
-        client_route.type as typ
+        client_route.type as typ,
+        client_route.canceled
         '))
             ->join('client_route','client_route.id','client_route_info.client_route_id')
             ->leftjoin('client','client.id','client_route.client_id')
@@ -4399,6 +4468,73 @@ class CrmRouteController extends Controller
                 ]);
         }
         return 'Zmiany zostały zapisane!';
+    }
+
+    public function hotelConfirmationHotelInfoAjax(Request $request) {
+
+        $hotelId = $request->hotelId;
+        $dataArr = []; //this array collect info about hotel
+
+        $item = Hotel::select(
+            'hotels.id',
+            'hotels.name as hotel_name',
+            'hotels.comment',
+            'city.name as city_name',
+            'voivodeship.name as voivode_name',
+            'hotels.payment_method_id',
+            'hotels.street',
+            'hotels.parking'
+            )
+            ->join('city', 'hotels.city_id', '=', 'city.id')
+            ->join('voivodeship', 'hotels.voivode_id', '=', 'voivodeship.id')
+            ->where('hotels.id', '=', $hotelId)
+            ->first();
+
+        array_push($dataArr, $item);
+
+        //This variable hold info about contacts to hotel
+        $hotelContactInfos = HotelsContacts::select(
+            'contact',
+            'type',
+            'suggested'
+        )
+            ->where('hotel_id', '=', $hotelId)
+            ->get();
+
+        array_push($dataArr, $hotelContactInfos);
+
+        return $dataArr;
+    }
+
+    /**
+     * @param $id
+     * This method change route canceled status.
+     */
+    public function cancelRoute($id) {
+        $info = ClientRoute::where('id', '=', $id)->first();
+
+        if($info->canceled == 0 || is_null($info->canceled)) {
+            ClientRoute::where('id', '=', $id)->update(['canceled' => 1]);
+            Session::flash('adnotation', 'Trasa została anulowana!');
+            $log = [
+                'T' => 'Anulowanie trasy',
+                'Id trasy' => $id
+            ];
+
+            new ActivityRecorder($log,230, 3);
+
+        }
+        else {
+            ClientRoute::where('id', '=', $id)->update(['canceled' => 0]);
+            Session::flash('adnotation', 'Trasa została przywrócona!');
+
+            $log = [
+                'T' => 'Przywrócenie trasy',
+                'Id trasy' => $id
+            ];
+
+            new ActivityRecorder($log,230, 4);
+        }
     }
 
 }

@@ -51,7 +51,13 @@
 
                                     <label for ="ipadress">Miesiąc:</label>
                                     <select class="form-control" name="month">
-                                        @for ($i = 0; $i < 3; $i++)
+                                        @php
+                                            $months=3;
+                                            if(Auth::user()->user_type_id == 3){
+                                                $months=7;
+                                            }
+                                        @endphp
+                                        @for ($i = 0; $i < $months; $i++)
                                             {{$date = date("Y-m",mktime(0,0,0,date("m")-$i,1,date("Y")))}}
                                             @if(isset($response_month))
                                                 @if($response_month == $date)
