@@ -1050,3 +1050,5 @@ Route::post('/hotelConfirmationHotelInfoAjax', 'CrmRouteController@hotelConfirma
 Route::post('/checkForTheSameRoute', 'CrmRouteController@checkForTheSameRoute')->name('api.checkForTheSameRoute');
 
 Route::get('/mailMonthReportUnpaidInvoices', 'StatisticsController@mailMonthReportUnpaidInvoices');
+
+Route::get('/setEngraverForConfirming', 'AutoScriptController@setEngraverForConfirming');
