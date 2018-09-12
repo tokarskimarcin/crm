@@ -222,16 +222,16 @@
                             return FUNCTIONS.AJAXs.departmentsConfirmationStatisticsAjax();
                         },
                         setTableData: function (data){
+                            //data is grouped by weeks and trainers  (/week/: [ trainer1:[], trainer2:[]])
                             let dataTable = this.dataTable;
-                            let table = this.table;
-                            let conditionLpCounterZeroing = null;
+                            let conditionLpCounterZeroing = null; //condition for pointing row that start a group
                             dataTable.clear();
                             $.each(data,function (dateGroup, trainersData) {
                                 $.each(trainersData, function (trainer, data) {
                                     if($.isArray(data)) {
                                         $.each(data, function (index, row) {
-                                            if(conditionLpCounterZeroing != row.trainer){
-                                                VARIABLES.lpCounter = 0;
+                                            if(conditionLpCounterZeroing != row.trainer){ // if condition is diffrent than next value, counter equals 0
+                                                VARIABLES.lpCounter = 0;                    //counting from beginning
                                                 conditionLpCounterZeroing = row.trainer;
                                             }
                                             dataTable.row.add(row);
@@ -284,6 +284,12 @@
                         });
                     }
                 },
+                /*function inserts rows in datatable
+                * @integer column - column number after which the data should be grouped
+                * @DataTable dataTable - datatable in which rows should be inserted
+                * @integer colspan - number of how many columns should be span
+                * @object cssOptionsTr - param for jQuery .css() method
+                * */
                 insertGroupRows: function(column, dataTable, colspan, cssOptionsTr = null){
                     let api = dataTable.api();
                     let rows = api.rows({page: 'current'}).nodes();
@@ -299,6 +305,9 @@
                         }
                     });
                 },
+                /*universal function for datatables that reload data in given datatable
+                * @DataTable dataTable
+                * */
                 ajaxReload: function(dataTable){
                     let processing = $('#'+dataTable.table.attr('id')+'_processing');
                     processing.show();
@@ -307,6 +316,10 @@
                         processing.hide();
                     });
                 },
+                /*universal function for datatables that sets given data in given datatable
+                * @array data - data for insert
+                * @DataTable dataTable
+                * */
                 setTableData: function(data, dataTable){
                     dataTable.clear();
                     if($.isArray(data)) {
@@ -316,6 +329,11 @@
                         dataTable.draw();
                     }
                 },
+                /*universal function for tables that adds class name to column
+                * @integer, @array column - column(s) number(s)
+                * @string className - data for insert
+                * @jQuery table
+                * */
                 setColumnClass: function (column, className, table) {
                     table.find('tbody').children().each(function (index, tr) {
                         $(tr).children().each(function (index, td) {
