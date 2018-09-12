@@ -1606,7 +1606,7 @@ class StatisticsController extends Controller
             'start_date' => $date_start,
             'stop_date' => $date_stop
         ];
-        $title = 'Raport Tygodniowy Szkoleń / Zatrudnionych kandydatów'. $date_start;
+        $title = 'Raport Tygodniowy Zatrudnionych kandydatów / Szkoleń'. $date_start;
         $this->sendMailByVerona('recruitmentMail.weekReportRecruitmentTrainingGroupFirstAndHire', $data, $title);
     }
 

@@ -5,7 +5,7 @@
     <div class="row">
         <div class="col-lg-12">
             <div class="page-header">
-                <div class="alert gray-nav">Raport Tygodniowy Szkoleń / Zatrudnionych kandydatów</div>
+                <div class="alert gray-nav">Raport Tygodniowy Zatrudnionych kandydatów / Szkoleń</div>
             </div>
         </div>
     </div>
