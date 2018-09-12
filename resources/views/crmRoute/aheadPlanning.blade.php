@@ -1658,7 +1658,7 @@
                 },
                 function (name) {
                     return $('<div>').addClass('alert alert-info').append($('<strong>').append(name+':'))
-                        .append(' symulowanie planowania wyprzedzenia na wybrany dzień przy założeniu, że dzienne wyniki bedą wynosić tyle, ile wynosi średnia wyliczona na podstawie danych z określonego okresu w zależności od wybranego ')
+                        .append(' symulowanie planowania wyprzedzenia na wybrany dzień (przed rozpoczęciem pracy) przy założeniu, że dzienne wyniki bedą wynosić tyle, ile wynosi średnia wyliczona na podstawie danych z określonego okresu w zależności od wybranego ')
                         .append($('<strong>').append('Rodzaju symulacji'));
                 }
             ));
@@ -1745,7 +1745,7 @@
                 },
                 function (name) {
                     return $('<div>').addClass('alert alert-info').append($('<strong>').append(name+':'))
-                        .append(' wyliczenie średnich, dziennych wyników jakie muszą uzyskiwać poszczególne oddziały do wybranego ostatniego dnia dzwonienia ')
+                        .append(' wyliczenie średnich, dziennych wyników jakie muszą uzyskiwać poszczególne oddziały do końca wybranego ostatniego dnia dzwonienia ')
                         .append($('<strong>').append('(1#)'))
                         .append(',  aby limity były wyrobione na wybrany inny dzień ')
                         .append($('<strong>').append('(2#)'));
