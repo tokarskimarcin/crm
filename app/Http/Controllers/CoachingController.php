@@ -995,7 +995,8 @@ class CoachingController extends Controller
                 $querry->orwhere('director_id', '=', $manager_id)
                     ->orwhere('menager_id', '=', $manager_id)
                     ->orwhere('regionalManager_id', '=', $manager_id)
-                    ->orwhere('director_hr_id', '=', $manager_id);
+                    ->orwhere('director_hr_id', '=', $manager_id)
+                    ->orwhere('instructor_regional_id', '=', $manager_id);
             })->get();
         // gdy koching chce zrobić osoba która nie jest kierownikiem lub dyrektorem
         if ($manager_departments->isempty()) {
@@ -1009,6 +1010,8 @@ class CoachingController extends Controller
             ->where('status_work', '=', 1)
             ->whereIn('user_type_id', [4, 12, 5, 19])
             ->get();
+
+//        dd($all_coach_list);
         $group_status = collect();
         foreach ($all_coach_list as $item) {
             $hold_info_about_user = $this::getCoachConsultant(array($item->id));
