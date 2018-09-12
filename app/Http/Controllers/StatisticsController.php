@@ -1553,7 +1553,7 @@ class StatisticsController extends Controller
             'data' => $date->sortByDesc('procScore'),
             'start_date' => $date_start
         ];
-        $title = 'Raport Dzienny Szkoleń / Zatrudnionych kandydatów'. $date_start;
+        $title = 'Raport Dzienny Zatrudnionych kandydatów / Szkoleń'. $date_start;
         $this->sendMailByVerona('recruitmentMail.dayReportRecruitmentTrainingGroupFirstAndHire', $data, $title);
     }
 
@@ -1606,7 +1606,7 @@ class StatisticsController extends Controller
             'start_date' => $date_start,
             'stop_date' => $date_stop
         ];
-        $title = 'Raport Tygodniowy Szkoleń / Zatrudnionych kandydatów'. $date_start;
+        $title = 'Raport Tygodniowy Zatrudnionych kandydatów / Szkoleń'. $date_start;
         $this->sendMailByVerona('recruitmentMail.weekReportRecruitmentTrainingGroupFirstAndHire', $data, $title);
     }
 
@@ -1665,7 +1665,7 @@ class StatisticsController extends Controller
             'start_date' => $date_start,
             'stop_date' => $date_stop
         ];
-        $title = 'Raport Miesięcznu Szkoleń / Zatrudnionych kandydatów'. $date_start;
+        $title = 'Raport Miesięcznu Zatrudnionych kandydatów / Szkoleń'. $date_start;
         $this->sendMailByVerona('recruitmentMail.monthReportRecruitmentTrainingGroupFirstAndHire', $data, $title);
     }
 
