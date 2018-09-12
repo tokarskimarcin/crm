@@ -43,13 +43,13 @@
     content: "";
     position: absolute;
     margin-left: -5px;
-    border: 5px solid transparent;
+    border: 10px solid transparent;
     border-top-color: white;
 }
 
 /* Tooltip arrow top*/
 .VCtooltip.VCtooltip-top .tooltiptext::after{
-    bottom: -10px;
+    bottom: -15px;
     left: 25px;
     border-color: white transparent transparent transparent;
 }
@@ -64,7 +64,7 @@
 
 /* Tooltip arrow bottom*/
 .VCtooltip.VCtooltip-bottom .tooltiptext::after{
-    top: -10px;
+    top: -15px;
     left: 25px;
     border-color: transparent transparent white transparent;
 }
@@ -79,7 +79,7 @@
 /* Tooltip arrow right*/
 .VCtooltip.VCtooltip-right .tooltiptext::after{
     top: 10px;
-    left: -4px;
+    left: -10px;
     border-color: transparent white transparent transparent;
 }
 .VCtooltip.VCtooltip-right .tooltiptext{
@@ -95,12 +95,12 @@
 /* Tooltip arrow left*/
 .VCtooltip.VCtooltip-left .tooltiptext::after{
     top: 10px;
-    right: -10px;
+    right: -15px;
     border-color:transparent transparent transparent white;
 }
 .VCtooltip.VCtooltip-left .tooltiptext{
     top: 0;
-    right: 105%;
+    right: calc(100% + 15px);
 }
 .VCtooltip.VCtooltip-left.VCtooltip-gray .tooltiptext::after{
     border-color: transparent transparent transparent #555;

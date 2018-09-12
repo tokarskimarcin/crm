@@ -7,13 +7,13 @@
 
 @extends('layouts.main')
 @section('style')
-@endsection
-@section('content')
     <style>
         .dropdown-menu{
             left: 0px;
         }
     </style>
+@endsection
+@section('content')
     <div class="page-header">
         <div class="alert gray-nav ">Lista faktur @if($routeId != 0 ) @if($client != null)
                 - {{$client->route_name}}@endif @endif</div>
@@ -23,6 +23,19 @@
             Faktury poszczególnych kampanii
         </div>
         <div class="panel-body">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="alert alert-info">
+                        Panel zawiera informacje o fakturach poszczególnych kampanii. Po najechaniu kursorem na nagłówki tabeli wyświetlą się szczegółowe informacje.
+                        Statusy faktur kampanii dzielą się na:
+                        <strong>Brak faktury</strong>, <strong>Faktura do wysłania</strong>, <strong>Oczekiwanie na zapłatę</strong>, <strong>Zapłacone</strong>.
+                        Wrzucając fakturę na serwer Teambox, status kampanii przechodzi ze statusu <strong>Brak faktury</strong> na <strong>Faktura do wysłania</strong>.
+                        Wrzuconą fakturę można pobrać z serwera naciskając na przycisk <button class="btn btn-primary"><span class="glyphicon glyphicon-cloud-download"></span></button>.
+                        Następnym możliwym krokiem jest wrzucenie innej faktury lub wysłanie już wrzuconej do klienta. Kara jest naliczana po pierwszych <strong>48H</strong> od daty wysłania faktury, jeżeli zapłata nie została wcześniej potwierdzona. Każde następne <strong>24H</strong> spóźnienia zwiększają karę.
+                        Przy naliczeniu jakiejkolwiek kary to dana kampania podświetla się na czerwono.
+                    </div>
+                </div>
+            </div>
             @if($routeId == 0)
                 <div class="row">
                     <div class="col-md-5">
@@ -66,7 +79,7 @@
                             <th>Trasa</th>
                             <th>Hotel</th>
                             <th>Data pokazu</th>
-                            <th>Faktura</th>
+                            <th>Faktura<span class="tooltiptext"></span></th>
                             <th>Status</th>
                             <th>Kara</th>
                             <th>Data wysłania faktury</th>
@@ -734,7 +747,18 @@
                 return response;
             });
         }
-
+        @if(session()->has('error'))
+            $.notify({
+                // options
+                message: '{{session()->get('error')}}'
+            },{
+                // settings
+                type: 'danger'
+            });
+            @php
+                session()->remove('error');
+            @endphp
+        @endif
 
         function reloadDataTable(datataTable) {
             datataTable.ajax.reload();
