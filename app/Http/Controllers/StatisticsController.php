@@ -1553,7 +1553,7 @@ class StatisticsController extends Controller
             'data' => $date->sortByDesc('procScore'),
             'start_date' => $date_start
         ];
-        $title = 'Raport Dzienny Szkoleń / Zatrudnionych kandydatów'. $date_start;
+        $title = 'Raport Dzienny Zatrudnionych kandydatów / Szkoleń'. $date_start;
         $this->sendMailByVerona('recruitmentMail.dayReportRecruitmentTrainingGroupFirstAndHire', $data, $title);
     }
 
