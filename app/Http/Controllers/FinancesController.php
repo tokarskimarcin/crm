@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\AcceptedPayment;
 use App\Agencies;
+use App\ClientRouteInfo;
 use App\Department_info;
 use App\Department_types;
 use App\Departments;
@@ -425,7 +426,6 @@ class FinancesController extends Controller
         $department_type = Department_types::find($department_info->id_dep_type);
         $count_agreement = $department_type->count_agreement;
 
-
         $payment_saved = AcceptedPayment::
         where('department_info_id','=',Auth::user()->department_info_id)
             ->where('payment_month','like', $date.'%')
@@ -661,7 +661,7 @@ class FinancesController extends Controller
     private function getSalary($month)
     {
 
-
+            $clientRouteInfoRecords = ClientRouteInfo::where('confirmDate', 'like', $month)->OnlyActive()->get();
             //Czy wypłata jest już zatwierdzona
             $payment_saved = AcceptedPayment::
             where('department_info_id','=',Auth::user()->department_info_id)
@@ -675,6 +675,7 @@ class FinancesController extends Controller
             }
         $query = DB::table(DB::raw("users"))
             ->join('work_hours', 'work_hours.id_user', 'users.id')
+            ->join('department_info', 'users.department_info_id', '=', 'department_info.id')
             ->where('users.department_info_id',Auth::user()->department_info_id)
             ->where(function ($querry) use ($month){
                 $querry->orwhere(DB::raw('SUBSTRING(promotion_date,1,7)'),'>=',substr($month,0,strlen($month)-1))
@@ -699,7 +700,8 @@ class FinancesController extends Controller
             SUM(`work_hours`.`success`) as `success`,
             `salary_to_account`,
             `users`.`successorUserId`,
-            0 as successorSalary
+            0 as successorSalary,
+            id_dep_type
             ');
             if(!$payment_saved->isEmpty()){
                 $query = $query
@@ -730,8 +732,9 @@ class FinancesController extends Controller
             `h`.`janki`,
             `salary_to_account`,
             successorUserId,
-            successorSalary')->get();
-            $result = $r->map(function($item) use($month) {
+            successorSalary,
+            id_dep_type')->get();
+            $result = $r->map(function($item) use($month, $clientRouteInfoRecords) {
                 $user_empl_status = UserEmploymentStatus::
                     where( function ($querry) use ($item) {
                     $querry = $querry->orwhere('pbx_id', '=', $item->login_phone)
@@ -741,6 +744,16 @@ class FinancesController extends Controller
                     ->where('pbx_id', '!=', 0)
                     ->where('pbx_id', '!=', null)
                     ->get();
+
+                $campaignScoresArr = [];
+                if($item->id_dep_type == 1) { //konsultant potwierdzeń
+                    $showRecordsOfGivenUser = $clientRouteInfoRecords->where('confirmingUser', '=', $item->id); //all campaigns that he/she confirm
+                    foreach($showRecordsOfGivenUser as $show) {
+                        array_push($campaignScoresArr, $show->frequency);
+                    }
+                    $item->frequency = $campaignScoresArr;
+                }
+
                 $user_empl_status = $user_empl_status->where('user_id','=',$item->id);
                 if(count($user_empl_status) == 0 || count($user_empl_status) == 1) {
 
@@ -797,6 +810,7 @@ class FinancesController extends Controller
                 }
                return $item;
             });
+
             $this::mapSuccessorSalary(Auth::user()->department_info_id,$r,$month);
             $final_salary = $r->groupBy('agency_id');
             return $final_salary;
