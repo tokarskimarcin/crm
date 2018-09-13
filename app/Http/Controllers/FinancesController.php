@@ -223,8 +223,7 @@ class FinancesController extends Controller
         dd($dividedMonth);
     }
 
-    private function provisionSystemForHR(&$user, $dividedMonth, $month, $year) {
-
+    public function divideMonthIntoCompanyWeeks($month, $year, $dividedMonth) {
         $weekDateArr = []; // array of objects with week info
 
         //*****Generating weekDateArr
@@ -263,6 +262,12 @@ class FinancesController extends Controller
             }
         }
         //*****End of generating weekDateArr
+        return $weekDateArr;
+    }
+
+    private function provisionSystemForHR(&$user, $dividedMonth, $month, $year) {
+
+        $weekDateArr = $this->divideMonthIntoCompanyWeeks($month,$year,$dividedMonth); // array of objects with week info
 
         //*****Generating info how much account was added per week
         $infoArr = [];
@@ -768,7 +773,8 @@ class FinancesController extends Controller
     //Custom Function
     private function getSalary($month)
     {
-
+            $realMonth = substr($month,5,2);
+            $realYear = substr($month, 0,4);
             $clientRouteInfoRecords = ClientRouteInfo::where('confirmDate', 'like', $month)->OnlyActive()->get();
             //Czy wypłata jest już zatwierdzona
             $payment_saved = AcceptedPayment::
@@ -842,7 +848,10 @@ class FinancesController extends Controller
             successorUserId,
             successorSalary,
             id_dep_type')->get();
-            $result = $r->map(function($item) use($month, $clientRouteInfoRecords) {
+
+            $weekDayArr = $this->divideMonthIntoCompanyWeeks($realMonth, $realYear, MonthPerWeekDivision::get($realMonth, $realYear));
+
+            $result = $r->map(function($item) use($month, $clientRouteInfoRecords, $weekDayArr) {
                 $user_empl_status = UserEmploymentStatus::
                     where( function ($querry) use ($item) {
                     $querry = $querry->orwhere('pbx_id', '=', $item->login_phone)
@@ -854,15 +863,39 @@ class FinancesController extends Controller
                     ->get();
 
                 $campaignScoresArr = [];
+
+                //creating provision field for each confirming consultant with data about provisions.
                 if($item->id_dep_type == 1) { //konsultant potwierdzeń
-                    $showRecordsOfGivenUser = $clientRouteInfoRecords->where('confirmingUser', '=', $item->id); //all campaigns that he/she confirm
-                    $provisionSum = 0;
-                    foreach($showRecordsOfGivenUser as $show) {
-                        array_push($campaignScoresArr, ProvisionLevels::get($show->frequency, 'consultant'));
-                        $provisionSum += ProvisionLevels::get($show->frequency, 'consultant');
+                    $globalProvisionSum = 0;
+
+                    foreach($weekDayArr as $week) { //looping after each week
+                        $weekScoreArr = [];
+                        $showRecordsOfGivenUser = $clientRouteInfoRecords
+                            ->where('confirmingUser', '=', $item->id)
+                            ->where('confirmDate', '>=', $week->firstDay)
+                            ->where('confirmDate', '<', $week->lastDay); //all campaigns that he/she confirm in given week
+                        $provisionSum = 0;
+                        $badCampaigns = 0;
+                        foreach($showRecordsOfGivenUser as $show) {
+                            $provision = ProvisionLevels::get($show->frequency, 'consultant', '1');
+                            array_push($weekScoreArr, $provision);
+                            if($provision < 0) {
+                                $badCampaigns++;
+                            }
+                            $provisionSum += $provision;
+                            $globalProvisionSum += $provision;
+                        }
+                        $badCampaignsProvision = ProvisionLevels::get($badCampaigns, 'consultant', '2');
+                        $obj = new \stdClass();
+                        $obj->weekNumber = $week->weekNumber;
+                        $obj->provisions = $weekScoreArr;
+                        $obj->provisionSum =  $provisionSum;
+                        $obj->badCampaignsProvision = $badCampaignsProvision; // 50zl for each week without bad campaigns
+                        $globalProvisionSum += $badCampaignsProvision;
+                        array_push($campaignScoresArr, $obj);
                     }
-                    $item->provisions = $campaignScoresArr;
-                    $item->provisionSum = $provisionSum;
+                    $item->provision = $campaignScoresArr;
+                    $item->totalProvision = $globalProvisionSum < 0 ? 0 : $globalProvisionSum;
                 }
                 $user_empl_status = $user_empl_status->where('user_id','=',$item->id);
                 if(count($user_empl_status) == 0 || count($user_empl_status) == 1) {

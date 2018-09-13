@@ -23,31 +23,48 @@ class ProvisionLevels
         $provision = 0;
         switch($type) {
             case 'consultant': {
-                if($level < 12) {
-                    $provision = -180;
+                switch($subtype) {
+                    case '1': { //case of number of people who show up after invitation.
+                        if($level < 12) {
+                            $provision = -180;
+                        }
+                        else if($level >= 12 && $level < 16) {
+                            $provision = -60;
+                        }
+                        else if($level >= 16 && $level < 20) {
+                            $provision = 0;
+                        }
+                        else if($level >= 20 && $level < 25) {
+                            $provision = 20;
+                        }
+                        else if($level >= 25 && $level < 30) {
+                            $provision = 25;
+                        }
+                        else if($level >= 30 && $level < 35) {
+                            $provision = 30;
+                        }
+                        else if($level >= 35 && $level < 40) {
+                            $provision = 35;
+                        }
+                        else if($level >= 40) {
+                            $provision = 40;
+                        }
+                        return $provision;
+                        break;
+                    }
+                    case '2': { //case when at least one of shows is bad.
+                        if($level == 0) {
+                            $provision = 50;
+                        }
+                        else {
+                            $provision = 0;
+                        }
+                        return $provision;
+                        break;
+                    }
                 }
-                else if($level >= 12 && $level < 16) {
-                    $provision = -60;
-                }
-                else if($level >= 16 && $level < 20) {
-                    $provision = 0;
-                }
-                else if($level >= 20 && $level < 25) {
-                    $provision = 20;
-                }
-                else if($level >= 25 && $level < 30) {
-                    $provision = 25;
-                }
-                else if($level >= 30 && $level < 35) {
-                    $provision = 30;
-                }
-                else if($level >= 35 && $level < 40) {
-                    $provision = 35;
-                }
-                else if($level >= 40) {
-                    $provision = 40;
-                }
-                return $provision;
+
+
                 break;
             }
             case 'trainer': {
