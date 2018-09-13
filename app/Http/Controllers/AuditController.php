@@ -67,7 +67,17 @@ class AuditController extends Controller
     public function ajax(Request $request) {
         $trainers = User::whereIn('user_type_id', [4,12])->where('department_info_id', '=', $request->wybranaOpcja)->where('status_work', '=', '1')->get();
         $hr = User::where('user_type_id', '=', '5')->where('department_info_id', '=', $request->wybranaOpcja)->where('status_work', '=', '1')->get();
-        $collective = User::where('user_type_id', '=', '7')->where('department_info_id', '=', $request->wybranaOpcja)->where('status_work', '=', '1')->first();
+        $collective = DB::table('department_info')
+            ->select(DB::raw('
+                users.first_name as first_name,
+                users.last_name as last_name,
+                users.id as id
+            '))
+            ->join('users', 'users.id', 'department_info.menager_id')
+            ->where('department_info.id', '=', $request->wybranaOpcja)
+            ->first();
+
+//            User::where('user_type_id', '=', '7')->where('department_info_id', '=', $request->wybranaOpcja)->where('status_work', '=', '1')->first();
         $kierownik = DB::table('department_info')
             ->select(DB::raw('
                 users.first_name as first_name,
