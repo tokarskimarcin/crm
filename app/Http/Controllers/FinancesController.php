@@ -19,6 +19,7 @@ use App\SummaryPayment;
 use App\User;
 use App\UserEmploymentStatus;
 use App\Utilities\Dates\MonthPerWeekDivision;
+use App\Utilities\Salary\ProvisionLevels;
 use App\Work_Hour;
 use function foo\func;
 use Illuminate\Http\Request;
@@ -266,45 +267,45 @@ class FinancesController extends Controller
         //*****Generating info how much account was added per week
         $infoArr = [];
         foreach($weekDateArr as $weekInfo) {
-           $data = RecruitmentStory::getReportNewAccountData($weekInfo->firstDay,$weekInfo->lastDay);
+           $data = RecruitmentStory::getReportNewAccountData($weekInfo->firstDay,$weekInfo->lastDay); //info about new accounts in teambox
 
            foreach($data as $item) {
                if($item->id == $user->id) {
                    $obj = new \stdClass();
                    $obj->week = $weekInfo->weekNumber;
-                   $obj->add_user = $item->add_user;
+                   $obj->provision = ProvisionLevels::get($item->add_user, 'HR');
                   array_push($infoArr, $obj);
                }
            }
 
         }
-        $user->add_user = $infoArr;
+        $user->provisions = $infoArr;
         //*****End of generating info how much account was added per week
 
         //*****Generating info with audits score
-        $departmentAudits = Audit::where('date_audit', 'like', $year . '-' . $month . '%')
-            ->where('user_type', '=', 3)
-            ->where('department_info_id', '=', $user->department_info_id)
-            ->first();
-
-        if(!is_null($departmentAudits)) {
-            $user->auditScore = $departmentAudits->score;
-        }
-        else {
-            $user->auditScore = -1; // if no data, -1
-        }
-
-        $personalAudits = Audit::where('date_audit', 'like', $year . '-' . $month . '%')
-            ->where('user_type', '=', 2)
-            ->where('trainer_id', '=', $user->id)
-            ->first();
-
-        if(!is_null($personalAudits)) {
-            $user->auditScorePersonal = $personalAudits->score;
-        }
-        else {
-            $user->auditScorePersonal = -1; // if no data, -1
-        }
+//        $departmentAudits = Audit::where('date_audit', 'like', $year . '-' . $month . '%')
+//            ->where('user_type', '=', 3)
+//            ->where('department_info_id', '=', $user->department_info_id)
+//            ->first();
+//
+//        if(!is_null($departmentAudits)) {
+//            $user->auditScore = $departmentAudits->score;
+//        }
+//        else {
+//            $user->auditScore = -1; // if no data, -1
+//        }
+//
+//        $personalAudits = Audit::where('date_audit', 'like', $year . '-' . $month . '%')
+//            ->where('user_type', '=', 2)
+//            ->where('trainer_id', '=', $user->id)
+//            ->first();
+//
+//        if(!is_null($personalAudits)) {
+//            $user->auditScorePersonal = $personalAudits->score;
+//        }
+//        else {
+//            $user->auditScorePersonal = -1; // if no data, -1
+//        }
         //*****End of generating info with audits score
     }
 
@@ -363,6 +364,7 @@ class FinancesController extends Controller
 
             }
         }
+//        dd($salary->where('user_type_id', '=', 5));
 
         $freeDaysData = $this->getFreeDays($dividedMonth); //[id_user, freeDays]
 
@@ -531,7 +533,6 @@ class FinancesController extends Controller
         $agencies = Agencies::all();
         $department_type = Department_types::find($department_info->id_dep_type);
         $count_agreement = $department_type->count_agreement;
-
 
         $payment_saved = AcceptedPayment::
         where('department_info_id','=',Auth::user()->department_info_id)
@@ -855,12 +856,14 @@ class FinancesController extends Controller
                 $campaignScoresArr = [];
                 if($item->id_dep_type == 1) { //konsultant potwierdzeń
                     $showRecordsOfGivenUser = $clientRouteInfoRecords->where('confirmingUser', '=', $item->id); //all campaigns that he/she confirm
+                    $provisionSum = 0;
                     foreach($showRecordsOfGivenUser as $show) {
-                        array_push($campaignScoresArr, $show->frequency);
+                        array_push($campaignScoresArr, ProvisionLevels::get($show->frequency, 'consultant'));
+                        $provisionSum += ProvisionLevels::get($show->frequency, 'consultant');
                     }
-                    $item->frequency = $campaignScoresArr;
+                    $item->provisions = $campaignScoresArr;
+                    $item->provisionSum = $provisionSum;
                 }
-
                 $user_empl_status = $user_empl_status->where('user_id','=',$item->id);
                 if(count($user_empl_status) == 0 || count($user_empl_status) == 1) {
 
