@@ -3,20 +3,32 @@
 namespace App\Http\Controllers\Statistics;
 
 use App\Department_info;
+use App\User;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 
 class DepartmentsConfirmationStatisticsController extends Controller
 {
     //
-
     public function departmentsConfirmationGet(){
         $deps = Department_info::where('id_dep_type', 1)->with('departments')->with('department_type')->get();
-        return view('statistics.departmentsConfirmationStatistics')->with('deps',$deps);
+        $trainers = User::select(
+            'id',
+            'first_name',
+            'last_name',
+            'department_info_id')
+            ->whereIn('department_info_id',$deps->pluck('id')->toArray())
+            ->where('status_work',1)
+            ->where('user_type_id',4)->get();
+        return view('statistics.departmentsConfirmationStatistics')
+            ->with('deps', $deps)
+            ->with('trainers', $trainers);
     }
 
 
     public function departmentsConfirmationStatisticsAjax(Request $request){
+
+
         $collect = collect();
         $collect->push(['name' => 'Marcin Tokarski1',   'shows' => 20,'provision' => 300, 'successful' => 12,'successfulPct'=> 63.45, 'neutral' => 3, 'neutralPct'=> 30.20, 'date' => '2018-09-01', 'dateGroup' => '2018-09-01 - 2018-09-09', 'trainer' => 'Piotr Sulisz']);
         $collect->push(['name' => 'Marcin Tokarski4',   'shows' => 20,'provision' => 200, 'successful' => 10,'successfulPct'=> 63.45, 'neutral' => 3, 'neutralPct'=> 30.20, 'date' => '2018-09-01', 'dateGroup' => '2018-09-01 - 2018-09-09', 'trainer' => 'Piotr Sulisz']);
