@@ -168,7 +168,7 @@
                                 <div class="row factorsSection" style="margin-top:1em; display:none">
                                     <div class="col-md-6">
                                         <label>Mnożnik sobót <span class="glyphicon glyphicon-info-sign VCtooltip VCtooltip-right">
-                                                <span class="tooltiptext">W przypadku, gdy średnie wyniki sobót wynoszą 0 to, te wyniki wyliczane są ze średnich dziennych pomnożonych o określony MNOŻNIK SOBÓT</span>
+                                                <span class="tooltiptext">W przypadku, gdy wyniki sobót wynoszą 0 to, te wyniki wyliczane są ze średnich dziennych pomnożonych o określony MNOŻNIK SOBÓT</span>
                                             </span></label>
                                         <div class="input-group">
                                             <input id="saturdayFactor" class="form-control" type="text" value="95" style="text-align: right;">
@@ -177,10 +177,10 @@
                                     </div>
                                     <div class="col-md-6">
                                         <label>Mnożnik niedziel <span class="glyphicon glyphicon-info-sign VCtooltip VCtooltip-right">
-                                                <span class="tooltiptext">W przypadku, gdy średnie wyniki niedziel wynoszą 0 to, te wyniki wyliczane są ze średnich sobót pomnożonych o określony MNOŻNIK NIEDZIEL</span>
+                                                <span class="tooltiptext">W przypadku, gdy wyniki niedziel wynoszą 0 to, te wyniki wyliczane są ze średnich dziennych pomnożonych o określony MNOŻNIK NIEDZIEL</span>
                                             </span></label>
                                         <div class="input-group">
-                                            <input id="sundayFactor" class="form-control" type="text" value="80" style="text-align: right;">
+                                            <input id="sundayFactor" class="form-control" type="text" value="70" style="text-align: right;">
                                             <span class="input-group-addon" id="basic-addon1">%</span>
                                         </div>
                                     </div>
@@ -1320,7 +1320,7 @@
                 factorsChangeHandler(e,95);
             });
             $('#sundayFactor').change(function (e) {
-                factorsChangeHandler(e,80);
+                factorsChangeHandler(e,70);
             });
 
             /*********************END EVENT LISTENERS FUNCTIONS****************************/
