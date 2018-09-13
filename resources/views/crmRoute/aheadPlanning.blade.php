@@ -1079,10 +1079,11 @@
                             }
                         },
                         success: function (response) {
+                            factorsChanged = false;
                             obj.data.aheadPlaning = response.aheadPlanningData;
                             obj.data.departmentsInvitationsAverages = response.departmentsInvitationsAveragesData;
-                            deferred.resolve(obj.data.aheadPlaning);
                             fillWorkFreeDaysForDepartments();
+                            deferred.resolve(obj.data.aheadPlaning);
                         },
                         error: function (jqXHR, textStatus, thrownError) {
                             console.log(jqXHR);
@@ -1096,7 +1097,6 @@
                             deferred.reject();
                         }
                     });
-                    selectedRowDays = [];
                     $('#removeSimulationButton').hide();
                     return deferred.promise();
                 }
@@ -1505,24 +1505,31 @@
                 ['factorsSection', 'simulationTypes'], //sections to show
                 true, // flag that identify is ahead planning data after simulation are changed
                 /* ---------------- simulation function ----------------------- */
-                function (thisObj){                    let selectedDay = getSelectedDay(selectedRowDays[0]);
+                function (thisObj){
+                    let selectedDay = getSelectedDay(selectedRowDays[0]);
                     let selectedType = getSelectedType();
                     let daysBetweenSelectedAndActualDay = Math.abs(Math.round(moment.duration(moment(new Date(selectedDay)).diff(moment(new Date(today)))).asDays()));
                     let workingHoursLeft = Math.abs(Math.round(moment.duration((moment().diff(moment().hour(16).minute(0)))).asHours()));
                     let simulatedData = null;
 
-                    prepareSimulationData();
                     if(factorsChanged){
+                        $('#datatable_processing').show();
                         aheadPlanningData.getData($('#date_start').val(),$("#date_stop").val()).done(function () {
-                            simulatedData = simulation();
+                            doThings();
+                            $('#datatable_processing').hide();
                         });
                     }else{
-                        simulatedData = simulation();
+                        doThings();
                     }
 
-                    aheadPlaningTable.setTableData(simulatedData);
-                    colorSelectedRowDays('selectedRowDayOfResultsSimulation');
-                    colorSelectedRowDays('selectedRowDay');
+                    function doThings(){
+                        prepareSimulationData();
+                        simulatedData = simulation();
+                        aheadPlaningTable.setTableData(simulatedData);
+                        colorSelectedRowDays('selectedRowDayOfResultsSimulation');
+                        colorSelectedRowDays('selectedRowDay');
+                    }
+
 
                     function prepareSimulationData() {
                         $.each(departmentInfo,function (index, department) {
@@ -1673,12 +1680,23 @@
                     let selectedDayWithCompletedResult = getSelectedDay(selectedRowDays[0] > selectedRowDays[1] ? selectedRowDays[0] : selectedRowDays[1]);
                     let daysBetweenSelectedAndActualDay = Math.abs(moment.duration(moment(new Date(selectedNewActualDay)).diff(moment(new Date(today)))).asDays());
 
-                    prepareSimulationData();
-                    simulation();
-                    $('#simulationAverages .modal-body').text('');
-                    $('#simulationAverages .modal-body').append(createSimulationAveragesTable());
-                    $('#simulationAverages').modal('show');
+                    if(factorsChanged){
+                        $('#datatable_processing').show();
+                        aheadPlanningData.getData($('#date_start').val(),$("#date_stop").val()).done(function () {
+                            doThings();
+                            $('#datatable_processing').hide();
+                        });
+                    }else{
+                        doThings();
+                    }
 
+                    function doThings() {
+                        prepareSimulationData();
+                        simulation();
+                        $('#simulationAverages .modal-body').text('');
+                        $('#simulationAverages .modal-body').append(createSimulationAveragesTable());
+                        $('#simulationAverages').modal('show');
+                    }
                     function prepareSimulationData() {
                         $.each(departmentInfo,function (index, department) {
                             aheadPlanningData.data.departmentsInvitationsAverages[department.name2].simulated = {
@@ -1763,8 +1781,8 @@
             });
 
             function factorsChangeHandler(e, value){
-                factorsChanged = $.isNumeric($(e.target).val());
-                if(!factorsChanged){
+                factorsChanged = true;
+                if(!$.isNumeric($(e.target).val())){
                     $(e.target).val(value);
                 }
             }
