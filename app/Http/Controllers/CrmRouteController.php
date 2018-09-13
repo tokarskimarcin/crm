@@ -3075,17 +3075,16 @@ class CrmRouteController extends Controller
         $departmentsInvitationsAveragesInfo = collect();
         foreach ($departmentInfo as $item) {
             $actualDate = $startDate;
-            $weekSum = 0;
             $weekScoresArr = [];
             $weekDivider = 0;
 
-            $saturdaySum = 0;
             $saturdayScoresArr = [];
             $saturdayDivider = 0;
+            $saturdayNullDivider = 0;
 
-            $sundaySum = 0;
             $sundayScoresArr = [];
             $sundayDivider = 0;
+            $sundayNullDivider = 0;
 
             while ($actualDate < $stopDate) {
                 $routeInfo = $routeInfoOverall->where('department_info_id' ,'=', $item->id)
@@ -3094,17 +3093,20 @@ class CrmRouteController extends Controller
 
                 if($routeInfo['sumOfActualSuccess'] != 0){
                     if(date('N',strtotime($actualDate)) <6){
-                        $weekSum += $routeInfo['sumOfActualSuccess'];
                         array_push($weekScoresArr, $routeInfo['sumOfActualSuccess']);
                         $weekDivider++;
                     } else if (date('N', strtotime($actualDate)) == 6) {
-                        $saturdaySum += $routeInfo['sumOfActualSuccess'];
                         array_push($saturdayScoresArr, $routeInfo['sumOfActualSuccess']);
                         $saturdayDivider++;
                     } else if (date('N', strtotime($actualDate)) == 7) {
-                        $sundaySum += $routeInfo['sumOfActualSuccess'];
                         array_push($sundayScoresArr, $routeInfo['sumOfActualSuccess']);
                         $sundayDivider++;
+                    }
+                }else{
+                    if (date('N', strtotime($actualDate)) == 6) {
+                        $saturdayNullDivider++;
+                    } else if (date('N', strtotime($actualDate)) == 7) {
+                        $sundayNullDivider++;
                     }
                 }
 
@@ -3164,7 +3166,7 @@ class CrmRouteController extends Controller
                     $varianceNumeratorSat += pow($value, 2) * ($iterator + 1);
                 }
 
-                $weightAverageSaturday = $denominatorSat == 0 ? 0 : $averageNumeratorSat / $denominatorSat;
+                $weightAverageSaturday = $denominatorSat == 0 ? 0 : ($averageNumeratorSat+(($weightAverageWeek*$factors['saturday']/100) * $saturdayNullDivider))/ ($denominatorSat+$saturdayNullDivider);
                 $weightedVarianceSaturday = ($varianceNumeratorSat / $denominatorSat) - pow($weightAverageSaturday, 2);
                 $stdDevSaturday = ($saturdayDivider >= 2 && $saturdayDivider <= 75) ? sqrt($weightedVarianceSaturday) / $this->getCzynnikC4($saturdayDivider) : sqrt($weightedVarianceSaturday); // ważone odchylenie standardowe.
             }else{
@@ -3217,7 +3219,7 @@ class CrmRouteController extends Controller
                     $varianceNumeratorSun += pow($value, 2) * ($iterator + 1);
                 }
 
-                $weightAverageSunday = $denominatorSun == 0 ? 0 : $averageNumeratorSun / $denominatorSun;
+                $weightAverageSunday = $denominatorSun == 0 ? 0 : ($averageNumeratorSun+(($weightAverageWeek*$factors['sunday']/100)*$saturdayNullDivider)) / ($denominatorSun+$saturdayNullDivider);
                 $weightedVarianceSunday = ($varianceNumeratorSun / $denominatorSun) - pow($weightAverageSunday, 2);
 
                 $sundayStdDev = ($sundayDivider >= 2 && $sundayDivider <= 75) ? sqrt($weightedVarianceSunday) / $this->getCzynnikC4($sundayDivider) : sqrt($weightedVarianceSunday);  //saturday standard deviation
