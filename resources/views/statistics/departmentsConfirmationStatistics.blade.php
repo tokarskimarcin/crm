@@ -23,24 +23,9 @@
 
         }
 
-        /*.DTFC_LeftBodyLiner{
-            overflow: visible !important;
-        }*/
-        /*.DTFC_LeftBodyWrapper{
-            top: -1px !important;
+        .bootstrap-select > .dropdown-menu {
+            left: 0 !important;
         }
-
-        .dataTables_scrollBody{
-            left: 1px;
-        }*/
-        /*#departmentsConfirmationDatatable thead{
-            display: none;
-        }*//*
-
-        .DTFC_LeftBodyLiner tbody{
-            height: 100% !importanwt;
-        }*/
-
         .green{
             background: #d9ead3 !important;
         }
@@ -78,10 +63,16 @@
         <div class="panel-body">
             <div class="row">
                 <div class="col-md-4">
+                    <select class="form-control selectpicker" id="departmentsSelect">
+                        @foreach($deps as $dep)
+                            <option value="{{$dep->id}}" >{{$dep->departments->name}} {{$dep->department_type->name}}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-md-4">
                     <div class="checkbox">
                         <label>
-
-                            <input type="checkbox" style="display: block;"> Grupowanie po trenerach
+                            <input id="trainersGroupingCheckbox" type="checkbox" style="display: block;"> Grupowanie po trenerach
                         </label>
                     </div>
                 </div>
@@ -134,9 +125,16 @@
 @section('script')
     <script>
         $(document).ready(function () {
-            let groupColumns = [19,20];
+            const columnsNr = {'lp':0,'name':1,'shows':2,'provision':3,'dateGroup':19,'trainer':20};
+            let hiddenColumns = [columnsNr['dateGroup'], columnsNr['trainer']];
+            let groupColumns = [columnsNr['dateGroup'], columnsNr['trainer']];
             let VARIABLES  = {
+                JQelemnts:{
+                    trainersGroupingCheckboxjQ: $('#trainersGroupingCheckbox'),
+                    departmentsSelectjQ: $('#departmentsSelect')
+                },
                 lpCounter: 0,
+                conditionLpCounterZeroing: null, //condition for pointing row that start a group
                 DATA_TABLES:{
                     departmentsConfirmation: {
                         data: {
@@ -153,8 +151,9 @@
                                 "url": "//cdn.datatables.net/plug-ins/1.10.16/i18n/Polish.json"
                             },
                             columnDefs:[
-                                { "visible": false, "targets": groupColumns }
+                                { "visible": false, "targets": hiddenColumns }
                             ],
+                            ordering: false,
                             columns:[
                                 {data: function () {
                                         VARIABLES.lpCounter++;
@@ -213,9 +212,12 @@
                                 FUNCTIONS.setColumnClass([6,7],'yellow', VARIABLES.DATA_TABLES.departmentsConfirmation.table);
                                 FUNCTIONS.setColumnClass([8,11],'red', VARIABLES.DATA_TABLES.departmentsConfirmation.table);
                                 FUNCTIONS.insertGroupRows(groupColumns[0], this, 19, {background:'#444444', color:'white', 'font-weight':'bold'});
-                                FUNCTIONS.insertGroupRows(groupColumns[1], this, 19, {background:'#ffe599', 'font-weight':'bold'});
-
-                                FUNCTIONS.EVENT_HANDLERS.scrollBodyHandler();
+                                if(VARIABLES.JQelemnts.trainersGroupingCheckboxjQ.get(0).checked) {
+                                    FUNCTIONS.insertGroupRows(groupColumns[1], this, 19, {
+                                        background: '#ffe599',
+                                        'font-weight': 'bold'
+                                    });
+                                }
                             }
                         }),
                         getData: function () {
@@ -224,20 +226,15 @@
                         setTableData: function (data){
                             //data is grouped by weeks and trainers  (/week/: [ trainer1:[], trainer2:[]])
                             let dataTable = this.dataTable;
-                            let conditionLpCounterZeroing = null; //condition for pointing row that start a group
                             dataTable.clear();
-                            $.each(data,function (dateGroup, trainersData) {
-                                $.each(trainersData, function (trainer, data) {
-                                    if($.isArray(data)) {
-                                        $.each(data, function (index, row) {
-                                            if(conditionLpCounterZeroing != row.trainer){ // if condition is diffrent than next value, counter equals 0
-                                                VARIABLES.lpCounter = 0;                    //counting from beginning
-                                                conditionLpCounterZeroing = row.trainer;
-                                            }
-                                            dataTable.row.add(row);
-                                        });
-                                    }
-                                });
+                            $.each(data,function (dateGroup, week) {
+                                if(VARIABLES.JQelemnts.trainersGroupingCheckboxjQ.get(0).checked){
+                                    $.each(week, function (trainer, data) {
+                                        FUNCTIONS.setTableDataWithLpCounterByGroup(data, 'trainer', dataTable);
+                                    });
+                                }else{
+                                    FUNCTIONS.setTableDataWithLpCounterByGroup(week, 'dateGroup', dataTable);
+                                }
                             });
                             dataTable.draw();
 
@@ -251,21 +248,31 @@
             let FUNCTIONS = {
                 /* functions groups should be before other functions which aren't grouped*/
                 EVENT_HANDLERS: {
-                    scrollBodyHandler: function(){
-                        $('.dataTables_scrollBody').scroll(function (e) {
-                            if($(e.target).scrollTop() < $('#departmentsConfirmationDatatable').find('thead').height()){
-                                $(e.target).scrollTop($('#departmentsConfirmationDatatable').find('thead').height());
-                            }
-                        });
+                    callEvents: function(){
+                        (function trainersGroupingCheckboxHandler() {
+                            VARIABLES.JQelemnts.trainersGroupingCheckboxjQ.change(function (e) {
+                                if(e.target.checked){
+                                    groupColumns[1] = columnsNr['trainer'];
+                                }
+                                VARIABLES.DATA_TABLES.departmentsConfirmation.ajaxReload();
+                            });
+                        })();
+                        (function departmentsSelectHandler() {
+                            VARIABLES.JQelemnts.departmentsSelectjQ.change(function (e) {
+                                VARIABLES.DATA_TABLES.departmentsConfirmation.ajaxReload();
+                            });
+                        })();
                     }
                 },
                 AJAXs:{
-                    departmentsConfirmationStatisticsAjax: function(dataToSend) {
+                    departmentsConfirmationStatisticsAjax: function() {
                         return $.ajax({
                             url: "{{ route('api.departmentsConfirmationStatisticsAjax') }}",
                             type: 'POST',
                             headers: {'X-CSRF-TOKEN': '{{ csrf_token() }}'},
                             data: {
+                                trainersGrouping: VARIABLES.JQelemnts.trainersGroupingCheckboxjQ.get(0).checked,
+                                departmentId: VARIABLES.JQelemnts.departmentsSelectjQ.val()
                             },
                             success: function (response) {
                                 VARIABLES.DATA_TABLES.departmentsConfirmation.data.departmentsConfirmationStatistics = response;
@@ -274,7 +281,7 @@
                             error: function (jqXHR, textStatus, thrownError) {
                                 console.log(jqXHR);
                                 console.log('textStatus: ' + textStatus);
-                                console.log('hrownError: ' + thrownError);
+                                console.log('thrownError: ' + thrownError);
                                 swal({
                                     type: 'error',
                                     title: 'Błąd ' + jqXHR.status,
@@ -284,12 +291,14 @@
                         });
                     }
                 },
+                @php
                 /*function inserts rows in datatable
                 * @integer column - column number after which the data should be grouped
                 * @DataTable dataTable - datatable in which rows should be inserted
                 * @integer colspan - number of how many columns should be span
                 * @object cssOptionsTr - param for jQuery .css() method
                 * */
+                @endphp
                 insertGroupRows: function(column, dataTable, colspan, cssOptionsTr = null){
                     let api = dataTable.api();
                     let rows = api.rows({page: 'current'}).nodes();
@@ -305,9 +314,11 @@
                         }
                     });
                 },
+                @php
                 /*universal function for datatables that reload data in given datatable
                 * @DataTable dataTable
                 * */
+                @endphp
                 ajaxReload: function(dataTable){
                     let processing = $('#'+dataTable.table.attr('id')+'_processing');
                     processing.show();
@@ -316,10 +327,12 @@
                         processing.hide();
                     });
                 },
+                @php
                 /*universal function for datatables that sets given data in given datatable
                 * @array data - data for insert
                 * @DataTable dataTable
                 * */
+                @endphp
                 setTableData: function(data, dataTable){
                     dataTable.clear();
                     if($.isArray(data)) {
@@ -329,11 +342,13 @@
                         dataTable.draw();
                     }
                 },
+                @php
                 /*universal function for tables that adds class name to column
-                * @integer, @array column - column(s) number(s)
+                * @integer, @array column - column(s) range number(s)
                 * @string className - data for insert
                 * @jQuery table
                 * */
+                @endphp
                 setColumnClass: function (column, className, table) {
                     table.find('tbody').children().each(function (index, tr) {
                         $(tr).children().each(function (index, td) {
@@ -342,16 +357,28 @@
                                     $(td).addClass(className);
                                 }
                             }else{
-                                if(index == column){
+                                if(index === column){
                                     $(td).addClass(className);
                                 }
                             }
 
                         });
                     });
+                },
+                setTableDataWithLpCounterByGroup: function(data, groupingData, dataTable){
+                    if($.isArray(data)) {
+                        $.each(data, function (index, row) {
+                            if(VARIABLES.conditionLpCounterZeroing !== row[groupingData]){ // if condition is diffrent than next value, counter equals 0
+                                VARIABLES.lpCounter = 0;                    //counting from beginning
+                                VARIABLES.conditionLpCounterZeroing = row[groupingData];
+                            }
+                            dataTable.row.add(row);
+                        });
+                    }
                 }
             };
             VARIABLES.DATA_TABLES.departmentsConfirmation.ajaxReload();
+            FUNCTIONS.EVENT_HANDLERS.callEvents();
             resizeDatatablesOnMenuToggle([VARIABLES.DATA_TABLES.departmentsConfirmation.dataTable]);
         });
     </script>

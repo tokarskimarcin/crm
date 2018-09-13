@@ -2,7 +2,7 @@
     <thead style="color:#efd88f">
     <tr>
         <td colspan="2" style="border:1px solid #231f20;text-align:center;padding:3px;background:#231f20;color:#efd88f">
-            <font size="6" face="Calibri">Raport Miesięczny Szkoleń / Zatrudnionych kandydatów</font></td>
+            <font size="6" face="Calibri">Raport Miesięczny Zatrudnionych kandydatów / Szkoleń</font></td>
         <td colspan="2" style="border:1px solid #231f20;text-align:left;padding:6px;background:#231f20">
             <img src="http://teambox.pl/image/logovc.png" class="CToWUd"></td>
     </tr>
@@ -13,7 +13,7 @@
         <th style="border:1px solid #231f20;padding:3px;background:#231f20">Oddział</th>
         <th style="border:1px solid #231f20;padding:3px;background:#231f20">Obecych na pierwszym etapie szkolenia</th>
         <th style="border:1px solid #231f20;padding:3px;background:#231f20">Zatrudnionych po szkoleniu</th>
-        <th style="border:1px solid #231f20;padding:3px;background:#231f20">% (Zatrudnionych po szkoleniu) / (Obecych na pierwszym etapie szkolenia)</th>
+        <th style="border:1px solid #231f20;padding:3px;background:#231f20">% Zatrudnionych po pierwszym etapie szkolenia</th>
     </tr>
     </thead>
     <tbody>

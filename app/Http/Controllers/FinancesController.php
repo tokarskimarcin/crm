@@ -12,11 +12,13 @@ use App\DoublingQueryLogs;
 use App\JankyPenatlyProc;
 use App\PaymentAgencyStory;
 use App\PenaltyBonus;
+use App\RecruitmentStory;
 use App\Schedule;
 use App\SuccessorHistory;
 use App\SummaryPayment;
 use App\User;
 use App\UserEmploymentStatus;
+use App\Utilities\Dates\MonthPerWeekDivision;
 use App\Work_Hour;
 use function foo\func;
 use Illuminate\Http\Request;
@@ -216,6 +218,96 @@ class FinancesController extends Controller
 
     }
 
+    private function provisionSystemForTrainers($user, $dividedMonth) {
+        dd($dividedMonth);
+    }
+
+    private function provisionSystemForHR(&$user, $dividedMonth, $month, $year) {
+
+        $weekDateArr = []; // array of objects with week info
+
+        //*****Generating weekDateArr
+        $tempFirstDate = $dividedMonth[0]->date;
+        $tempLastDate = null;
+        $tempWeek = $dividedMonth[0]->weekNumber;
+        $tempDate = $dividedMonth[0]->date;
+        $i = 0;
+        for($i = 0; $i < count($dividedMonth); $i++) {
+            $dateObj = new \stdClass();
+
+            $dateObj->firstDay = null;
+            $dateObj->lastDay = null;
+            $dateObj->weekNumber = null;
+            if($dividedMonth[$i]->date == 'Suma') {
+                $tempLastDate = $tempDate;
+            }
+            if($dividedMonth[$i]->weekNumber != $tempWeek) {
+                $dateObj->lastDay = $tempLastDate;
+                $dateObj->firstDay = $tempFirstDate;
+                $dateObj->weekNumber = $tempWeek;
+                array_push($weekDateArr, $dateObj);
+                $tempWeek = $dividedMonth[$i]->weekNumber;
+                $tempDate = $dividedMonth[$i]->date;
+                $tempFirstDate = $dividedMonth[$i]->date;
+            }
+            else {
+                $tempDate = $dividedMonth[$i]->date;
+            }
+
+            if($i == count($dividedMonth) - 1) {
+                $dateObj->weekNumber = $dividedMonth[$i]->weekNumber;
+                $dateObj->firstDay = $tempFirstDate;
+                $dateObj->lastDay = $tempLastDate;
+                array_push($weekDateArr, $dateObj);
+            }
+        }
+        //*****End of generating weekDateArr
+
+        //*****Generating info how much account was added per week
+        $infoArr = [];
+        foreach($weekDateArr as $weekInfo) {
+           $data = RecruitmentStory::getReportNewAccountData($weekInfo->firstDay,$weekInfo->lastDay);
+
+           foreach($data as $item) {
+               if($item->id == $user->id) {
+                   $obj = new \stdClass();
+                   $obj->week = $weekInfo->weekNumber;
+                   $obj->add_user = $item->add_user;
+                  array_push($infoArr, $obj);
+               }
+           }
+
+        }
+        $user->add_user = $infoArr;
+        //*****End of generating info how much account was added per week
+
+        //*****Generating info with audits score
+        $departmentAudits = Audit::where('date_audit', 'like', $year . '-' . $month . '%')
+            ->where('user_type', '=', 3)
+            ->where('department_info_id', '=', $user->department_info_id)
+            ->first();
+
+        if(!is_null($departmentAudits)) {
+            $user->auditScore = $departmentAudits->score;
+        }
+        else {
+            $user->auditScore = -1; // if no data, -1
+        }
+
+        $personalAudits = Audit::where('date_audit', 'like', $year . '-' . $month . '%')
+            ->where('user_type', '=', 2)
+            ->where('trainer_id', '=', $user->id)
+            ->first();
+
+        if(!is_null($personalAudits)) {
+            $user->auditScorePersonal = $personalAudits->score;
+        }
+        else {
+            $user->auditScorePersonal = -1; // if no data, -1
+        }
+        //*****End of generating info with audits score
+    }
+
     public function viewPaymentCadrePost(Request $request)
     {
 
@@ -231,6 +323,7 @@ class FinancesController extends Controller
             ->where('users.salary','>',0)
             ->selectRaw('
             `users`.`id`,
+            `users`.`user_type_id`,
             `users`.`agency_id`,
             `users`.`max_transaction`,
             `users`.`first_name`,
@@ -239,6 +332,7 @@ class FinancesController extends Controller
             `users`.`username`,
             `departments`.`name` as dep_name, 
             `department_type`.`name`  as dep_type,
+            `department_info`.`id` as department_info_id,
             `users`.`salary`,
             `users`.`additional_salary`,
             `users`.`student`,
@@ -257,6 +351,18 @@ class FinancesController extends Controller
             ->where('work_hours.date', 'like', $date)
             ->groupBy('users.id')
             ->orderBy('users.last_name')->get();
+
+        foreach($salary as $user) {
+            if($user->user_type_id == 4) {
+//                $this->provisionSystemForTrainers($user,  MonthPerWeekDivision::get($month, $year));
+            }
+            else if($user->user_type_id == 5) {
+//                $this->provisionSystemForHR($user, MonthPerWeekDivision::get($month, $year), $month, $year);
+            }
+            else if($user->user_type_id == 19) {
+
+            }
+        }
 
         $freeDaysData = $this->getFreeDays($dividedMonth); //[id_user, freeDays]
 
@@ -425,6 +531,7 @@ class FinancesController extends Controller
         $agencies = Agencies::all();
         $department_type = Department_types::find($department_info->id_dep_type);
         $count_agreement = $department_type->count_agreement;
+
 
         $payment_saved = AcceptedPayment::
         where('department_info_id','=',Auth::user()->department_info_id)

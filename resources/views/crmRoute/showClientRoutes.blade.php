@@ -692,10 +692,10 @@
                     });
                     if (sessionStorage.getItem('idsOfSelectedClients')) {
                         selectedClientIds = sessionStorage.getItem('idsOfSelectedClients').split(",");
-                        colorSelectedClients(selectedClientIds);
                         sessionStorage.removeItem('idsOfSelectedClients');
                         table2.ajax.reload();
                     }
+                    colorSelectedClients(selectedClientIds);
                 }, "ajax": {
                     'url': "{{route('api.getClientRoutes')}}",
                     'type': 'POST',
