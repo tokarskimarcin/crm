@@ -105,7 +105,7 @@
                             <th>T</th>
                             <th>Data</th>
                             <th>Miasto</th>
-                            <th>Nazwa klienta</th>
+                            <th>Nazwa_klienta</th>
                             <th>G</th>
                             <th>Oddział</th>
                             <th>Potwierdzająca osoba</th>

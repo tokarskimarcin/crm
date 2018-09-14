@@ -110,21 +110,21 @@
                     <table id="datatable" class="thead-inverse table table-striped table-bordered compact" style="max-width:100%;">
                         <thead>
                         <tr>
-                            <th>Tydz.</th>
+                            <th>Tydz</th>
                             <th>Data</th>
-                            <th>Godz.</th>
+                            <th>Godz</th>
                             <th>Kampania</th>
                             <th>Podział bazy</th>
                             <th>Sprawdzenie</th>
                             <th>Zaproszenia <br>Live</th>
                             <th>Limit</th>
                             <th>Straty</th>
-                            <th>Projekt</th>
+                            <th>Nazwa_klienta</th>
                             <th>Oddział</th>
                             <th>Uwagi</th>
                             <th>Nr kampanii (PBX)</th>
-                            <th>Nazwa Hotelu</th>
-                            <th>Adres Hotelu</th>
+                            <th>Nazwa_Hotelu</th>
+                            <th>Adres_Hotelu</th>
                         </tr>
                         </thead>
                     </table>
