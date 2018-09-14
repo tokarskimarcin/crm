@@ -225,7 +225,7 @@ class FinancesController extends Controller
 
     public function divideMonthIntoCompanyWeeks($month, $year, $dividedMonth) {
         $weekDateArr = []; // array of objects with week info
-
+//dd($dividedMonth);
         //*****Generating weekDateArr
         $tempFirstDate = $dividedMonth[0]->date;
         $tempLastDate = null;
@@ -239,6 +239,9 @@ class FinancesController extends Controller
             $dateObj->lastDay = null;
             $dateObj->weekNumber = null;
             if($dividedMonth[$i]->date == 'Suma') {
+                $tempLastDate = $tempDate;
+            }
+            else if($i == count($dividedMonth) - 1) {
                 $tempLastDate = $tempDate;
             }
             if($dividedMonth[$i]->weekNumber != $tempWeek) {
@@ -262,7 +265,18 @@ class FinancesController extends Controller
             }
         }
         //*****End of generating weekDateArr
+//        dd($weekDateArr);
         return $weekDateArr;
+    }
+
+    private function provisionSystemForCoordinators(&$user, $dividedMonth, $month, $year) {
+        $weekDateArr = $this->divideMonthIntoCompanyWeeks($month,$year,$dividedMonth); // array of objects with week info
+//        dd($weekDateArr);
+        $infoArr = [];
+        $today = date('Y-m-d'); //today
+        foreach($weekDateArr as $weekInfo) {
+
+        }
     }
 
     private function provisionSystemForHR(&$user, $dividedMonth, $month, $year) {
@@ -343,6 +357,7 @@ class FinancesController extends Controller
             `users`.`additional_salary`,
             `users`.`student`,
             `users`.`documents`,
+            `users`.`promotion_date`,
              ROUND(salary / DAY(LAST_DAY("' . $request->search_money_month.'-01' .'")),2) as average_salary,
             (SELECT SUM(`penalty_bonus`.`amount`) FROM `penalty_bonus` WHERE `penalty_bonus`.`id_user`=`users`.`id` AND `penalty_bonus`.`event_date` LIKE "'.$date.'" AND `penalty_bonus`.`type`=1 AND `penalty_bonus`.`status`=1) as `penalty`,
             (SELECT SUM(`penalty_bonus`.`amount`) FROM `penalty_bonus` WHERE `penalty_bonus`.`id_user`=`users`.`id` AND `penalty_bonus`.`event_date` LIKE  "'.$date.'" AND `penalty_bonus`.`type`=2 AND `penalty_bonus`.`status`=1) as `bonus`')
@@ -368,10 +383,14 @@ class FinancesController extends Controller
             else if($user->user_type_id == 19) {
 
             }
+            else if($user->user_type_id == 8) { //koordynator
+//                $this->provisionSystemForCoordinators($user, MonthPerWeekDivision::get($month, $year), $month, $year);
+            }
         }
 //        dd($salary->where('user_type_id', '=', 5));
 
         $freeDaysData = $this->getFreeDays($dividedMonth); //[id_user, freeDays]
+//        dd($freeDaysData);
 
         /**
          * Pobranie danych osób którzy nie pracowali całego miesiąca
