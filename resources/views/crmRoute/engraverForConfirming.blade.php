@@ -99,7 +99,7 @@
                     </div>
                 </div>
                 <div class="row">
-                    <table id="datatable" class="thead-inverse table table-striped table-bordered" style="max-width:100%;">
+                    <table id="datatable" class="thead-inverse table table-striped table-bordered compact" style="max-width:100%;">
                         <thead>
                         <tr>
                             <th>T</th>
