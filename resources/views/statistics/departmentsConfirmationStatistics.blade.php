@@ -63,12 +63,36 @@
         <div class="panel-body">
             <div class="row">
                 <div class="col-md-4">
+                    <label>Miesiąc:</label>
+                    <div class="form-group">
+                        <div class='input-group date' id='monthDatetimepicker'>
+                            <span class="input-group-addon">
+                                <span class="glyphicon glyphicon-calendar"></span>
+                            </span>
+                            <input type='text' class="form-control" value="{{date('Y-m')}}" readonly/>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <label>Oddział:</label>
                     <select class="form-control selectpicker" id="departmentsSelect">
                         @foreach($deps as $dep)
                             <option value="{{$dep->id}}" >{{$dep->departments->name}} {{$dep->department_type->name}}</option>
                         @endforeach
                     </select>
+                </div><div class="col-md-4">
+                    <label>Trener:</label>
+                    <select class="form-control selectpicker" id="trainersSelect">
+                        <option value="-1" selected>Wybierz</option>
+                        @foreach($trainers as $trainer)
+                            @if($trainer->department_info_id == $deps[0]->id)
+                                <option value="{{$trainer->id}}" >{{$trainer->first_name}} {{$trainer->last_name}}</option>
+                            @endif
+                        @endforeach
+                    </select>
                 </div>
+            </div>
+            <div class="row">
                 <div class="col-md-4">
                     <div class="checkbox">
                         <label>
@@ -79,7 +103,7 @@
             </div>
             <div class="row">
                 <div class="col-md-12">
-                    <table id="departmentsConfirmationDatatable" class="table row-border table-striped table-hover compact"  style="width:100%;">
+                    <table id="departmentsConfirmationDatatable" class="table cell-border table-striped table-hover compact"  style="width:100%;">
                         <thead>
                         <tr>
                             <th colspan="4"></th>
@@ -123,16 +147,28 @@
 @endsection
 
 @section('script')
+    <script src="{{ asset('/js/moment.js')}}"></script>
     <script>
         $(document).ready(function () {
             const columnsNr = {'lp':0,'name':1,'shows':2,'provision':3,'dateGroup':19,'trainer':20};
             let hiddenColumns = [columnsNr['dateGroup'], columnsNr['trainer']];
             let groupColumns = [columnsNr['dateGroup'], columnsNr['trainer']];
             let VARIABLES  = {
-                JQelemnts:{
+                jQElements:{
                     trainersGroupingCheckboxjQ: $('#trainersGroupingCheckbox'),
-                    departmentsSelectjQ: $('#departmentsSelect')
+                    departmentsSelectjQ: $('#departmentsSelect'),
+                    trainersSelectjQ: $('#trainersSelect'),
+                    monthDatetimepicker: $('#monthDatetimepicker').datetimepicker({
+                        language: 'pl',
+                        minView: 3,
+                        startView: 3,
+                        format: 'yyyy-mm',
+                        startDate: moment('2018-09-01').format('YYYY-MM-DD'),
+                        endDate: moment().format('YYYY-MM-DD')
+                    })
                 },
+                departments: <?php echo json_encode($deps->toArray()) ?>,
+                trainers: <?php echo json_encode($trainers->toArray()) ?>,
                 lpCounter: 0,
                 conditionLpCounterZeroing: null, //condition for pointing row that start a group
                 DATA_TABLES:{
@@ -155,10 +191,7 @@
                             ],
                             ordering: false,
                             columns:[
-                                {data: function () {
-                                        VARIABLES.lpCounter++;
-                                        return VARIABLES.lpCounter;
-                                    }},
+                                {data: 'lp'},
                                 {data: 'name'},
                                 {data: 'shows'},
                                 {data: 'provision'},
@@ -212,7 +245,7 @@
                                 FUNCTIONS.setColumnClass([6,7],'yellow', VARIABLES.DATA_TABLES.departmentsConfirmation.table);
                                 FUNCTIONS.setColumnClass([8,11],'red', VARIABLES.DATA_TABLES.departmentsConfirmation.table);
                                 FUNCTIONS.insertGroupRows(groupColumns[0], this, 19, {background:'#444444', color:'white', 'font-weight':'bold'});
-                                if(VARIABLES.JQelemnts.trainersGroupingCheckboxjQ.get(0).checked) {
+                                if(VARIABLES.jQElements.trainersGroupingCheckboxjQ.get(0).checked) {
                                     FUNCTIONS.insertGroupRows(groupColumns[1], this, 19, {
                                         background: '#ffe599',
                                         'font-weight': 'bold'
@@ -228,7 +261,7 @@
                             let dataTable = this.dataTable;
                             dataTable.clear();
                             $.each(data,function (dateGroup, week) {
-                                if(VARIABLES.JQelemnts.trainersGroupingCheckboxjQ.get(0).checked){
+                                if(VARIABLES.jQElements.trainersGroupingCheckboxjQ.get(0).checked){
                                     $.each(week, function (trainer, data) {
                                         FUNCTIONS.setTableDataWithLpCounterByGroup(data, 'trainer', dataTable);
                                     });
@@ -250,7 +283,7 @@
                 EVENT_HANDLERS: {
                     callEvents: function(){
                         (function trainersGroupingCheckboxHandler() {
-                            VARIABLES.JQelemnts.trainersGroupingCheckboxjQ.change(function (e) {
+                            VARIABLES.jQElements.trainersGroupingCheckboxjQ.change(function (e) {
                                 if(e.target.checked){
                                     groupColumns[1] = columnsNr['trainer'];
                                 }
@@ -258,7 +291,21 @@
                             });
                         })();
                         (function departmentsSelectHandler() {
-                            VARIABLES.JQelemnts.departmentsSelectjQ.change(function (e) {
+                            VARIABLES.jQElements.departmentsSelectjQ.change(function (e) {
+                                VARIABLES.jQElements.trainersSelectjQ.find('option')
+                                    .remove();
+                                VARIABLES.jQElements.trainersSelectjQ.append($('<option>').val(-1).text('Wybierz')).prop('selected',true);
+                                $.each(VARIABLES.trainers, function(index, trainer){
+                                   if(trainer.department_info_id == VARIABLES.jQElements.departmentsSelectjQ.val()){
+                                       VARIABLES.jQElements.trainersSelectjQ.append($('<option>').val(trainer.id).text(trainer.first_name+' '+trainer.last_name));
+                                   }
+                                });
+                                VARIABLES.jQElements.trainersSelectjQ.selectpicker('refresh');
+                                VARIABLES.DATA_TABLES.departmentsConfirmation.ajaxReload();
+                            });
+                        })();
+                        (function trainersSelectHandler() {
+                            VARIABLES.jQElements.trainersSelectjQ.change(function (e) {
                                 VARIABLES.DATA_TABLES.departmentsConfirmation.ajaxReload();
                             });
                         })();
@@ -271,8 +318,9 @@
                             type: 'POST',
                             headers: {'X-CSRF-TOKEN': '{{ csrf_token() }}'},
                             data: {
-                                trainersGrouping: VARIABLES.JQelemnts.trainersGroupingCheckboxjQ.get(0).checked,
-                                departmentId: VARIABLES.JQelemnts.departmentsSelectjQ.val()
+                                trainersGrouping: VARIABLES.jQElements.trainersGroupingCheckboxjQ.get(0).checked,
+                                departmentId: VARIABLES.jQElements.departmentsSelectjQ.val(),
+                                selectedMonth: VARIABLES.jQElements.monthDatetimepicker.find('input').val()
                             },
                             success: function (response) {
                                 VARIABLES.DATA_TABLES.departmentsConfirmation.data.departmentsConfirmationStatistics = response;
@@ -293,7 +341,7 @@
                 },
                 @php
                 /*function inserts rows in datatable
-                * @integer column - column number after which the data should be grouped
+                * @integer column - column number pointing on the data that should be taken as grouping data
                 * @DataTable dataTable - datatable in which rows should be inserted
                 * @integer colspan - number of how many columns should be span
                 * @object cssOptionsTr - param for jQuery .css() method
@@ -361,18 +409,19 @@
                                     $(td).addClass(className);
                                 }
                             }
-
                         });
                     });
                 },
                 setTableDataWithLpCounterByGroup: function(data, groupingData, dataTable){
                     if($.isArray(data)) {
                         $.each(data, function (index, row) {
-                            if(VARIABLES.conditionLpCounterZeroing !== row[groupingData]){ // if condition is diffrent than next value, counter equals 0
-                                VARIABLES.lpCounter = 0;                    //counting from beginning
-                                VARIABLES.conditionLpCounterZeroing = row[groupingData];
+                            if(VARIABLES.conditionLpCounterZeroing !== row[groupingData]){  //if groupig data is diffrent than previous value, counter equals 0
+                                VARIABLES.lpCounter = 0;                                    //counting from beginning
+                                VARIABLES.conditionLpCounterZeroing = row[groupingData];    //setting condition to grouping data of current row
                             }
-                            dataTable.row.add(row);
+                            VARIABLES.lpCounter++;
+                            row.lp = VARIABLES.lpCounter;   //setting 'lp' row attribute
+                            dataTable.row.add(row);         //adding row to datatable
                         });
                     }
                 }
