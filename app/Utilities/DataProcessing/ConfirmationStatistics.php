@@ -8,27 +8,28 @@
 
 namespace App\Utilities\DataProcessing;
 
-
-use App\Utilities\Dates\MonthIntoCompanyWeeksDivision;
-use App\Utilities\Dates\MonthPerWeekDivision;
 use App\Utilities\Salary\ProvisionLevels;
 
 class ConfirmationStatistics
 {
-    public static function getConsultantsConfirmationStatisticsCollectionForMonth($clientRouteInfo, $monthIntoCompanyWeeksDivision){
+    /**
+     * @param $clientRouteInfo - collection that need to have 'confirmDate', 'frequency', 'pairs', 'actual_success', 'users.first_name', 'users.last_name',
+     * 'trainer.first_name as t_first_name', 'trainer.last_name as t_last_name', 'users.coach_id'
+     * @param $dividedMonth - array that every cell has object with `firstDay` and `lastDay` fields
+     * @return \Illuminate\Support\Collection
+     */
+    public static function getConsultantsConfirmationStatisticsCollectionForMonth($clientRouteInfo, $dividedMonth){
         $clientRouteInfo = $clientRouteInfo->sortBy('confirmDate');
-        foreach($clientRouteInfo as $consultantConfirmation){/*
-            $consultantConfirmation->name = $consultantConfirmation->first_name.' '.$consultantConfirmation->last_name;
-            $consultantConfirmation->trainer = $consultantConfirmation->t_first_name.' '.$consultantConfirmation->t_last_name;*/
-            $confirmingTime = strtotime($consultantConfirmation->confirmDate);
-            foreach ($monthIntoCompanyWeeksDivision as $week){
-                if(date('W', $confirmingTime) == $week->weekNumber){
+        foreach($clientRouteInfo as $consultantConfirmation){
+            foreach ($dividedMonth as $week){
+                if(strtotime($consultantConfirmation->confirmDate) >= strtotime($week->firstDay)
+                    && strtotime($consultantConfirmation->confirmDate) <= strtotime($week->lastDay)){
                     $consultantConfirmation->dateGroup =  date('Y.m.d',strtotime($week->firstDay)).' - '.date('Y.m.d',strtotime($week->lastDay));
                     break;
                 }
             }
         }
-        $confirmationStatisctics = collect();
+        $confirmationStatistics = collect();
 
         $clientRouteInfo = $clientRouteInfo->groupBy('dateGroup');
         foreach ($clientRouteInfo as $dateGroup => $clientRouteInfoByDateGroup){
@@ -50,9 +51,11 @@ class ConfirmationStatistics
                     $consultantConfirmationStatistics->provision            = 0;
                     $frequencySum = 0;
                     $pairsSum = 0;
+
+                    //getting every client route info for specified trainer consultant in specified week
                     foreach ($consultantConfirmationData as $confirmationInfo){
                         $frequencySum = $frequencySum + $confirmationInfo->frequency;
-                        $consultantConfirmationStatistics->provision = $consultantConfirmationStatistics->provision + ProvisionLevels::get($confirmationInfo->frequency,'consultant', ProvisionLevels::$SUBTYPES);
+                        $consultantConfirmationStatistics->provision = $consultantConfirmationStatistics->provision + ProvisionLevels::get($confirmationInfo->frequency,'consultant');
                         $pairsSum = $pairsSum + $confirmationInfo->pairs;
                         if($confirmationInfo->frequency > 19){
                             $consultantConfirmationStatistics->successful = $consultantConfirmationStatistics->successful + 1;
@@ -64,7 +67,6 @@ class ConfirmationStatistics
                             $consultantConfirmationStatistics->unsuccessfulBadly = $consultantConfirmationStatistics->unsuccessfulBadly +1;
                         }
                         $consultantConfirmationStatistics->recordsCount = $consultantConfirmationStatistics->recordsCount + $confirmationInfo->actual_success;
-
                     }
                     $consultantConfirmationStatistics->successfulPct        = round($consultantConfirmationStatistics->successful*100/$consultantConfirmationStatistics->shows, 2);
                     $consultantConfirmationStatistics->neutralPct           = round($consultantConfirmationStatistics->neutral*100/$consultantConfirmationStatistics->shows, 2);
@@ -72,10 +74,10 @@ class ConfirmationStatistics
                     $consultantConfirmationStatistics->unsuccessfulBadlyPct = round($consultantConfirmationStatistics->unsuccessfulBadly*100/$consultantConfirmationStatistics->shows, 2);
                     $consultantConfirmationStatistics->avgFrequency         = round($frequencySum/$consultantConfirmationStatistics->shows,2);
                     $consultantConfirmationStatistics->avgPairs             = round($pairsSum/$consultantConfirmationStatistics->shows,2);
-                    $confirmationStatisctics->push($consultantConfirmationStatistics);
+                    $confirmationStatistics->push($consultantConfirmationStatistics);
                 }
             }
         }
-        dd($confirmationStatisctics);
+        return $confirmationStatistics;
     }
 }

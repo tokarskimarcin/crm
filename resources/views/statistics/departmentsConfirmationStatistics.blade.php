@@ -203,27 +203,17 @@
                                 {data: function (data) {
                                         return data.neutralPct+'%';
                                     },name : 'neutralPct'},
-                                {data: function () {
-                                        return 1;
+                                {data: 'unsuccessful'},
+                                {data: function (data) {
+                                        return data.unsuccessfulPct+'%';
                                     }},
-                                {data: function () {
-                                        return 1;
+                                {data: 'unsuccessfulBadly'},
+                                {data: function (data) {
+                                        return data.unsuccessfulBadlyPct+'%';
                                     }},
-                                {data: function () {
-                                        return 1;
-                                    }},
-                                {data: function () {
-                                        return 1;
-                                    }},
-                                {data: function () {
-                                        return 1;
-                                    }},
-                                {data: function () {
-                                        return 1;
-                                    }},
-                                {data: function () {
-                                        return 1;
-                                    }},
+                                {data: 'avgFrequency'},
+                                {data: 'avgPairs'},
+                                {data: 'recordsCount'},
                                 {data: function () {
                                         return 1;
                                     }},
@@ -251,6 +241,13 @@
                                         'font-weight': 'bold'
                                     });
                                 }
+                                $('.group_'+groupColumns[0]).each(function (index, row) {
+                                    let dates = $(row).find('td').text().split(" ");
+                                    let lastDay = dates[2].split('.');
+                                    if(moment()<moment().set({'year':lastDay[0],'month':lastDay[1]-1,'date':lastDay[2]})){
+                                        $(row).css('background','#429137')
+                                    }
+                                });
                             }
                         }),
                         getData: function () {
