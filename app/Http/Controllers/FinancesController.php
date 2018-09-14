@@ -18,6 +18,7 @@ use App\SuccessorHistory;
 use App\SummaryPayment;
 use App\User;
 use App\UserEmploymentStatus;
+use App\Utilities\Dates\MonthIntoCompanyWeeksDivision;
 use App\Utilities\Dates\MonthPerWeekDivision;
 use App\Utilities\Salary\ProvisionLevels;
 use App\Work_Hour;
@@ -219,69 +220,13 @@ class FinancesController extends Controller
 
     }
 
-    private function provisionSystemForTrainers($user, $dividedMonth) {
+    private function provisionSystemForTrainers(&$user, $dividedMonth) {
         dd($dividedMonth);
-    }
-
-    public function divideMonthIntoCompanyWeeks($month, $year, $dividedMonth) {
-        $weekDateArr = []; // array of objects with week info
-//dd($dividedMonth);
-        //*****Generating weekDateArr
-        $tempFirstDate = $dividedMonth[0]->date;
-        $tempLastDate = null;
-        $tempWeek = $dividedMonth[0]->weekNumber;
-        $tempDate = $dividedMonth[0]->date;
-        $i = 0;
-        for($i = 0; $i < count($dividedMonth); $i++) {
-            $dateObj = new \stdClass();
-
-            $dateObj->firstDay = null;
-            $dateObj->lastDay = null;
-            $dateObj->weekNumber = null;
-            if($dividedMonth[$i]->date == 'Suma') {
-                $tempLastDate = $tempDate;
-            }
-            else if($i == count($dividedMonth) - 1) {
-                $tempLastDate = $tempDate;
-            }
-            if($dividedMonth[$i]->weekNumber != $tempWeek) {
-                $dateObj->lastDay = $tempLastDate;
-                $dateObj->firstDay = $tempFirstDate;
-                $dateObj->weekNumber = $tempWeek;
-                array_push($weekDateArr, $dateObj);
-                $tempWeek = $dividedMonth[$i]->weekNumber;
-                $tempDate = $dividedMonth[$i]->date;
-                $tempFirstDate = $dividedMonth[$i]->date;
-            }
-            else {
-                $tempDate = $dividedMonth[$i]->date;
-            }
-
-            if($i == count($dividedMonth) - 1) {
-                $dateObj->weekNumber = $dividedMonth[$i]->weekNumber;
-                $dateObj->firstDay = $tempFirstDate;
-                $dateObj->lastDay = $tempLastDate;
-                array_push($weekDateArr, $dateObj);
-            }
-        }
-        //*****End of generating weekDateArr
-//        dd($weekDateArr);
-        return $weekDateArr;
-    }
-
-    private function provisionSystemForCoordinators(&$user, $dividedMonth, $month, $year) {
-        $weekDateArr = $this->divideMonthIntoCompanyWeeks($month,$year,$dividedMonth); // array of objects with week info
-//        dd($weekDateArr);
-        $infoArr = [];
-        $today = date('Y-m-d'); //today
-        foreach($weekDateArr as $weekInfo) {
-
-        }
     }
 
     private function provisionSystemForHR(&$user, $dividedMonth, $month, $year) {
 
-        $weekDateArr = $this->divideMonthIntoCompanyWeeks($month,$year,$dividedMonth); // array of objects with week info
+        $weekDateArr = MonthIntoCompanyWeeksDivision::get($month,$year); // array of objects with week info
 
         //*****Generating info how much account was added per week
         $infoArr = [];
@@ -868,7 +813,8 @@ class FinancesController extends Controller
             successorSalary,
             id_dep_type')->get();
 
-            $weekDayArr = $this->divideMonthIntoCompanyWeeks($realMonth, $realYear, MonthPerWeekDivision::get($realMonth, $realYear));
+
+        $weekDayArr = MonthIntoCompanyWeeksDivision::get($realMonth,$realYear);
 
             $result = $r->map(function($item) use($month, $clientRouteInfoRecords, $weekDayArr) {
                 $user_empl_status = UserEmploymentStatus::
