@@ -86,7 +86,7 @@
                 </div><div class="col-md-4">
                     <label>Trener:</label>
                     <select class="form-control selectpicker" id="trainersSelect">
-                        <option value="-1" selected>Wybierz</option>
+                        <option value="-1" selected>Wszyscy</option>
                         @foreach($trainers as $trainer)
                             @if($trainer->department_info_id == $deps[0]->id)
                                 <option value="{{$trainer->id}}" >{{$trainer->first_name}} {{$trainer->last_name}}</option>
@@ -301,7 +301,7 @@
                             VARIABLES.jQElements.departmentsSelectjQ.change(function (e) {
                                 VARIABLES.jQElements.trainersSelectjQ.find('option')
                                     .remove();
-                                VARIABLES.jQElements.trainersSelectjQ.append($('<option>').val(-1).text('Wybierz')).prop('selected',true);
+                                VARIABLES.jQElements.trainersSelectjQ.append($('<option>').val(-1).text('Wszyscy')).prop('selected',true);
                                 $.each(VARIABLES.trainers, function(index, trainer){
                                    if(trainer.department_info_id == VARIABLES.jQElements.departmentsSelectjQ.val()){
                                        VARIABLES.jQElements.trainersSelectjQ.append($('<option>').val(trainer.id).text(trainer.first_name+' '+trainer.last_name));

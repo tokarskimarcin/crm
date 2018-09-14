@@ -7,7 +7,6 @@ use App\Department_info;
 use App\User;
 use App\Utilities\DataProcessing\ConfirmationStatistics;
 use App\Utilities\Dates\MonthFourWeeksDivision;
-use App\Utilities\Dates\MonthIntoCompanyWeeksDivision;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\DB;
