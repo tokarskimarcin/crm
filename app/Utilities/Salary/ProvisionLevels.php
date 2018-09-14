@@ -88,15 +88,35 @@ class ProvisionLevels
                 break;
             }
             case 'HR': {
-                if($level >= 15) {
-                    $provision = 450;
-                } else if($level >= 10){
-                    $provision = 300;
-                } else{
-                    $provision = 150;
+                switch ($subsubtype) {
+                    case 1: { //confirmation
+                        if($level >= 15) { // ammout of new peoples
+                            $provision = 450;
+                        } else if($level >= 10){
+                            $provision = 300;
+                        } else{
+                            $provision = 150;
+                        }
+                        return $provision;
+                        break;
+                    }
+                    case 2: { //telemarketing
+                        if($level < 5) { //janki
+                            if($subtype > 100) { //target rbh, target ammout
+                                $provision = 150;
+                            }
+                            else {
+                                $provision = 0;
+                            }
+                        }
+                        else {
+                            $provision = 0;
+                        }
+                        return $provision;
+                        break;
+                    }
                 }
-                return $provision;
-                break;
+
             }
             case 'instructor': {
                 switch ($subtype) {
@@ -129,34 +149,28 @@ class ProvisionLevels
                 break;
             }
             case 'koordynator': {
-                if($subtype > 100) { //cel > 100%
-                    if($subsubtype > 90) { //number of days in work
-                        if($level > 10) { //database use
+                if($level < 10) { //database use
+                    if($subtype > 100) { //target > 100%
+                        if($subsubtype > 90) { //working more than 90 days as coordinator
                             $provision = 500;
                         }
-                        else {
-                            $provision = 0;
+                        else { //working less or equal than 90 days as coordinator
+                            $provision = 250;
                         }
                     }
                     else {
-                        if($level > 10) {
-                            $provision = 250;
-                        }
-                        else {
-                            $provision = 0;
-                        }
+                        $provision = 0;
                     }
                 }
                 else {
                     $provision = 0;
                 }
-
                 return $provision;
                 break;
             }
-            case 'Lider koordynatorow': {
-                if($subtype > 100) { // cel > 100%
-                    if($level > 10) { //database use
+            case 'coordinator leader': {
+                if($level < 10) { //database use
+                    if($subtype > 100) { //target > 100%
                         $provision = 1000;
                     }
                     else {
