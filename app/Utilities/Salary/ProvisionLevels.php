@@ -11,7 +11,6 @@ namespace App\Utilities\Salary;
 
 class ProvisionLevels
 {
-
     /**
      * //This method return premium money amount in case of frequency amount
      * @param $level - float number sometimes it is percent sometimes it is value, depends of type or subtype
@@ -25,29 +24,22 @@ class ProvisionLevels
             case 'consultant': {
                 switch($subtype) {
                     case '1': { //case of number of people who show up after invitation.
-                        if($level < 12) {
-                            $provision = -180;
-                        }
-                        else if($level >= 12 && $level < 16) {
-                            $provision = -60;
-                        }
-                        else if($level >= 16 && $level < 20) {
-                            $provision = 0;
-                        }
-                        else if($level >= 20 && $level < 25) {
-                            $provision = 20;
-                        }
-                        else if($level >= 25 && $level < 30) {
-                            $provision = 25;
-                        }
-                        else if($level >= 30 && $level < 35) {
-                            $provision = 30;
-                        }
-                        else if($level >= 35 && $level < 40) {
-                            $provision = 35;
-                        }
-                        else if($level >= 40) {
+                        if($level >= 40){
                             $provision = 40;
+                        }else if($level >= 35){
+                            $provision = 35;
+                        }else if($level >= 30 ){
+                            $provision = 30;
+                        }else if($level >= 25){
+                            $provision = 25;
+                        }else if($level >= 20){
+                            $provision = 20;
+                        }else if($level >= 16){
+                            $provision = 0;
+                        }else if($level >= 12){
+                            $provision = -60;
+                        }else {
+                            $provision = -180;
                         }
                         return $provision;
                         break;
@@ -63,8 +55,6 @@ class ProvisionLevels
                         break;
                     }
                 }
-
-
                 break;
             }
             case 'trainer': {
@@ -80,20 +70,16 @@ class ProvisionLevels
                         break;
                     }
                     case '2': { //case when green shows
-                        if($level < 80) {
-                            $provision = 0;
-                        }
-                        else if($level >= 80 && $level < 85) {
-                            $provision = 200;
-                        }
-                        else if($level >= 85 && $level < 90) {
-                            $provision = 250;
-                        }
-                        else if($level >= 90 && $level < 95) {
-                            $provision = 300;
-                        }
-                        else if($level >= 95) {
+                        if($level >= 95){
                             $provision = 350;
+                        }else if($level >= 90){
+                            $provision = 300;
+                        }else if($level >= 85 ){
+                            $provision = 250;
+                        }else if($level >= 80){
+                            $provision = 200;
+                        }else {
+                            $provision = 0;
                         }
                         return $provision;
                         break;
@@ -102,17 +88,12 @@ class ProvisionLevels
                 break;
             }
             case 'HR': {
-                if($level < 6) {
-                    $provision = 0;
-                }
-                else if($level >= 6 && $level < 10) {
-                    $provision = 150;
-                }
-                else if($level >= 10 && $level < 16) {
-                    $provision = 300;
-                }
-                else if($level >= 16) {
+                if($level >= 15) {
                     $provision = 450;
+                } else if($level >= 10){
+                    $provision = 300;
+                } else{
+                    $provision = 150;
                 }
                 return $provision;
                 break;
@@ -130,20 +111,16 @@ class ProvisionLevels
                         break;
                     }
                     case '2': { //case when green shows
-                        if($level < 80) {
-                            $provision = 0;
-                        }
-                        else if($level >= 80 && $level < 85) {
-                            $provision = 200;
-                        }
-                        else if($level >= 85 && $level < 90) {
-                            $provision = 250;
-                        }
-                        else if($level >= 90 && $level < 95) {
-                            $provision = 300;
-                        }
-                        else if($level >= 95) {
+                        if($level >= 95){
                             $provision = 350;
+                        }else if($level >= 90){
+                            $provision = 300;
+                        }else if($level >= 85 ){
+                            $provision = 250;
+                        }else if($level >= 80){
+                            $provision = 200;
+                        }else {
+                            $provision = 0;
                         }
                         return $provision;
                         break;

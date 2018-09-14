@@ -320,7 +320,8 @@
                             data: {
                                 trainersGrouping: VARIABLES.jQElements.trainersGroupingCheckboxjQ.get(0).checked,
                                 departmentId: VARIABLES.jQElements.departmentsSelectjQ.val(),
-                                selectedMonth: VARIABLES.jQElements.monthDatetimepicker.find('input').val()
+                                selectedMonth: VARIABLES.jQElements.monthDatetimepicker.find('input').val(),
+                                trainerId: VARIABLES.jQElements.trainersSelectjQ.val()
                             },
                             success: function (response) {
                                 VARIABLES.DATA_TABLES.departmentsConfirmation.data.departmentsConfirmationStatistics = response;
