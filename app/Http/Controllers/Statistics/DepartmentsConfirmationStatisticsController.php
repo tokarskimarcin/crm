@@ -10,6 +10,7 @@ use App\Utilities\Dates\MonthFourWeeksDivision;
 use App\Utilities\Dates\MonthIntoCompanyWeeksDivision;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\DB;
 
 class DepartmentsConfirmationStatisticsController extends Controller
 {
@@ -31,7 +32,6 @@ class DepartmentsConfirmationStatisticsController extends Controller
 
 
     public function departmentsConfirmationStatisticsAjax(Request $request){
-
         $month = $request->selectedMonth;
         $trainersGrouping = $request->trainersGrouping;
         $departmentId = $request->departmentId;
@@ -39,15 +39,13 @@ class DepartmentsConfirmationStatisticsController extends Controller
 
         $monthFourWeeksDivision = MonthFourWeeksDivision::get(date('Y',strtotime($month)),date('m',strtotime($month)));
         $clientRouteInfo = ClientRouteInfo::select(
+            DB::raw('concat(users.first_name," ",users.last_name) as confirmingUserName'),
+            DB::raw('concat(trainer.first_name," ",trainer.last_name) as confirmingUserTrainerName'),
             'confirmingUser',
             'confirmDate',
             'frequency',
             'pairs',
             'actual_success',
-            'users.first_name',
-            'users.last_name',
-            'trainer.first_name as t_first_name',
-            'trainer.last_name as t_last_name',
             'users.department_info_id',
             'users.coach_id'
             )
@@ -65,12 +63,12 @@ class DepartmentsConfirmationStatisticsController extends Controller
         }
         $clientRouteInfo = $clientRouteInfo->get();
 
-        $confirmationStatistics = ConfirmationStatistics::getConsultantsConfirmationStatisticsCollectionForMonth($clientRouteInfo, $monthFourWeeksDivision);
+        $confirmationStatistics = ConfirmationStatistics::getConsultantsConfirmationStatisticsForMonth($clientRouteInfo, $monthFourWeeksDivision);
 
-        $confirmationStatistics = $confirmationStatistics->sortByDesc('provision')->groupBy('dateGroup');
+        $confirmationStatistics['data'] = $confirmationStatistics['data']->sortByDesc('provision')->groupBy('dateGroup');
         if($trainersGrouping == 'true'){
-            foreach ($confirmationStatistics as $dateGroup => $dateGroupCollection){
-                $confirmationStatistics[$dateGroup] = $dateGroupCollection->groupBy('trainer');
+            foreach ($confirmationStatistics['data'] as $dateGroup => $dateGroupCollection){
+                $confirmationStatistics['data'][$dateGroup] = $dateGroupCollection->groupBy('secondGroup');
             }
         }
 

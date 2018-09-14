@@ -48,6 +48,9 @@
         .peach{
             background: #ffe599 !important;
         }
+        .gray{
+            background: #999999;
+        }
     </style>
 @endsection
 @section('content')
@@ -174,7 +177,8 @@
                 DATA_TABLES:{
                     departmentsConfirmation: {
                         data: {
-                            departmentsConfirmationStatistics: null
+                            departmentsConfirmationStatistics: null,
+                            departmentsConfirmationStatisticsSums: null
                         },
                         table: $('#departmentsConfirmationDatatable'),
                         dataTable: $('#departmentsConfirmationDatatable').DataTable({
@@ -227,7 +231,7 @@
                                         return 1;
                                     }},
                                 {data: 'dateGroup'},
-                                {data: 'trainer'}
+                                {data: 'secondGroup'}
                             ],
                             fnDrawCallback: function () {
                                 FUNCTIONS.setColumnClass(0, 'peach', VARIABLES.DATA_TABLES.departmentsConfirmation.table);
@@ -241,6 +245,9 @@
                                         'font-weight': 'bold'
                                     });
                                 }
+                                FUNCTIONS.insertSumRowAfterGroup(VARIABLES.jQElements.trainersGroupingCheckboxjQ.get(0).checked, this);
+
+                                //coloring to green date(week) group rows if week didn't end
                                 $('.group_'+groupColumns[0]).each(function (index, row) {
                                     let dates = $(row).find('td').text().split(" ");
                                     let lastDay = dates[2].split('.');
@@ -251,7 +258,10 @@
                             }
                         }),
                         getData: function () {
-                            return FUNCTIONS.AJAXs.departmentsConfirmationStatisticsAjax();
+                            return FUNCTIONS.AJAXs.departmentsConfirmationStatisticsAjax().then(function (response) {
+                                return response.data;
+                            });
+
                         },
                         setTableData: function (data){
                             //data is grouped by weeks and trainers  (/week/: [ trainer1:[], trainer2:[]])
@@ -321,7 +331,8 @@
                                 trainerId: VARIABLES.jQElements.trainersSelectjQ.val()
                             },
                             success: function (response) {
-                                VARIABLES.DATA_TABLES.departmentsConfirmation.data.departmentsConfirmationStatistics = response;
+                                VARIABLES.DATA_TABLES.departmentsConfirmation.data.departmentsConfirmationStatistics = response.data;
+                                VARIABLES.DATA_TABLES.departmentsConfirmation.data.departmentsConfirmationStatisticsSums = response.sums;
                                 return response;
                             },
                             error: function (jqXHR, textStatus, thrownError) {
@@ -360,6 +371,48 @@
                         }
                     });
                 },
+                insertSumRowAfterGroup: function (insideGrouping, dataTable, cssOptionsTr = null) {
+                    let column = insideGrouping ? groupColumns[1] : groupColumns[0];
+                    let api = dataTable.api();
+                    let rows = api.rows({page: 'current'}).nodes();
+                    api.column(column, {page: 'current'}).data().each(function (group, i) {
+                       if(group !== api.column(column, {page: 'current'}).data()[i+1]){
+                           let data = null;
+                           $.each(VARIABLES.DATA_TABLES.departmentsConfirmation.data.departmentsConfirmationStatisticsSums, function (weekNr, weekSums) {
+                               if(weekSums.dateGroup === api.column(groupColumns[0], {page: 'current'}).data()[i]){
+                                   data = weekSums;
+                                   return false;
+                               }
+                           });
+                           if(insideGrouping){
+                               $.each(data.secondGrouping, function (secondGroupingNr, secondGroupingSums) {
+                                   console.log(api.column(groupColumns[1], {page: 'current'}).data()[i]);
+                                   if(secondGroupingSums.secondGroup === api.column(groupColumns[1], {page: 'current'}).data()[i]){
+                                       data = secondGroupingSums;
+                                       return false;
+                                   }
+                               });
+                           }
+                           let elementToInsert = $('<tr>').addClass('groupSum_'+column).css('font-weight','bold')
+                               .append($('<td>'))
+                               .append($('<td>').addClass('gray').text('Suma:'))
+                               .append($('<td>').addClass('gray').text(data.shows))
+                               .append($('<td>').addClass('gray').text(data.provision))
+                               .append($('<td>').addClass('strongGreen').text(data.successful))
+                               .append($('<td>').addClass('strongGreen').text(data.successfulPct+'%'))
+                               .append($('<td>').addClass('strongYellow').text(data.neutral))
+                               .append($('<td>').addClass('strongYellow').text(data.neutralPct+'%'))
+                               .append($('<td>').addClass('strongRed').text(data.unsuccessful))
+                               .append($('<td>').addClass('strongRed').text(data.unsuccessfulPct+'%'))
+                               .append($('<td>').addClass('strongRed').text(data.unsuccessfulBadly))
+                               .append($('<td>').addClass('strongRed').text(data.unsuccessfulBadlyPct+'%'))
+                               .append($('<td>').addClass('gray').text(data.avgFrequency))
+                               .append($('<td>').addClass('gray').text(data.avgPairs))
+                               .append($('<td>').addClass('gray').text(data.recordsCount));
+                           $($(rows).eq(i)[0]).after(elementToInsert);
+                       }
+                    });
+                },
                 @php
                 /*universal function for datatables that reload data in given datatable
                 * @DataTable dataTable
@@ -369,6 +422,7 @@
                     let processing = $('#'+dataTable.table.attr('id')+'_processing');
                     processing.show();
                     dataTable.getData().done(function (response) {
+                        console.log(VARIABLES.DATA_TABLES.departmentsConfirmation.data.departmentsConfirmationStatisticsSums);
                         dataTable.setTableData(response);
                         processing.hide();
                     });
