@@ -28,7 +28,7 @@ class ScheduleController extends Controller
         $number_of_week = $request->show_schedule;
         $request->session()->put('number_of_week', $number_of_week);
         $request->session()->put('year', $request->schedule_year);
-        $schedule_analitics = $this->setWeekDays($number_of_week,$request);
+        $schedule_analitics = $this->setWeekDays($number_of_week,$request, [1,2]);
         return view('schedule.setSchedule')
             ->with('number_of_week',$number_of_week)
             ->with('schedule_analitics',$schedule_analitics)
@@ -115,8 +115,7 @@ class ScheduleController extends Controller
         $userTypes = UserTypes::all();
         $request->session()->put('number_of_week', $number_of_week);
         $request->session()->put('year', $request->schedule_year);
-        $schedule_analitics = $this->setWeekDays($number_of_week,$request);
-//        dd($schedule_analitics);
+        $schedule_analitics = $this->setWeekDays($number_of_week,$request,$userTypes->whereNotIn('id',[1,2])->pluck('id')->toArray());
         return view('schedule.setScheduleCadre')
             ->with('number_of_week',$number_of_week)
             ->with('userTypes', $userTypes)
@@ -396,7 +395,7 @@ class ScheduleController extends Controller
         $ret['week_end'] = $dto->format('Y-m-d');
         return $ret;
     }
-    private function setWeekDays($number_week,$request)
+    private function setWeekDays($number_week,$request, $userTypesArrays)
     {
         $dayOfWeekArray= array('monday' ,'tuesday','wednesday','thursday','friday','saturday','sunday');
         $query = DB::table('schedule');
@@ -409,11 +408,11 @@ class ScheduleController extends Controller
                         $czas_plus = $i+1;
                         $czas = '0' . $i;
                     }else {
-                        $czas_plus = '0' . $i + 1;
+                        $czas_plus = '0' . ($i + 1);
                         $czas = '0' . $i;
                     }
-                } else
-                {
+                }
+                else{
                     $czas = $i;
                     $czas_plus = $i+1;
                 }
@@ -431,10 +430,11 @@ class ScheduleController extends Controller
             }
         }
         $query->select(DB::raw($sql))
-          ->join('users','users.id','schedule.id_user')
-          ->where('week_num',$number_week)
-          ->where('year',$request->session()->get('year'))
-          ->where('users.department_info_id',Auth::user()->department_info_id);
+            ->join('users','users.id','schedule.id_user')
+            ->where('week_num',$number_week)
+            ->whereIn('user_type_id', $userTypesArrays)
+            ->where('year',$request->session()->get('year'))
+            ->where('users.department_info_id',Auth::user()->department_info_id);
 
         return $query->get();
     }

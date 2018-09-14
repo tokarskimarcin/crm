@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\AcceptedPayment;
 use App\Agencies;
+use App\ClientRouteInfo;
 use App\Department_info;
 use App\Department_types;
 use App\Departments;
@@ -11,11 +12,14 @@ use App\DoublingQueryLogs;
 use App\JankyPenatlyProc;
 use App\PaymentAgencyStory;
 use App\PenaltyBonus;
+use App\RecruitmentStory;
 use App\Schedule;
 use App\SuccessorHistory;
 use App\SummaryPayment;
 use App\User;
 use App\UserEmploymentStatus;
+use App\Utilities\Dates\MonthPerWeekDivision;
+use App\Utilities\Salary\ProvisionLevels;
 use App\Work_Hour;
 use function foo\func;
 use Illuminate\Http\Request;
@@ -215,6 +219,101 @@ class FinancesController extends Controller
 
     }
 
+    private function provisionSystemForTrainers($user, $dividedMonth) {
+        dd($dividedMonth);
+    }
+
+    public function divideMonthIntoCompanyWeeks($month, $year, $dividedMonth) {
+        $weekDateArr = []; // array of objects with week info
+
+        //*****Generating weekDateArr
+        $tempFirstDate = $dividedMonth[0]->date;
+        $tempLastDate = null;
+        $tempWeek = $dividedMonth[0]->weekNumber;
+        $tempDate = $dividedMonth[0]->date;
+        $i = 0;
+        for($i = 0; $i < count($dividedMonth); $i++) {
+            $dateObj = new \stdClass();
+
+            $dateObj->firstDay = null;
+            $dateObj->lastDay = null;
+            $dateObj->weekNumber = null;
+            if($dividedMonth[$i]->date == 'Suma') {
+                $tempLastDate = $tempDate;
+            }
+            if($dividedMonth[$i]->weekNumber != $tempWeek) {
+                $dateObj->lastDay = $tempLastDate;
+                $dateObj->firstDay = $tempFirstDate;
+                $dateObj->weekNumber = $tempWeek;
+                array_push($weekDateArr, $dateObj);
+                $tempWeek = $dividedMonth[$i]->weekNumber;
+                $tempDate = $dividedMonth[$i]->date;
+                $tempFirstDate = $dividedMonth[$i]->date;
+            }
+            else {
+                $tempDate = $dividedMonth[$i]->date;
+            }
+
+            if($i == count($dividedMonth) - 1) {
+                $dateObj->weekNumber = $dividedMonth[$i]->weekNumber;
+                $dateObj->firstDay = $tempFirstDate;
+                $dateObj->lastDay = $tempLastDate;
+                array_push($weekDateArr, $dateObj);
+            }
+        }
+        //*****End of generating weekDateArr
+        return $weekDateArr;
+    }
+
+    private function provisionSystemForHR(&$user, $dividedMonth, $month, $year) {
+
+        $weekDateArr = $this->divideMonthIntoCompanyWeeks($month,$year,$dividedMonth); // array of objects with week info
+
+        //*****Generating info how much account was added per week
+        $infoArr = [];
+        foreach($weekDateArr as $weekInfo) {
+           $data = RecruitmentStory::getReportNewAccountData($weekInfo->firstDay,$weekInfo->lastDay); //info about new accounts in teambox
+
+           foreach($data as $item) {
+               if($item->id == $user->id) {
+                   $obj = new \stdClass();
+                   $obj->week = $weekInfo->weekNumber;
+                   $obj->provision = ProvisionLevels::get($item->add_user, 'HR');
+                  array_push($infoArr, $obj);
+               }
+           }
+
+        }
+        $user->provisions = $infoArr;
+        //*****End of generating info how much account was added per week
+
+        //*****Generating info with audits score
+//        $departmentAudits = Audit::where('date_audit', 'like', $year . '-' . $month . '%')
+//            ->where('user_type', '=', 3)
+//            ->where('department_info_id', '=', $user->department_info_id)
+//            ->first();
+//
+//        if(!is_null($departmentAudits)) {
+//            $user->auditScore = $departmentAudits->score;
+//        }
+//        else {
+//            $user->auditScore = -1; // if no data, -1
+//        }
+//
+//        $personalAudits = Audit::where('date_audit', 'like', $year . '-' . $month . '%')
+//            ->where('user_type', '=', 2)
+//            ->where('trainer_id', '=', $user->id)
+//            ->first();
+//
+//        if(!is_null($personalAudits)) {
+//            $user->auditScorePersonal = $personalAudits->score;
+//        }
+//        else {
+//            $user->auditScorePersonal = -1; // if no data, -1
+//        }
+        //*****End of generating info with audits score
+    }
+
     public function viewPaymentCadrePost(Request $request)
     {
 
@@ -230,6 +329,7 @@ class FinancesController extends Controller
             ->where('users.salary','>',0)
             ->selectRaw('
             `users`.`id`,
+            `users`.`user_type_id`,
             `users`.`agency_id`,
             `users`.`max_transaction`,
             `users`.`first_name`,
@@ -238,6 +338,7 @@ class FinancesController extends Controller
             `users`.`username`,
             `departments`.`name` as dep_name, 
             `department_type`.`name`  as dep_type,
+            `department_info`.`id` as department_info_id,
             `users`.`salary`,
             `users`.`additional_salary`,
             `users`.`student`,
@@ -256,6 +357,19 @@ class FinancesController extends Controller
             ->where('work_hours.date', 'like', $date)
             ->groupBy('users.id')
             ->orderBy('users.last_name')->get();
+
+        foreach($salary as $user) {
+            if($user->user_type_id == 4) {
+//                $this->provisionSystemForTrainers($user,  MonthPerWeekDivision::get($month, $year));
+            }
+            else if($user->user_type_id == 5) {
+//                $this->provisionSystemForHR($user, MonthPerWeekDivision::get($month, $year), $month, $year);
+            }
+            else if($user->user_type_id == 19) {
+
+            }
+        }
+//        dd($salary->where('user_type_id', '=', 5));
 
         $freeDaysData = $this->getFreeDays($dividedMonth); //[id_user, freeDays]
 
@@ -424,7 +538,6 @@ class FinancesController extends Controller
         $agencies = Agencies::all();
         $department_type = Department_types::find($department_info->id_dep_type);
         $count_agreement = $department_type->count_agreement;
-
 
         $payment_saved = AcceptedPayment::
         where('department_info_id','=',Auth::user()->department_info_id)
@@ -660,8 +773,9 @@ class FinancesController extends Controller
     //Custom Function
     private function getSalary($month)
     {
-
-
+            $realMonth = substr($month,5,2);
+            $realYear = substr($month, 0,4);
+            $clientRouteInfoRecords = ClientRouteInfo::where('confirmDate', 'like', $month)->OnlyActive()->get();
             //Czy wypłata jest już zatwierdzona
             $payment_saved = AcceptedPayment::
             where('department_info_id','=',Auth::user()->department_info_id)
@@ -675,6 +789,7 @@ class FinancesController extends Controller
             }
         $query = DB::table(DB::raw("users"))
             ->join('work_hours', 'work_hours.id_user', 'users.id')
+            ->join('department_info', 'users.department_info_id', '=', 'department_info.id')
             ->where('users.department_info_id',Auth::user()->department_info_id)
             ->where(function ($querry) use ($month){
                 $querry->orwhere(DB::raw('SUBSTRING(promotion_date,1,7)'),'>=',substr($month,0,strlen($month)-1))
@@ -699,7 +814,8 @@ class FinancesController extends Controller
             SUM(`work_hours`.`success`) as `success`,
             `salary_to_account`,
             `users`.`successorUserId`,
-            0 as successorSalary
+            0 as successorSalary,
+            id_dep_type
             ');
             if(!$payment_saved->isEmpty()){
                 $query = $query
@@ -730,8 +846,12 @@ class FinancesController extends Controller
             `h`.`janki`,
             `salary_to_account`,
             successorUserId,
-            successorSalary')->get();
-            $result = $r->map(function($item) use($month) {
+            successorSalary,
+            id_dep_type')->get();
+
+            $weekDayArr = $this->divideMonthIntoCompanyWeeks($realMonth, $realYear, MonthPerWeekDivision::get($realMonth, $realYear));
+
+            $result = $r->map(function($item) use($month, $clientRouteInfoRecords, $weekDayArr) {
                 $user_empl_status = UserEmploymentStatus::
                     where( function ($querry) use ($item) {
                     $querry = $querry->orwhere('pbx_id', '=', $item->login_phone)
@@ -741,6 +861,42 @@ class FinancesController extends Controller
                     ->where('pbx_id', '!=', 0)
                     ->where('pbx_id', '!=', null)
                     ->get();
+
+                $campaignScoresArr = [];
+
+                //creating provision field for each confirming consultant with data about provisions.
+                if($item->id_dep_type == 1) { //konsultant potwierdzeń
+                    $globalProvisionSum = 0;
+
+                    foreach($weekDayArr as $week) { //looping after each week
+                        $weekScoreArr = [];
+                        $showRecordsOfGivenUser = $clientRouteInfoRecords
+                            ->where('confirmingUser', '=', $item->id)
+                            ->where('confirmDate', '>=', $week->firstDay)
+                            ->where('confirmDate', '<', $week->lastDay); //all campaigns that he/she confirm in given week
+                        $provisionSum = 0;
+                        $badCampaigns = 0;
+                        foreach($showRecordsOfGivenUser as $show) {
+                            $provision = ProvisionLevels::get($show->frequency, 'consultant', '1');
+                            array_push($weekScoreArr, $provision);
+                            if($provision < 0) {
+                                $badCampaigns++;
+                            }
+                            $provisionSum += $provision;
+                            $globalProvisionSum += $provision;
+                        }
+                        $badCampaignsProvision = ProvisionLevels::get($badCampaigns, 'consultant', '2');
+                        $obj = new \stdClass();
+                        $obj->weekNumber = $week->weekNumber;
+                        $obj->provisions = $weekScoreArr;
+                        $obj->provisionSum =  $provisionSum;
+                        $obj->badCampaignsProvision = $badCampaignsProvision; // 50zl for each week without bad campaigns
+                        $globalProvisionSum += $badCampaignsProvision;
+                        array_push($campaignScoresArr, $obj);
+                    }
+                    $item->provision = $campaignScoresArr;
+                    $item->totalProvision = $globalProvisionSum < 0 ? 0 : $globalProvisionSum;
+                }
                 $user_empl_status = $user_empl_status->where('user_id','=',$item->id);
                 if(count($user_empl_status) == 0 || count($user_empl_status) == 1) {
 
@@ -797,6 +953,7 @@ class FinancesController extends Controller
                 }
                return $item;
             });
+
             $this::mapSuccessorSalary(Auth::user()->department_info_id,$r,$month);
             $final_salary = $r->groupBy('agency_id');
             return $final_salary;

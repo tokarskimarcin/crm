@@ -22,6 +22,8 @@ use App\Route;
 use App\RouteInfo;
 use App\Schedule;
 use App\User;
+use App\Utilities\Dates\MonthPerWeekDivision;
+use App\Utilities\Dates\NameOfWeek;
 use App\Voivodes;
 use App\Work_Hour;
 use DateTime;
@@ -3017,7 +3019,7 @@ class CrmRouteController extends Controller
         while($actualDate <= $stopDate){
             $dayCollect = collect();
             $dayCollect->offsetSet('numberOfWeek',date('W',strtotime($actualDate)));
-            $dayCollect->offsetSet('dayName',$this::getNameOfWeek($actualDate));
+            $dayCollect->offsetSet('dayName',NameOfWeek::get($actualDate, 'short'));
             $dayCollect->offsetSet('day',$actualDate);
             $totalScore = 0;
             $allSet = true;
@@ -3076,17 +3078,16 @@ class CrmRouteController extends Controller
         $departmentsInvitationsAveragesInfo = collect();
         foreach ($departmentInfo as $item) {
             $actualDate = $startDate;
-            $weekSum = 0;
             $weekScoresArr = [];
             $weekDivider = 0;
 
-            $saturdaySum = 0;
             $saturdayScoresArr = [];
             $saturdayDivider = 0;
+            $saturdayNullDivider = 0;
 
-            $sundaySum = 0;
             $sundayScoresArr = [];
             $sundayDivider = 0;
+            $sundayNullDivider = 0;
 
             while ($actualDate < $stopDate) {
                 $routeInfo = $routeInfoOverall->where('department_info_id' ,'=', $item->id)
@@ -3095,17 +3096,20 @@ class CrmRouteController extends Controller
 
                 if($routeInfo['sumOfActualSuccess'] != 0){
                     if(date('N',strtotime($actualDate)) <6){
-                        $weekSum += $routeInfo['sumOfActualSuccess'];
                         array_push($weekScoresArr, $routeInfo['sumOfActualSuccess']);
                         $weekDivider++;
                     } else if (date('N', strtotime($actualDate)) == 6) {
-                        $saturdaySum += $routeInfo['sumOfActualSuccess'];
                         array_push($saturdayScoresArr, $routeInfo['sumOfActualSuccess']);
                         $saturdayDivider++;
                     } else if (date('N', strtotime($actualDate)) == 7) {
-                        $sundaySum += $routeInfo['sumOfActualSuccess'];
                         array_push($sundayScoresArr, $routeInfo['sumOfActualSuccess']);
                         $sundayDivider++;
+                    }
+                }else{
+                    if (date('N', strtotime($actualDate)) == 6) {
+                        $saturdayNullDivider++;
+                    } else if (date('N', strtotime($actualDate)) == 7) {
+                        $sundayNullDivider++;
                     }
                 }
 
@@ -3165,7 +3169,7 @@ class CrmRouteController extends Controller
                     $varianceNumeratorSat += pow($value, 2) * ($iterator + 1);
                 }
 
-                $weightAverageSaturday = $denominatorSat == 0 ? 0 : $averageNumeratorSat / $denominatorSat;
+                $weightAverageSaturday = $denominatorSat == 0 ? 0 : ($averageNumeratorSat+(($weightAverageWeek*$factors['saturday']/100) * $saturdayNullDivider))/ ($denominatorSat+$saturdayNullDivider);
                 $weightedVarianceSaturday = ($varianceNumeratorSat / $denominatorSat) - pow($weightAverageSaturday, 2);
                 $stdDevSaturday = ($saturdayDivider >= 2 && $saturdayDivider <= 75) ? sqrt($weightedVarianceSaturday) / $this->getCzynnikC4($saturdayDivider) : sqrt($weightedVarianceSaturday); // ważone odchylenie standardowe.
             }else{
@@ -3218,7 +3222,7 @@ class CrmRouteController extends Controller
                     $varianceNumeratorSun += pow($value, 2) * ($iterator + 1);
                 }
 
-                $weightAverageSunday = $denominatorSun == 0 ? 0 : $averageNumeratorSun / $denominatorSun;
+                $weightAverageSunday = $denominatorSun == 0 ? 0 : ($averageNumeratorSun+(($weightAverageWeek*$factors['sunday']/100)*$saturdayNullDivider)) / ($denominatorSun+$saturdayNullDivider);
                 $weightedVarianceSunday = ($varianceNumeratorSun / $denominatorSun) - pow($weightAverageSunday, 2);
 
                 $sundayStdDev = ($sundayDivider >= 2 && $sundayDivider <= 75) ? sqrt($weightedVarianceSunday) / $this->getCzynnikC4($sundayDivider) : sqrt($weightedVarianceSunday);  //saturday standard deviation
@@ -3341,30 +3345,6 @@ class CrmRouteController extends Controller
         return $arr[$number];
     }
 
-    private function getNameOfWeek($date){
-        $arrayOfWeekName = [
-            '1' => 'Pn',
-            '2' => 'Wt',
-            '3' => 'Śr',
-            '4' => 'Czw',
-            '5' => 'Pt',
-            '6' => 'Sb',
-            '7' => 'Nd'];
-        return $arrayOfWeekName[date('N',strtotime($date))+0];
-    }
-
-    private function getNameOfWeek2($date){
-        $arrayOfWeekName = [
-            '1' => 'Poniedziałek',
-            '2' => 'Wtorek',
-            '3' => 'Środa',
-            '4' => 'Czwartek',
-            '5' => 'Piątek',
-            '6' => 'Sobota',
-            '7' => 'Niedziela'];
-        return $arrayOfWeekName[date('N',strtotime($date))+0];
-    }
-
     /**
      * This method returns view presentationStatistics with a data necessary for table
      */
@@ -3386,7 +3366,7 @@ class CrmRouteController extends Controller
         $date = new DateTime(date('Y-m').'-01');
         $week = $date->format("W");
         //Pobranie równych czterech tygodni
-        $split_month = $this->monthPerWeekDivision(date('m'),date('Y'));
+        $split_month = MonthPerWeekDivision::get(date('m'),date('Y'));
 
 //        dd($split_month);
         $allInfo = Clients::select(DB::raw(
@@ -3531,7 +3511,7 @@ class CrmRouteController extends Controller
 
             $month = $request->month;
             $year = $request->year;
-            $days = $this->monthPerWeekDivision($month,$year);
+            $days = MonthPerWeekDivision::get($month,$year);
             return $days;
     }
 
@@ -3561,7 +3541,7 @@ class CrmRouteController extends Controller
         $date = new DateTime($year. '-' . $month . '-01');
         $week = $date->format("W");
         //Pobranie równych czterech tygodni
-        $split_month = $this->monthPerWeekDivision($month,$year);
+        $split_month = MonthPerWeekDivision::get($month,$year);
         $allInfo = Clients::select(DB::raw(
             'client.id,
                 client.name,
@@ -3722,80 +3702,6 @@ class CrmRouteController extends Controller
             ->with('month',date('m'))
             ->with('currentYear', $year)
             ->with('currentMonth', $currentMonth);
-    }
-
-    public function monthPerWeekDivision($month,$year){
-        $arrayOfWeekName = [
-            '1' => 'Poniedziałek',
-            '2' => 'Wtorek',
-            '3' => 'Środa',
-            '4' => 'Czwartek',
-            '5' => 'Piątek',
-            '6' => 'Sobota',
-            '7' => 'Niedziela'];
-
-        $days_in_month = date('t', strtotime($year . '-' . $month));
-
-        $numberOfWeekPreviusMonth = $this::getWeekNumber(date('Y-m-d', strtotime($year.'-'.$month.'-01'. ' - 1 days')));
-
-        $weeks = [];
-        for ($i = 1; $i <= $days_in_month; $i++) {
-            $loop_day = ($i < 10) ? '0' . $i : $i ;
-            $date = $year.'-'.$month.'-'.$loop_day;
-            $actualWeek = $this::getWeekNumber($date);
-
-            if($actualWeek != $numberOfWeekPreviusMonth){
-                foreach($arrayOfWeekName as $key => $value) {
-                    if($value == $this::getNameOfWeek2($date)) {
-                        $weeksObj = new \stdClass();
-                        $weeksObj->date = $date;
-                        $weeksObj->weekNumber = date('W', strtotime($date));
-                        $weeksObj->name = $this::getNameOfWeek($date);
-                        $weeksObj->dayNumber = $key;
-                        array_push($weeks,$weeksObj);
-
-                        // czy niedziela
-                        if($weeksObj->name == 'Nd') {
-                            $sumObj = new \stdClass();
-                            $sumObj->date = 'Suma';
-                            $sumObj->weekNumber = date('W', strtotime($date));
-                            $sumObj->name = 'Suma';
-                            array_push($weeks, $sumObj);
-                        }
-                    }
-                }
-            }
-        }
-
-        $lastNumberOfWeek = $actualWeek;
-        $dateNextMonth = date('Y-m-d', strtotime($date . ' + 1 days'));
-        $daysInNextMonth = date('t', strtotime($dateNextMonth));
-        for ($i = 1; $i <= $daysInNextMonth; $i++) {
-            $loop_day = ($i < 10) ? '0' . $i : $i ;
-            $date = date('Y-m',strtotime($dateNextMonth)).'-'.$loop_day;
-            $actualWeek = $this::getWeekNumber($date);
-            if($actualWeek == $lastNumberOfWeek){
-                foreach($arrayOfWeekName as $key => $value) {
-                    if($value == $this::getNameOfWeek($date)) {
-                        $weeksObj = new \stdClass();
-                        $weeksObj->date = $date;
-                        $weeksObj->weekNumber = date('W', strtotime($date));
-                        $weeksObj->name = $this::getNameOfWeek($date);
-                        $weeksObj->dayNumber = $key;
-                        array_push($weeks,$weeksObj);
-                    }
-                }
-            }else{
-                break;
-            }
-        }
-        return $weeks;
-    }
-
-    public function getWeekNumber($date){
-        $actualWeek = new DateTime($date);
-        $actualWeek = $actualWeek->format("W");
-        return $actualWeek;
     }
 
     public function monthArray(){
