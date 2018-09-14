@@ -899,7 +899,7 @@
                            .append('<td>' + sumAllSuccess + '</td>')
                            .append('<td>' + sumAllLimit + '</td>')
                            .append('<td>' + sumAllLose + '</td>')
-                           .append('<td colspan="4"></td>')
+                           .append('<td colspan="5"></td>')
                    },
                },
            });
