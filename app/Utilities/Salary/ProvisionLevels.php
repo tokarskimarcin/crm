@@ -33,7 +33,7 @@ class ProvisionLevels
      * @param null $subtype - different variations of provisions for some type, defined as integer.
      * @return int - value of provision
      */
-    public static function get($level, $type, $subtype = 1) {
+    public static function get($level, $type, $subtype = 1, $subsubtype = null) {
         $provision = 0;
         switch($type) {
             case 'consultant': {
@@ -141,6 +141,47 @@ class ProvisionLevels
                         break;
                     }
                 }
+                break;
+            }
+            case 'koordynator': {
+                if($subtype > 100) { //cel > 100%
+                    if($subsubtype > 90) { //number of days in work
+                        if($level > 10) { //database use
+                            $provision = 500;
+                        }
+                        else {
+                            $provision = 0;
+                        }
+                    }
+                    else {
+                        if($level > 10) {
+                            $provision = 250;
+                        }
+                        else {
+                            $provision = 0;
+                        }
+                    }
+                }
+                else {
+                    $provision = 0;
+                }
+
+                return $provision;
+                break;
+            }
+            case 'Lider koordynatorow': {
+                if($subtype > 100) { // cel > 100%
+                    if($level > 10) { //database use
+                        $provision = 1000;
+                    }
+                    else {
+                        $provision = 0;
+                    }
+                }
+                else {
+                    $provision = 0;
+                }
+                return $provision;
                 break;
             }
         }

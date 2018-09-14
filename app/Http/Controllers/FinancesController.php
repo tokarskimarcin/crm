@@ -302,6 +302,7 @@ class FinancesController extends Controller
             `users`.`additional_salary`,
             `users`.`student`,
             `users`.`documents`,
+            `users`.`promotion_date`,
              ROUND(salary / DAY(LAST_DAY("' . $request->search_money_month.'-01' .'")),2) as average_salary,
             (SELECT SUM(`penalty_bonus`.`amount`) FROM `penalty_bonus` WHERE `penalty_bonus`.`id_user`=`users`.`id` AND `penalty_bonus`.`event_date` LIKE "'.$date.'" AND `penalty_bonus`.`type`=1 AND `penalty_bonus`.`status`=1) as `penalty`,
             (SELECT SUM(`penalty_bonus`.`amount`) FROM `penalty_bonus` WHERE `penalty_bonus`.`id_user`=`users`.`id` AND `penalty_bonus`.`event_date` LIKE  "'.$date.'" AND `penalty_bonus`.`type`=2 AND `penalty_bonus`.`status`=1) as `bonus`')
@@ -327,10 +328,14 @@ class FinancesController extends Controller
             else if($user->user_type_id == 19) {
 
             }
+            else if($user->user_type_id == 8) { //koordynator
+//                $this->provisionSystemForCoordinators($user, MonthPerWeekDivision::get($month, $year), $month, $year);
+            }
         }
 //        dd($salary->where('user_type_id', '=', 5));
 
         $freeDaysData = $this->getFreeDays($dividedMonth); //[id_user, freeDays]
+//        dd($freeDaysData);
 
         /**
          * Pobranie danych osób którzy nie pracowali całego miesiąca
@@ -914,7 +919,7 @@ class FinancesController extends Controller
                return $item;
             });
 
-        $this::mapSuccessorSalary(Auth::user()->department_info_id,$r,$month);
+            $this::mapSuccessorSalary(Auth::user()->department_info_id,$r,$month);
             $final_salary = $r->groupBy('agency_id');
             return $final_salary;
     }
