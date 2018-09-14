@@ -11,21 +11,6 @@ namespace App\Utilities\Salary;
 
 class ProvisionLevels
 {
-
-    public static $SUBTYPES = (object)[
-            'consultants'=> (object)[
-                'frequency' => 1,
-                'bad_shows' => 2
-            ],
-            'trainers'=> (object)[
-                'red_shows' => 1,
-                'green_shows' => 2
-            ],
-            'instructors'=> (object)[
-                'red_shows' => 1,
-                'green_shows' => 2
-            ]
-        ];
     /**
      * //This method return premium money amount in case of frequency amount
      * @param $level - float number sometimes it is percent sometimes it is value, depends of type or subtype
