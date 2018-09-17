@@ -511,13 +511,14 @@ class FinancesController extends Controller
             $todayDateTime = new DateTime($today);
             $provisions = [];
             $totalProvision = 0;
-            $data = $this->getMultiDepartmentData($firstDayOfMonth->format('Y-m-d'), $lastDayOfMonth->format('Y-m-d'), $month, $year,$user->department_info_id, $days_in_month);
+            $data = $this->getMultiDepartmentData($firstDayOfMonth->format('Y-m-d'), $lastDayOfMonth->format('Y-m-d'), $month, $year,[$user->department_info_id], $days_in_month);
             $weekGoalsRBH = [];
-//            dd($dividedMonth);
+            dd($user);
             foreach($weekDateArr as $weekInfo) {
                 $total_week_goal_RBH = 0;
                 $hour_reports = $data['hour_reports'];
                 $dep_info = $data['dep_info'];
+//                dd($dep_info);
                 $firstDayOfMonthDateTime = new DateTime($weekInfo->firstDay);
                 $lastDayOfWeekDateTime = new DateTime($weekInfo->lastDay);
                 $dateDiff = $lastDayOfWeekDateTime->diff($firstDayOfMonthDateTime)->days;
@@ -528,8 +529,8 @@ class FinancesController extends Controller
                     if ($add_default_zero == false) {
                         $day_number = date('N', strtotime($report->report_date));
 
-                        $goal = ($day_number < 6) ? $dep_info['dep_aim'] : $dep_info['dep_aim_week'];
-                        $working_hours_goal = ($dep_info['commission_avg'] > 0) ? $goal / $dep_info['commission_avg'] : 0 ;
+                        $goal = ($day_number < 6) ? $dep_info[0]['dep_aim'] : $dep_info[0]['dep_aim_week'];
+                        $working_hours_goal = ($dep_info[0]['commission_avg'] > 0) ? $goal / $dep_info[0]['commission_avg'] : 0 ;
                         $total_week_goal_RBH += $working_hours_goal;
                     }
                 }
