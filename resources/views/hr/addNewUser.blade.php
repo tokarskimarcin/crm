@@ -168,7 +168,7 @@
                             </div>
                         </div>
                         @if($type == 2)
-                            <div class="col-md-6">
+                            <div class="col-md-6" id="emailSection">
                                 <div class="form-group">
                                     <label class="myLabel">Adres email:</label>
                                     <input class="form-control" type="mail" class="form-control" placeholder="Email" id="email" name="email"  value="">
@@ -180,7 +180,7 @@
                                     <input type="number" pattern="[0-9]*" class="form-control" placeholder="format: 000000000" id="phone" name="phone" value="">
                                 </div>
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-3" id="salarySection">
                                 <div class="form-group">
                                     <label class="myLabel">Wynagrodzenie:</label>
                                     <input type="number" class="form-control" placeholder="0" name="salary" id="salary" value="">
@@ -438,10 +438,15 @@ $(document).ready(function() {
             return false;
         }
 
-        if (email != null && email.trim().length == 0) {
-            swal('Podaj adres email!');
-            return false;
+        if(user_type != 9){
+            if (email != null && email.trim().length == 0) {
+                swal('Podaj adres email!');
+                return false;
+            }
+        } else {
+            email = '';
         }
+
 
         if (user_type != null && user_type == 'Wybierz') {
             swal('Wybierz uprawnienia!');
@@ -476,7 +481,7 @@ $(document).ready(function() {
             }
         });
 
-        if (email != null) {
+        if (email != null && user_type != 9) {
             $.ajax({
                 type: "POST",
                 async: false,
@@ -555,12 +560,16 @@ $(document).ready(function() {
        let selectedObject = $(this);
        if(selectedObject.val() == 9){
            $('#successorUserSelect').attr('hidden',false);
+           $('#salarySection').attr('hidden',true);
+           $('#emailSection').attr('hidden',true);
            if(departmentInfoId.val() == 'Wybierz'){
                successorSelect.empty();
                successorSelect.append(getSelectOption("Wybierz oddział sukcesora"));
            }
        }else{
            $('#successorUserSelect').attr('hidden',true);
+           $('#salarySection').attr('hidden',false);
+           $('#emailSection').attr('hidden',false);
        }
     });
     departmentInfoId.on('change',function () {
