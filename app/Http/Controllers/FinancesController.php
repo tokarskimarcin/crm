@@ -513,7 +513,7 @@ class FinancesController extends Controller
             $totalProvision = 0;
             $data = $this->getMultiDepartmentData($firstDayOfMonth->format('Y-m-d'), $lastDayOfMonth->format('Y-m-d'), $month, $year,[$user->department_info_id], $days_in_month);
             $weekGoalsRBH = [];
-            dd($user);
+//            dd($user);
             foreach($weekDateArr as $weekInfo) {
                 $total_week_goal_RBH = 0;
                 $hour_reports = $data['hour_reports'];
@@ -537,7 +537,7 @@ class FinancesController extends Controller
                 array_push($weekGoalsRBH, $total_week_goal_RBH);
             }
 //            dd($user);
-            dd($weekGoalsRBH);
+//            dd($weekGoalsRBH);
 
 
         }
