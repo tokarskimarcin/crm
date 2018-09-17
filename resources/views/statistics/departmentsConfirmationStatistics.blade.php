@@ -22,7 +22,7 @@
             background: white;
 
         }
-        #departmentsConfirmationDatatable tbody td{
+        #departmentsConfirmationDatatable tbody td, #allDepartmentsConfirmationDatatable tbody td{
             text-align: center;
         }
 
@@ -695,7 +695,7 @@
             VARIABLES.DATA_TABLES.departmentsConfirmation.ajaxReload();
             VARIABLES.DATA_TABLES.allDepartmentsConfirmation.ajaxReload();
             FUNCTIONS.EVENT_HANDLERS.callEvents();
-            resizeDatatablesOnMenuToggle([VARIABLES.DATA_TABLES.departmentsConfirmation.dataTable]);
+            resizeDatatablesOnMenuToggle([VARIABLES.DATA_TABLES.departmentsConfirmation.dataTable, VARIABLES.DATA_TABLES.allDepartmentsConfirmation.dataTable]);
         });
     </script>
 @endsection
