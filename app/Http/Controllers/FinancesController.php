@@ -542,9 +542,74 @@ class FinancesController extends Controller
         }
     }
 
+    private function getDepartmentStatistics($weekDateArr, $month, $year, $departments) {
+        $firstDayOfMonth = new DateTime(date('Y-m-d', strtotime($year . '-' . $month . '-01')));
+        $lastDayOfMonth = new DateTime(date('Y-m-d', strtotime($year .'-'. $month . '-' . date('t', strtotime($year . '-' . $month . '-01')))));
+
+        $days_in_month = date('t', strtotime(date('Y').'-'. $month));
+
+        $today = date('Y-m-d'); //today
+        $todayDateTime = new DateTime($today);
+        $data = $this->getMultiDepartmentData($firstDayOfMonth->format('Y-m-d'), $lastDayOfMonth->format('Y-m-d'), $month, $year,$departments, $days_in_month);
+        $rbhTargetArr = [];
+        foreach($weekDateArr as $weekInfo) {
+            $total_week_proc_janky = 0;
+            $total_week_goal = 0;
+            $total_week_success = 0;
+            $real_week_RBH = 0;
+            $week_target_RBH = 0;
+            $total_week_checked = 0;
+            $total_week_bad = 0;
+            $hour_reports = $data['hour_reports'];
+            $dep_info = $data['dep_info'];
+            $firstDayOfMonthDateTime = new DateTime($weekInfo->firstDay);
+            $lastDayOfWeekDateTime = new DateTime($weekInfo->lastDay);
+            $dateDiff = $lastDayOfWeekDateTime->diff($firstDayOfMonthDateTime)->days;
+            for($i = 0; $i <= intval($dateDiff); $i++) {
+                $depAim = 0;
+                $date = date('Y-m-d', strtotime($weekInfo->firstDay . ' + ' . $i .' days'));
+                $report = $hour_reports->where('report_date', '=', $date)->where('success', '>', 0)->first();
+                $add_default_zero = ($report != null) ? false : true ;
+                if ($add_default_zero == false) {
+                    $day_number = date('N', strtotime($report->report_date));
+                    $real_RBH = round(($report->time_sum_real_RBH / 3600) ,2);
+                    if(date('w', strtotime($date)) == 6) { //saturday
+                        $depAim = $dep_info[0]['dep_aim_week'];
+                    }
+                    else { //other than saturday
+                        $depAim = $dep_info[0]['dep_aim'];
+                    }
+                    $goal = ($day_number < 6) ? $dep_info[0]['dep_aim'] : $dep_info[0]['dep_aim_week'];
+                    $total_week_goal += $goal;
+                    $total_week_success += $report->success;
+
+                    $commisionAvg = $dep_info[0]['commission_avg'];
+                    $targetRBH =$commisionAvg != 0 ? round($depAim / $commisionAvg, 2) : 0; //cel rbh
+                    $week_target_RBH += $targetRBH;
+                    $real_week_RBH += $real_RBH;
+                    $total_week_checked += $report->count_all_check;
+                    $total_week_bad += $report->count_bad_check;
+                }
+            }
+            $total_week_proc_janky = ($total_week_checked != null && $total_week_checked > 0) ? round(($total_week_bad / $total_week_checked) * 100, 2) : 0 ;
+            $total_week_goal_proc = ($total_week_goal != null && $total_week_goal > 0) ? round(($total_week_success / $total_week_goal) * 100, 2) : 0 ;
+
+            $obj = new \stdClass();
+            $obj->week_target_rbh = round($week_target_RBH);
+            $obj->real_week_rbh = $real_week_RBH;
+            $obj->janky_proc = $total_week_proc_janky;
+            $obj->target_rbh_percentage = round($week_target_RBH) != 0 ? 100 * $real_week_RBH / round($week_target_RBH) : 0;
+            $obj->total_week_goal_proc = $total_week_goal_proc;
+            array_push($rbhTargetArr, $obj);
+        }
+
+        return $rbhTargetArr;
+    }
+
     private function provisionSystemForHR(&$user, $month, $year) {
 
         $weekDateArr = MonthFourWeeksDivision::get($year,$month); // array of objects with week info
+//        dd($weekDateArr);
 
         if($user->dep_type_id == 1) { //hr from confirming
             //*****Generating info how much account was added per week
@@ -569,62 +634,72 @@ class FinancesController extends Controller
             //*****End of generating info how much account was added per week
         }
         else if($user->dep_type_id == 2) { //hr from telemarketing
-            $firstDayOfMonth = new DateTime(date('Y-m-d', strtotime($year . '-' . $month . '-01')));
-            $lastDayOfMonth = new DateTime(date('Y-m-d', strtotime($year .'-'. $month . '-' . date('t', strtotime($year . '-' . $month . '-01')))));
-
-            $days_in_month = date('t', strtotime(date('Y').'-'. $month));
-
-            $departments = Department_info::where('id_dep_type', '=', 2)->get();
-
-            $infoArr = [];
-            $today = date('Y-m-d'); //today
-            $todayDateTime = new DateTime($today);
+//            $firstDayOfMonth = new DateTime(date('Y-m-d', strtotime($year . '-' . $month . '-01')));
+//            $lastDayOfMonth = new DateTime(date('Y-m-d', strtotime($year .'-'. $month . '-' . date('t', strtotime($year . '-' . $month . '-01')))));
+//
+//            $days_in_month = date('t', strtotime(date('Y').'-'. $month));
+//
+//            $departments = Department_info::where('id_dep_type', '=', 2)->get();
+//
+//            $infoArr = [];
+//            $today = date('Y-m-d'); //today
+//            $todayDateTime = new DateTime($today);
             $provisions = [];
             $totalProvision = 0;
-            $data = $this->getMultiDepartmentData($firstDayOfMonth->format('Y-m-d'), $lastDayOfMonth->format('Y-m-d'), $month, $year,[$user->department_info_id], $days_in_month);
-            $rbhTargetArr = [];
-            foreach($weekDateArr as $weekInfo) {
-                $total_week_proc_janky = 0;
-                $real_week_RBH = 0;
-                $week_target_RBH = 0;
-                $total_week_checked = 0;
-                $total_week_bad = 0;
-                $hour_reports = $data['hour_reports'];
-                $dep_info = $data['dep_info'];
-                $firstDayOfMonthDateTime = new DateTime($weekInfo->firstDay);
-                $lastDayOfWeekDateTime = new DateTime($weekInfo->lastDay);
-                $dateDiff = $lastDayOfWeekDateTime->diff($firstDayOfMonthDateTime)->days;
-                for($i = 0; $i <= intval($dateDiff); $i++) {
-                    $depAim = 0;
-                    $date = date('Y-m-d', strtotime($weekInfo->firstDay . ' + ' . $i .' days'));
-                    $report = $hour_reports->where('report_date', '=', $date)->where('success', '>', 0)->first();
-                    $add_default_zero = ($report != null) ? false : true ;
-                    if ($add_default_zero == false) {
-                        $day_number = date('N', strtotime($report->report_date));
-                        $real_RBH = round(($report->time_sum_real_RBH / 3600) ,2);
-                        if(date('w', strtotime($date)) == 6) { //saturday
-                            $depAim = $dep_info[0]['dep_aim_week'];
-                        }
-                        else { //other than saturday
-                            $depAim = $dep_info[0]['dep_aim'];
-                        }
-                        $commisionAvg = $dep_info[0]['commission_avg'];
-                        $targetRBH =$commisionAvg != 0 ? round($depAim / $commisionAvg, 2) : 0; //cel rbh
-                        $week_target_RBH += $targetRBH;
-                        $real_week_RBH += $real_RBH;
-                        $total_week_checked += $report->count_all_check;
-                        $total_week_bad += $report->count_bad_check;
-                    }
-                }
-                $total_week_proc_janky = ($total_week_checked != null && $total_week_checked > 0) ? round(($total_week_bad / $total_week_checked) * 100, 2) : 0 ;
+//            $data = $this->getMultiDepartmentData($firstDayOfMonth->format('Y-m-d'), $lastDayOfMonth->format('Y-m-d'), $month, $year,[$user->department_info_id], $days_in_month);
+            $rbhTargetArr = $this->getDepartmentStatistics($weekDateArr, $month, $year, [$user->department_info_id]);
+//            foreach($weekDateArr as $weekInfo) {
+//                $total_week_proc_janky = 0;
+//                $total_week_goal = 0;
+//                $total_week_success = 0;
+//                $real_week_RBH = 0;
+//                $week_target_RBH = 0;
+//                $total_week_checked = 0;
+//                $total_week_bad = 0;
+//                $hour_reports = $data['hour_reports'];
+//                $dep_info = $data['dep_info'];
+//                $firstDayOfMonthDateTime = new DateTime($weekInfo->firstDay);
+//                $lastDayOfWeekDateTime = new DateTime($weekInfo->lastDay);
+//                $dateDiff = $lastDayOfWeekDateTime->diff($firstDayOfMonthDateTime)->days;
+//                for($i = 0; $i <= intval($dateDiff); $i++) {
+//                    $depAim = 0;
+//                    $date = date('Y-m-d', strtotime($weekInfo->firstDay . ' + ' . $i .' days'));
+//                    $report = $hour_reports->where('report_date', '=', $date)->where('success', '>', 0)->first();
+//                    $add_default_zero = ($report != null) ? false : true ;
+//                    if ($add_default_zero == false) {
+//                        $day_number = date('N', strtotime($report->report_date));
+//                        $real_RBH = round(($report->time_sum_real_RBH / 3600) ,2);
+//                        if(date('w', strtotime($date)) == 6) { //saturday
+//                            $depAim = $dep_info[0]['dep_aim_week'];
+//                        }
+//                        else { //other than saturday
+//                            $depAim = $dep_info[0]['dep_aim'];
+//                        }
+//                        $goal = ($day_number < 6) ? $dep_info[0]['dep_aim'] : $dep_info[0]['dep_aim_week'];
+//                        $total_week_goal += $goal;
+//                        $total_week_success += $report->success;
+//
+//                        $commisionAvg = $dep_info[0]['commission_avg'];
+//                        $targetRBH =$commisionAvg != 0 ? round($depAim / $commisionAvg, 2) : 0; //cel rbh
+//                        $week_target_RBH += $targetRBH;
+//                        $real_week_RBH += $real_RBH;
+//                        $total_week_checked += $report->count_all_check;
+//                        $total_week_bad += $report->count_bad_check;
+//                    }
+//                }
+//                $total_week_proc_janky = ($total_week_checked != null && $total_week_checked > 0) ? round(($total_week_bad / $total_week_checked) * 100, 2) : 0 ;
+//                $total_week_goal_proc = ($total_week_goal != null && $total_week_goal > 0) ? round(($total_week_success / $total_week_goal) * 100, 2) : 0 ;
+//
+//                $obj = new \stdClass();
+//                $obj->week_target_rbh = round($week_target_RBH);
+//                $obj->real_week_rbh = $real_week_RBH;
+//                $obj->janky_proc = $total_week_proc_janky;
+//                $obj->target_rbh_percentage = round($week_target_RBH) != 0 ? 100 * $real_week_RBH / round($week_target_RBH) : 0;
+//                $obj->total_week_goal_proc = $total_week_goal_proc;
+//                array_push($rbhTargetArr, $obj);
+//            }
 
-                $obj = new \stdClass();
-                $obj->week_target_rbh = round($week_target_RBH);
-                $obj->real_week_rbh = $real_week_RBH;
-                $obj->janky_proc = $total_week_proc_janky;
-                $obj->target_rbh_percentage = round($week_target_RBH) != 0 ? 100 * $real_week_RBH / round($week_target_RBH) : 0;
-                array_push($rbhTargetArr, $obj);
-            }
+//            dd($rbhTargetArr);
             foreach ($rbhTargetArr as $target) {
                 $prov = ProvisionLevels::get('HR', $target->janky_proc, $target->target_rbh_percentage,2, 1);
                 array_push($provisions, $prov);
