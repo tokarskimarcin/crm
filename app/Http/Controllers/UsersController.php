@@ -611,8 +611,10 @@ class UsersController extends Controller
                         $user->user_type_id = $request->user_type;
                 }
             } else {
-                new ActivityRecorder(array_merge(['T'=>'Próba zmiany uprawnień na sukcesora'], ['user' =>$user->toArray()]),10,5);
-                return view('errors.404');
+                if($user->user_type_id != 9 ){
+                    new ActivityRecorder(array_merge(['T'=>'Próba zmiany uprawnień na sukcesora'], ['user' =>$user->toArray()]),10,5);
+                    return view('errors.404');
+                }
             }
         }
         if ($request->status_work == "1") {
