@@ -1520,5 +1520,9 @@ class FinancesController extends Controller
         }
     }
 
+    public function viewEmployeeOfTheWeekCadreGet(){
+
+        return view('finances.viewEmployeeOfTheWeekCadre');
+    }
 
 }
