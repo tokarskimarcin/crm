@@ -11,6 +11,7 @@ use App\Departments;
 use App\DoublingQueryLogs;
 use App\JankyPenatlyProc;
 use App\PaymentAgencyStory;
+use App\Pbx_report_extension;
 use App\PenaltyBonus;
 use App\RecruitmentStory;
 use App\ReportCampaign;
@@ -21,7 +22,6 @@ use App\User;
 use App\UserEmploymentStatus;
 use App\Utilities\Dates\MonthFourWeeksDivision;
 use App\Utilities\DataProcessing\ConfirmationStatistics;
-use App\Utilities\Dates\MonthFourWeeksDivision;
 use App\Utilities\Dates\MonthIntoCompanyWeeksDivision;
 use App\Utilities\Dates\MonthPerWeekDivision;
 use App\Utilities\Salary\ProvisionLevels;
@@ -498,12 +498,27 @@ class FinancesController extends Controller
                 ->whereNotNull('confirmingUser')
                 ->whereNotNull('users.coach_id')
                 ->where('users.coach_id', $user->id)->get(); //client route info poszczególnych konsultantów wybranego trenera w miesiacu
+            $janky = collect();
+            foreach ($dividedMonth as $dateGroup){
+                $weekJanky = Pbx_report_extension::select(DB::raw('sum(all_bad_talks)*100/sum(all_checked_talks) as janky'))
+                    ->where('actual_coach_id','=',$user->id)
+                    ->whereBetween('report_date',[$dateGroup->firstDay,$dateGroup->lastDay])
+                    ->groupBy('actual_coach_id')
+                    ->first();
+                if($weekJanky !== null) {
+                    $weekJanky = (object)$weekJanky->toArray();
+                    $weekJanky->dateGroup = date('Y.m.d',strtotime($dateGroup->firstDay)). ' - ' . date('Y.m.d',strtotime($dateGroup->lastDay));
+                    $janky->push($weekJanky);
+                }
+            }
+            $departmentInfo = Department_info::find($user->department_info_id);
             $confirmationStatistics = ConfirmationStatistics::getConsultantsConfirmationStatisticsForMonth($clientRouteInfo, $dividedMonth, 'coach_id');
             foreach ($confirmationStatistics['sums'] as $confirmationStatisticsWeek){
-                $user->provision = $user->provision + ProvisionLevels::get($confirmationStatisticsWeek->successfulPct,'trainer',2);
-                $user->provision = $user->provision + ProvisionLevels::get($confirmationStatisticsWeek->unsuccessfulBadlyPct,'trainer',1);
+                if($janky->where('dateGroup',$confirmationStatisticsWeek->dateGroup)->first()->janky < $departmentInfo->commission_janky){
+                    $user->provision = $user->provision + ProvisionLevels::get($confirmationStatisticsWeek->successfulPct,'trainer',2);
+                    $user->provision = $user->provision + ProvisionLevels::get($confirmationStatisticsWeek->unsuccessfulBadlyPct,'trainer',1);
+                }
             }
-            dd($user);
         }else if($user->department_type_id == 2){       //trener telemarketing
 
         }
@@ -532,12 +547,28 @@ class FinancesController extends Controller
                 ->where('di.id_dep_type',1)
                 ->whereNotNull('confirmingUser')
                 ->whereNotNull('users.coach_id')->get(); //client route info poszczególnych konsultantów w calym oddziale w miesiacu
+            $janky = collect();
+            foreach ($dividedMonth as $dateGroup){
+                $weekJanky = Pbx_report_extension::select(DB::raw('sum(all_bad_talks)*100/sum(all_checked_talks) as janky'))
+                    ->join('users as consultants','consultants.id','pbx_report_extension.user_id')
+                    ->whereNotNull('pbx_report_extension.user_id')
+                    ->whereBetween('report_date',[$dateGroup->firstDay,$dateGroup->lastDay])
+                    ->where('consultants.department_info_id',$user->department_info_id)
+                    ->first();
+                if($weekJanky !== null) {
+                    $weekJanky = (object)$weekJanky->toArray();
+                    $weekJanky->dateGroup = date('Y.m.d',strtotime($dateGroup->firstDay)). ' - ' . date('Y.m.d',strtotime($dateGroup->lastDay));
+                    $janky->push($weekJanky);
+                }
+            }
+            $departmentInfo = Department_info::find($user->department_info_id);
             $confirmationStatistics = ConfirmationStatistics::getConsultantsConfirmationStatisticsForMonth($clientRouteInfo, $dividedMonth);
             foreach ($confirmationStatistics['sums'] as $confirmationStatisticsWeek){
-                $user->provision = $user->provision + ProvisionLevels::get($confirmationStatisticsWeek->successfulPct,'instructor',2);
-                $user->provision = $user->provision + ProvisionLevels::get($confirmationStatisticsWeek->unsuccessfulBadlyPct,'instructor',1);
+                if($janky->where('dateGroup',$confirmationStatisticsWeek->dateGroup)->first()->janky < $departmentInfo->commission_janky) {
+                    $user->provision = $user->provision + ProvisionLevels::get($confirmationStatisticsWeek->successfulPct, 'instructor', 2);
+                    $user->provision = $user->provision + ProvisionLevels::get($confirmationStatisticsWeek->unsuccessfulBadlyPct, 'instructor', 1);
+                }
             }
-            dd($user);
         }else if($user->department_type_id == 2){       //szkoleniowiec telemarketing
 
         }
@@ -755,16 +786,16 @@ class FinancesController extends Controller
 
         foreach($salary as $user) {
             if($user->user_type_id == 4) {
-//                $this->provisionSystemForTrainers($user,  MonthFourWeeksDivision::get($year, $month));
+                //$this->provisionSystemForTrainers($user,  MonthFourWeeksDivision::get($year, $month));
             }
             else if($user->user_type_id == 5) {
-                $this->provisionSystemForHR($user, $month, $year);
+//                $this->provisionSystemForHR($user, $month, $year);
             }
             else if($user->user_type_id == 19) {
 //                $this->provisionSystemForInstructors($user,  MonthFourWeeksDivision::get($year, $month));
             }
             else if($user->user_type_id == 8 || $user->id == 6) { //koordynator + menager of coordinators
-                $this->provisionSystemForCoordinators($user, MonthPerWeekDivision::get($month, $year), $month, $year);
+//                $this->provisionSystemForCoordinators($user, MonthPerWeekDivision::get($month, $year), $month, $year);
             }
         }
 //        dd($salary->where('id', '=', 6));
