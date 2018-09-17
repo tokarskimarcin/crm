@@ -168,7 +168,7 @@
                                 <div class="row factorsSection" style="margin-top:1em; display:none">
                                     <div class="col-md-6">
                                         <label>Mnożnik sobót <span class="glyphicon glyphicon-info-sign VCtooltip VCtooltip-right">
-                                                <span class="tooltiptext">W przypadku, gdy średnie wyniki sobót wynoszą 0 to, te wyniki wyliczane są ze średnich dziennych pomnożonych o określony MNOŻNIK SOBÓT</span>
+                                                <span class="tooltiptext">W przypadku, gdy wyniki sobót wynoszą 0 to, te wyniki wyliczane są ze średnich dziennych pomnożonych o określony MNOŻNIK SOBÓT</span>
                                             </span></label>
                                         <div class="input-group">
                                             <input id="saturdayFactor" class="form-control" type="text" value="95" style="text-align: right;">
@@ -177,10 +177,10 @@
                                     </div>
                                     <div class="col-md-6">
                                         <label>Mnożnik niedziel <span class="glyphicon glyphicon-info-sign VCtooltip VCtooltip-right">
-                                                <span class="tooltiptext">W przypadku, gdy średnie wyniki niedziel wynoszą 0 to, te wyniki wyliczane są ze średnich sobót pomnożonych o określony MNOŻNIK NIEDZIEL</span>
+                                                <span class="tooltiptext">W przypadku, gdy wyniki niedziel wynoszą 0 to, te wyniki wyliczane są ze średnich dziennych pomnożonych o określony MNOŻNIK NIEDZIEL</span>
                                             </span></label>
                                         <div class="input-group">
-                                            <input id="sundayFactor" class="form-control" type="text" value="80" style="text-align: right;">
+                                            <input id="sundayFactor" class="form-control" type="text" value="70" style="text-align: right;">
                                             <span class="input-group-addon" id="basic-addon1">%</span>
                                         </div>
                                     </div>
@@ -1079,10 +1079,11 @@
                             }
                         },
                         success: function (response) {
+                            factorsChanged = false;
                             obj.data.aheadPlaning = response.aheadPlanningData;
                             obj.data.departmentsInvitationsAverages = response.departmentsInvitationsAveragesData;
-                            deferred.resolve(obj.data.aheadPlaning);
                             fillWorkFreeDaysForDepartments();
+                            deferred.resolve(obj.data.aheadPlaning);
                         },
                         error: function (jqXHR, textStatus, thrownError) {
                             console.log(jqXHR);
@@ -1096,7 +1097,6 @@
                             deferred.reject();
                         }
                     });
-                    selectedRowDays = [];
                     $('#removeSimulationButton').hide();
                     return deferred.promise();
                 }
@@ -1160,7 +1160,12 @@
                             if(cell.textContent == '0') {
                                 cell.style.background = "#b9f4b7";
                             }
-                        })
+                        });
+                        $('.dataTables_scrollBody').scroll(function (e) {
+                            if($(e.tdepartmentsConfirmationDatatablearget).scrollTop() < $('#datatable').find('thead').height()){
+                                $(e.target).scrollTop($('#datatable').find('thead').height());
+                            }
+                        });
                     }, order: [[2,'asc']]
                     ,"columns": [
                         {"data": "numberOfWeek", orderable: false},
@@ -1315,7 +1320,7 @@
                 factorsChangeHandler(e,95);
             });
             $('#sundayFactor').change(function (e) {
-                factorsChangeHandler(e,80);
+                factorsChangeHandler(e,70);
             });
 
             /*********************END EVENT LISTENERS FUNCTIONS****************************/
@@ -1500,24 +1505,31 @@
                 ['factorsSection', 'simulationTypes'], //sections to show
                 true, // flag that identify is ahead planning data after simulation are changed
                 /* ---------------- simulation function ----------------------- */
-                function (thisObj){                    let selectedDay = getSelectedDay(selectedRowDays[0]);
+                function (thisObj){
+                    let selectedDay = getSelectedDay(selectedRowDays[0]);
                     let selectedType = getSelectedType();
                     let daysBetweenSelectedAndActualDay = Math.abs(Math.round(moment.duration(moment(new Date(selectedDay)).diff(moment(new Date(today)))).asDays()));
                     let workingHoursLeft = Math.abs(Math.round(moment.duration((moment().diff(moment().hour(16).minute(0)))).asHours()));
                     let simulatedData = null;
 
-                    prepareSimulationData();
                     if(factorsChanged){
+                        $('#datatable_processing').show();
                         aheadPlanningData.getData($('#date_start').val(),$("#date_stop").val()).done(function () {
-                            simulatedData = simulation();
+                            doThings();
+                            $('#datatable_processing').hide();
                         });
                     }else{
-                        simulatedData = simulation();
+                        doThings();
                     }
 
-                    aheadPlaningTable.setTableData(simulatedData);
-                    colorSelectedRowDays('selectedRowDayOfResultsSimulation');
-                    colorSelectedRowDays('selectedRowDay');
+                    function doThings(){
+                        prepareSimulationData();
+                        simulatedData = simulation();
+                        aheadPlaningTable.setTableData(simulatedData);
+                        colorSelectedRowDays('selectedRowDayOfResultsSimulation');
+                        colorSelectedRowDays('selectedRowDay');
+                    }
+
 
                     function prepareSimulationData() {
                         $.each(departmentInfo,function (index, department) {
@@ -1653,7 +1665,7 @@
                 },
                 function (name) {
                     return $('<div>').addClass('alert alert-info').append($('<strong>').append(name+':'))
-                        .append(' symulowanie planowania wyprzedzenia na wybrany dzień przy założeniu, że dzienne wyniki bedą wynosić tyle, ile wynosi średnia wyliczona na podstawie danych z określonego okresu w zależności od wybranego ')
+                        .append(' symulowanie planowania wyprzedzenia na wybrany dzień (przed rozpoczęciem pracy) przy założeniu, że dzienne wyniki bedą wynosić tyle, ile wynosi średnia wyliczona na podstawie danych z określonego okresu w zależności od wybranego ')
                         .append($('<strong>').append('Rodzaju symulacji'));
                 }
             ));
@@ -1668,12 +1680,23 @@
                     let selectedDayWithCompletedResult = getSelectedDay(selectedRowDays[0] > selectedRowDays[1] ? selectedRowDays[0] : selectedRowDays[1]);
                     let daysBetweenSelectedAndActualDay = Math.abs(moment.duration(moment(new Date(selectedNewActualDay)).diff(moment(new Date(today)))).asDays());
 
-                    prepareSimulationData();
-                    simulation();
-                    $('#simulationAverages .modal-body').text('');
-                    $('#simulationAverages .modal-body').append(createSimulationAveragesTable());
-                    $('#simulationAverages').modal('show');
+                    if(factorsChanged){
+                        $('#datatable_processing').show();
+                        aheadPlanningData.getData($('#date_start').val(),$("#date_stop").val()).done(function () {
+                            doThings();
+                            $('#datatable_processing').hide();
+                        });
+                    }else{
+                        doThings();
+                    }
 
+                    function doThings() {
+                        prepareSimulationData();
+                        simulation();
+                        $('#simulationAverages .modal-body').text('');
+                        $('#simulationAverages .modal-body').append(createSimulationAveragesTable());
+                        $('#simulationAverages').modal('show');
+                    }
                     function prepareSimulationData() {
                         $.each(departmentInfo,function (index, department) {
                             aheadPlanningData.data.departmentsInvitationsAverages[department.name2].simulated = {
@@ -1740,7 +1763,7 @@
                 },
                 function (name) {
                     return $('<div>').addClass('alert alert-info').append($('<strong>').append(name+':'))
-                        .append(' wyliczenie średnich, dziennych wyników jakie muszą uzyskiwać poszczególne oddziały do wybranego ostatniego dnia dzwonienia ')
+                        .append(' wyliczenie średnich, dziennych wyników jakie muszą uzyskiwać poszczególne oddziały do końca wybranego ostatniego dnia dzwonienia ')
                         .append($('<strong>').append('(1#)'))
                         .append(',  aby limity były wyrobione na wybrany inny dzień ')
                         .append($('<strong>').append('(2#)'));
@@ -1758,8 +1781,8 @@
             });
 
             function factorsChangeHandler(e, value){
-                factorsChanged = $.isNumeric($(e.target).val());
-                if(!factorsChanged){
+                factorsChanged = true;
+                if(!$.isNumeric($(e.target).val())){
                     $(e.target).val(value);
                 }
             }

@@ -190,7 +190,6 @@
                             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                         },
                         success: function(response) {
-                            console.log(response);
                             for(var i = 0; i < response.trainers.length; i++) {
                                 var newItem = $('<option class="generatedValues" value="' + response.trainers[i].id + '">' + response.trainers[i].first_name + ' ' + response.trainers[i].last_name + '</option>');
                                 $('#trainerDefaultValue').after(newItem);

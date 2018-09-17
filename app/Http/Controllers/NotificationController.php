@@ -70,7 +70,7 @@ class NotificationController extends Controller
 
             $notificationChangesDisplayedFlags = NotificationChangesDisplayedFlags::where('notification_id','=',$notification->id)->first();
             if(!empty($notificationChangesDisplayedFlags)){
-                $notificationChangesDisplayedFlags->comment_added_by_realizator_displayed = true;
+                $notificationChangesDisplayedFlags->comment_added_by_reporter_displayed = true;
                 $notificationChangesDisplayedFlags->save();
             }
 
@@ -192,13 +192,16 @@ class NotificationController extends Controller
             return view('errors.404');
         }
 
+        $authUserId = Auth::user()->id;
         $notificationsChangesDisplayedFlags = NotificationChangesDisplayedFlags::where('notification_id',$checkNotification->id)->first();
         if(!empty($notificationsChangesDisplayedFlags)){
-            if(Auth::user()->id == $checkNotification->user_id){
-                $notificationsChangesDisplayedFlags->comment_added_by_realizator_displayed = false;
-            }
-            if(Auth::user()->id == $checkNotification->displayed_by){
+            if($authUserId == $checkNotification->user_id){
                 $notificationsChangesDisplayedFlags->comment_added_by_reporter_displayed = false;
+            }elseif($authUserId == $checkNotification->displayed_by
+                || ($authUserId != $checkNotification->user_id && $authUserId != $checkNotification->displayed_by)){
+                $notificationsChangesDisplayedFlags->comment_added_by_realizator_displayed = false;
+            }else{
+                Session::flash('message_orror', "AA");
             }
             $notificationsChangesDisplayedFlags->save();
         }
@@ -475,7 +478,7 @@ class NotificationController extends Controller
         }
         $notificationChangesDisplayedFlags = NotificationChangesDisplayedFlags::where('notification_id','=',$notification->id)->first();
         if(!empty($notificationChangesDisplayedFlags)){
-            $notificationChangesDisplayedFlags->comment_added_by_reporter_displayed = true;
+            $notificationChangesDisplayedFlags->comment_added_by_realizator_displayed = true;
             $notificationChangesDisplayedFlags->status_change_displayed = true;
             $notificationChangesDisplayedFlags->save();
         }

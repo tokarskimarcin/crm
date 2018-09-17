@@ -80,6 +80,7 @@
                 <th>Kontakt</th>
                 <th>Cena</th>
                 <th>Typ płatności</th>
+                <th>Uwaga</th>
             </tr>
         </thead>
         <tbody>
@@ -105,6 +106,8 @@
                                     <li class="list-group-item"><strong>Aktywne</strong> oznaczone jako <button class="btn btn-success" style="font-weight:bold;">Aktywna</button> - Trasa jest gotowa do użycia (wszystkie godziny oraz hotele muszą być określone aby mogła być aktywna), pobierane są informacje z PBX odnośnie takich kampanii, wyświetlają się we wszystkich statystykach</li>
                                     <li class="list-group-item"><strong>Zakończone</strong> oznaczone jako <button class="btn btn-info" style="font-weight:bold;">Zakończona</button> - Trasa automatycznie zmienia stan z Aktywnej na Zakończoną, gdy data ostatniego pokazu zostaje osiągnięta</li>
                                 </ul>--}}
+                                <br>
+                                Trasy anulowane mają kolor <span style="background-color: #ff8c88;">czerwony</span>.
                                 Trasy mające przyciski edycji o różnych kolorach dzielą się na: </br>
                                 <div class="row">
                                     <div class="col-md-5">
@@ -243,11 +246,11 @@
                             <table id="datatable2" class="thead-inverse table table-striped row-border" cellspacing="0" width="100%">
                                 <thead>
                                 <tr>
+                                    <th>ID</th>
                                     <th>Tydzień</th>
                                     <th>Klient</th>
                                     <th>Data I pokazu</th>
                                     <th>Trasa</th>
-                                    {{--<th>Hotel i godziny</th>--}}
                                     <th>Edycja (Hoteli i godzin)</th>
                                     <th>Edycja (Trasy)</th>
                                     <th>Edycja parametrów (Kampanii)</th>
@@ -490,6 +493,7 @@
                                         '</td><td>' + returnblank(value.hotelContact) +
                                         '</td><td>' + returnblank(value.toPay) +
                                         '</td><td>' + returnblank(value.paymentMethod)+
+                                        '</td><td>' + returnblank(value.comment_for_report)+
                                     '</td></tr>';
                             });
                             $('#tabelka tbody').empty();
@@ -688,10 +692,10 @@
                     });
                     if (sessionStorage.getItem('idsOfSelectedClients')) {
                         selectedClientIds = sessionStorage.getItem('idsOfSelectedClients').split(",");
-                        colorSelectedClients(selectedClientIds);
                         sessionStorage.removeItem('idsOfSelectedClients');
                         table2.ajax.reload();
                     }
+                    colorSelectedClients(selectedClientIds);
                 }, "ajax": {
                     'url': "{{route('api.getClientRoutes')}}",
                     'type': 'POST',
@@ -774,6 +778,9 @@
                             row.classList.add('colorRow');
                         }
                     });
+                    if(data.canceled == 1) {
+                        $(row).css("background-color", '#ff8c88');
+                    }
 
                     return row;
                 },
@@ -794,11 +801,17 @@
                     "url": "//cdn.datatables.net/plug-ins/1.10.16/i18n/Polish.json"
                 },
                 columns: [
+                    {
+                        "data": function (data, type, dataToSet) {
+                            return data.client_route_id
+                        }, "name": "id"
+                    },
                     {"data": "weekOfYear"},
                     {"data": "clientName"},
                     {"data": "date"},
                     {
                         "data": function (data, type, dataToSet) {
+                            console.log(data);
                             let finalName = '';
                             if (data.type == '1') {
                                 finalName = data.route_name + ' (B)';

@@ -22,6 +22,8 @@ use App\Route;
 use App\RouteInfo;
 use App\Schedule;
 use App\User;
+use App\Utilities\Dates\MonthPerWeekDivision;
+use App\Utilities\Dates\NameOfWeek;
 use App\Voivodes;
 use App\Work_Hour;
 use DateTime;
@@ -33,6 +35,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\URL;
+use League\Flysystem\FileNotFoundException;
 use function MongoDB\BSON\toJSON;
 use PhpParser\Node\Expr\Array_;
 use Session;
@@ -51,6 +54,43 @@ class CrmRouteController extends Controller
 
         return view('crmRoute.routeTemplates')
             ->with('voivodes', $voivodes);
+    }
+
+    //This method checks if there is the same route template in database.
+    public function checkForTheSameRoute(Request $request) {
+        $allData = json_decode($request->alldata);
+        $allData = array_reverse($allData);
+
+        $allCities = Cities::select('id','name')->get();
+        $reverseNameArr = [];
+        $dayFlag = $allData[0]->day;
+
+        foreach($allData as $record) {
+            $name = '';
+            $name .=  $allCities->where('id', '=', $record->city)->first()->name . ' + ';
+            if($record->day != $dayFlag) {
+                $name = substr($name, 0,strlen($name) - 3) . ' | ';
+            }
+            array_push($reverseNameArr, $name);
+        }
+
+        $fullName = '';
+        $nameArr = array_reverse($reverseNameArr);
+
+        foreach($nameArr as $key => $value) {
+            $fullName .= $value;
+        }
+
+        $fullName = substr($fullName, 0,strlen($fullName) - 3); // removing last | in name
+
+        $route = Route::where('name', '=', $fullName)->get();
+
+        if($route->count() > 0) {
+            return 1;
+        }
+        else {
+            return 0;
+        }
     }
 
     /**
@@ -244,6 +284,7 @@ class CrmRouteController extends Controller
                     $clientRouteInfo->city_id = $show->city;
                     $clientRouteInfo->voivode_id = $show->voivode;
                     $clientRouteInfo->date = $show->date;
+                    $clientRouteInfo->confirmDate = Date('Y-m-d', strtotime($show->date . ' -1 days'));
                     $clientRouteInfo->status = 1;
                     $clientRouteInfo->show_order = $show->order;
                     $clientRouteInfo->verification = 0; // 0 - not set, 1 - set
@@ -302,7 +343,12 @@ class CrmRouteController extends Controller
 
     public function editAssignedRouteGet($id) {
         $voivodes = Voivodes::all();
-        $client_route = ClientRoute::select('client.name as name', 'client.id as clientId', 'client_route.type as clientType')
+        $client_route = ClientRoute::select(
+            'client.name as name',
+            'client.id as clientId',
+            'client_route.type as clientType',
+            'client_route.canceled as isCanceled'
+        )
             ->OnlyActiveClientRoutes()
             ->join('client', 'client_route.client_id', '=', 'client.id')
             ->where('client_route.id', '=', $id)
@@ -321,8 +367,6 @@ class CrmRouteController extends Controller
             ->orderBy('date')
             ->orderBy('show_order')
             ->get();
-
-//        dd($client_route_info);
 
         return view('crmRoute.editAssignedRoute')
             ->with('voivodes', $voivodes)
@@ -771,7 +815,8 @@ class CrmRouteController extends Controller
                     'hour',
                     'city.name as city_name',
                     'voivodeship.name as voivode_name',
-                    'hotel_price'
+                    'hotel_price',
+                    'client_route_info.comment_for_report'
                 )
                 ->where('cr.status', '=', 1)
                 ->where('cr.id', '=', $id)
@@ -834,7 +879,8 @@ class CrmRouteController extends Controller
                 'client_route_info.hour as hour',
                 'client_route.client_id as client_id',
                 'client_route_info.weekOfYear as weekOfYear',
-                'client_route_info.hotel_price')
+                'client_route_info.hotel_price',
+                'client_route_info.comment_for_report')
                 ->join('client_route', 'client_route.id', '=', 'client_route_info.client_route_id')
                 ->join('city', 'city.id', '=', 'client_route_info.city_id')
                 ->join('voivodeship', 'voivodeship.id', '=', 'client_route_info.voivode_id')
@@ -952,7 +998,8 @@ class CrmRouteController extends Controller
                             'hotel_id' => $clientRouteInfo->hotelId,
                             'hour' => $clientRouteInfo->time == "" ? null : $clientRouteInfo->time,
                             'user_reservation' => $campaign->userReservation == 'Brak' ? '' : $campaign->userReservation,
-                            'hotel_price' => $campaign->hotelPrice == 0 ? null : $campaign->hotelPrice
+                            'hotel_price' => $campaign->hotelPrice == 0 ? null : $campaign->hotelPrice,
+                            'comment_for_report' => $campaign->comment
                         ]);
                         $lp++;
                     }
@@ -1120,7 +1167,8 @@ class CrmRouteController extends Controller
                 'date',
                 'client_route.type',
                 'client_route_id',
-                'limits')
+                'limits',
+                'canceled')
             ->join('client_route' ,'client_route.id','=','client_route_id')
             ->join('client' ,'client.id','=','client_route.client_id')
             ->join('city' ,'city.id','=', 'city_id')
@@ -1849,10 +1897,17 @@ class CrmRouteController extends Controller
          hotels.zip_code,
          hotels.comment,
          voivodeship.name as voivodeName,
-         city.name as cityName
+         city.name as cityName,
+         hotels_contacts.contact as contact
         '))
             ->join('city','city.id','city_id')
-            ->join('voivodeship','voivodeship.id','voivode_id')->orderBy('id');
+            ->join('voivodeship','voivodeship.id','voivode_id')
+            ->leftJoin('hotels_contacts', function($join) {
+                $join->on('hotels.id', '=', 'hotels_contacts.hotel_id')
+                    ->where('type', '=', 'phone')
+                    ->where('suggested', '=', 1);
+            })
+            ->orderBy('id');
 
         if($hotelId != 0){
             $hotels->where('hotels.id','=',$hotelId);
@@ -2433,9 +2488,13 @@ class CrmRouteController extends Controller
         client_route_info.comment as comment,
         city.name as cityName,
         0 as totalScore,
-        client_route.type as typ
+        client_route.type as typ,
+        hotels.name as hotelName,
+        hotels.street as hotelAdress,
+        client_route.canceled
         '))
         ->join('client_route','client_route.id','client_route_info.client_route_id')
+        ->leftJoin('hotels', 'client_route_info.hotel_id', '=', 'hotels.id')
         ->leftjoin('client','client.id','client_route.client_id')
         ->leftjoin('city','city.id','client_route_info.city_id')
         ->leftjoin('department_info','department_info.id','client_route_info.department_info_id')
@@ -2960,7 +3019,7 @@ class CrmRouteController extends Controller
         while($actualDate <= $stopDate){
             $dayCollect = collect();
             $dayCollect->offsetSet('numberOfWeek',date('W',strtotime($actualDate)));
-            $dayCollect->offsetSet('dayName',$this::getNameOfWeek($actualDate));
+            $dayCollect->offsetSet('dayName',NameOfWeek::get($actualDate, 'short'));
             $dayCollect->offsetSet('day',$actualDate);
             $totalScore = 0;
             $allSet = true;
@@ -3019,17 +3078,16 @@ class CrmRouteController extends Controller
         $departmentsInvitationsAveragesInfo = collect();
         foreach ($departmentInfo as $item) {
             $actualDate = $startDate;
-            $weekSum = 0;
             $weekScoresArr = [];
             $weekDivider = 0;
 
-            $saturdaySum = 0;
             $saturdayScoresArr = [];
             $saturdayDivider = 0;
+            $saturdayNullDivider = 0;
 
-            $sundaySum = 0;
             $sundayScoresArr = [];
             $sundayDivider = 0;
+            $sundayNullDivider = 0;
 
             while ($actualDate < $stopDate) {
                 $routeInfo = $routeInfoOverall->where('department_info_id' ,'=', $item->id)
@@ -3038,17 +3096,20 @@ class CrmRouteController extends Controller
 
                 if($routeInfo['sumOfActualSuccess'] != 0){
                     if(date('N',strtotime($actualDate)) <6){
-                        $weekSum += $routeInfo['sumOfActualSuccess'];
                         array_push($weekScoresArr, $routeInfo['sumOfActualSuccess']);
                         $weekDivider++;
                     } else if (date('N', strtotime($actualDate)) == 6) {
-                        $saturdaySum += $routeInfo['sumOfActualSuccess'];
                         array_push($saturdayScoresArr, $routeInfo['sumOfActualSuccess']);
                         $saturdayDivider++;
                     } else if (date('N', strtotime($actualDate)) == 7) {
-                        $sundaySum += $routeInfo['sumOfActualSuccess'];
                         array_push($sundayScoresArr, $routeInfo['sumOfActualSuccess']);
                         $sundayDivider++;
+                    }
+                }else{
+                    if (date('N', strtotime($actualDate)) == 6) {
+                        $saturdayNullDivider++;
+                    } else if (date('N', strtotime($actualDate)) == 7) {
+                        $sundayNullDivider++;
                     }
                 }
 
@@ -3108,7 +3169,7 @@ class CrmRouteController extends Controller
                     $varianceNumeratorSat += pow($value, 2) * ($iterator + 1);
                 }
 
-                $weightAverageSaturday = $denominatorSat == 0 ? 0 : $averageNumeratorSat / $denominatorSat;
+                $weightAverageSaturday = $denominatorSat == 0 ? 0 : ($averageNumeratorSat+(($weightAverageWeek*$factors['saturday']/100) * $saturdayNullDivider))/ ($denominatorSat+$saturdayNullDivider);
                 $weightedVarianceSaturday = ($varianceNumeratorSat / $denominatorSat) - pow($weightAverageSaturday, 2);
                 $stdDevSaturday = ($saturdayDivider >= 2 && $saturdayDivider <= 75) ? sqrt($weightedVarianceSaturday) / $this->getCzynnikC4($saturdayDivider) : sqrt($weightedVarianceSaturday); // ważone odchylenie standardowe.
             }else{
@@ -3161,7 +3222,7 @@ class CrmRouteController extends Controller
                     $varianceNumeratorSun += pow($value, 2) * ($iterator + 1);
                 }
 
-                $weightAverageSunday = $denominatorSun == 0 ? 0 : $averageNumeratorSun / $denominatorSun;
+                $weightAverageSunday = $denominatorSun == 0 ? 0 : ($averageNumeratorSun+(($weightAverageWeek*$factors['sunday']/100)*$saturdayNullDivider)) / ($denominatorSun+$saturdayNullDivider);
                 $weightedVarianceSunday = ($varianceNumeratorSun / $denominatorSun) - pow($weightAverageSunday, 2);
 
                 $sundayStdDev = ($sundayDivider >= 2 && $sundayDivider <= 75) ? sqrt($weightedVarianceSunday) / $this->getCzynnikC4($sundayDivider) : sqrt($weightedVarianceSunday);  //saturday standard deviation
@@ -3284,30 +3345,6 @@ class CrmRouteController extends Controller
         return $arr[$number];
     }
 
-    private function getNameOfWeek($date){
-        $arrayOfWeekName = [
-            '1' => 'Pn',
-            '2' => 'Wt',
-            '3' => 'Śr',
-            '4' => 'Czw',
-            '5' => 'Pt',
-            '6' => 'Sb',
-            '7' => 'Nd'];
-        return $arrayOfWeekName[date('N',strtotime($date))+0];
-    }
-
-    private function getNameOfWeek2($date){
-        $arrayOfWeekName = [
-            '1' => 'Poniedziałek',
-            '2' => 'Wtorek',
-            '3' => 'Środa',
-            '4' => 'Czwartek',
-            '5' => 'Piątek',
-            '6' => 'Sobota',
-            '7' => 'Niedziela'];
-        return $arrayOfWeekName[date('N',strtotime($date))+0];
-    }
-
     /**
      * This method returns view presentationStatistics with a data necessary for table
      */
@@ -3329,7 +3366,7 @@ class CrmRouteController extends Controller
         $date = new DateTime(date('Y-m').'-01');
         $week = $date->format("W");
         //Pobranie równych czterech tygodni
-        $split_month = $this->monthPerWeekDivision(date('m'),date('Y'));
+        $split_month = MonthPerWeekDivision::get(date('m'),date('Y'));
 
 //        dd($split_month);
         $allInfo = Clients::select(DB::raw(
@@ -3474,7 +3511,7 @@ class CrmRouteController extends Controller
 
             $month = $request->month;
             $year = $request->year;
-            $days = $this->monthPerWeekDivision($month,$year);
+            $days = MonthPerWeekDivision::get($month,$year);
             return $days;
     }
 
@@ -3504,7 +3541,7 @@ class CrmRouteController extends Controller
         $date = new DateTime($year. '-' . $month . '-01');
         $week = $date->format("W");
         //Pobranie równych czterech tygodni
-        $split_month = $this->monthPerWeekDivision($month,$year);
+        $split_month = MonthPerWeekDivision::get($month,$year);
         $allInfo = Clients::select(DB::raw(
             'client.id,
                 client.name,
@@ -3667,80 +3704,6 @@ class CrmRouteController extends Controller
             ->with('currentMonth', $currentMonth);
     }
 
-    public function monthPerWeekDivision($month,$year){
-        $arrayOfWeekName = [
-            '1' => 'Poniedziałek',
-            '2' => 'Wtorek',
-            '3' => 'Środa',
-            '4' => 'Czwartek',
-            '5' => 'Piątek',
-            '6' => 'Sobota',
-            '7' => 'Niedziela'];
-
-        $days_in_month = date('t', strtotime($year . '-' . $month));
-
-        $numberOfWeekPreviusMonth = $this::getWeekNumber(date('Y-m-d', strtotime($year.'-'.$month.'-01'. ' - 1 days')));
-
-        $weeks = [];
-        for ($i = 1; $i <= $days_in_month; $i++) {
-            $loop_day = ($i < 10) ? '0' . $i : $i ;
-            $date = $year.'-'.$month.'-'.$loop_day;
-            $actualWeek = $this::getWeekNumber($date);
-
-            if($actualWeek != $numberOfWeekPreviusMonth){
-                foreach($arrayOfWeekName as $key => $value) {
-                    if($value == $this::getNameOfWeek2($date)) {
-                        $weeksObj = new \stdClass();
-                        $weeksObj->date = $date;
-                        $weeksObj->weekNumber = date('W', strtotime($date));
-                        $weeksObj->name = $this::getNameOfWeek($date);
-                        $weeksObj->dayNumber = $key;
-                        array_push($weeks,$weeksObj);
-
-                        // czy niedziela
-                        if($weeksObj->name == 'Nd') {
-                            $sumObj = new \stdClass();
-                            $sumObj->date = 'Suma';
-                            $sumObj->weekNumber = date('W', strtotime($date));
-                            $sumObj->name = 'Suma';
-                            array_push($weeks, $sumObj);
-                        }
-                    }
-                }
-            }
-        }
-
-        $lastNumberOfWeek = $actualWeek;
-        $dateNextMonth = date('Y-m-d', strtotime($date . ' + 1 days'));
-        $daysInNextMonth = date('t', strtotime($dateNextMonth));
-        for ($i = 1; $i <= $daysInNextMonth; $i++) {
-            $loop_day = ($i < 10) ? '0' . $i : $i ;
-            $date = date('Y-m',strtotime($dateNextMonth)).'-'.$loop_day;
-            $actualWeek = $this::getWeekNumber($date);
-            if($actualWeek == $lastNumberOfWeek){
-                foreach($arrayOfWeekName as $key => $value) {
-                    if($value == $this::getNameOfWeek($date)) {
-                        $weeksObj = new \stdClass();
-                        $weeksObj->date = $date;
-                        $weeksObj->weekNumber = date('W', strtotime($date));
-                        $weeksObj->name = $this::getNameOfWeek($date);
-                        $weeksObj->dayNumber = $key;
-                        array_push($weeks,$weeksObj);
-                    }
-                }
-            }else{
-                break;
-            }
-        }
-        return $weeks;
-    }
-
-    public function getWeekNumber($date){
-        $actualWeek = new DateTime($date);
-        $actualWeek = $actualWeek->format("W");
-        return $actualWeek;
-    }
-
     public function monthArray(){
         /**
          * Tabela z miesiącami
@@ -3837,7 +3800,7 @@ class CrmRouteController extends Controller
     public function allCitiesInGivenVoivodeAjax(Request $request) {
         if($request->ajax()) {
             $voivodeId = $request->id;
-            $allCitiesFromGivenVoivode = Cities::select('id', 'name')
+            $allCitiesFromGivenVoivode = Cities::select('id', 'name', 'max_hour')
                 ->where('voivodeship_id', '=', $voivodeId)
                 ->get();
 
@@ -3846,9 +3809,9 @@ class CrmRouteController extends Controller
     }
 
     public function getCampaignsInvoices($id = 0){
+        $invoiceStatuses = InvoiceStatus::all();
         if($id <= 0) {
             $clients = Clients::all();
-            $invoiceStatuses = InvoiceStatus::all();
             return view('crmRoute.campaignsInvoices')
                 ->with('routeId', $id)
                 ->with('clients', $clients)
@@ -3859,6 +3822,7 @@ class CrmRouteController extends Controller
         }else{
             $client = ClientRoute::find($id);
             return view('crmRoute.campaignsInvoices')
+                ->with('invoiceStatuses', $invoiceStatuses)
                 ->with('routeId', $id)
                 ->with('client', $client)
                 ->with('validCampaignInvoiceExtensions',json_encode($this->validCampaignInvoiceExtensions));
@@ -3922,7 +3886,12 @@ class CrmRouteController extends Controller
     public function downloadCampaignInvoicePDF($id){
         $clientRouteCampaign = ClientRouteCampaigns::find($id);
         $url = $clientRouteCampaign->invoice_path;
-        return Storage::download($url);
+        try{
+            return Storage::download($url);
+        }catch(FileNotFoundException $e){
+            session()->put('error', 'Nie znaleziono pliku na serwerze. Spróbuj wysłać ponownie');
+            return Redirect::back();
+        }
     }
 
     public function getCampaignsInvoicesDatatableAjax(Request $request){
@@ -4073,7 +4042,8 @@ class CrmRouteController extends Controller
             client.name as clientName,
             client_gift_type.name as clientGiftName,
             client_meeting_type.name clientMeetingName,
-            hotels.id as hotelID       
+            hotels.id as hotelID,
+            client_route_info.comment_for_report       
         '))
             ->join('client_route','client_route.id','client_route_info.client_route_id')
             ->join('client','client.id','client_route.client_id')
@@ -4087,6 +4057,7 @@ class CrmRouteController extends Controller
             ->where('client_route_info.weekOfYear','like',$selectedWeek)
             ->where('client_route_info.status', '=', 1)
             ->where(DB::raw('YEAR(client_route_info.date)'),'like',$year)
+            ->orderBy('clientRouteID') //routes are close to each other in report
             ->orderBy('date')
             ->orderBy('cityName')
             ->orderBy('hour')
@@ -4125,8 +4096,12 @@ class CrmRouteController extends Controller
             ->where('client_route.status', '=', 1)
             ->where('client_route_info.status', '=', 1)
             ->get();
+
+        $voivodes = Voivodes::all();
+
         return view('crmRoute.hotelConfirmation')
-            ->with('allClients',$allClients);
+            ->with('allClients',$allClients)
+            ->with('voivodes', $voivodes);
     }
 
     public function getConfirmHotelInfo(Request $request){
@@ -4288,19 +4263,19 @@ class CrmRouteController extends Controller
                 }
 
                 if($item->czw != '') {
-                    array_push($dataArr, Date('Y-m-d', strtotime($firstDayOfGivenWeek . '+ 4 days')));
+                    array_push($dataArr, Date('Y-m-d', strtotime($firstDayOfGivenWeek . '+ 3 days')));
                 }
 
                 if($item->pt != '') {
-                    array_push($dataArr, Date('Y-m-d', strtotime($firstDayOfGivenWeek . '+ 5 days')));
+                    array_push($dataArr, Date('Y-m-d', strtotime($firstDayOfGivenWeek . '+ 4 days')));
                 }
 
                 if($item->sob != '') {
-                    array_push($dataArr, Date('Y-m-d', strtotime($firstDayOfGivenWeek . '+ 6 days')));
+                    array_push($dataArr, Date('Y-m-d', strtotime($firstDayOfGivenWeek . '+ 5 days')));
                 }
 
                 if($item->nd != '') {
-                    array_push($dataArr, Date('Y-m-d', strtotime($firstDayOfGivenWeek . '+ 7 days')));
+                    array_push($dataArr, Date('Y-m-d', strtotime($firstDayOfGivenWeek . '+ 6 days')));
                 }
             }
             $user->date = $dataArr;
@@ -4345,7 +4320,8 @@ class CrmRouteController extends Controller
         client_route_info.department_info_id as depId,
         department_type.name as departmentName2,
         city.name as cityName,
-        client_route.type as typ
+        client_route.type as typ,
+        client_route.canceled
         '))
             ->join('client_route','client_route.id','client_route_info.client_route_id')
             ->leftjoin('client','client.id','client_route.client_id')
@@ -4399,6 +4375,73 @@ class CrmRouteController extends Controller
                 ]);
         }
         return 'Zmiany zostały zapisane!';
+    }
+
+    public function hotelConfirmationHotelInfoAjax(Request $request) {
+
+        $hotelId = $request->hotelId;
+        $dataArr = []; //this array collect info about hotel
+
+        $item = Hotel::select(
+            'hotels.id',
+            'hotels.name as hotel_name',
+            'hotels.comment',
+            'city.name as city_name',
+            'voivodeship.name as voivode_name',
+            'hotels.payment_method_id',
+            'hotels.street',
+            'hotels.parking'
+            )
+            ->join('city', 'hotels.city_id', '=', 'city.id')
+            ->join('voivodeship', 'hotels.voivode_id', '=', 'voivodeship.id')
+            ->where('hotels.id', '=', $hotelId)
+            ->first();
+
+        array_push($dataArr, $item);
+
+        //This variable hold info about contacts to hotel
+        $hotelContactInfos = HotelsContacts::select(
+            'contact',
+            'type',
+            'suggested'
+        )
+            ->where('hotel_id', '=', $hotelId)
+            ->get();
+
+        array_push($dataArr, $hotelContactInfos);
+
+        return $dataArr;
+    }
+
+    /**
+     * @param $id
+     * This method change route canceled status.
+     */
+    public function cancelRoute($id) {
+        $info = ClientRoute::where('id', '=', $id)->first();
+
+        if($info->canceled == 0 || is_null($info->canceled)) {
+            ClientRoute::where('id', '=', $id)->update(['canceled' => 1]);
+            Session::flash('adnotation', 'Trasa została anulowana!');
+            $log = [
+                'T' => 'Anulowanie trasy',
+                'Id trasy' => $id
+            ];
+
+            new ActivityRecorder($log,230, 3);
+
+        }
+        else {
+            ClientRoute::where('id', '=', $id)->update(['canceled' => 0]);
+            Session::flash('adnotation', 'Trasa została przywrócona!');
+
+            $log = [
+                'T' => 'Przywrócenie trasy',
+                'Id trasy' => $id
+            ];
+
+            new ActivityRecorder($log,230, 4);
+        }
     }
 
 }

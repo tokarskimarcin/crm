@@ -1,0 +1,435 @@
+@php
+    /**
+     *Created by PhpStorm.
+     *User: veronaprogramista
+     *Date: 07.09.18
+     *Time: 15:21
+    */
+@endphp
+
+{{--/*--}}
+{{--*@category: Statistics,--}}
+{{--*@info: This template view is for copy purpose--}}
+{{--*@controller: DepartmentsConfirmationStatisticsController,--}}
+{{--*@methods: departmentsConfirmationGet, departmentsConfirmationStatisticsAjax, --}}
+{{--*/--}}
+
+@extends('layouts.main')
+@section('style')
+    <link rel="stylesheet" href="{{asset('/assets/css/VCtooltip.css')}}">
+    <style>
+        .DTFC_LeftHeadWrapper thead tr, .DTFC_LeftBodyWrapper thead tr{
+            background: white;
+
+        }
+
+        .bootstrap-select > .dropdown-menu {
+            left: 0 !important;
+        }
+        .green{
+            background: #d9ead3 !important;
+        }
+        .strongGreen{
+            background: #93c47d !important;
+        }
+
+        .yellow{
+            background: #fff2cc !important;
+        }
+        .strongYellow{
+            background: #ffd966 !important;
+        }
+        .red{
+            background: #f4cccc !important;
+        }
+        .strongRed{
+            background: #e06666 !important;
+        }
+        .peach{
+            background: #ffe599 !important;
+        }
+    </style>
+@endsection
+@section('content')
+    <div class="page-header">
+        <div class="alert gray-nav ">
+            Statystki oddziały potwierdznia
+        </div>
+    </div>
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            Panel ze statystykami dla poszczególnych oddziałów w wybranym miesiącu
+        </div>
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-md-4">
+                    <label>Miesiąc:</label>
+                    <div class="form-group">
+                        <div class='input-group date' id='monthDatetimepicker'>
+                            <span class="input-group-addon">
+                                <span class="glyphicon glyphicon-calendar"></span>
+                            </span>
+                            <input type='text' class="form-control" value="{{date('Y-m')}}" readonly/>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <label>Oddział:</label>
+                    <select class="form-control selectpicker" id="departmentsSelect">
+                        @foreach($deps as $dep)
+                            <option value="{{$dep->id}}" >{{$dep->departments->name}} {{$dep->department_type->name}}</option>
+                        @endforeach
+                    </select>
+                </div><div class="col-md-4">
+                    <label>Trener:</label>
+                    <select class="form-control selectpicker" id="trainersSelect">
+                        <option value="-1" selected>Wybierz</option>
+                        @foreach($trainers as $trainer)
+                            @if($trainer->department_info_id == $deps[0]->id)
+                                <option value="{{$trainer->id}}" >{{$trainer->first_name}} {{$trainer->last_name}}</option>
+                            @endif
+                        @endforeach
+                    </select>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="checkbox">
+                        <label>
+                            <input id="trainersGroupingCheckbox" type="checkbox" style="display: block;"> Grupowanie po trenerach
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <table id="departmentsConfirmationDatatable" class="table cell-border table-striped table-hover compact"  style="width:100%;">
+                        <thead>
+                        <tr>
+                            <th colspan="4"></th>
+                            <th colspan="2" class="strongGreen" style="text-align: center">Pokazy udane</th>
+                            <th colspan="2" class="strongYellow" style="text-align: center">Pokazy neutralne</th>
+                            <th colspan="4" class="strongRed" style="text-align: center">Pokazy nieudane</th>
+                            <th colspan="8"></th>
+                        </tr>
+                        <tr>
+                            <th class="peach">Lp.</th>
+                            <th class="yellow">Imię i nazwisko</th>
+                            <th class="yellow">Liczba pokazów</th>
+                            <th class="yellow">Prowizja</th>
+                            <th class="strongGreen">Liczba</th>
+                            <th class="strongGreen">%</th>
+                            <th class="strongYellow">Liczba</th>
+                            <th class="strongYellow">%</th>
+                            <th class="strongRed">Liczba</th>
+                            <th class="strongRed">%</th>
+                            <th class="strongRed"><12</th>
+                            <th class="strongRed">%</th>
+                            <th class="yellow">Śr. liczba osób</th>
+                            <th class="yellow">Śr. liczba par</th>
+                            <th class="yellow">Liczba rekordów</th>
+                            <th class="yellow">Czas na rekord</th>
+                            <th class="yellow">% zgód</th>
+                            <th class="yellow">% niepewnych</th>
+                            <th class="yellow">% odmów</th>
+                            <th class="yellow">Tydzień</th>
+                            <th class="yellow">Trener</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+@endsection
+
+@section('script')
+    <script src="{{ asset('/js/moment.js')}}"></script>
+    <script>
+        $(document).ready(function () {
+            const columnsNr = {'lp':0,'name':1,'shows':2,'provision':3,'dateGroup':19,'trainer':20};
+            let hiddenColumns = [columnsNr['dateGroup'], columnsNr['trainer']];
+            let groupColumns = [columnsNr['dateGroup'], columnsNr['trainer']];
+            let VARIABLES  = {
+                jQElements:{
+                    trainersGroupingCheckboxjQ: $('#trainersGroupingCheckbox'),
+                    departmentsSelectjQ: $('#departmentsSelect'),
+                    trainersSelectjQ: $('#trainersSelect'),
+                    monthDatetimepicker: $('#monthDatetimepicker').datetimepicker({
+                        language: 'pl',
+                        minView: 3,
+                        startView: 3,
+                        format: 'yyyy-mm',
+                        startDate: moment('2018-09-01').format('YYYY-MM-DD'),
+                        endDate: moment().format('YYYY-MM-DD')
+                    })
+                },
+                departments: <?php echo json_encode($deps->toArray()) ?>,
+                trainers: <?php echo json_encode($trainers->toArray()) ?>,
+                lpCounter: 0,
+                conditionLpCounterZeroing: null, //condition for pointing row that start a group
+                DATA_TABLES:{
+                    departmentsConfirmation: {
+                        data: {
+                            departmentsConfirmationStatistics: null
+                        },
+                        table: $('#departmentsConfirmationDatatable'),
+                        dataTable: $('#departmentsConfirmationDatatable').DataTable({
+                            scrollX: true,
+                            scrollY: '70vh',
+                            scrollCollapse: true,
+                            processing: true,
+                            paging: false,
+                            language: {
+                                "url": "//cdn.datatables.net/plug-ins/1.10.16/i18n/Polish.json"
+                            },
+                            columnDefs:[
+                                { "visible": false, "targets": hiddenColumns }
+                            ],
+                            ordering: false,
+                            columns:[
+                                {data: 'lp'},
+                                {data: 'name'},
+                                {data: 'shows'},
+                                {data: 'provision'},
+                                {data: 'successful'},
+                                {data: function (data) {
+                                        return data.successfulPct+'%';
+                                    }, name: 'successfulPct'},
+                                {data: 'neutral'},
+                                {data: function (data) {
+                                        return data.neutralPct+'%';
+                                    },name : 'neutralPct'},
+                                {data: function () {
+                                        return 1;
+                                    }},
+                                {data: function () {
+                                        return 1;
+                                    }},
+                                {data: function () {
+                                        return 1;
+                                    }},
+                                {data: function () {
+                                        return 1;
+                                    }},
+                                {data: function () {
+                                        return 1;
+                                    }},
+                                {data: function () {
+                                        return 1;
+                                    }},
+                                {data: function () {
+                                        return 1;
+                                    }},
+                                {data: function () {
+                                        return 1;
+                                    }},
+                                {data: function () {
+                                        return 1;
+                                    }},
+                                {data: function () {
+                                        return 1;
+                                    }},
+                                {data: function () {
+                                        return 1;
+                                    }},
+                                {data: 'dateGroup'},
+                                {data: 'trainer'}
+                            ],
+                            fnDrawCallback: function () {
+                                FUNCTIONS.setColumnClass(0, 'peach', VARIABLES.DATA_TABLES.departmentsConfirmation.table);
+                                FUNCTIONS.setColumnClass([4,5],'green', VARIABLES.DATA_TABLES.departmentsConfirmation.table);
+                                FUNCTIONS.setColumnClass([6,7],'yellow', VARIABLES.DATA_TABLES.departmentsConfirmation.table);
+                                FUNCTIONS.setColumnClass([8,11],'red', VARIABLES.DATA_TABLES.departmentsConfirmation.table);
+                                FUNCTIONS.insertGroupRows(groupColumns[0], this, 19, {background:'#444444', color:'white', 'font-weight':'bold'});
+                                if(VARIABLES.jQElements.trainersGroupingCheckboxjQ.get(0).checked) {
+                                    FUNCTIONS.insertGroupRows(groupColumns[1], this, 19, {
+                                        background: '#ffe599',
+                                        'font-weight': 'bold'
+                                    });
+                                }
+                            }
+                        }),
+                        getData: function () {
+                            return FUNCTIONS.AJAXs.departmentsConfirmationStatisticsAjax();
+                        },
+                        setTableData: function (data){
+                            //data is grouped by weeks and trainers  (/week/: [ trainer1:[], trainer2:[]])
+                            let dataTable = this.dataTable;
+                            dataTable.clear();
+                            $.each(data,function (dateGroup, week) {
+                                if(VARIABLES.jQElements.trainersGroupingCheckboxjQ.get(0).checked){
+                                    $.each(week, function (trainer, data) {
+                                        FUNCTIONS.setTableDataWithLpCounterByGroup(data, 'trainer', dataTable);
+                                    });
+                                }else{
+                                    FUNCTIONS.setTableDataWithLpCounterByGroup(week, 'dateGroup', dataTable);
+                                }
+                            });
+                            dataTable.draw();
+
+                        },
+                        ajaxReload: function () {
+                            FUNCTIONS.ajaxReload(this);
+                        }
+                    }
+                }
+            };
+            let FUNCTIONS = {
+                /* functions groups should be before other functions which aren't grouped*/
+                EVENT_HANDLERS: {
+                    callEvents: function(){
+                        (function trainersGroupingCheckboxHandler() {
+                            VARIABLES.jQElements.trainersGroupingCheckboxjQ.change(function (e) {
+                                if(e.target.checked){
+                                    groupColumns[1] = columnsNr['trainer'];
+                                }
+                                VARIABLES.DATA_TABLES.departmentsConfirmation.ajaxReload();
+                            });
+                        })();
+                        (function departmentsSelectHandler() {
+                            VARIABLES.jQElements.departmentsSelectjQ.change(function (e) {
+                                VARIABLES.jQElements.trainersSelectjQ.find('option')
+                                    .remove();
+                                VARIABLES.jQElements.trainersSelectjQ.append($('<option>').val(-1).text('Wybierz')).prop('selected',true);
+                                $.each(VARIABLES.trainers, function(index, trainer){
+                                   if(trainer.department_info_id == VARIABLES.jQElements.departmentsSelectjQ.val()){
+                                       VARIABLES.jQElements.trainersSelectjQ.append($('<option>').val(trainer.id).text(trainer.first_name+' '+trainer.last_name));
+                                   }
+                                });
+                                VARIABLES.jQElements.trainersSelectjQ.selectpicker('refresh');
+                                VARIABLES.DATA_TABLES.departmentsConfirmation.ajaxReload();
+                            });
+                        })();
+                        (function trainersSelectHandler() {
+                            VARIABLES.jQElements.trainersSelectjQ.change(function (e) {
+                                VARIABLES.DATA_TABLES.departmentsConfirmation.ajaxReload();
+                            });
+                        })();
+                    }
+                },
+                AJAXs:{
+                    departmentsConfirmationStatisticsAjax: function() {
+                        return $.ajax({
+                            url: "{{ route('api.departmentsConfirmationStatisticsAjax') }}",
+                            type: 'POST',
+                            headers: {'X-CSRF-TOKEN': '{{ csrf_token() }}'},
+                            data: {
+                                trainersGrouping: VARIABLES.jQElements.trainersGroupingCheckboxjQ.get(0).checked,
+                                departmentId: VARIABLES.jQElements.departmentsSelectjQ.val(),
+                                selectedMonth: VARIABLES.jQElements.monthDatetimepicker.find('input').val(),
+                                trainerId: VARIABLES.jQElements.trainersSelectjQ.val()
+                            },
+                            success: function (response) {
+                                VARIABLES.DATA_TABLES.departmentsConfirmation.data.departmentsConfirmationStatistics = response;
+                                return response;
+                            },
+                            error: function (jqXHR, textStatus, thrownError) {
+                                console.log(jqXHR);
+                                console.log('textStatus: ' + textStatus);
+                                console.log('thrownError: ' + thrownError);
+                                swal({
+                                    type: 'error',
+                                    title: 'Błąd ' + jqXHR.status,
+                                    text: 'Wystąpił błąd: ' + thrownError+' "'+jqXHR.responseJSON.message+'"',
+                                });
+                            }
+                        });
+                    }
+                },
+                @php
+                /*function inserts rows in datatable
+                * @integer column - column number pointing on the data that should be taken as grouping data
+                * @DataTable dataTable - datatable in which rows should be inserted
+                * @integer colspan - number of how many columns should be span
+                * @object cssOptionsTr - param for jQuery .css() method
+                * */
+                @endphp
+                insertGroupRows: function(column, dataTable, colspan, cssOptionsTr = null){
+                    let api = dataTable.api();
+                    let rows = api.rows({page: 'current'}).nodes();
+                    let last = null;
+                    api.column(column, {page: 'current'}).data().each(function (group, i) {
+                        if (last !== group) {
+                            let elementToInsert = $('<tr>').addClass('group_'+column).append($('<td>').attr('colspan',colspan).text(group));
+                            if(cssOptionsTr != null){
+                                elementToInsert.css(cssOptionsTr);
+                            }
+                            $($(rows).eq(i)[0]).before(elementToInsert);
+                            last = group;
+                        }
+                    });
+                },
+                @php
+                /*universal function for datatables that reload data in given datatable
+                * @DataTable dataTable
+                * */
+                @endphp
+                ajaxReload: function(dataTable){
+                    let processing = $('#'+dataTable.table.attr('id')+'_processing');
+                    processing.show();
+                    dataTable.getData().done(function (response) {
+                        dataTable.setTableData(response);
+                        processing.hide();
+                    });
+                },
+                @php
+                /*universal function for datatables that sets given data in given datatable
+                * @array data - data for insert
+                * @DataTable dataTable
+                * */
+                @endphp
+                setTableData: function(data, dataTable){
+                    dataTable.clear();
+                    if($.isArray(data)) {
+                        $.each(data, function (index, row) {
+                            dataTable.row.add(row);
+                        });
+                        dataTable.draw();
+                    }
+                },
+                @php
+                /*universal function for tables that adds class name to column
+                * @integer, @array column - column(s) range number(s)
+                * @string className - data for insert
+                * @jQuery table
+                * */
+                @endphp
+                setColumnClass: function (column, className, table) {
+                    table.find('tbody').children().each(function (index, tr) {
+                        $(tr).children().each(function (index, td) {
+                            if(Array.isArray(column)){
+                                if(index >= column[0] && index <= column[1] ){
+                                    $(td).addClass(className);
+                                }
+                            }else{
+                                if(index === column){
+                                    $(td).addClass(className);
+                                }
+                            }
+                        });
+                    });
+                },
+                setTableDataWithLpCounterByGroup: function(data, groupingData, dataTable){
+                    if($.isArray(data)) {
+                        $.each(data, function (index, row) {
+                            if(VARIABLES.conditionLpCounterZeroing !== row[groupingData]){  //if groupig data is diffrent than previous value, counter equals 0
+                                VARIABLES.lpCounter = 0;                                    //counting from beginning
+                                VARIABLES.conditionLpCounterZeroing = row[groupingData];    //setting condition to grouping data of current row
+                            }
+                            VARIABLES.lpCounter++;
+                            row.lp = VARIABLES.lpCounter;   //setting 'lp' row attribute
+                            dataTable.row.add(row);         //adding row to datatable
+                        });
+                    }
+                }
+            };
+            VARIABLES.DATA_TABLES.departmentsConfirmation.ajaxReload();
+            FUNCTIONS.EVENT_HANDLERS.callEvents();
+            resizeDatatablesOnMenuToggle([VARIABLES.DATA_TABLES.departmentsConfirmation.dataTable]);
+        });
+    </script>
+@endsection

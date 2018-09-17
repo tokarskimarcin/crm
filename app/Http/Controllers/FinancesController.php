@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\AcceptedPayment;
 use App\Agencies;
+use App\ClientRouteInfo;
 use App\Department_info;
 use App\Department_types;
 use App\Departments;
@@ -11,12 +12,19 @@ use App\DoublingQueryLogs;
 use App\JankyPenatlyProc;
 use App\PaymentAgencyStory;
 use App\PenaltyBonus;
+use App\RecruitmentStory;
+use App\ReportCampaign;
 use App\Schedule;
 use App\SuccessorHistory;
 use App\SummaryPayment;
 use App\User;
 use App\UserEmploymentStatus;
+use App\Utilities\Dates\MonthFourWeeksDivision;
+use App\Utilities\Dates\MonthIntoCompanyWeeksDivision;
+use App\Utilities\Dates\MonthPerWeekDivision;
+use App\Utilities\Salary\ProvisionLevels;
 use App\Work_Hour;
+use DateTime;
 use function foo\func;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -127,6 +135,255 @@ class FinancesController extends Controller
         return $weeksDivided;
     }
 
+    /**
+     * @param $sum == 0 indices that we want raw data, $sum == 1 indices that we want agreggate data
+     * @return data about camapigns
+     */
+    public function getCampaignData($date_start, $date_stop, $sum) {
+        if($sum == 0) { //raw data
+            $campaign_data = DB::table('report_campaign')->select(DB::raw('
+            SUM(all_campaigns) as all_campaigns,
+            SUM(active_campaigns) as active_campaigns,
+            SUBSTRING_INDEX(name,"_",1) as split_name
+            '))
+                ->whereBetween('date', [$date_start, $date_stop])
+                ->where('all_campaigns', '>', 0)
+                ->groupBy('split_name')
+                ->get();
+        }
+        else { //agreggate data
+            $campaign_data = ReportCampaign::select(DB::raw('
+            SUM(all_campaigns) AS sum_campaign,
+            SUM(active_campaigns) AS sum_active,
+            SUM(received_campaigns) AS sum_received,
+            SUM(unreceived_campaigns) AS sum_unreceived
+            '))
+                ->whereBetween('date', [$date_start, $date_stop])
+                ->get();
+        }
+        return $campaign_data->sortByDesc('all_campaigns');
+    }
+
+    /**
+     * Pobranie danych dla zbiorczego raportu (sortowanie po dyrektorach)
+     */
+    private function getMultiDepartmentData($date_start, $date_stop, $month, $year, $deps, $days_in_month) {
+        /**
+         * Pobranie ostatnich ID z dnia
+         */
+        $reportIds = DB::table('hour_report')
+            ->select(DB::raw('
+                MAX(id) as id
+            '))
+            ->whereBetween('hour_report.report_date', [$date_start, $date_stop])
+            ->groupBy('report_date')
+            ->groupBy('department_info_id')
+            ->whereIn('department_info_id', $deps)
+            ->get();
+        /**
+         * Pobranie danych do raportu
+         */
+        $hourReports = DB::table('hour_report')
+            ->select(DB::raw('
+                hour_report.*
+            '))
+            ->whereBetween('hour_report.report_date', [$date_start, $date_stop])
+            ->whereIn('hour_report.id', $reportIds->pluck('id')->toArray())
+            ->get();
+        /**
+         * Pobranie danych z przepracowanych godzin
+         */
+        $acceptHours = DB::table('work_hours')
+            ->select(DB::raw('
+                SUM(TIME_TO_SEC(accept_stop) - TIME_TO_SEC(accept_start)) as time_sum,
+                date
+            '))
+            ->join('users', 'users.id', 'work_hours.id_user')
+            ->whereBetween('date', [$date_start, $date_stop])
+            ->whereIn('users.department_info_id', $deps)
+            ->whereIn('users.user_type_id', [1,2])
+            ->groupBy('date')
+            ->get();
+        /**
+         * Pobranie danych z przepracowanych godzin
+         */
+        $acceptHours_2 = DB::table('work_hours')
+            ->select(DB::raw('
+                SUM(TIME_TO_SEC(accept_stop) - TIME_TO_SEC(accept_start)) as time_sum,
+                date,users.department_info_id
+                
+            '))
+            ->join('users', 'users.id', 'work_hours.id_user')
+            ->whereBetween('date', [$date_start, $date_stop])
+            ->whereIn('users.department_info_id', $deps)
+            ->whereIn('users.user_type_id', [1,2])
+            ->groupBy('date','users.department_info_id')
+            ->get();
+        /**
+         * Pobranie danych dotyczących janków
+         */
+        $jankyIds = DB::table('pbx_dkj_team')
+            ->select(DB::raw('
+                MAX(id) as id
+            '))
+            ->whereBetween('report_date', [$date_start, $date_stop])
+            ->groupBy('report_date')
+            ->groupBy('department_info_id')
+            ->whereIn('department_info_id', $deps)
+            ->get();
+        $yanky = DB::table('pbx_dkj_team')
+            ->select(DB::raw('
+                *
+            '))
+            ->whereBetween('report_date', [$date_start, $date_stop])
+            ->whereIn('id', $jankyIds->pluck('id')->toArray())
+            ->get();
+        $newYanky = [];
+        for ($i = 1; $i <= $days_in_month; $i++) {
+            $day = ($i < 10) ? '0' . $i : $i ;
+            $loop_date = $year . '-' . $month . '-' . $day;
+            if ($yanky->where('report_date', '=', $loop_date)->count() > 0) {
+                $tempYanek = new \stdClass();
+                $tempYanek->report_date = $loop_date;
+                $tempYanek->consultant_without_check = 0;
+                $tempYanek->online_consultant = 0;
+                $tempYanek->success = 0;
+                $tempYanek->count_all_check = 0;
+                $tempYanek->count_good_check = 0;
+                $tempYanek->count_bad_check = 0;
+                $tempYanek->all_jaky_disagreement = 0;
+                $tempYanek->good_jaky_disagreement = 0;
+                foreach($yanky->where('report_date', '=', $loop_date) as $item) {
+                    $tempYanek->consultant_without_check += $item->consultant_without_check;
+                    $tempYanek->online_consultant += $item->online_consultant;
+                    $tempYanek->success += $item->success;
+                    $tempYanek->count_all_check += $item->count_all_check;
+                    $tempYanek->count_good_check += $item->count_good_check;
+                    $tempYanek->count_bad_check += $item->count_bad_check;
+                    $tempYanek->all_jaky_disagreement += $item->all_jaky_disagreement;
+                    $tempYanek->good_jaky_disagreement += $item->good_jaky_disagreement;
+                }
+                $newYanky[] = $tempYanek;
+            }
+        }
+        $newYanky = collect($newYanky);
+        /**
+         * Pobranie danych z grafiku
+         */
+        //Pobranie tygodni których dotyczy dany miesiąc
+        $schedule_weeks = [];
+        for ($i = 1; $i <= intval($days_in_month); $i = $i + 7) {
+            $cur_day = ($i < 10) ? '0' . $i : $i;
+            $schedule_weeks[] = intval(date('W',strtotime($year . '-'. $month . '-' . $cur_day)));
+        }
+        $schedule_data_raw = [];
+        foreach($schedule_weeks as $week) {
+            $schedule_data_raw[] = DB::table('schedule')
+                ->select(DB::raw('
+                    SUM(TIME_TO_SEC(monday_stop) - TIME_TO_SEC(monday_start)) / 3600 as day1,
+                    SUM(TIME_TO_SEC(tuesday_stop) - TIME_TO_SEC(tuesday_start)) / 3600 as day2,
+                    SUM(TIME_TO_SEC(wednesday_stop) - TIME_TO_SEC(wednesday_start)) / 3600 as day3,
+                    SUM(TIME_TO_SEC(thursday_stop) - TIME_TO_SEC(thursday_start)) / 3600 as day4,
+                    SUM(TIME_TO_SEC(friday_stop) - TIME_TO_SEC(friday_start)) / 3600 as day5,
+                    SUM(TIME_TO_SEC(saturday_stop) - TIME_TO_SEC(saturday_start)) / 3600 as day6,
+                    SUM(TIME_TO_SEC(sunday_stop) - TIME_TO_SEC(sunday_start)) / 3600 as day7,
+                    week_num
+                '))
+                ->join('users', 'users.id', 'schedule.id_user')
+                ->whereIn('users.department_info_id', $deps)
+                ->whereIn('users.user_type_id', [1,2])
+                ->where('week_num', $week)
+                ->get();
+        }
+        $schedule_data_raw = collect($schedule_data_raw);
+        $schedule_data = $schedule_data_raw->map(function($item) {
+            return $item->first();
+        });
+        $reps = [];
+        for ($i = 1; $i <= $days_in_month; $i++) {
+            $day = ($i < 10) ? '0' . $i : $i ;
+            $loop_date = $year . '-' . $month . '-' . $day;
+            if ($hourReports->where('report_date', '=', $loop_date)->count() > 0) {
+                $reports = $hourReports->where('report_date', '=', $loop_date);
+                $tempReport = new \stdClass();
+                $tempReport->report_date = $loop_date;
+                $tempReport->average = 0;
+                $tempReport->success = 0;
+                $tempReport->janky_count = 0;
+                $tempReport->wear_base = 0;
+                $tempReport->call_time = 0;
+                $tempReport->hour_time_use = 0;
+                $tempReport->total_time = 0;
+                foreach ($reports as $item) {
+                    $tempReport->success += $item->success;
+                    $rbh_departments = $acceptHours_2->where('date', '=', $item->report_date);
+                    $total_hour_time_use = 0;
+                    foreach ($rbh_departments as $rbh_department)
+                    {
+                        $sigle_hour_report = $reports->where('department_info_id','=',$rbh_department->department_info_id);
+                        if(!$sigle_hour_report->isEmpty()){
+                            $total_hour_time_use += round(($sigle_hour_report->first()->call_time * ($rbh_department->time_sum/3600)) / 100, 2);
+                        }
+                    }
+                    $tempReport->hour_time_use += $total_hour_time_use;//floatval($item->hour_time_use);
+                    $tempReport->total_time += floatval($item->hour_time_use);//($item->call_time > 0) ? ((100 * $item->hour_time_use) / $item->call_time) : 0 ;
+                }
+                $tempReport->average = ($tempReport->hour_time_use > 0) ? round($tempReport->success / $tempReport->hour_time_use, 2) : 0 ;
+                $tempReport->hour_time_use = $total_hour_time_use;
+                $reps[] = $tempReport;
+            }
+        }
+        $hourReports = collect($reps);
+        /**
+         * Przypisanie danych do jednego obiektu
+         */
+        $newHourReports = $hourReports->map(function($item) use ($newYanky, $acceptHours) {
+            //Pobranie danych z jankami
+            $toAdd = $newYanky->where('report_date', '=', $item->report_date)->first();
+            $item->count_all_check = ($toAdd != null) ? $toAdd->count_all_check : 0;
+            $item->count_bad_check = ($toAdd != null) ? $toAdd->count_bad_check : 0;
+            //pobranie danych z przepracowanymi godzinami
+            $toAddHours = $acceptHours->where('date', '=', $item->report_date)->first();
+            $item->time_sum_real_RBH = ($toAddHours != null) ? $toAddHours->time_sum : 0;
+            return $item;
+        });
+        /**
+         *Tutaj raport w widoku bierze pierwszy wpis z daną datą, trzeba  posumować dane ze wszystkich oddziałów pogrupowane po datach
+         */
+        /**
+         * Pobranie danych departamentu
+         */
+        $dep_info = Department_info::whereIn('id', $deps)->get();
+        /**
+         * Tabela z miesiącami
+         */
+        $months = [
+            '01' => 'Styczeń',
+            '02' => 'Luty',
+            '03' => 'Marzec',
+            '04' => 'Kwiecień',
+            '05' => 'Maj',
+            '06' => 'Czerwiec',
+            '07' => 'Lipiec',
+            '08' => 'Sierpień',
+            '09' => 'Wrzesień',
+            '10' => 'Październik',
+            '11' => 'Listopad',
+            '12' => 'Grudzień'
+        ];
+        $data = [
+            'date_start' => $date_start,
+            'date_stop' => $date_stop,
+            'month' => $month,
+            'year' => $year,
+            'hour_reports' => $newHourReports,
+            'dep_info' => $dep_info,
+            'schedule_data' => $schedule_data,
+            'months' => $months
+        ];
+        return $data;
+    }
+
     private function getFreeDays($dividedMonth) {
 
 //        dd($dividedMonth);
@@ -215,6 +472,172 @@ class FinancesController extends Controller
 
     }
 
+    private function provisionSystemForTrainers(&$user, $dividedMonth) {
+        dd($dividedMonth);
+    }
+
+    private function provisionSystemForHR(&$user, $month, $year) {
+
+        $weekDateArr = MonthIntoCompanyWeeksDivision::get($month,$year); // array of objects with week info
+
+        if($user->dep_type_id == 1) { //hr from confirming
+            //*****Generating info how much account was added per week
+            $infoArr = [];
+            foreach($weekDateArr as $weekInfo) {
+                $data = RecruitmentStory::getReportNewAccountData($weekInfo->firstDay,$weekInfo->lastDay); //info about new accounts in teambox
+
+                foreach($data as $item) {
+                    if($item->id == $user->id) {
+                        $obj = new \stdClass();
+                        $obj->week = $weekInfo->weekNumber;
+                        $obj->provision = ProvisionLevels::get($item->add_user, 'HR', 1);
+                        array_push($infoArr, $obj);
+                    }
+                }
+
+            }
+            $user->provisions = $infoArr;
+        }
+        else if($user->dep_type_id == 2) { //hr from telemarketing
+            $firstDayOfMonth = new DateTime(date('Y-m-d', strtotime($year . '-' . $month . '-01')));
+            $lastDayOfMonth = new DateTime(date('Y-m-d', strtotime($year .'-'. $month . '-' . date('t', strtotime($year . '-' . $month . '-01')))));
+
+            $days_in_month = date('t', strtotime(date('Y').'-'. $month));
+
+            $departments = Department_info::where('id_dep_type', '=', 2)->get();
+
+            $infoArr = [];
+            $today = date('Y-m-d'); //today
+            $todayDateTime = new DateTime($today);
+            $provisions = [];
+            $totalProvision = 0;
+            $data = $this->getMultiDepartmentData($firstDayOfMonth->format('Y-m-d'), $lastDayOfMonth->format('Y-m-d'), $month, $year,$user->department_info_id, $days_in_month);
+            $weekGoalsRBH = [];
+//            dd($dividedMonth);
+            foreach($weekDateArr as $weekInfo) {
+                $total_week_goal_RBH = 0;
+                $hour_reports = $data['hour_reports'];
+                $dep_info = $data['dep_info'];
+                $firstDayOfMonthDateTime = new DateTime($weekInfo->firstDay);
+                $lastDayOfWeekDateTime = new DateTime($weekInfo->lastDay);
+                $dateDiff = $lastDayOfWeekDateTime->diff($firstDayOfMonthDateTime)->days;
+                for($i = 0; $i <= intval($dateDiff); $i++) {
+                    $date = date('Y-m-d', strtotime($weekInfo->firstDay . ' + ' . $i .' days'));
+                    $report = $hour_reports->where('report_date', '=', $date)->where('success', '>', 0)->first();
+                    $add_default_zero = ($report != null) ? false : true ;
+                    if ($add_default_zero == false) {
+                        $day_number = date('N', strtotime($report->report_date));
+
+                        $goal = ($day_number < 6) ? $dep_info['dep_aim'] : $dep_info['dep_aim_week'];
+                        $working_hours_goal = ($dep_info['commission_avg'] > 0) ? $goal / $dep_info['commission_avg'] : 0 ;
+                        $total_week_goal_RBH += $working_hours_goal;
+                    }
+                }
+                array_push($weekGoalsRBH, $total_week_goal_RBH);
+            }
+//            dd($user);
+            dd($weekGoalsRBH);
+
+
+        }
+
+        //*****End of generating info how much account was added per week
+
+        //*****Generating info with audits score
+//        $departmentAudits = Audit::where('date_audit', 'like', $year . '-' . $month . '%')
+//            ->where('user_type', '=', 3)
+//            ->where('department_info_id', '=', $user->department_info_id)
+//            ->first();
+//
+//        if(!is_null($departmentAudits)) {
+//            $user->auditScore = $departmentAudits->score;
+//        }
+//        else {
+//            $user->auditScore = -1; // if no data, -1
+//        }
+//
+//        $personalAudits = Audit::where('date_audit', 'like', $year . '-' . $month . '%')
+//            ->where('user_type', '=', 2)
+//            ->where('trainer_id', '=', $user->id)
+//            ->first();
+//
+//        if(!is_null($personalAudits)) {
+//            $user->auditScorePersonal = $personalAudits->score;
+//        }
+//        else {
+//            $user->auditScorePersonal = -1; // if no data, -1
+//        }
+        //*****End of generating info with audits score
+    }
+
+    private function provisionSystemForCoordinators(&$user, $dividedMonth, $month, $year) {
+        $weekDateArr = MonthFourWeeksDivision::get($year, $month); //month divided on 4 weeks
+        $firstDayOfMonth = new DateTime(date('Y-m-d', strtotime($year . '-' . $month . '-01')));
+        $lastDayOfMonth = new DateTime(date('Y-m-d', strtotime($year .'-'. $month . '-' . date('t', strtotime($year . '-' . $month . '-01')))));
+
+        $days_in_month = date('t', strtotime(date('Y').'-'. $month));
+
+        $departments = Department_info::where('id_dep_type', '=', 2)->get();
+
+        $infoArr = [];
+        $today = date('Y-m-d'); //today
+        $todayDateTime = new DateTime($today);
+        $provisions = [];
+        $totalProvision = 0;
+        $goals = [];
+        $data = $this->getMultiDepartmentData($firstDayOfMonth->format('Y-m-d'), $lastDayOfMonth->format('Y-m-d'), $month, $year, $departments->pluck('id')->toArray(), $days_in_month);
+        foreach($weekDateArr as $weekInfo) {
+            $firstDayOfWork = null;
+            if($user->promotion_date != null) { //user was promoted for coordinator
+                $firstDayOfWork = new DateTime($user->promotion_date);
+            }
+            else { //user started working as coordinator, and wasn't in company priously.
+                $firstDayOfWork = new DateTime($user->start_work);
+            }
+            $daysInPosition = $todayDateTime->diff($firstDayOfWork)->days; //how much days coordinator work on his position
+            $campaignData = $this->getCampaignData($weekInfo->firstDay, $weekInfo->lastDay, 1);
+            $databasePercentageUsage = $campaignData[0]->sum_campaign != 0 ? 100 * $campaignData[0]->sum_active / $campaignData[0]->sum_campaign : 0; //percent of database usage
+
+            $hour_reports = $data['hour_reports'];
+            $dep_info = $data['dep_info'];
+            $total_success = 0;
+            $total_week_goal = 0;
+            $total_week_success = 0;
+            $firstDayOfMonthDateTime = new DateTime($weekInfo->firstDay);
+            $lastDayOfWeekDateTime = new DateTime($weekInfo->lastDay);
+            $dateDiff = $lastDayOfWeekDateTime->diff($firstDayOfMonthDateTime)->days;
+
+            for($i = 0; $i <= intval($dateDiff); $i++) {
+                $date = date('Y-m-d', strtotime($weekInfo->firstDay . ' + ' . $i .' days'));
+                $report = $hour_reports->where('report_date', '=', $date)->where('success', '>', 0)->first();
+                $add_default_zero = ($report != null) ? false : true ;
+                if ($add_default_zero == false) {
+                    $goal = 0;
+                    $total_week_success += $report->success;
+                    $day_number = date('N', strtotime($report->report_date));
+                    foreach ($dep_info as $dep) {
+                        $goal += ($day_number < 6) ? $dep->dep_aim : $dep->dep_aim_week;
+                    }
+                    $total_week_goal += $goal;
+                }
+            }
+            $total_week_goal_proc = ($total_week_goal != null && $total_week_goal > 0) ? round(($total_week_success / $total_week_goal) * 100, 2) : 0 ;
+            $provision = 0;
+            if($user->id == 6) { //coordinators menager
+                $provision = ProvisionLevels::get($databasePercentageUsage, 'coordinator leader', $total_week_goal_proc);
+            }
+            else {
+                $provision = ProvisionLevels::get($databasePercentageUsage, 'koordynator', $total_week_goal_proc, $daysInPosition);
+            }
+
+            array_push($goals, $total_week_goal_proc);
+            array_push($provisions, $provision);
+            $totalProvision+= $provision;
+        }
+        $user->totalProvision = $totalProvision;
+        $user->provisions = $provisions;
+    }
+
     public function viewPaymentCadrePost(Request $request)
     {
 
@@ -230,6 +653,7 @@ class FinancesController extends Controller
             ->where('users.salary','>',0)
             ->selectRaw('
             `users`.`id`,
+            `users`.`user_type_id`,
             `users`.`agency_id`,
             `users`.`max_transaction`,
             `users`.`first_name`,
@@ -238,10 +662,14 @@ class FinancesController extends Controller
             `users`.`username`,
             `departments`.`name` as dep_name, 
             `department_type`.`name`  as dep_type,
+            `department_type`.`id` as dep_type_id,
+            `department_info`.`id` as department_info_id,
             `users`.`salary`,
             `users`.`additional_salary`,
             `users`.`student`,
             `users`.`documents`,
+            `users`.`promotion_date`,
+            `users`.`start_work`,
              ROUND(salary / DAY(LAST_DAY("' . $request->search_money_month.'-01' .'")),2) as average_salary,
             (SELECT SUM(`penalty_bonus`.`amount`) FROM `penalty_bonus` WHERE `penalty_bonus`.`id_user`=`users`.`id` AND `penalty_bonus`.`event_date` LIKE "'.$date.'" AND `penalty_bonus`.`type`=1 AND `penalty_bonus`.`status`=1) as `penalty`,
             (SELECT SUM(`penalty_bonus`.`amount`) FROM `penalty_bonus` WHERE `penalty_bonus`.`id_user`=`users`.`id` AND `penalty_bonus`.`event_date` LIKE  "'.$date.'" AND `penalty_bonus`.`type`=2 AND `penalty_bonus`.`status`=1) as `bonus`')
@@ -257,7 +685,24 @@ class FinancesController extends Controller
             ->groupBy('users.id')
             ->orderBy('users.last_name')->get();
 
+        foreach($salary as $user) {
+            if($user->user_type_id == 4) {
+//                $this->provisionSystemForTrainers($user,  MonthPerWeekDivision::get($month, $year));
+            }
+            else if($user->user_type_id == 5) {
+                $this->provisionSystemForHR($user, $month, $year);
+            }
+            else if($user->user_type_id == 19) {
+
+            }
+            else if($user->user_type_id == 8 || $user->id == 6) { //koordynator + menager of coordinators
+                $this->provisionSystemForCoordinators($user, MonthPerWeekDivision::get($month, $year), $month, $year);
+            }
+        }
+//        dd($salary->where('id', '=', 6));
+
         $freeDaysData = $this->getFreeDays($dividedMonth); //[id_user, freeDays]
+//        dd($freeDaysData);
 
         /**
          * Pobranie danych osób którzy nie pracowali całego miesiąca
@@ -424,7 +869,6 @@ class FinancesController extends Controller
         $agencies = Agencies::all();
         $department_type = Department_types::find($department_info->id_dep_type);
         $count_agreement = $department_type->count_agreement;
-
 
         $payment_saved = AcceptedPayment::
         where('department_info_id','=',Auth::user()->department_info_id)
@@ -660,8 +1104,9 @@ class FinancesController extends Controller
     //Custom Function
     private function getSalary($month)
     {
-
-
+            $realMonth = substr($month,5,2);
+            $realYear = substr($month, 0,4);
+            $clientRouteInfoRecords = ClientRouteInfo::where('confirmDate', 'like', $month)->OnlyActive()->get();
             //Czy wypłata jest już zatwierdzona
             $payment_saved = AcceptedPayment::
             where('department_info_id','=',Auth::user()->department_info_id)
@@ -675,6 +1120,7 @@ class FinancesController extends Controller
             }
         $query = DB::table(DB::raw("users"))
             ->join('work_hours', 'work_hours.id_user', 'users.id')
+            ->join('department_info', 'users.department_info_id', '=', 'department_info.id')
             ->where('users.department_info_id',Auth::user()->department_info_id)
             ->where(function ($querry) use ($month){
                 $querry->orwhere(DB::raw('SUBSTRING(promotion_date,1,7)'),'>=',substr($month,0,strlen($month)-1))
@@ -699,7 +1145,8 @@ class FinancesController extends Controller
             SUM(`work_hours`.`success`) as `success`,
             `salary_to_account`,
             `users`.`successorUserId`,
-            0 as successorSalary
+            0 as successorSalary,
+            id_dep_type
             ');
             if(!$payment_saved->isEmpty()){
                 $query = $query
@@ -730,8 +1177,13 @@ class FinancesController extends Controller
             `h`.`janki`,
             `salary_to_account`,
             successorUserId,
-            successorSalary')->get();
-            $result = $r->map(function($item) use($month) {
+            successorSalary,
+            id_dep_type')->get();
+
+
+        $weekDayArr = MonthIntoCompanyWeeksDivision::get($realMonth,$realYear);
+
+            $result = $r->map(function($item) use($month, $clientRouteInfoRecords, $weekDayArr) {
                 $user_empl_status = UserEmploymentStatus::
                     where( function ($querry) use ($item) {
                     $querry = $querry->orwhere('pbx_id', '=', $item->login_phone)
@@ -741,6 +1193,42 @@ class FinancesController extends Controller
                     ->where('pbx_id', '!=', 0)
                     ->where('pbx_id', '!=', null)
                     ->get();
+
+                $campaignScoresArr = [];
+
+                //creating provision field for each confirming consultant with data about provisions.
+                if($item->id_dep_type == 1) { //konsultant potwierdzeń
+                    $globalProvisionSum = 0;
+
+                    foreach($weekDayArr as $week) { //looping after each week
+                        $weekScoreArr = [];
+                        $showRecordsOfGivenUser = $clientRouteInfoRecords
+                            ->where('confirmingUser', '=', $item->id)
+                            ->where('confirmDate', '>=', $week->firstDay)
+                            ->where('confirmDate', '<', $week->lastDay); //all campaigns that he/she confirm in given week
+                        $provisionSum = 0;
+                        $badCampaigns = 0;
+                        foreach($showRecordsOfGivenUser as $show) {
+                            $provision = ProvisionLevels::get($show->frequency, 'consultant', '1');
+                            array_push($weekScoreArr, $provision);
+                            if($provision < 0) {
+                                $badCampaigns++;
+                            }
+                            $provisionSum += $provision;
+                            $globalProvisionSum += $provision;
+                        }
+                        $badCampaignsProvision = ProvisionLevels::get($badCampaigns, 'consultant', '2');
+                        $obj = new \stdClass();
+                        $obj->weekNumber = $week->weekNumber;
+                        $obj->provisions = $weekScoreArr;
+                        $obj->provisionSum =  $provisionSum;
+                        $obj->badCampaignsProvision = $badCampaignsProvision; // 50zl for each week without bad campaigns
+                        $globalProvisionSum += $badCampaignsProvision;
+                        array_push($campaignScoresArr, $obj);
+                    }
+                    $item->provision = $campaignScoresArr;
+                    $item->totalProvision = $globalProvisionSum < 0 ? 0 : $globalProvisionSum;
+                }
                 $user_empl_status = $user_empl_status->where('user_id','=',$item->id);
                 if(count($user_empl_status) == 0 || count($user_empl_status) == 1) {
 
@@ -797,6 +1285,7 @@ class FinancesController extends Controller
                 }
                return $item;
             });
+
             $this::mapSuccessorSalary(Auth::user()->department_info_id,$r,$month);
             $final_salary = $r->groupBy('agency_id');
             return $final_salary;

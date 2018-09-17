@@ -529,13 +529,15 @@ class PBXDataAPI extends Controller
                             $data_to_insert[$temp_key]['success'] = intval($rowItem);
                             $date = date('Y-m-d', strtotime("today"));
                             $data_to_insert[$temp_key]['report_date'] = $date;
+
                             if($campainTime == '????' || $campainTime == 0)
                                 unset($data_to_insert[$temp_key]);
                             else{
                                 //Wgranie aktualnych inforamcji o kampani
                                 $clientRouteInfo = ClientRouteInfo::where('pbx_campaign_id','=',$campainId)
-                                    ->where('hour','=',$campainTime)
+                                    ->where('hour','=',$campainTime)->where('status',1)
                                     ->first();
+
                                 if($clientRouteInfo != null){
                                     $clientRouteInfo->actual_success = $campainSuccess;
                                     $clientRouteInfo->save();

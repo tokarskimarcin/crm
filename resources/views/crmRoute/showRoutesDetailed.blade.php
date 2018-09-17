@@ -56,7 +56,8 @@
                     Moduł <span style="font-weight: bold;">Szczegółowe informacje o kampaniach</span> wyświetla informacje o poszczególnych pokazo-godzinach,
                     które mogą być zbiorczo edytowane. Tabela z rekordami może być filtrowana dostępnymi polami wielokrotnego wyboru.
                     Aby edytować rekordy, należy je zaznaczyć i nacisnąć przycisk <span style="font-weight: bold;">Edytuj rekord(y)</span>.
-                    Jeśli liczba <i>zaproszeń live</i> przekracza zakładane <i>limity</i>, w kolumnie <i>straty</i> wyswietli się 0.
+                    Jeśli liczba <i>zaproszeń live</i> przekracza zakładane <i>limity</i>, w kolumnie <i>straty</i> wyswietli się 0. <br>
+                    Pokazy anulowane mają cały wiersz w kolorze <span style="background-color: #ffc0bd;">czerwonym</span>.
                 </div>
                 <div class="row">
                     <div class="col-md-2">
@@ -106,22 +107,24 @@
 
                 </div>
                 <div class="row">
-                    <table id="datatable" class="thead-inverse table table-striped table-bordered" style="max-width:100%;">
+                    <table id="datatable" class="thead-inverse table table-striped table-bordered compact" style="max-width:100%;">
                         <thead>
                         <tr>
-                            <th>Tydzien</th>
+                            <th>Tydz</th>
                             <th>Data</th>
-                            <th>Godzina</th>
+                            <th>Godz</th>
                             <th>Kampania</th>
                             <th>Podział bazy</th>
                             <th>Sprawdzenie</th>
                             <th>Zaproszenia <br>Live</th>
                             <th>Limit</th>
                             <th>Straty</th>
-                            <th>Projekt</th>
+                            <th>Nazwa_klienta</th>
                             <th>Oddział</th>
                             <th>Uwagi</th>
                             <th>Nr kampanii (PBX)</th>
+                            <th>Nazwa_Hotelu</th>
+                            <th>Adres_Hotelu</th>
                         </tr>
                         </thead>
                     </table>
@@ -375,9 +378,12 @@
 
                    if(addFlag == true) {
                        let givenRow = document.querySelector('[data-id="' + idItem + '"]');
+                       console.log(givenRow);
                        let givenRowData = givenRow.cells[1].textContent;
                        let givenRowKampania = givenRow.cells[3].textContent;
                        let givenRowProjekt = givenRow.cells[9].textContent;
+                       let hotelName = givenRow.cells[12].textContent;
+                       let hotelAdress = givenRow.cells[13].textContent;
                        let tr = document.createElement('tr');
                        let td1 = document.createElement('td');
                        td1.textContent = givenRowData;
@@ -388,6 +394,14 @@
                        let td3 = document.createElement('td');
                        td3.textContent = givenRowProjekt;
                        tr.appendChild(td3);
+
+                       let td4 = document.createElement('td');
+                       td4.textContent = hotelName;
+                       tr.appendChild(td4);
+
+                       let td5 = document.createElement('td');
+                       td5.textContent = hotelAdress;
+                       tr.appendChild(td5);
 
                        let rowObject = {
                            id: idItem,
@@ -413,6 +427,8 @@
                let th1 = document.createElement('th');
                let th2 = document.createElement('th');
                let th3 = document.createElement('th');
+               let th4 = document.createElement('th');
+               let th5 = document.createElement('th');
 
                th1.textContent = "Data";
                tr1.appendChild(th1);
@@ -422,6 +438,12 @@
 
                th3.textContent = "Projekt";
                tr1.appendChild(th3);
+
+               th4.textContent = "Nazwa hotelu";
+               tr1.appendChild(th4);
+
+               th5.textContent = "Adres";
+               tr1.appendChild(th5);
 
                theadElement.appendChild(tr1);
 
@@ -693,6 +715,9 @@
                        });
 
                    });
+                   if(data.canceled == 1) {
+                       $(row).css("background-color", '#ffc0bd');
+                   }
                },
                "fnDrawCallback": function(settings) {
                    $('#datatable tbody tr').on('click', function(e) {
@@ -748,7 +773,7 @@
                    },
                    {"data": function (data, type, dataToSet) {
                            if(data.baseDivision != null) {
-                               return '<textarea class="form-control baseDivision" cols="10" readonly>'+data.baseDivision+'</textarea>';
+                               return '<textarea class="form-control baseDivision" cols="5" rows="1" readonly>'+data.baseDivision+'</textarea>';
                            }
                            else {
                                return "";
@@ -825,8 +850,15 @@
                             }
                        },"name":"comment","orderable" : false
                    },
-                   {"data":"nrPBX", "visible":false}
-
+                   {"data":"nrPBX", "visible":false},
+                   {"data":function (data, type, dataToSet) {
+                           return data.hotelName;
+                       },"name":"hotelName"
+                   },
+                   {"data":function (data, type, dataToSet) {
+                           return data.hotelAdress;
+                       },"name":"hotelAdress"
+                   }
                ],
                order: [[1, 'asc'], [9, 'asc'],[3, 'desc'], [2, 'asc']],
                rowGroup: {
@@ -867,7 +899,7 @@
                            .append('<td>' + sumAllSuccess + '</td>')
                            .append('<td>' + sumAllLimit + '</td>')
                            .append('<td>' + sumAllLose + '</td>')
-                           .append('<td colspan="4"></td>')
+                           .append('<td colspan="5"></td>')
                    },
                },
            });
