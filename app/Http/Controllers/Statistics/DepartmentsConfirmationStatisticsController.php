@@ -74,5 +74,35 @@ class DepartmentsConfirmationStatisticsController extends Controller
         return $confirmationStatistics;
     }
 
+    public function allDepartmentsConfirmationStatisticsAjax(Request $request){
+        $month = $request->selectedMonth;
 
+        $monthFourWeeksDivision = MonthFourWeeksDivision::get(date('Y',strtotime($month)),date('m',strtotime($month)));
+        $clientRouteInfo = ClientRouteInfo::select(
+            DB::raw('concat(users.first_name," ",users.last_name) as confirmingUserName'),
+            DB::raw('concat(trainer.first_name," ",trainer.last_name) as confirmingUserTrainerName'),
+            'confirmingUser',
+            'confirmDate',
+            'frequency',
+            'pairs',
+            'actual_success',
+            'users.department_info_id',
+            'users.coach_id'
+        )
+            ->join('users','confirmingUser', '=', 'users.id')
+            ->join('department_info as di', 'users.department_info_id','=','di.id')
+            ->join('users as trainer','users.coach_id','=','trainer.id')
+            ->where('confirmDate', '>=', $monthFourWeeksDivision[0]->firstDay)
+            ->where('confirmDate', '<=', $monthFourWeeksDivision[count($monthFourWeeksDivision)-1]->lastDay)
+            ->where('di.id_dep_type',1)
+            ->whereNotNull('confirmingUser')
+            ->whereNotNull('users.coach_id');
+        $clientRouteInfo = $clientRouteInfo->get();
+
+        $confirmationStatistics = ConfirmationStatistics::getConsultantsConfirmationStatisticsForMonth($clientRouteInfo, $monthFourWeeksDivision, 'department_info_id');
+
+        $confirmationStatistics['data'] = $confirmationStatistics['data']->sortByDesc('provision')->groupBy('dateGroup');
+
+        return $confirmationStatistics;
+    }
 }
