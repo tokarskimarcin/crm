@@ -335,6 +335,7 @@ Route::post('/pbxReportDetailedAjax', 'StatisticsController@pbxReportDetailedAja
 Route::post('/getDepartmentsAveragesForEveryHourAjax', 'StatisticsController@getDepartmentsAveragesForEveryHourAjax')->name('api.getDepartmentsAveragesForEveryHourAjax');
 Route::post('/getDepartmentsAveragesForEveryDayAjax', 'StatisticsController@getDepartmentsAveragesForEveryDayAjax')->name('api.getDepartmentsAveragesForEveryDayAjax');
 Route::post('/departmentsConfirmationStatisticsAjax', 'Statistics\DepartmentsConfirmationStatisticsController@departmentsConfirmationStatisticsAjax')->name('api.departmentsConfirmationStatisticsAjax');
+Route::post('/allDepartmentsConfirmationStatisticsAjax', 'Statistics\DepartmentsConfirmationStatisticsController@allDepartmentsConfirmationStatisticsAjax')->name('api.allDepartmentsConfirmationStatisticsAjax');
 /* END STATISTICS ROUTES AJAX */
 
 //********************END AJAX*********************** */

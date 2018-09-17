@@ -20,6 +20,8 @@ use App\SummaryPayment;
 use App\User;
 use App\UserEmploymentStatus;
 use App\Utilities\Dates\MonthFourWeeksDivision;
+use App\Utilities\DataProcessing\ConfirmationStatistics;
+use App\Utilities\Dates\MonthFourWeeksDivision;
 use App\Utilities\Dates\MonthIntoCompanyWeeksDivision;
 use App\Utilities\Dates\MonthPerWeekDivision;
 use App\Utilities\Salary\ProvisionLevels;
@@ -473,7 +475,72 @@ class FinancesController extends Controller
     }
 
     private function provisionSystemForTrainers(&$user, $dividedMonth) {
-        dd($dividedMonth);
+        $user->provision = 0;
+        if($user->department_type_id == 1){             //trener potwierdzeń
+            $clientRouteInfo = ClientRouteInfo::select(
+                DB::raw('concat(users.first_name," ",users.last_name) as confirmingUserName'),
+                DB::raw('concat(trainer.first_name," ",trainer.last_name) as confirmingUserTrainerName'),
+                'confirmingUser',
+                'confirmDate',
+                'frequency',
+                'pairs',
+                'actual_success',
+                'users.department_info_id',
+                'users.coach_id'
+            )
+                ->join('users','confirmingUser', '=', 'users.id')
+                ->join('department_info as di', 'users.department_info_id','=','di.id')
+                ->join('users as trainer','users.coach_id','=','trainer.id')
+                ->where('confirmDate', '>=', $dividedMonth[0]->firstDay)
+                ->where('confirmDate', '<=', $dividedMonth[count($dividedMonth)-1]->lastDay)
+                ->where('users.department_info_id', $user->department_info_id)
+                ->where('di.id_dep_type',1)
+                ->whereNotNull('confirmingUser')
+                ->whereNotNull('users.coach_id')
+                ->where('users.coach_id', $user->id)->get(); //client route info poszczególnych konsultantów wybranego trenera w miesiacu
+            $confirmationStatistics = ConfirmationStatistics::getConsultantsConfirmationStatisticsForMonth($clientRouteInfo, $dividedMonth, 'coach_id');
+            foreach ($confirmationStatistics['sums'] as $confirmationStatisticsWeek){
+                $user->provision = $user->provision + ProvisionLevels::get($confirmationStatisticsWeek->successfulPct,'trainer',2);
+                $user->provision = $user->provision + ProvisionLevels::get($confirmationStatisticsWeek->unsuccessfulBadlyPct,'trainer',1);
+            }
+            dd($user);
+        }else if($user->department_type_id == 2){       //trener telemarketing
+
+        }
+    }
+
+    private function provisionSystemForInstructors(&$user, $dividedMonth){
+        $user->provision = 0;
+        if($user->department_type_id == 1){             //szkoleniowiec potwierdzeń
+            $clientRouteInfo = ClientRouteInfo::select(
+                DB::raw('concat(users.first_name," ",users.last_name) as confirmingUserName'),
+                DB::raw('concat(trainer.first_name," ",trainer.last_name) as confirmingUserTrainerName'),
+                'confirmingUser',
+                'confirmDate',
+                'frequency',
+                'pairs',
+                'actual_success',
+                'users.department_info_id',
+                'users.coach_id'
+            )
+                ->join('users','confirmingUser', '=', 'users.id')
+                ->join('department_info as di', 'users.department_info_id','=','di.id')
+                ->join('users as trainer','users.coach_id','=','trainer.id')
+                ->where('confirmDate', '>=', $dividedMonth[0]->firstDay)
+                ->where('confirmDate', '<=', $dividedMonth[count($dividedMonth)-1]->lastDay)
+                ->where('users.department_info_id', $user->department_info_id)
+                ->where('di.id_dep_type',1)
+                ->whereNotNull('confirmingUser')
+                ->whereNotNull('users.coach_id')->get(); //client route info poszczególnych konsultantów w calym oddziale w miesiacu
+            $confirmationStatistics = ConfirmationStatistics::getConsultantsConfirmationStatisticsForMonth($clientRouteInfo, $dividedMonth);
+            foreach ($confirmationStatistics['sums'] as $confirmationStatisticsWeek){
+                $user->provision = $user->provision + ProvisionLevels::get($confirmationStatisticsWeek->successfulPct,'instructor',2);
+                $user->provision = $user->provision + ProvisionLevels::get($confirmationStatisticsWeek->unsuccessfulBadlyPct,'instructor',1);
+            }
+            dd($user);
+        }else if($user->department_type_id == 2){       //szkoleniowiec telemarketing
+
+        }
     }
 
     private function provisionSystemForHR(&$user, $month, $year) {
@@ -660,6 +727,7 @@ class FinancesController extends Controller
             `users`.`last_name`,
             `users`.`salary_to_account`,
             `users`.`username`,
+            `department_type`.`id` as department_type_id,
             `departments`.`name` as dep_name, 
             `department_type`.`name`  as dep_type,
             `department_type`.`id` as dep_type_id,
@@ -687,13 +755,13 @@ class FinancesController extends Controller
 
         foreach($salary as $user) {
             if($user->user_type_id == 4) {
-//                $this->provisionSystemForTrainers($user,  MonthPerWeekDivision::get($month, $year));
+//                $this->provisionSystemForTrainers($user,  MonthFourWeeksDivision::get($year, $month));
             }
             else if($user->user_type_id == 5) {
                 $this->provisionSystemForHR($user, $month, $year);
             }
             else if($user->user_type_id == 19) {
-
+//                $this->provisionSystemForInstructors($user,  MonthFourWeeksDivision::get($year, $month));
             }
             else if($user->user_type_id == 8 || $user->id == 6) { //koordynator + menager of coordinators
                 $this->provisionSystemForCoordinators($user, MonthPerWeekDivision::get($month, $year), $month, $year);
@@ -1290,6 +1358,7 @@ class FinancesController extends Controller
             $final_salary = $r->groupBy('agency_id');
             return $final_salary;
     }
+
     public function mapSuccessorSalary($departmentInfoID,&$usersSalary,$month){
         $map = SuccessorHistory::select('successor_history.*','users.rate','users.successorUserId')->join('users','users.id','successor_history.user_id')
             ->where('users.department_info_id',$departmentInfoID)
