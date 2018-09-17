@@ -13,7 +13,7 @@ use DateTime;
 
 class WeekNumber
 {
-    public static function get($date){
+    public static function get($date) {
         $actualWeek = new DateTime($date);
         $actualWeek = $actualWeek->format("W");
         return $actualWeek;

@@ -11,7 +11,6 @@ use App\Departments;
 use App\DoublingQueryLogs;
 use App\JankyPenatlyProc;
 use App\PaymentAgencyStory;
-use App\Pbx_report_extension;
 use App\PenaltyBonus;
 use App\RecruitmentStory;
 use App\ReportCampaign;
@@ -498,27 +497,12 @@ class FinancesController extends Controller
                 ->whereNotNull('confirmingUser')
                 ->whereNotNull('users.coach_id')
                 ->where('users.coach_id', $user->id)->get(); //client route info poszczególnych konsultantów wybranego trenera w miesiacu
-            $janky = collect();
-            foreach ($dividedMonth as $dateGroup){
-                $weekJanky = Pbx_report_extension::select(DB::raw('sum(all_bad_talks)*100/sum(all_checked_talks) as janky'))
-                    ->where('actual_coach_id','=',$user->id)
-                    ->whereBetween('report_date',[$dateGroup->firstDay,$dateGroup->lastDay])
-                    ->groupBy('actual_coach_id')
-                    ->first();
-                if($weekJanky !== null) {
-                    $weekJanky = (object)$weekJanky->toArray();
-                    $weekJanky->dateGroup = date('Y.m.d',strtotime($dateGroup->firstDay)). ' - ' . date('Y.m.d',strtotime($dateGroup->lastDay));
-                    $janky->push($weekJanky);
-                }
-            }
-            $departmentInfo = Department_info::find($user->department_info_id);
             $confirmationStatistics = ConfirmationStatistics::getConsultantsConfirmationStatisticsForMonth($clientRouteInfo, $dividedMonth, 'coach_id');
             foreach ($confirmationStatistics['sums'] as $confirmationStatisticsWeek){
-                if($janky->where('dateGroup',$confirmationStatisticsWeek->dateGroup)->first()->janky < $departmentInfo->commission_janky){
-                    $user->provision = $user->provision + ProvisionLevels::get($confirmationStatisticsWeek->successfulPct,'trainer',2);
-                    $user->provision = $user->provision + ProvisionLevels::get($confirmationStatisticsWeek->unsuccessfulBadlyPct,'trainer',1);
-                }
+                $user->provision = $user->provision + ProvisionLevels::get('trainer', $confirmationStatisticsWeek->successfulPct,2);
+                $user->provision = $user->provision + ProvisionLevels::get('trainer', $confirmationStatisticsWeek->unsuccessfulBadlyPct,1);
             }
+            dd($user);
         }else if($user->department_type_id == 2){       //trener telemarketing
 
         }
@@ -547,99 +531,182 @@ class FinancesController extends Controller
                 ->where('di.id_dep_type',1)
                 ->whereNotNull('confirmingUser')
                 ->whereNotNull('users.coach_id')->get(); //client route info poszczególnych konsultantów w calym oddziale w miesiacu
-            $janky = collect();
-            foreach ($dividedMonth as $dateGroup){
-                $weekJanky = Pbx_report_extension::select(DB::raw('sum(all_bad_talks)*100/sum(all_checked_talks) as janky'))
-                    ->join('users as consultants','consultants.id','pbx_report_extension.user_id')
-                    ->whereNotNull('pbx_report_extension.user_id')
-                    ->whereBetween('report_date',[$dateGroup->firstDay,$dateGroup->lastDay])
-                    ->where('consultants.department_info_id',$user->department_info_id)
-                    ->first();
-                if($weekJanky !== null) {
-                    $weekJanky = (object)$weekJanky->toArray();
-                    $weekJanky->dateGroup = date('Y.m.d',strtotime($dateGroup->firstDay)). ' - ' . date('Y.m.d',strtotime($dateGroup->lastDay));
-                    $janky->push($weekJanky);
-                }
-            }
-            $departmentInfo = Department_info::find($user->department_info_id);
             $confirmationStatistics = ConfirmationStatistics::getConsultantsConfirmationStatisticsForMonth($clientRouteInfo, $dividedMonth);
             foreach ($confirmationStatistics['sums'] as $confirmationStatisticsWeek){
-                if($janky->where('dateGroup',$confirmationStatisticsWeek->dateGroup)->first()->janky < $departmentInfo->commission_janky) {
-                    $user->provision = $user->provision + ProvisionLevels::get($confirmationStatisticsWeek->successfulPct, 'instructor', 2);
-                    $user->provision = $user->provision + ProvisionLevels::get($confirmationStatisticsWeek->unsuccessfulBadlyPct, 'instructor', 1);
-                }
+                $user->provision = $user->provision + ProvisionLevels::get('instructor', $confirmationStatisticsWeek->successfulPct,2);
+                $user->provision = $user->provision + ProvisionLevels::get('instructor', $confirmationStatisticsWeek->unsuccessfulBadlyPct,1);
             }
+            dd($user);
         }else if($user->department_type_id == 2){       //szkoleniowiec telemarketing
 
         }
     }
 
+    private function getDepartmentStatistics($weekDateArr, $month, $year, $departments) {
+        $firstDayOfMonth = new DateTime(date('Y-m-d', strtotime($year . '-' . $month . '-01')));
+        $lastDayOfMonth = new DateTime(date('Y-m-d', strtotime($year .'-'. $month . '-' . date('t', strtotime($year . '-' . $month . '-01')))));
+
+        $days_in_month = date('t', strtotime(date('Y').'-'. $month));
+
+        $today = date('Y-m-d'); //today
+        $todayDateTime = new DateTime($today);
+        $data = $this->getMultiDepartmentData($firstDayOfMonth->format('Y-m-d'), $lastDayOfMonth->format('Y-m-d'), $month, $year,$departments, $days_in_month);
+        $rbhTargetArr = [];
+        foreach($weekDateArr as $weekInfo) {
+            $total_week_proc_janky = 0;
+            $total_week_goal = 0;
+            $total_week_success = 0;
+            $real_week_RBH = 0;
+            $week_target_RBH = 0;
+            $total_week_checked = 0;
+            $total_week_bad = 0;
+            $hour_reports = $data['hour_reports'];
+            $dep_info = $data['dep_info'];
+            $firstDayOfMonthDateTime = new DateTime($weekInfo->firstDay);
+            $lastDayOfWeekDateTime = new DateTime($weekInfo->lastDay);
+            $dateDiff = $lastDayOfWeekDateTime->diff($firstDayOfMonthDateTime)->days;
+            for($i = 0; $i <= intval($dateDiff); $i++) {
+                $depAim = 0;
+                $date = date('Y-m-d', strtotime($weekInfo->firstDay . ' + ' . $i .' days'));
+                $report = $hour_reports->where('report_date', '=', $date)->where('success', '>', 0)->first();
+                $add_default_zero = ($report != null) ? false : true ;
+                if ($add_default_zero == false) {
+                    $day_number = date('N', strtotime($report->report_date));
+                    $real_RBH = round(($report->time_sum_real_RBH / 3600) ,2);
+                    if(date('w', strtotime($date)) == 6) { //saturday
+                        $depAim = $dep_info[0]['dep_aim_week'];
+                    }
+                    else { //other than saturday
+                        $depAim = $dep_info[0]['dep_aim'];
+                    }
+                    $goal = ($day_number < 6) ? $dep_info[0]['dep_aim'] : $dep_info[0]['dep_aim_week'];
+                    $total_week_goal += $goal;
+                    $total_week_success += $report->success;
+
+                    $commisionAvg = $dep_info[0]['commission_avg'];
+                    $targetRBH =$commisionAvg != 0 ? round($depAim / $commisionAvg, 2) : 0; //cel rbh
+                    $week_target_RBH += $targetRBH;
+                    $real_week_RBH += $real_RBH;
+                    $total_week_checked += $report->count_all_check;
+                    $total_week_bad += $report->count_bad_check;
+                }
+            }
+            $total_week_proc_janky = ($total_week_checked != null && $total_week_checked > 0) ? round(($total_week_bad / $total_week_checked) * 100, 2) : 0 ;
+            $total_week_goal_proc = ($total_week_goal != null && $total_week_goal > 0) ? round(($total_week_success / $total_week_goal) * 100, 2) : 0 ;
+
+            $obj = new \stdClass();
+            $obj->week_target_rbh = round($week_target_RBH);
+            $obj->real_week_rbh = $real_week_RBH;
+            $obj->janky_proc = $total_week_proc_janky;
+            $obj->target_rbh_percentage = round($week_target_RBH) != 0 ? 100 * $real_week_RBH / round($week_target_RBH) : 0;
+            $obj->total_week_goal_proc = $total_week_goal_proc;
+            array_push($rbhTargetArr, $obj);
+        }
+
+        return $rbhTargetArr;
+    }
+
     private function provisionSystemForHR(&$user, $month, $year) {
 
-        $weekDateArr = MonthIntoCompanyWeeksDivision::get($month,$year); // array of objects with week info
+        $weekDateArr = MonthFourWeeksDivision::get($year,$month); // array of objects with week info
+//        dd($weekDateArr);
 
         if($user->dep_type_id == 1) { //hr from confirming
             //*****Generating info how much account was added per week
             $infoArr = [];
+            $totalProv = 0;
             foreach($weekDateArr as $weekInfo) {
                 $data = RecruitmentStory::getReportNewAccountData($weekInfo->firstDay,$weekInfo->lastDay); //info about new accounts in teambox
 
                 foreach($data as $item) {
                     if($item->id == $user->id) {
+                        $provision = ProvisionLevels::get('HR',$item->add_user, 1);
                         $obj = new \stdClass();
-                        $obj->week = $weekInfo->weekNumber;
-                        $obj->provision = ProvisionLevels::get($item->add_user, 'HR', 1);
+                        $obj->provision = $provision;
                         array_push($infoArr, $obj);
+                        $totalProv += $provision;
                     }
                 }
 
             }
             $user->provisions = $infoArr;
+            $user->totalProvision = $totalProv;
+            //*****End of generating info how much account was added per week
         }
         else if($user->dep_type_id == 2) { //hr from telemarketing
-            $firstDayOfMonth = new DateTime(date('Y-m-d', strtotime($year . '-' . $month . '-01')));
-            $lastDayOfMonth = new DateTime(date('Y-m-d', strtotime($year .'-'. $month . '-' . date('t', strtotime($year . '-' . $month . '-01')))));
-
-            $days_in_month = date('t', strtotime(date('Y').'-'. $month));
-
-            $departments = Department_info::where('id_dep_type', '=', 2)->get();
-
-            $infoArr = [];
-            $today = date('Y-m-d'); //today
-            $todayDateTime = new DateTime($today);
+//            $firstDayOfMonth = new DateTime(date('Y-m-d', strtotime($year . '-' . $month . '-01')));
+//            $lastDayOfMonth = new DateTime(date('Y-m-d', strtotime($year .'-'. $month . '-' . date('t', strtotime($year . '-' . $month . '-01')))));
+//
+//            $days_in_month = date('t', strtotime(date('Y').'-'. $month));
+//
+//            $departments = Department_info::where('id_dep_type', '=', 2)->get();
+//
+//            $infoArr = [];
+//            $today = date('Y-m-d'); //today
+//            $todayDateTime = new DateTime($today);
             $provisions = [];
             $totalProvision = 0;
-            $data = $this->getMultiDepartmentData($firstDayOfMonth->format('Y-m-d'), $lastDayOfMonth->format('Y-m-d'), $month, $year,$user->department_info_id, $days_in_month);
-            $weekGoalsRBH = [];
-//            dd($dividedMonth);
-            foreach($weekDateArr as $weekInfo) {
-                $total_week_goal_RBH = 0;
-                $hour_reports = $data['hour_reports'];
-                $dep_info = $data['dep_info'];
-                $firstDayOfMonthDateTime = new DateTime($weekInfo->firstDay);
-                $lastDayOfWeekDateTime = new DateTime($weekInfo->lastDay);
-                $dateDiff = $lastDayOfWeekDateTime->diff($firstDayOfMonthDateTime)->days;
-                for($i = 0; $i <= intval($dateDiff); $i++) {
-                    $date = date('Y-m-d', strtotime($weekInfo->firstDay . ' + ' . $i .' days'));
-                    $report = $hour_reports->where('report_date', '=', $date)->where('success', '>', 0)->first();
-                    $add_default_zero = ($report != null) ? false : true ;
-                    if ($add_default_zero == false) {
-                        $day_number = date('N', strtotime($report->report_date));
+//            $data = $this->getMultiDepartmentData($firstDayOfMonth->format('Y-m-d'), $lastDayOfMonth->format('Y-m-d'), $month, $year,[$user->department_info_id], $days_in_month);
+            $rbhTargetArr = $this->getDepartmentStatistics($weekDateArr, $month, $year, [$user->department_info_id]);
+//            foreach($weekDateArr as $weekInfo) {
+//                $total_week_proc_janky = 0;
+//                $total_week_goal = 0;
+//                $total_week_success = 0;
+//                $real_week_RBH = 0;
+//                $week_target_RBH = 0;
+//                $total_week_checked = 0;
+//                $total_week_bad = 0;
+//                $hour_reports = $data['hour_reports'];
+//                $dep_info = $data['dep_info'];
+//                $firstDayOfMonthDateTime = new DateTime($weekInfo->firstDay);
+//                $lastDayOfWeekDateTime = new DateTime($weekInfo->lastDay);
+//                $dateDiff = $lastDayOfWeekDateTime->diff($firstDayOfMonthDateTime)->days;
+//                for($i = 0; $i <= intval($dateDiff); $i++) {
+//                    $depAim = 0;
+//                    $date = date('Y-m-d', strtotime($weekInfo->firstDay . ' + ' . $i .' days'));
+//                    $report = $hour_reports->where('report_date', '=', $date)->where('success', '>', 0)->first();
+//                    $add_default_zero = ($report != null) ? false : true ;
+//                    if ($add_default_zero == false) {
+//                        $day_number = date('N', strtotime($report->report_date));
+//                        $real_RBH = round(($report->time_sum_real_RBH / 3600) ,2);
+//                        if(date('w', strtotime($date)) == 6) { //saturday
+//                            $depAim = $dep_info[0]['dep_aim_week'];
+//                        }
+//                        else { //other than saturday
+//                            $depAim = $dep_info[0]['dep_aim'];
+//                        }
+//                        $goal = ($day_number < 6) ? $dep_info[0]['dep_aim'] : $dep_info[0]['dep_aim_week'];
+//                        $total_week_goal += $goal;
+//                        $total_week_success += $report->success;
+//
+//                        $commisionAvg = $dep_info[0]['commission_avg'];
+//                        $targetRBH =$commisionAvg != 0 ? round($depAim / $commisionAvg, 2) : 0; //cel rbh
+//                        $week_target_RBH += $targetRBH;
+//                        $real_week_RBH += $real_RBH;
+//                        $total_week_checked += $report->count_all_check;
+//                        $total_week_bad += $report->count_bad_check;
+//                    }
+//                }
+//                $total_week_proc_janky = ($total_week_checked != null && $total_week_checked > 0) ? round(($total_week_bad / $total_week_checked) * 100, 2) : 0 ;
+//                $total_week_goal_proc = ($total_week_goal != null && $total_week_goal > 0) ? round(($total_week_success / $total_week_goal) * 100, 2) : 0 ;
+//
+//                $obj = new \stdClass();
+//                $obj->week_target_rbh = round($week_target_RBH);
+//                $obj->real_week_rbh = $real_week_RBH;
+//                $obj->janky_proc = $total_week_proc_janky;
+//                $obj->target_rbh_percentage = round($week_target_RBH) != 0 ? 100 * $real_week_RBH / round($week_target_RBH) : 0;
+//                $obj->total_week_goal_proc = $total_week_goal_proc;
+//                array_push($rbhTargetArr, $obj);
+//            }
 
-                        $goal = ($day_number < 6) ? $dep_info['dep_aim'] : $dep_info['dep_aim_week'];
-                        $working_hours_goal = ($dep_info['commission_avg'] > 0) ? $goal / $dep_info['commission_avg'] : 0 ;
-                        $total_week_goal_RBH += $working_hours_goal;
-                    }
-                }
-                array_push($weekGoalsRBH, $total_week_goal_RBH);
+//            dd($rbhTargetArr);
+            foreach ($rbhTargetArr as $target) {
+                $prov = ProvisionLevels::get('HR', $target->janky_proc, $target->target_rbh_percentage,2, 1);
+                array_push($provisions, $prov);
+                $totalProvision += $prov;
             }
-//            dd($user);
-            dd($weekGoalsRBH);
-
-
+            $user->totalProvision = $totalProvision;
         }
-
-        //*****End of generating info how much account was added per week
 
         //*****Generating info with audits score
 //        $departmentAudits = Audit::where('date_audit', 'like', $year . '-' . $month . '%')
@@ -668,7 +735,7 @@ class FinancesController extends Controller
         //*****End of generating info with audits score
     }
 
-    private function provisionSystemForCoordinators(&$user, $dividedMonth, $month, $year) {
+    private function provisionSystemForCoordinators(&$user, $month, $year) {
         $weekDateArr = MonthFourWeeksDivision::get($year, $month); //month divided on 4 weeks
         $firstDayOfMonth = new DateTime(date('Y-m-d', strtotime($year . '-' . $month . '-01')));
         $lastDayOfMonth = new DateTime(date('Y-m-d', strtotime($year .'-'. $month . '-' . date('t', strtotime($year . '-' . $month . '-01')))));
@@ -721,11 +788,11 @@ class FinancesController extends Controller
             }
             $total_week_goal_proc = ($total_week_goal != null && $total_week_goal > 0) ? round(($total_week_success / $total_week_goal) * 100, 2) : 0 ;
             $provision = 0;
-            if($user->id == 6) { //coordinators menager
-                $provision = ProvisionLevels::get($databasePercentageUsage, 'coordinator leader', $total_week_goal_proc);
+            if($user->user_type_id == 22) { //coordinators menager
+                $provision = ProvisionLevels::get('coordinator leader', $databasePercentageUsage, $total_week_goal_proc);
             }
-            else {
-                $provision = ProvisionLevels::get($databasePercentageUsage, 'koordynator', $total_week_goal_proc, $daysInPosition);
+            else if($user->user_type_id == 8) {
+                $provision = ProvisionLevels::get('koordynator', $databasePercentageUsage, $total_week_goal_proc, $daysInPosition);
             }
 
             array_push($goals, $total_week_goal_proc);
@@ -786,16 +853,16 @@ class FinancesController extends Controller
 
         foreach($salary as $user) {
             if($user->user_type_id == 4) {
-                //$this->provisionSystemForTrainers($user,  MonthFourWeeksDivision::get($year, $month));
+//                $this->provisionSystemForTrainers($user,  MonthFourWeeksDivision::get($year, $month));
             }
             else if($user->user_type_id == 5) {
-//                $this->provisionSystemForHR($user, $month, $year);
+                $this->provisionSystemForHR($user, $month, $year);
             }
             else if($user->user_type_id == 19) {
 //                $this->provisionSystemForInstructors($user,  MonthFourWeeksDivision::get($year, $month));
             }
-            else if($user->user_type_id == 8 || $user->id == 6) { //koordynator + menager of coordinators
-//                $this->provisionSystemForCoordinators($user, MonthPerWeekDivision::get($month, $year), $month, $year);
+            else if($user->user_type_id == 8 || $user->user_type_id == 22) { //koordynator + menager of coordinators
+                $this->provisionSystemForCoordinators($user, $month, $year);
             }
         }
 //        dd($salary->where('id', '=', 6));
@@ -1308,7 +1375,7 @@ class FinancesController extends Controller
                         $provisionSum = 0;
                         $badCampaigns = 0;
                         foreach($showRecordsOfGivenUser as $show) {
-                            $provision = ProvisionLevels::get($show->frequency, 'consultant', '1');
+                            $provision = ProvisionLevels::get('consultant', $show->frequency, '1');
                             array_push($weekScoreArr, $provision);
                             if($provision < 0) {
                                 $badCampaigns++;
@@ -1316,7 +1383,7 @@ class FinancesController extends Controller
                             $provisionSum += $provision;
                             $globalProvisionSum += $provision;
                         }
-                        $badCampaignsProvision = ProvisionLevels::get($badCampaigns, 'consultant', '2');
+                        $badCampaignsProvision = ProvisionLevels::get('consultant', $badCampaigns, '2');
                         $obj = new \stdClass();
                         $obj->weekNumber = $week->weekNumber;
                         $obj->provisions = $weekScoreArr;
