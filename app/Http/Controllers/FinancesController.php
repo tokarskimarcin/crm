@@ -593,8 +593,11 @@ class FinancesController extends Controller
             }
             $total_week_proc_janky = ($total_week_checked != null && $total_week_checked > 0) ? round(($total_week_bad / $total_week_checked) * 100, 2) : 0 ;
             $total_week_goal_proc = ($total_week_goal != null && $total_week_goal > 0) ? round(($total_week_success / $total_week_goal) * 100, 2) : 0 ;
+            $tatal_week_avg = ($total_week_success <=0 || $real_week_RBH <=0)  ? 0: round($total_week_success/$real_week_RBH,2);
 
             $obj = new \stdClass();
+            $obj->total_week_success = $total_week_success;
+            $obj->total_week_avg = $tatal_week_avg;
             $obj->week_target_rbh = round($week_target_RBH);
             $obj->real_week_rbh = $real_week_RBH;
             $obj->janky_proc = $total_week_proc_janky;
