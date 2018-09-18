@@ -17,6 +17,11 @@
 @extends('layouts.main')
 @section('style')
     <link rel="stylesheet" href="{{asset('/assets/css/VCtooltip.css')}}">
+    <style>
+        .bootstrap-select > .dropdown-menu {
+            left: 0 !important;
+        }
+    </style>
 @endsection
 @section('content')
     <div class="page-header">
@@ -51,15 +56,16 @@
     <script>
         $(document).ready(function () {
             let VARIABLES = {
-                jQElements:{
+                jQElements: {
                     monthDatetimepicker: $('#monthDatetimepicker').datetimepicker({
                         language: 'pl',
                         minView: 3,
                         startView: 3,
                         format: 'yyyy-mm',
-                        startDate: moment('2018-09-01').format('YYYY-MM-DD'),
+                        startDate: moment('2018-09-01').subtract(2,'months').format('YYYY-MM-DD'),
                         endDate: moment().format('YYYY-MM-DD')
                     }),
+                },
                 DATA_TABLES: {}
             };
 
