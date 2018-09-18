@@ -36,6 +36,25 @@ use App\ActivityRecorder;
 
 class FinancesController extends Controller
 {
+    public $toSave = 0;
+
+    /**
+     * @return int
+     */
+    public function getToSave()
+    {
+        return $this->toSave;
+    }
+
+    /**
+     * @param int $toSave
+     */
+    public function setToSave($toSave)
+    {
+        $this->toSave = $toSave;
+    }
+
+
     public function viewPaymentGet()
     {
         $logged_user = Auth::user();
@@ -501,6 +520,10 @@ class FinancesController extends Controller
             foreach ($confirmationStatistics['sums'] as $confirmationStatisticsWeek){
                 $user->provision = $user->provision + ProvisionLevels::get('trainer', $confirmationStatisticsWeek->successfulPct,2);
                 $user->provision = $user->provision + ProvisionLevels::get('trainer', $confirmationStatisticsWeek->unsuccessfulBadlyPct,1);
+                if($this->getToSave() == 1){
+                    $this->saveBonus($user->id,ProvisionLevels::get('trainer', $confirmationStatisticsWeek->successfulPct,2),$dividedMonth[0]->firstDay,"Premia tygodniowa (".$dividedMonth[0]->firstDay." -- ".$dividedMonth[0]->lastDay." za osiągnięcie:  ".$confirmationStatisticsWeek->successfulPct."% pokazów zielonych.");
+                    $this->saveBonus($user->id,ProvisionLevels::get('trainer', $confirmationStatisticsWeek->unsuccessfulBadlyPct,1),$dividedMonth[0]->firstDay,"Premia tygodniowa (".$dividedMonth[0]->firstDay." -- ".$dividedMonth[0]->lastDay." za osiągnięcie:  ".$confirmationStatisticsWeek->unsuccessfulBadlyPct."% czerwonych pokazów");
+                }
             }
         }else if($user->department_type_id == 2){       //trener telemarketing
             foreach ($arrayOfDepartmentStatistics as $item){
@@ -508,8 +531,31 @@ class FinancesController extends Controller
                 $total_week_avg_proc = round((100*$item->total_week_avg)/$commissionAvg,2);
                 $user->provision += ProvisionLevels::get('trainer', $item->janky_proc,3,$total_week_avg_proc, 'avg'); // Średnia
                 $user->provision += ProvisionLevels::get('trainer', $item->janky_proc,3,$item->total_week_goal_proc, 'ammount'); // Cel zgód
+                if($this->getToSave() == 1){
+                    $this->saveBonus($user->id,ProvisionLevels::get('trainer', $item->janky_proc,3,$total_week_avg_proc, 'avg'),$dividedMonth[0]->firstDay,"Premia tygodniowa (".$dividedMonth[0]->firstDay." -- ".$dividedMonth[0]->lastDay." za osiągnięcie:  Średniej na projekcie");
+                    $this->saveBonus($user->id,ProvisionLevels::get('trainer', $item->janky_proc,3,$item->total_week_goal_proc, 'ammount'),$dividedMonth[0]->firstDay,"Premia tygodniowa (".$dividedMonth[0]->firstDay." -- ".$dividedMonth[0]->lastDay." za osiągnięcie: Celu na projekcie");
+                }
+
             }
         }
+    }
+
+    private function saveBonus($userID,$amount,$event_date,$comment){
+        if($amount > 0 ){
+            $penaltyBonusObj                = new PenaltyBonus();
+            $penaltyBonusObj->type          = 2;
+            $penaltyBonusObj->id_user       = $userID;
+            $penaltyBonusObj->amount        = $amount;
+            $penaltyBonusObj->comment       = $comment;
+            $penaltyBonusObj->id_manager    = Auth::user()->id;
+            $penaltyBonusObj->event_date    = $event_date;
+            try{
+                $penaltyBonusObj->save();
+            }catch (\Exception $exception){
+                return 0;
+            }
+        }
+
     }
 
     private function provisionSystemForInstructors(&$user, $dividedMonth,$arrayOfDepartmentStatistics = null){
@@ -754,11 +800,11 @@ class FinancesController extends Controller
 
     public function viewPaymentCadrePost(Request $request)
     {
-
-        $date_to_post = $request->search_money_month;
-        $date = $request->search_money_month.'%';
-        $year = substr($date, 0, 4);
-        $month = substr($date, 5, 2);
+        $this->setToSave($request->toSave);
+        $date_to_post   = $request->search_money_month;
+        $date           = $request->search_money_month.'%';
+        $year           = substr($date, 0, 4);
+        $month          = substr($date, 5, 2);
 
         $dividedMonth = $this->monthPerRealWeekDivision($month, $year);
         $agencies = Agencies::all();

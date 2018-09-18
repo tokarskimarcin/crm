@@ -48,7 +48,7 @@
                             <div id="start_stop">
                                 <div class="panel-body">
                                         <div class="well">
-                                            <form action="view_payment_cadre" method="post">
+                                            <form action="view_payment_cadre" id="view_payment_cadre" method="post">
                                                 <input type="hidden" name="_token" value="{{ csrf_token() }}">
                                                 <div class="col-md-8">
                                                     <select name="search_money_month" class="form-control" style="font-size:18px;">
@@ -72,6 +72,7 @@
                                                     <button class="btn btn-primary" id="show_load_data_info" style="width:100%;">Wyświetl</button>
                                                 </div>
                                                 </br></br>
+                                                <input type="hidden" value="0" id="toSave" name="toSave">
                                             </form>
                                         </div>
                                         @if(isset($month))
@@ -206,6 +207,7 @@
             </div>
         </div>
     </div>
+
 @endsection
 
 @section('script')
@@ -579,20 +581,9 @@
         }).then((result) => {
             if (result.value)
             {
+                $('#toSave').val(1);
                 $('#accept_payment').prop('disabled',true);
-                $.ajax({
-                    type:"POST",
-                    url: '{{route('api.paymentStory')}}',
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    },
-                    data: {
-                        accetp_month: $('#month_select').val()
-                    },
-                    success: function(response) {
-                        location.reload();
-                    }
-                });
+                $('#view_payment_cadre').submit();
             }
         });
     });
