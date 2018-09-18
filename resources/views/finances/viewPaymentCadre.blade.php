@@ -23,7 +23,10 @@
 
 
 {{--Header page --}}
-
+{{--Pomocnicza zmienna do przekzywanie informacji czy dane wypłaty można pobrać do csv--}}
+@php
+    $payment_saved_pom = 0;
+@endphp
 <div class="row">
     <div class="col-md-12">
         <div class="page-header">
@@ -67,9 +70,21 @@
                                                 </div>
                                                 <div class="col-md-4">
                                                     <button class="btn btn-primary" id="show_load_data_info" style="width:100%;">Wyświetl</button>
-                                                </div></br></br>
+                                                </div>
+                                                </br></br>
                                             </form>
                                         </div>
+                                        @if(isset($month))
+                                            <div class="col-md-12">
+                                                @if(!$payment_saved->isNotEmpty())
+                                                    <button class="btn btn-danger" id="accept_payment">Zaakceptuj wypłaty</button>
+                                                    @php $payment_saved_pom = 0 @endphp
+                                                @else
+                                                    @php $payment_saved_pom = 1 @endphp
+                                                    <button class="btn btn-success">Wypłaty zaakceptowane</button>
+                                                @endif
+                                            </div>
+                                    @endif
                                     </div>
                                                 @if(isset($month))
                                                             @php
@@ -209,7 +224,6 @@
                 var month = <?php echo json_encode($month); ?>;
                 var user_total = <?php echo json_encode($users_total); ?>;
                 var departments = <?php echo json_encode($departments); ?>;
-                console.log(departments);
                 $.ajax({
                     type: "POST",
                     url: '{{ route('api.summary_payment_save') }}',
@@ -220,7 +234,6 @@
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                     },
                     success: function(response) {
-                      console.log(rbh_total);
                     }
                 });
 
@@ -544,6 +557,43 @@
             "ordering": false,
             "paging": false,
             "bInfo": false,
+        });
+
+        // Ukrycie klawisza pozwalającego wygenerować wypłatę w csv
+        let payment_saved = '{{$payment_saved_pom}}';
+        if(payment_saved == 0){
+            $(".dt-buttons").css('display','none');
+        }
+    });
+
+    $('#accept_payment').on('click',function (e) {
+
+        swal({
+            title: 'Jesteś pewien?',
+            text: "Spowoduje to zaakceptowanie wypłat, bez możliwości cofnięcia zmian!",
+            type: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Zaakceptuj'
+        }).then((result) => {
+            if (result.value)
+            {
+                $('#accept_payment').prop('disabled',true);
+                $.ajax({
+                    type:"POST",
+                    url: '{{route('api.paymentStory')}}',
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    data: {
+                        accetp_month: $('#month_select').val()
+                    },
+                    success: function(response) {
+                        location.reload();
+                    }
+                });
+            }
         });
     });
 

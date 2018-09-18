@@ -473,7 +473,7 @@ class FinancesController extends Controller
 
     }
 
-    private function provisionSystemForTrainers(&$user, $dividedMonth) {
+    private function provisionSystemForTrainers(&$user, $dividedMonth,&$arrayOfDepartmentStatistics = null) {
         $user->provision = 0;
         if($user->department_type_id == 1){             //trener potwierdzeń
             $clientRouteInfo = ClientRouteInfo::select(
@@ -503,18 +503,16 @@ class FinancesController extends Controller
                 $user->provision = $user->provision + ProvisionLevels::get('trainer', $confirmationStatisticsWeek->unsuccessfulBadlyPct,1);
             }
         }else if($user->department_type_id == 2){       //trener telemarketing
-            //dd($user);
-            $data = $this->getDepartmentStatistics($dividedMonth, substr($dividedMonth[0]->firstDay,5,2), substr($dividedMonth[0]->firstDay,0,4), [$user->department_info_id]);
-            foreach ($data as $item){
-                dd($item);
-                $prov = ProvisionLevels::get('trainer', $target->janky_proc,3,null, 'avg');
-                dd($data);
+            foreach ($arrayOfDepartmentStatistics as $item){
+                $commissionAvg = Department_info::find($user->department_info_id)->commission_avg;
+                $total_week_avg_proc = round((100*$item->total_week_avg)/$commissionAvg,2);
+                $user->provision += ProvisionLevels::get('trainer', $item->janky_proc,3,$total_week_avg_proc, 'avg'); // Średnia
+                $user->provision += ProvisionLevels::get('trainer', $item->janky_proc,3,$item->total_week_goal_proc, 'ammount'); // Cel zgód
             }
-
         }
     }
 
-    private function provisionSystemForInstructors(&$user, $dividedMonth){
+    private function provisionSystemForInstructors(&$user, $dividedMonth,$arrayOfDepartmentStatistics = null){
         $user->provision = 0;
         if($user->department_type_id == 1){             //szkoleniowiec potwierdzeń
             $clientRouteInfo = ClientRouteInfo::select(
@@ -542,9 +540,13 @@ class FinancesController extends Controller
                 $user->provision = $user->provision + ProvisionLevels::get('instructor', $confirmationStatisticsWeek->successfulPct,2);
                 $user->provision = $user->provision + ProvisionLevels::get('instructor', $confirmationStatisticsWeek->unsuccessfulBadlyPct,1);
             }
-            dd($user);
         }else if($user->department_type_id == 2){       //szkoleniowiec telemarketing
-
+            foreach ($arrayOfDepartmentStatistics as $item){
+                $commissionAvg = Department_info::find($user->department_info_id)->commission_avg;
+                $total_week_avg_proc = round((100*$item->total_week_avg)/$commissionAvg,2);
+                $user->provision = $user->provision + ProvisionLevels::get('instructor', $item->janky_proc,3,$total_week_avg_proc, 'avg'); // Średnia
+                $user->provision = $user->provision + ProvisionLevels::get('instructor', $item->janky_proc,3,$item->total_week_goal_proc, 'ammount'); // Cel zgód
+            }
         }
     }
 
@@ -615,7 +617,7 @@ class FinancesController extends Controller
         return $rbhTargetArr;
     }
 
-    private function provisionSystemForHR(&$user, $month, $year) {
+    private function provisionSystemForHR(&$user, $month, $year,$arrayOfDepartmentStatistics = null) {
 
         $weekDateArr = MonthFourWeeksDivision::get($year,$month); // array of objects with week info
 //        dd($weekDateArr);
@@ -645,8 +647,7 @@ class FinancesController extends Controller
         else if($user->dep_type_id == 2) { //hr from telemarketing
             $provisions = [];
             $totalProvision = 0;
-            $rbhTargetArr = $this->getDepartmentStatistics($weekDateArr, $month, $year, [$user->department_info_id]);
-            foreach ($rbhTargetArr as $target) {
+            foreach ($arrayOfDepartmentStatistics as $target) {
                 $provTarget = ProvisionLevels::get('HR', $target->janky_proc, $target->total_week_goal_proc, 2, 'ammount');
                 $prov = ProvisionLevels::get('HR', $target->janky_proc, $target->target_rbh_percentage,2, 1);
                 $sumProv = $prov + $provTarget;
@@ -799,22 +800,26 @@ class FinancesController extends Controller
             ->groupBy('users.id')
             ->orderBy('users.last_name')->get();
 
+        $allDepartments = Department_info::all();
+        $arrayOfDepartmentStatistics = [];
+        $dividedMonthForDepartmentStatistics = MonthFourWeeksDivision::get($year, $month);
+        foreach ($allDepartments as $item){
+            $arrayOfDepartmentStatistics[$item->id] =  $this->getDepartmentStatistics($dividedMonthForDepartmentStatistics, substr($dividedMonthForDepartmentStatistics[0]->firstDay,5,2), substr($dividedMonthForDepartmentStatistics[0]->firstDay,0,4), [$item->id]);
+        }
         foreach($salary as $user) {
             if($user->user_type_id == 4) {
-                $this->provisionSystemForTrainers($user,  MonthFourWeeksDivision::get($year, $month));
+                $this->provisionSystemForTrainers($user,  MonthFourWeeksDivision::get($year, $month),$arrayOfDepartmentStatistics[$user->department_info_id]);
             }
             else if($user->user_type_id == 5) {
-                $this->provisionSystemForHR($user, $month, $year);
+                $this->provisionSystemForHR($user, $month, $year,$arrayOfDepartmentStatistics[$user->department_info_id]);
             }
             else if($user->user_type_id == 19) {
-//                $this->provisionSystemForInstructors($user,  MonthFourWeeksDivision::get($year, $month));
+                $this->provisionSystemForInstructors($user,  MonthFourWeeksDivision::get($year, $month),$arrayOfDepartmentStatistics[$user->department_info_id]);
             }
             else if($user->user_type_id == 8 || $user->user_type_id == 22) { //koordynator + menager of coordinators
                 $this->provisionSystemForCoordinators($user, $month, $year);
             }
         }
-//        dd($salary->where('id', '=', 6));
-
         $freeDaysData = $this->getFreeDays($dividedMonth); //[id_user, freeDays]
 //        dd($freeDaysData);
 
@@ -966,12 +971,17 @@ class FinancesController extends Controller
             ->join('departments','departments.id','department_info.id_dep')
             ->join('department_type','department_type.id','department_info.id_dep_type')
             ->get();
+        $payment_saved = AcceptedPayment::
+        where('department_info_id','=',Auth::user()->department_info_id)
+            ->where('payment_month','like', $date.'%')
+            ->get();
 
         return view('finances.viewPaymentCadre')
             ->with('month',$date_to_post)
             ->with('salary',$salary->groupby('agency_id'))
             ->with('agencies',$agencies)
-            ->with('departments',$departments);
+            ->with('departments',$departments)
+            ->with('payment_saved',$payment_saved);
     }
 
     public function viewPaymentPOST(Request $request)
