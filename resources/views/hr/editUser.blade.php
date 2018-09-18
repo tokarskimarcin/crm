@@ -193,7 +193,7 @@
                         </div>
                         @if($type == 2)
                             <div class="row">
-                                @if($user->user_type !=9)
+                                @if($user->user_type->id != 9)
                                 <div class="col-md-6" id="emailSection">
                                     <div class="form-group">
                                         <label class="myLabel">Adres email:</label>
@@ -209,6 +209,7 @@
                                 </div>
                             </div>
                             <div class="row">
+                                @if($user->user_type->id != 9)
                                 <div class="col-md-3" id="salarySection">
                                     <div class="form-group">
                                         <label class="myLabel">Wynagrodzenie:</label>
@@ -219,6 +220,7 @@
                                         @endif
                                     </div>
                                 </div>
+                                @endif
                                 <div class="col-md-3">
                                     <div class="form-group">
                                         <label class="myLabel">Dodatek służbowy:</label>
