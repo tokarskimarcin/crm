@@ -94,7 +94,7 @@
                                 if(parseInt($(e.target).val())>0){
                                     FUNCTIONS.AJAXs.getEmployeeOfTheWeekSectionSubView({
                                         view: $(e.target).val(),
-                                        monthSelected: VARIABLES.jQElements.monthDatetimepicker.val()
+                                        selectedMonth: VARIABLES.jQElements.monthDatetimepicker.find('input').val()
                                     }).done(function (resolve) {
                                         VARIABLES.jQElements.employeeOfTheWeekSection.html(resolve);
                                     });

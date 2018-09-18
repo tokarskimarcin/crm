@@ -142,8 +142,6 @@ Route::POST('/deleteTester', 'TestsController@deleteTester')->name('api.deleteTe
 
 Route::POST('/datatableAllTests', 'AdminController@datatableAllTests')->name('api.datatableAllTests');
 
-Route::POST('/paymentStory', 'FinancesController@paymentStory')->name('api.paymentStory');
-
 Route::POST('/saveCoaching', 'CoachingController@saveCoaching')->name('api.saveCoaching');
 Route::POST('/deleteCoaching', 'CoachingController@deleteCoaching')->name('api.deleteCoaching');
 Route::POST('/getCoaching', 'CoachingController@getCoaching')->name('api.getCoaching');
@@ -162,6 +160,14 @@ Route::POST('/getManagerId', 'CoachingController@getManagerId')->name('api.getMa
 
 
 /* TEST AJAX ROUTES STOP */
+
+/* FINANCES AJAX  */
+
+Route::POST('/paymentStory', 'FinancesController@paymentStory')->name('api.paymentStory');
+Route::post('/employeeOfTheWeekSubViewAjax','FinancesController@employeeOfTheWeekSubViewAjax')->name('api.employeeOfTheWeekSubViewAjax');
+
+
+/* END FINANCES AJAX  */
 
 //** RECRUITMENT AJAX */
 
@@ -1056,5 +1062,3 @@ Route::post('/checkForTheSameRoute', 'CrmRouteController@checkForTheSameRoute')-
 Route::get('/mailMonthReportUnpaidInvoices', 'StatisticsController@mailMonthReportUnpaidInvoices');
 
 Route::get('/setEngraverForConfirming', 'AutoScriptController@setEngraverForConfirming');
-
-Route::post('/employeeOfTheWeekSubViewAjax','FinancesController@employeeOfTheWeekSubViewAjax')->name('api.employeeOfTheWeekSubViewAjax');

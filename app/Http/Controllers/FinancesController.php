@@ -1530,7 +1530,6 @@ class FinancesController extends Controller
         }
     }
 
-
     public function viewEmployeeOfTheWeekCadreGet(){
         $userTypes = UserTypes::whereNotIn('id',[1,2,9,3])->get();
         return view('finances.employeeOfTheWeek.viewEmployeeOfTheWeekCadre')
@@ -1544,6 +1543,7 @@ class FinancesController extends Controller
                 $year = date('Y',strtotime($selectedMonth));
                 $month = date('m',strtotime($selectedMonth));
                 $dividedMonth = MonthFourWeeksDivision::get($year, $month);
+                dd($dividedMonth);
                 return view('finances.employeeOfTheWeek.trainerOfTheWeekConfirmation')->with('a','bu');
             }
         }else{
