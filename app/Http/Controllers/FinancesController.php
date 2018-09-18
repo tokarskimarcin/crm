@@ -502,8 +502,14 @@ class FinancesController extends Controller
                 $user->provision = $user->provision + ProvisionLevels::get('trainer', $confirmationStatisticsWeek->successfulPct,2);
                 $user->provision = $user->provision + ProvisionLevels::get('trainer', $confirmationStatisticsWeek->unsuccessfulBadlyPct,1);
             }
-            dd($user);
         }else if($user->department_type_id == 2){       //trener telemarketing
+            //dd($user);
+            $data = $this->getDepartmentStatistics($dividedMonth, substr($dividedMonth[0]->firstDay,5,2), substr($dividedMonth[0]->firstDay,0,4), [$user->department_info_id]);
+            foreach ($data as $item){
+                dd($item);
+                $prov = ProvisionLevels::get('trainer', $target->janky_proc,3,null, 'avg');
+                dd($data);
+            }
 
         }
     }
@@ -853,7 +859,7 @@ class FinancesController extends Controller
 
         foreach($salary as $user) {
             if($user->user_type_id == 4) {
-//                $this->provisionSystemForTrainers($user,  MonthFourWeeksDivision::get($year, $month));
+                $this->provisionSystemForTrainers($user,  MonthFourWeeksDivision::get($year, $month));
             }
             else if($user->user_type_id == 5) {
                 $this->provisionSystemForHR($user, $month, $year);

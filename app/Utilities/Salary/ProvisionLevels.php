@@ -84,6 +84,34 @@ class ProvisionLevels
                         return $provision;
                         break;
                     }
+                    case '3':{ // Telemarketing
+                        if($level < 5) {
+                            switch($subsubsubtype) {
+                                case 'avg': {
+                                    if($subsubtype > 100) { //target avg in %
+                                        $provision = 150;
+                                    }
+                                    else {
+                                        $provision = 0;
+                                    }
+                                    break;
+                                }
+                                case 'ammount': {
+                                    if($subsubtype > 100) { //target ammount in %
+                                        $provision = 150;
+                                    }
+                                    else {
+                                        $provision = 0;
+                                    }
+                                    break;
+                                }
+                            }
+                        }else {
+                            $provision = 0;
+                        }
+                        return $provision;
+                        break;
+                    }
                 }
                 break;
             }
@@ -122,7 +150,6 @@ class ProvisionLevels
                                     break;
                                 }
                             }
-
                         }
                         else {
                             $provision = 0;
