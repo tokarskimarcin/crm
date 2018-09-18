@@ -591,6 +591,7 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
     Route::Post('/view_summary_payment', 'FinancesController@viewSummaryPaymentPOST');
 
     Route::get('/viewEmployeeOfTheWeekCadreGet', 'FinancesController@viewEmployeeOfTheWeekCadreGet');
+    Route::post('/viewEmployeeOfTheWeekCadrePost', 'FinancesController@viewEmployeeOfTheWeekCadrePost');
 
     Route::get('/medicalPackagesRaportExtended', 'UsersController@medicalPackagesRaportExtendedGet');
     Route::post('/medicalPackagesRaportExtended', 'UsersController@medicalPackagesRaportExtendedPost');
@@ -1055,3 +1056,5 @@ Route::post('/checkForTheSameRoute', 'CrmRouteController@checkForTheSameRoute')-
 Route::get('/mailMonthReportUnpaidInvoices', 'StatisticsController@mailMonthReportUnpaidInvoices');
 
 Route::get('/setEngraverForConfirming', 'AutoScriptController@setEngraverForConfirming');
+
+Route::post('/employeeOfTheWeekSubViewAjax','FinancesController@employeeOfTheWeekSubViewAjax')->name('api.employeeOfTheWeekSubViewAjax');

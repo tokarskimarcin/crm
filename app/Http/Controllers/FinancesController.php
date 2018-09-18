@@ -19,6 +19,7 @@ use App\SuccessorHistory;
 use App\SummaryPayment;
 use App\User;
 use App\UserEmploymentStatus;
+use App\UserTypes;
 use App\Utilities\Dates\MonthFourWeeksDivision;
 use App\Utilities\DataProcessing\ConfirmationStatistics;
 use App\Utilities\Dates\MonthIntoCompanyWeeksDivision;
@@ -1529,9 +1530,24 @@ class FinancesController extends Controller
         }
     }
 
-    public function viewEmployeeOfTheWeekCadreGet(){
 
-        return view('finances.viewEmployeeOfTheWeekCadre');
+    public function viewEmployeeOfTheWeekCadreGet(){
+        $userTypes = UserTypes::whereNotIn('id',[1,2,9,3])->get();
+        return view('finances.employeeOfTheWeek.viewEmployeeOfTheWeekCadre')
+            ->with('userTypes', $userTypes->where('id',4));
     }
 
+    public function employeeOfTheWeekSubViewAjax( Request $request){
+        if($request->ajax()){
+            if($request->view == 4){
+                $selectedMonth = $request->selectedMonth;
+                $year = date('Y',strtotime($selectedMonth));
+                $month = date('m',strtotime($selectedMonth));
+                $dividedMonth = MonthFourWeeksDivision::get($year, $month);
+                return view('finances.employeeOfTheWeek.trainerOfTheWeekConfirmation')->with('a','bu');
+            }
+        }else{
+            return view('errors.404');
+        }
+    }
 }
