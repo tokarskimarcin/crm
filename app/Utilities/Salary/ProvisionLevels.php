@@ -14,13 +14,13 @@ class ProvisionLevels
     /**
      * //This method return premium money amount in case of frequency amount
      * @param $level - float number sometimes it is percent sometimes it is value, depends of type or subtype
-     * @param $type - name of role
+     * @param $occupation - name of role
      * @param null $subtype - different variations of provisions for some type, defined as integer.
      * @return int - value of provision
      */
-    public static function get($level, $type, $subtype = 1, $subsubtype = null) {
+    public static function get($occupation, $level, $subtype = 1, $subsubtype = null, $subsubsubtype = null) {
         $provision = 0;
-        switch($type) {
+        switch($occupation) {
             case 'consultant': {
                 switch($subtype) {
                     case '1': { //case of number of people who show up after invitation.
@@ -102,12 +102,27 @@ class ProvisionLevels
                     }
                     case 2: { //telemarketing
                         if($level < 5) { //janki
-                            if($subtype > 100) { //target rbh, target ammout
-                                $provision = 150;
+                            switch($subsubsubtype) {
+                                case 'rbh': {
+                                    if($subtype > 100) { //target rbh
+                                        $provision = 150;
+                                    }
+                                    else {
+                                        $provision = 0;
+                                    }
+                                    break;
+                                }
+                                case 'ammount': {
+                                    if($subtype > 100) { //target ammount
+                                        $provision = 150;
+                                    }
+                                    else {
+                                        $provision = 0;
+                                    }
+                                    break;
+                                }
                             }
-                            else {
-                                $provision = 0;
-                            }
+
                         }
                         else {
                             $provision = 0;
