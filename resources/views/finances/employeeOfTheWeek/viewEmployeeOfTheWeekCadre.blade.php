@@ -46,6 +46,15 @@
                         </div>
                     </div>
                 </div>
+
+                    <div class="col-md-4" @if($accessToAllDepartments != 1) hidden @endif>
+                        <label for="departmentSelect">Oddział:</label>
+                        <select id="departmentSelect" name="departmentSelect" class="form-control">
+                            @foreach($departments_info as $department_info)
+                                <option value="{{$department_info->id}}" @if($department_info->id == Auth::user()->department_info_id) selected @endif>{{$department_info->departments->name}} {{$department_info->department_type->name}}</option>
+                            @endforeach
+                        </select>
+                    </div>
                 <div class="col-md-4">
                     <label for="userTypeSelect">Stanowisko:</label>
                     <select id="userTypeSelect" name="userTypeSelect" class="form-control">
@@ -67,10 +76,14 @@
 @section('script')
     <script src="{{ asset('/js/moment.js')}}"></script>
     <script>
+        let VARIABLES;
+        let FUNCTIONS;
         $(document).ready(function () {
-            let VARIABLES = {
+            VARIABLES = {
+                SUBVIEW:{},
                 jQElements: {
                     employeeOfTheWeekSection: $('#employeeOfTheWeekSection'),
+                    departmentSelect: $('#departmentSelect').selectpicker(),
                     userTypeSelect: $('#userTypeSelect').selectpicker(),
                     monthDatetimepicker: $('#monthDatetimepicker').datetimepicker({
                         language: 'pl',
@@ -84,21 +97,31 @@
                 DATA_TABLES: {}
             };
 
-            let FUNCTIONS = {
+            FUNCTIONS = {
+                SUBVIEW:{},
                 /* function grups should be before other functions which aren't grouped */
                 EVENT_HANDLERS: {
                     callEvents:function () {
+                        (function monthDatetimepickerHandler() {
+                            VARIABLES.jQElements.monthDatetimepicker.change(function () {
+                                FUNCTIONS.loadSubview();
+                            });
+                        })();
+                        (function departmentSelectHandeler() {
+                            VARIABLES.jQElements.departmentSelect.change(function (e) {
+                                if(parseInt($(e.target).val())>0) {
+                                    VARIABLES.jQElements.userTypeSelect.parent().parent().attr('hidden', false);
+                                    FUNCTIONS.loadSubview();
+                                }else{
+                                    VARIABLES.jQElements.employeeOfTheWeekSection.empty();
+                                    VARIABLES.jQElements.userTypeSelect.parent().parent().attr('hidden', true);
+                                }
+                            });
+                        })();
                         (function userTypeSelectHandler() {
                             VARIABLES.jQElements.userTypeSelect.change(function (e) {
                                 VARIABLES.jQElements.employeeOfTheWeekSection.empty();
-                                if(parseInt($(e.target).val())>0){
-                                    FUNCTIONS.AJAXs.getEmployeeOfTheWeekSectionSubView({
-                                        userTypeId: $(e.target).val(),
-                                        selectedMonth: VARIABLES.jQElements.monthDatetimepicker.find('input').val()
-                                    }).done(function (resolve) {
-                                        VARIABLES.jQElements.employeeOfTheWeekSection.html(resolve);
-                                    });
-                                }
+                                FUNCTIONS.loadSubview();
                             });
                         })();
                     }
@@ -118,6 +141,32 @@
                         });
                     }
                 },
+                loadSubview: function(){
+                    VARIABLES.SUBVIEW = {};
+                    FUNCTIONS.SUBVIEW = {};
+                    if(parseInt(VARIABLES.jQElements.userTypeSelect.val())>0){
+                        swal({
+                            title: 'Ładowawnie...',
+                            text: 'To może chwilę zająć',
+                            showConfirmButton: false,
+                            allowOutsideClick: false,
+                            allowEscapeKey: false,
+                            allowEnterKey: false,
+                            onOpen: () => {
+                                swal.showLoading();
+                                FUNCTIONS.AJAXs.getEmployeeOfTheWeekSectionSubView({
+                                    departmentInfoId: VARIABLES.jQElements.departmentSelect.val(),
+                                    userTypeId: VARIABLES.jQElements.userTypeSelect.val(),
+                                    selectedMonth: VARIABLES.jQElements.monthDatetimepicker.find('input').val()
+                                }).done(function (resolve) {
+                                    VARIABLES.jQElements.employeeOfTheWeekSection.html(resolve);
+                                    swal.close();
+                                });
+                            }
+                        });
+
+                    }
+                }
             };
             FUNCTIONS.EVENT_HANDLERS.callEvents();
             //resizeDatatablesOnMenuToggle();

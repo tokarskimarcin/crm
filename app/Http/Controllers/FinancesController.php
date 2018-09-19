@@ -10,6 +10,7 @@ use App\Department_types;
 use App\Departments;
 use App\DoublingQueryLogs;
 use App\EmployeeOfTheWeek;
+use App\EmployeeOfTheWeekRanking;
 use App\JankyPenatlyProc;
 use App\PaymentAgencyStory;
 use App\PenaltyBonus;
@@ -1533,29 +1534,98 @@ class FinancesController extends Controller
 
     public function viewEmployeeOfTheWeekCadreGet(){
         $userTypes = UserTypes::whereNotIn('id',[1,2,9,3])->get();
+        $departments_info = Department_info::with('departments')->with('department_type');
+        $accessToAllDepartments = UserTypes::find(Auth::user()->user_type_id)->all_departments;;
+        if($accessToAllDepartments != 1){
+            $departments_info->where('id',Auth::user()->department_info_id);
+        }else{
+            $departments_info->where('id_dep_type',1);
+        }
         return view('finances.employeeOfTheWeek.viewEmployeeOfTheWeekCadre')
-            ->with('userTypes', $userTypes->where('id',4));
+            ->with('accessToAllDepartments',$accessToAllDepartments)
+            ->with('userTypes', $userTypes->where('id',4))
+            ->with('departments_info', $departments_info->get());
     }
 
     public function employeeOfTheWeekSubViewAjax( Request $request){
         if($request->ajax()){
             $selectedMonth = $request->selectedMonth;
+            $departmentInfoId = $request->departmentInfoId;
             $userTypeId = $request->userTypeId;
+            $departmentInfo = Department_info::find($departmentInfoId);
             $year = date('Y',strtotime($selectedMonth));
             $month = date('m',strtotime($selectedMonth));
             $dividedMonth = MonthFourWeeksDivision::get($year, $month);
             $employeesOfTheWeek = EmployeeOfTheWeek::where('user_type_id', $userTypeId)
-                ->where('department_info_id', 1)
+                ->where('department_info_id', $departmentInfoId)
                 ->where('first_day_week','>=',$dividedMonth[0]->firstDay)
                 ->where('last_day_week','<=',$dividedMonth[count($dividedMonth) - 1]->lastDay)
                 ->with('department_info')
                 ->get();
-            if($userTypeId == 4){
+            if($userTypeId == 4 && $departmentInfo->id_dep_type == 1){
+                foreach($dividedMonth as $week){
+                    $employeeOfTheWeek = $employeesOfTheWeek->where('first_day_week',$week->firstDay)->where('last_day_week',$week->lastDay);
+                    if(count($employeeOfTheWeek) == 0){
+                        $employeeOfTheWeek = new EmployeeOfTheWeek();
+                        $employeeOfTheWeek->user_type_id = $userTypeId;
+                        $employeeOfTheWeek->department_info_id = $departmentInfoId;
+                        $employeeOfTheWeek->first_day_week = $week->firstDay;
+                        $employeeOfTheWeek->last_day_week = $week->lastDay;
+                        $employeeOfTheWeek->save();
+                        $employeesOfTheWeek->push($employeeOfTheWeek);
+                    }
+                }
+                $this->updateTrainersConfirmationRanking($employeesOfTheWeek->where('accepted',0), $dividedMonth, $departmentInfoId);
 
-                return view('finances.employeeOfTheWeek.trainerOfTheWeekConfirmation')->with('employeesOfTheWeek',$employeesOfTheWeek);
+                $employeesOfTheWeekRankings = EmployeeOfTheWeekRanking::whereIn('employee_of_the_week_id',$employeesOfTheWeek->pluck('id')->toArray())->with('user')->get();
+                return view('finances.employeeOfTheWeek.trainerOfTheWeekConfirmation')
+                    ->with('employeesOfTheWeek',$employeesOfTheWeek->sortBy('first_day_week'))
+                    ->with('employeesOfTheWeekRankings',$employeesOfTheWeekRankings);
             }
         }else{
             return view('errors.404');
+        }
+    }
+
+    private function updateTrainersConfirmationRanking($employeesOfTheWeek, $dividedMonth, $departmentInfoId){
+        EmployeeOfTheWeekRanking::whereIn('employee_of_the_week_id',$employeesOfTheWeek->pluck('id')->toArray())->delete();
+        $clientRouteInfo = ClientRouteInfo::select(
+            DB::raw('concat(users.first_name," ",users.last_name) as confirmingUserName'),
+            DB::raw('concat(trainer.first_name," ",trainer.last_name) as confirmingUserTrainerName'),
+            'confirmingUser',
+            'confirmDate',
+            'frequency',
+            'pairs',
+            'actual_success',
+            'users.department_info_id',
+            'users.coach_id'
+        )
+            ->join('users','confirmingUser', '=', 'users.id')
+            ->join('department_info as di', 'users.department_info_id','=','di.id')
+            ->join('users as trainer','users.coach_id','=','trainer.id')
+            ->where('confirmDate', '>=', $dividedMonth[0]->firstDay)
+            ->where('confirmDate', '<=', $dividedMonth[count($dividedMonth)-1]->lastDay)
+            ->where('users.department_info_id', $departmentInfoId)
+            ->where('di.id_dep_type',1)
+            ->whereNotNull('confirmingUser')
+            ->whereNotNull('users.coach_id')->get();
+        $confirmationStatistics = ConfirmationStatistics::getConsultantsConfirmationStatisticsForMonth($clientRouteInfo, $dividedMonth, 'coach_id')['sums'];
+
+        foreach ($confirmationStatistics as $confirmationStatisticWeek) {
+            foreach ($employeesOfTheWeek as $employeeOfTheWeek){
+                if($confirmationStatisticWeek->firstDay == $employeeOfTheWeek->first_day_week && $confirmationStatisticWeek->lastDay == $employeeOfTheWeek->last_day_week){
+                    $rankingPositionCounter = 0;
+                    foreach ($confirmationStatisticWeek->secondGrouping->sortByDesc('successfulPct') as $trainerSum){
+                        $rankingPositionCounter = $rankingPositionCounter+1;
+                        $employeeOfTheWeekRanking = new EmployeeOfTheWeekRanking();
+                        $employeeOfTheWeekRanking->employee_of_the_week_id = $employeeOfTheWeek->id;
+                        $employeeOfTheWeekRanking->user_id = $trainerSum->secondGroup;
+                        $employeeOfTheWeekRanking->ranking_position = $rankingPositionCounter;
+                        $employeeOfTheWeekRanking->criterion = $trainerSum->successfulPct.'% ('.$trainerSum->shows.')';
+                        $employeeOfTheWeekRanking->save();
+                    }
+                }
+            }
         }
     }
 }

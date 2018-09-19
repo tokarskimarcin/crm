@@ -33,8 +33,13 @@ class ConfirmationStatistics
         $confirmationStatistics = ['data'=>collect(),'sums'=>collect()];
         $clientRouteInfo = $clientRouteInfo->groupBy('dateGroup');
         foreach ($clientRouteInfo as $dateGroup => $clientRouteInfoByDateGroup){
+            $dates = explode(' ',$dateGroup);
+            $firstDay = explode('.',$dates[0]);
+            $lastDay = explode('.',$dates[2]);
             $dateGroupSum = (object)[];
             $dateGroupSum->dateGroup            = $dateGroup;
+            $dateGroupSum->firstDay             = $firstDay[0].'-'.$firstDay[1].'-'.$firstDay[2];
+            $dateGroupSum->lastDay              = $lastDay[0].'-'.$lastDay[1].'-'.$lastDay[2];
             $dateGroupSum->secondGrouping       = collect();
             $dateGroupSum->shows                = 0;
             $dateGroupSum->provision            = 0;
