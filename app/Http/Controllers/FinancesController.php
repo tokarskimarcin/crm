@@ -9,6 +9,7 @@ use App\Department_info;
 use App\Department_types;
 use App\Departments;
 use App\DoublingQueryLogs;
+use App\EmployeeOfTheWeek;
 use App\JankyPenatlyProc;
 use App\PaymentAgencyStory;
 use App\PenaltyBonus;
@@ -1538,13 +1539,20 @@ class FinancesController extends Controller
 
     public function employeeOfTheWeekSubViewAjax( Request $request){
         if($request->ajax()){
-            if($request->view == 4){
-                $selectedMonth = $request->selectedMonth;
-                $year = date('Y',strtotime($selectedMonth));
-                $month = date('m',strtotime($selectedMonth));
-                $dividedMonth = MonthFourWeeksDivision::get($year, $month);
-                dd($dividedMonth);
-                return view('finances.employeeOfTheWeek.trainerOfTheWeekConfirmation')->with('a','bu');
+            $selectedMonth = $request->selectedMonth;
+            $userTypeId = $request->userTypeId;
+            $year = date('Y',strtotime($selectedMonth));
+            $month = date('m',strtotime($selectedMonth));
+            $dividedMonth = MonthFourWeeksDivision::get($year, $month);
+            $employeesOfTheWeek = EmployeeOfTheWeek::where('user_type_id', $userTypeId)
+                ->where('department_info_id', 1)
+                ->where('first_day_week','>=',$dividedMonth[0]->firstDay)
+                ->where('last_day_week','<=',$dividedMonth[count($dividedMonth) - 1]->lastDay)
+                ->with('department_info')
+                ->get();
+            if($userTypeId == 4){
+
+                return view('finances.employeeOfTheWeek.trainerOfTheWeekConfirmation')->with('employeesOfTheWeek',$employeesOfTheWeek);
             }
         }else{
             return view('errors.404');
