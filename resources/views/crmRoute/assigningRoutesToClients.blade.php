@@ -431,7 +431,6 @@
                         let allTr = thisTable.querySelectorAll('tr');
                         allTr.forEach(clientRow => {
                             if(clientRow.matches(`#${clientToSelect}`)) {
-                                console.log('clientRow', clientRow);
                                 $(clientRow).addClass('check');
                                 $(clientRow).find('.client_check').prop('checked', true);
                                 clientId = $(clientRow).attr('id');

@@ -50,7 +50,7 @@ class CrmRouteController extends Controller
      * @return view route Templates
      */
     public function addNewRouteTemplateGet() {
-        $voivodes = Voivodes::all();
+        $voivodes = Voivodes::all()->sortBy('name');
 
         return view('crmRoute.routeTemplates')
             ->with('voivodes', $voivodes);
@@ -331,7 +331,7 @@ class CrmRouteController extends Controller
         $departments = Department_info::all();
         $today = date('Y-m-d');
         $today .= '';
-        $voivodes = Voivodes::all();
+        $voivodes = Voivodes::all()->sortBy('name');
         $year = date('Y',strtotime("this year"));
         $numberOfLastYearsWeek = date('W',mktime(0, 0, 0, 12, 27, $year));
         return view('crmRoute.assigningRoutesToClients')
@@ -342,7 +342,7 @@ class CrmRouteController extends Controller
     }
 
     public function editAssignedRouteGet($id) {
-        $voivodes = Voivodes::all();
+        $voivodes = Voivodes::all()->sortBy('name');
         $client_route = ClientRoute::select(
             'client.name as name',
             'client.id as clientId',
@@ -571,7 +571,7 @@ class CrmRouteController extends Controller
 
             $city = Cities::where('id', '=', $cityId)->first();
             $voievodeshipRound = $this::findCityByDistanceWithoutGracePeriod($city, $limit);
-            $voievodeshipRound = $voievodeshipRound->groupBy('id');
+            $voievodeshipRound = $voievodeshipRound->groupBy('id')->sortBy('name');
             $voievodeshipDistinc = array();
             foreach ($voievodeshipRound as $item){
                 array_push($voievodeshipDistinc,$item->first());
@@ -606,12 +606,13 @@ class CrmRouteController extends Controller
                 ->get();
             $voievodeshipRound = $this::findCityByDistanceWithDistanceLimit($city, $currentDate, $clientRouteInfoAll, $limit);
 
-            $voievodeshipRound = $voievodeshipRound->groupBy('id');
+            $voievodeshipRound = $voievodeshipRound->groupBy('id')->sortBy('name');
             $voievodeshipDistinc = array();
             foreach ($voievodeshipRound as $item){
                 array_push($voievodeshipDistinc,$item->first());
             }
             $responseArray['voievodeInfo'] = $voievodeshipDistinc;
+
             $responseArray['cityInfo'] = $voievodeshipRound;
             return $responseArray;
         }
@@ -633,6 +634,7 @@ class CrmRouteController extends Controller
                 (SELECT count(*) from client_route_info e where e.city_id = cityAlias.`id` and e.date >= "'.$firstDayOfThisMonth.'"
                 and e.date <= "'.$lastDayOfThisMonth.'"  and e.status = 1) as numberOfRecords'))
                 ->join('voivodeship', 'voivodeship.id', 'cityAlias.voivodeship_id')
+                ->orderBy('voivodeship.name')
                 ->orderBy('cityAlias.name')
                 ->get();
         }else {
@@ -660,6 +662,7 @@ class CrmRouteController extends Controller
             ))
                 ->join('voivodeship', 'voivodeship.id', 'cityAlias.voivodeship_id')
                 ->having('distance', '<=', $limit)
+                ->orderBy('voivodeship.name')
                 ->orderBy('cityAlias.name')
                 ->get();
         }
@@ -768,6 +771,7 @@ class CrmRouteController extends Controller
         if($limit == 'infinity'){
             $voievodeshipRound = Cities::select(DB::raw('voivodeship.id as id,voivodeship.name,city.name as city_name,city.id as city_id, city.max_hour as max_hour'))
                 ->join('voivodeship', 'voivodeship.id', 'city.voivodeship_id')
+                ->orderBy('voivodeship.name')
                 ->orderBy('city.name')
                 ->get();
         }else {
@@ -787,6 +791,7 @@ class CrmRouteController extends Controller
            AS distance'))
                 ->join('voivodeship', 'voivodeship.id', 'city.voivodeship_id')
                 ->having('distance', '<=', $limit)
+                ->orderBy('voivodeship.name')
                 ->orderBy('city.name')
                 ->get();
         }

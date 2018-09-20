@@ -1107,11 +1107,11 @@
                 appendBasicOption(nextContVoivodeSelect);
                 let nextContCitySelect = nextShowContainer.querySelector('.citySelect');
                 $(nextContVoivodeSelect).off(); //remove all previous event listeners
-                        @foreach($voivodes as $voivode)
-                var singleVoivode = document.createElement('option');
-                singleVoivode.value = {{$voivode->id}};
-                singleVoivode.textContent = '{{$voivode->name}}';
-                nextContVoivodeSelect.appendChild(singleVoivode);
+                @foreach($voivodes as $voivode)
+                    var singleVoivode = document.createElement('option');
+                    singleVoivode.value = {{$voivode->id}};
+                    singleVoivode.textContent = '{{$voivode->name}}';
+                    nextContVoivodeSelect.appendChild(singleVoivode);
                 @endforeach()
 
                 const dayContainer = nextShowContainer.closest('.singleDayContainer');
