@@ -25,6 +25,10 @@
         -moz-box-shadow: 0px 0px 10px 1px rgba(0,0,0,0.5);
         box-shadow: 0px 0px 10px 1px rgba(0,0,0,0.5);
     }
+    .myContentLeft{
+        border-right: 1px solid #cdcdcd;
+
+    }
 </style>
 <div id="content">
     @foreach($employeesOfTheWeek as $employeeOfTheWeek)
@@ -37,10 +41,10 @@
             @endif
                         <span class="caret"></span> Tydzień: {{date('Y.m.d',strtotime($employeeOfTheWeek->first_day_week))}} - {{date('Y.m.d',strtotime($employeeOfTheWeek->last_day_week))}}
                 </div>
-                <div id="body_{{$employeeOfTheWeek->id}}" class="panel-body">
+                <div id="body_{{$employeeOfTheWeek->id}}" data-id="{{$employeeOfTheWeek->id}}}" class="panel-body">
                     <div class="row">
-                        <div class="col-md-6">
-                            <table id="datatable_{{$employeeOfTheWeek->id}}" class="table-bordered table-striped datatable" style="width: 100%">
+                        <div class="col-md-6 myContentLeft">
+                            <table id="datatable_{{$employeeOfTheWeek->id}}" class="display datatable" style="width: 100%">
                                 <thead>
                                 <tr>
                                     <th>Lp.</th>
@@ -50,7 +54,7 @@
                                 </thead>
                                 <tbody>
                                     @foreach($employeesOfTheWeekRankings->where('employee_of_the_week_id',$employeeOfTheWeek->id) as $employeeOfTheWeekRanking)
-                                           <tr id="{{$employeeOfTheWeekRanking->user_id}}">
+                                           <tr id="{{$employeeOfTheWeekRanking->user_id}}" data-id="{{$employeeOfTheWeekRanking->user_id}}}">
                                                <td>{{$employeeOfTheWeekRanking->ranking_position}}</td>
                                                <td>{{$employeeOfTheWeekRanking->user->first_name}} {{$employeeOfTheWeekRanking->user->last_name}}</td>
                                                <td>{{$employeeOfTheWeekRanking->criterion}}</td>
@@ -59,11 +63,50 @@
                                 </tbody>
                             </table>
                         </div>
-                        @if($employeeOfTheWeek->accepted == 0 )
                             <div class="col-md-6">
-                                <button class="btn btn-block btn-success">Akceptuj premie</button>
+                                @if($employeeOfTheWeek->accepted == 0 )
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <button class="btn btn-block btn-success acceptBonusButton" data-id="{{$employeeOfTheWeek->id}}">Akceptuj premie</button>
+                                    </div>
+                                </div>
+                                @endif
+                                <div class="row" style="margin-top: 1em">
+                                    <div class="col-md-12">
+                                        <div class="well well-sm bonusSection"  data-id="{{$employeeOfTheWeek->id}}">
+                                            @for($i = 1; $i <= $employeeOfTheWeek->employees_with_bonus; $i++)
+                                                <div class="row">
+                                                    <div class="col-md-8">
+                                                        <div class="input-group input-group-lg">
+                                                            <span class="input-group-addon" id="employee_bonus_{{$i}}" data-position="{{$i}}">{{$i}}#</span>
+                                                            <select class="form-control" aria-describedby="employee_bonus_{{$i}}"
+                                                            @if($employeeOfTheWeek->accepted != 0 ) disabled @endif>
+                                                                <option value="0" selected>Brak</option>
+                                                                @foreach($employeesOfTheWeekRankings->where('employee_of_the_week_id',$employeeOfTheWeek->id) as $employeeOfTheWeekRanking)
+                                                                    <option value="{{$employeeOfTheWeekRanking->user_id}}" @if($employeeOfTheWeekRanking->ranking_position == $i) selected @endif>
+                                                                        {{$employeeOfTheWeekRanking->user->first_name}} {{$employeeOfTheWeekRanking->user->last_name}}</option>
+                                                                @endforeach
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-4">
+                                                        <div class="input-group input-group-lg">
+                                                            <input type="text" class="form-control" placeholder="Premia" aria-describedby="bonus_{{$i}}" @if($employeeOfTheWeek->accepted != 0 ) readonly @endif
+                                                            @foreach($employeesOfTheWeekRankings->where('employee_of_the_week_id',$employeeOfTheWeek->id) as $employeeOfTheWeekRanking)
+                                                                @if($employeeOfTheWeekRanking->ranking_position == $i)
+                                                                     value="{{$employeeOfTheWeekRanking->bonus}}"
+                                                                @endif
+                                                            @endforeach>
+
+                                                            <span class="input-group-addon" id="bonus_{{$i}}" data-position="{{$i}}">zł</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            @endfor
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                        @endif
                     </div>
                 </div>
             </div>
@@ -72,7 +115,11 @@
 </div>
 <script>
     VARIABLES.SUBVIEW = {
-        myPanels: $('.myPanels'),
+        jQElements:{
+            myPanels: $('.myPanels'),
+            bonusSections: $('.bonusSection'),
+            acceptBonusButtons: $('.acceptBonusButton')
+        },
         DATA_TABLES: {
             tables: $('.datatable'),
             dataTables: []
@@ -83,9 +130,14 @@
         EVENT_HANDLERS: {
           callEvents: function () {
               (function panelHeadingClickHandler() {
-                  VARIABLES.SUBVIEW.myPanels.find('.panel-body').on('shown.bs.collapse',function (e) {
+                  VARIABLES.SUBVIEW.jQElements.myPanels.find('.panel-body').on('shown.bs.collapse',function (e) {
                       let employeeOfTheWeekId = ($(e.target).attr('id')).split('_')[1];
                       VARIABLES.SUBVIEW.DATA_TABLES.dataTables[employeeOfTheWeekId].columns.adjust().draw();
+                  });
+              })();
+              (function acceptBonusButtonHandler() {
+                  VARIABLES.SUBVIEW.jQElements.acceptBonusButtons.click(function (e) {
+                     console.log($(e.target).data('id'));
                   });
               })();
           }
@@ -107,7 +159,7 @@
                 array.push(VARIABLES.SUBVIEW.DATA_TABLES.dataTables[employeeOfTheWeekId]);
             });
             resizeDatatablesOnMenuToggle(array);
-            VARIABLES.SUBVIEW.myPanels.find('.panel-body').addClass('collapse');
+            VARIABLES.SUBVIEW.jQElements.myPanels.find('.panel-body').addClass('collapse');
         }
     };
     FUNCTIONS.SUBVIEW.call();

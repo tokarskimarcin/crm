@@ -120,7 +120,6 @@
                         })();
                         (function userTypeSelectHandler() {
                             VARIABLES.jQElements.userTypeSelect.change(function (e) {
-                                VARIABLES.jQElements.employeeOfTheWeekSection.empty();
                                 FUNCTIONS.loadSubview();
                             });
                         })();
@@ -159,7 +158,12 @@
                                     userTypeId: VARIABLES.jQElements.userTypeSelect.val(),
                                     selectedMonth: VARIABLES.jQElements.monthDatetimepicker.find('input').val()
                                 }).done(function (resolve) {
-                                    VARIABLES.jQElements.employeeOfTheWeekSection.html(resolve);
+                                    VARIABLES.jQElements.employeeOfTheWeekSection.empty();
+                                    if(resolve !== 'noView'){
+                                        VARIABLES.jQElements.employeeOfTheWeekSection.html(resolve);
+                                    }else{
+                                        VARIABLES.jQElements.employeeOfTheWeekSection.append($('<h1>').append('Brak danych o premiach'))
+                                    }
                                     swal.close();
                                 });
                             }

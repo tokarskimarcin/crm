@@ -1538,9 +1538,9 @@ class FinancesController extends Controller
         $accessToAllDepartments = UserTypes::find(Auth::user()->user_type_id)->all_departments;;
         if($accessToAllDepartments != 1){
             $departments_info->where('id',Auth::user()->department_info_id);
-        }else{
+        }/*else{
             $departments_info->where('id_dep_type',1);
-        }
+        }*/
         return view('finances.employeeOfTheWeek.viewEmployeeOfTheWeekCadre')
             ->with('accessToAllDepartments',$accessToAllDepartments)
             ->with('userTypes', $userTypes->where('id',4))
@@ -1553,6 +1553,7 @@ class FinancesController extends Controller
             $departmentInfoId = $request->departmentInfoId;
             $userTypeId = $request->userTypeId;
             $departmentInfo = Department_info::find($departmentInfoId);
+            if($userTypeId == 4 && $departmentInfo->id_dep_type == 1){
             $year = date('Y',strtotime($selectedMonth));
             $month = date('m',strtotime($selectedMonth));
             $dividedMonth = MonthFourWeeksDivision::get($year, $month);
@@ -1562,7 +1563,6 @@ class FinancesController extends Controller
                 ->where('last_day_week','<=',$dividedMonth[count($dividedMonth) - 1]->lastDay)
                 ->with('department_info')
                 ->get();
-            if($userTypeId == 4 && $departmentInfo->id_dep_type == 1){
                 foreach($dividedMonth as $week){
                     $employeeOfTheWeek = $employeesOfTheWeek->where('first_day_week',$week->firstDay)->where('last_day_week',$week->lastDay);
                     if(count($employeeOfTheWeek) == 0){
@@ -1571,6 +1571,7 @@ class FinancesController extends Controller
                         $employeeOfTheWeek->department_info_id = $departmentInfoId;
                         $employeeOfTheWeek->first_day_week = $week->firstDay;
                         $employeeOfTheWeek->last_day_week = $week->lastDay;
+                        $employeeOfTheWeek->employees_with_bonus = 1;
                         $employeeOfTheWeek->save();
                         $employeesOfTheWeek->push($employeeOfTheWeek);
                     }
@@ -1581,6 +1582,8 @@ class FinancesController extends Controller
                 return view('finances.employeeOfTheWeek.trainerOfTheWeekConfirmation')
                     ->with('employeesOfTheWeek',$employeesOfTheWeek->sortBy('first_day_week'))
                     ->with('employeesOfTheWeekRankings',$employeesOfTheWeekRankings);
+            }else{
+                return 'noView';
             }
         }else{
             return view('errors.404');
@@ -1611,15 +1614,18 @@ class FinancesController extends Controller
             ->whereNotNull('users.coach_id')->get();
         $confirmationStatistics = ConfirmationStatistics::getConsultantsConfirmationStatisticsForMonth($clientRouteInfo, $dividedMonth, 'coach_id')['sums'];
 
-        foreach ($confirmationStatistics as $confirmationStatisticWeek) {
+        $bonus = [200];
+        foreach ($confirmationStatistics as $confirmationStatisticWeek){
             foreach ($employeesOfTheWeek as $employeeOfTheWeek){
                 if($confirmationStatisticWeek->firstDay == $employeeOfTheWeek->first_day_week && $confirmationStatisticWeek->lastDay == $employeeOfTheWeek->last_day_week){
                     $rankingPositionCounter = 0;
                     foreach ($confirmationStatisticWeek->secondGrouping->sortByDesc('successfulPct') as $trainerSum){
-                        $rankingPositionCounter = $rankingPositionCounter+1;
+
                         $employeeOfTheWeekRanking = new EmployeeOfTheWeekRanking();
                         $employeeOfTheWeekRanking->employee_of_the_week_id = $employeeOfTheWeek->id;
                         $employeeOfTheWeekRanking->user_id = $trainerSum->secondGroup;
+                        $employeeOfTheWeekRanking->bonus = array_key_exists($rankingPositionCounter, $bonus) ? $bonus[$rankingPositionCounter] : 0;
+                        $rankingPositionCounter = $rankingPositionCounter+1;
                         $employeeOfTheWeekRanking->ranking_position = $rankingPositionCounter;
                         $employeeOfTheWeekRanking->criterion = $trainerSum->successfulPct.'% ('.$trainerSum->shows.')';
                         $employeeOfTheWeekRanking->save();
