@@ -22,6 +22,9 @@
             background: white;
 
         }
+        #departmentsConfirmationDatatable tbody td, #allDepartmentsConfirmationDatatable tbody td{
+            text-align: center;
+        }
 
         .bootstrap-select > .dropdown-menu {
             left: 0 !important;
@@ -47,6 +50,9 @@
         }
         .peach{
             background: #ffe599 !important;
+        }
+        .gray{
+            background: #999999;
         }
     </style>
 @endsection
@@ -83,7 +89,7 @@
                 </div><div class="col-md-4">
                     <label>Trener:</label>
                     <select class="form-control selectpicker" id="trainersSelect">
-                        <option value="-1" selected>Wybierz</option>
+                        <option value="-1" selected>Wszyscy</option>
                         @foreach($trainers as $trainer)
                             @if($trainer->department_info_id == $deps[0]->id)
                                 <option value="{{$trainer->id}}" >{{$trainer->first_name}} {{$trainer->last_name}}</option>
@@ -144,6 +150,67 @@
             </div>
         </div>
     </div>
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            Panel ze statystykami dla wszystkich oddziałów w wybranym miesiącu
+        </div>
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-md-4">
+                    <label>Miesiąc:</label>
+                    <div class="form-group">
+                        <div class='input-group date' id='monthDatetimepickerForDepartments'>
+                            <span class="input-group-addon">
+                                <span class="glyphicon glyphicon-calendar"></span>
+                            </span>
+                            <input type='text' class="form-control" value="{{date('Y-m')}}" readonly/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <table id="allDepartmentsConfirmationDatatable" class="table cell-border table-striped table-hover compact"  style="width:100%;">
+                        <thead>
+                        <tr>
+                            <th colspan="4"></th>
+                            <th colspan="2" class="strongGreen" style="text-align: center">Pokazy udane</th>
+                            <th colspan="2" class="strongYellow" style="text-align: center">Pokazy neutralne</th>
+                            <th colspan="4" class="strongRed" style="text-align: center">Pokazy nieudane</th>
+                            <th colspan="8"></th>
+                        </tr>
+                        <tr>
+                            <th class="peach">Lp.</th>
+                            <th class="yellow">Oddział</th>
+                            <th class="yellow">Liczba pokazów</th>
+                            <th class="yellow">Prowizja</th>
+                            <th class="strongGreen">Liczba</th>
+                            <th class="strongGreen">%</th>
+                            <th class="strongYellow">Liczba</th>
+                            <th class="strongYellow">%</th>
+                            <th class="strongRed">Liczba</th>
+                            <th class="strongRed">%</th>
+                            <th class="strongRed"><12</th>
+                            <th class="strongRed">%</th>
+                            <th class="yellow">Śr. liczba osób</th>
+                            <th class="yellow">Śr. liczba par</th>
+                            <th class="yellow">Liczba rekordów</th>
+                            <th class="yellow">Czas na rekord</th>
+                            <th class="yellow">% zgód</th>
+                            <th class="yellow">% niepewnych</th>
+                            <th class="yellow">% odmów</th>
+                            <th class="yellow">Tydzień</th>
+                            <th class="yellow">Trener</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 
 @section('script')
@@ -165,16 +232,26 @@
                         format: 'yyyy-mm',
                         startDate: moment('2018-09-01').format('YYYY-MM-DD'),
                         endDate: moment().format('YYYY-MM-DD')
+                    }),
+                    monthDatetimepickerForDepartments: $('#monthDatetimepickerForDepartments').datetimepicker({
+                        language: 'pl',
+                        minView: 3,
+                        startView: 3,
+                        format: 'yyyy-mm',
+                        startDate: moment('2018-09-01').format('YYYY-MM-DD'),
+                        endDate: moment().format('YYYY-MM-DD')
                     })
                 },
                 departments: <?php echo json_encode($deps->toArray()) ?>,
                 trainers: <?php echo json_encode($trainers->toArray()) ?>,
-                lpCounter: 0,
-                conditionLpCounterZeroing: null, //condition for pointing row that start a group
+                departmentsConfirmationStatisticsLpCounter: 0,
+                allDepartmentsConfirmationStatisticsLpCounter: 0,
+                conditionDepartmentsConfirmationStatisticsLpCounterZeroing: null, //condition for pointing row that start a group
                 DATA_TABLES:{
                     departmentsConfirmation: {
                         data: {
-                            departmentsConfirmationStatistics: null
+                            departmentsConfirmationStatistics: null,
+                            departmentsConfirmationStatisticsSums: null
                         },
                         table: $('#departmentsConfirmationDatatable'),
                         dataTable: $('#departmentsConfirmationDatatable').DataTable({
@@ -203,27 +280,17 @@
                                 {data: function (data) {
                                         return data.neutralPct+'%';
                                     },name : 'neutralPct'},
-                                {data: function () {
-                                        return 1;
+                                {data: 'unsuccessful'},
+                                {data: function (data) {
+                                        return data.unsuccessfulPct+'%';
                                     }},
-                                {data: function () {
-                                        return 1;
+                                {data: 'unsuccessfulBadly'},
+                                {data: function (data) {
+                                        return data.unsuccessfulBadlyPct+'%';
                                     }},
-                                {data: function () {
-                                        return 1;
-                                    }},
-                                {data: function () {
-                                        return 1;
-                                    }},
-                                {data: function () {
-                                        return 1;
-                                    }},
-                                {data: function () {
-                                        return 1;
-                                    }},
-                                {data: function () {
-                                        return 1;
-                                    }},
+                                {data: 'avgFrequency'},
+                                {data: 'avgPairs'},
+                                {data: 'recordsCount'},
                                 {data: function () {
                                         return 1;
                                     }},
@@ -237,7 +304,7 @@
                                         return 1;
                                     }},
                                 {data: 'dateGroup'},
-                                {data: 'trainer'}
+                                {data: 'secondGroup'}
                             ],
                             fnDrawCallback: function () {
                                 FUNCTIONS.setColumnClass(0, 'peach', VARIABLES.DATA_TABLES.departmentsConfirmation.table);
@@ -251,23 +318,136 @@
                                         'font-weight': 'bold'
                                     });
                                 }
+                                FUNCTIONS.insertSumRowAfterGroup(VARIABLES.jQElements.trainersGroupingCheckboxjQ.get(0).checked, this, VARIABLES.DATA_TABLES.departmentsConfirmation.data.departmentsConfirmationStatisticsSums);
+
+                                //coloring to green date(week) group rows if week didn't end
+                                $('#'+VARIABLES.DATA_TABLES.departmentsConfirmation.table.attr('id')).find('.group_'+groupColumns[0]).each(function (index, row) {
+                                    let dates = $(row).find('td').text().split(" ");
+                                    let lastDay = dates[2].split('.');
+                                    if(moment()<moment().set({'year':lastDay[0],'month':lastDay[1]-1,'date':lastDay[2]})){
+                                        $(row).css('background','#429137')
+                                    }
+                                });
                             }
                         }),
                         getData: function () {
-                            return FUNCTIONS.AJAXs.departmentsConfirmationStatisticsAjax();
+                            return FUNCTIONS.AJAXs.departmentsConfirmationStatisticsAjax().then(function (response) {
+                                return response.data;
+                            });
+
                         },
                         setTableData: function (data){
+                            VARIABLES.departmentsConfirmationStatisticsLpCounter = 0;
                             //data is grouped by weeks and trainers  (/week/: [ trainer1:[], trainer2:[]])
                             let dataTable = this.dataTable;
                             dataTable.clear();
                             $.each(data,function (dateGroup, week) {
                                 if(VARIABLES.jQElements.trainersGroupingCheckboxjQ.get(0).checked){
                                     $.each(week, function (trainer, data) {
-                                        FUNCTIONS.setTableDataWithLpCounterByGroup(data, 'trainer', dataTable);
+                                        FUNCTIONS.setTableDataWithdepartmentsConfirmationStatisticsLpCounterByGroup(data, 'trainer', dataTable);
                                     });
                                 }else{
-                                    FUNCTIONS.setTableDataWithLpCounterByGroup(week, 'dateGroup', dataTable);
+                                    FUNCTIONS.setTableDataWithdepartmentsConfirmationStatisticsLpCounterByGroup(week, 'dateGroup', dataTable);
                                 }
+                            });
+                            dataTable.draw();
+
+                        },
+                        ajaxReload: function () {
+                            FUNCTIONS.ajaxReload(this);
+                        }
+                    },
+                    allDepartmentsConfirmation: {
+                        data: {
+                            allDepartmentsConfirmationStatistics: null,
+                            allDepartmentsConfirmationStatisticsSums: null
+                        },
+                        table: $('#allDepartmentsConfirmationDatatable'),
+                        dataTable: $('#allDepartmentsConfirmationDatatable').DataTable({
+                            scrollX: true,
+                            scrollY: '70vh',
+                            scrollCollapse: true,
+                            processing: true,
+                            paging: false,
+                            language: {
+                                "url": "//cdn.datatables.net/plug-ins/1.10.16/i18n/Polish.json"
+                            },
+                            columnDefs:[
+                                { "visible": false, "targets": hiddenColumns }
+                            ],
+                            ordering: false,
+                            columns:[
+                                {data: 'lp'},
+                                {data: 'name'},
+                                {data: 'shows'},
+                                {data: 'provision'},
+                                {data: 'successful'},
+                                {data: function (data) {
+                                        return data.successfulPct+'%';
+                                    }, name: 'successfulPct'},
+                                {data: 'neutral'},
+                                {data: function (data) {
+                                        return data.neutralPct+'%';
+                                    },name : 'neutralPct'},
+                                {data: 'unsuccessful'},
+                                {data: function (data) {
+                                        return data.unsuccessfulPct+'%';
+                                    }},
+                                {data: 'unsuccessfulBadly'},
+                                {data: function (data) {
+                                        return data.unsuccessfulBadlyPct+'%';
+                                    }},
+                                {data: 'avgFrequency'},
+                                {data: 'avgPairs'},
+                                {data: 'recordsCount'},
+                                {data: function () {
+                                        return 1;
+                                    }},
+                                {data: function () {
+                                        return 1;
+                                    }},
+                                {data: function () {
+                                        return 1;
+                                    }},
+                                {data: function () {
+                                        return 1;
+                                    }},
+                                {data: 'dateGroup'},
+                                {data: 'secondGroup'}
+                            ],
+                            fnDrawCallback: function () {
+                                FUNCTIONS.setColumnClass(0, 'peach', VARIABLES.DATA_TABLES.allDepartmentsConfirmation.table);
+                                FUNCTIONS.setColumnClass([4,5],'green', VARIABLES.DATA_TABLES.allDepartmentsConfirmation.table);
+                                FUNCTIONS.setColumnClass([6,7],'yellow', VARIABLES.DATA_TABLES.allDepartmentsConfirmation.table);
+                                FUNCTIONS.setColumnClass([8,11],'red', VARIABLES.DATA_TABLES.allDepartmentsConfirmation.table);
+                                FUNCTIONS.insertGroupRows(groupColumns[0], this, 19, {background:'#444444', color:'white', 'font-weight':'bold'});
+                                FUNCTIONS.insertSumRowAfterGroup(false, this, VARIABLES.DATA_TABLES.allDepartmentsConfirmation.data.allDepartmentsConfirmationStatisticsSums);
+
+                                //coloring to green date(week) group rows if week didn't end
+                                $('#'+VARIABLES.DATA_TABLES.allDepartmentsConfirmation.table.attr('id')).find('.group_'+groupColumns[0]).each(function (index, row) {
+                                    let dates = $(row).find('td').text().split(" ");
+                                    let lastDay = dates[2].split('.');
+                                    if(moment()<moment().set({'year':lastDay[0],'month':lastDay[1]-1,'date':lastDay[2]})){
+                                        $(row).css('background','#429137')
+                                    }
+                                });
+                            }
+                        }),
+                        getData: function () {
+                            return FUNCTIONS.AJAXs.allDepartmentsConfirmationStatisticsAjax().then(function (response) {
+                                return response.sums;
+                            });
+
+                        },
+                        setTableData: function (data){
+                            VARIABLES.departmentsConfirmationStatisticsLpCounter = 0;
+                            let dataTable = this.dataTable;
+                            dataTable.clear();
+                            $.each(data, function (weekIndex, week) {
+                                $.each(week.secondGrouping, function (secondGroupingIndex, secondGrouping) {
+                                    secondGrouping.dateGroup = week.dateGroup;
+                                });
+                                FUNCTIONS.setTableDataWithdepartmentsConfirmationStatisticsLpCounterByGroup(week.secondGrouping, 'dateGroup', dataTable);
                             });
                             dataTable.draw();
 
@@ -294,7 +474,7 @@
                             VARIABLES.jQElements.departmentsSelectjQ.change(function (e) {
                                 VARIABLES.jQElements.trainersSelectjQ.find('option')
                                     .remove();
-                                VARIABLES.jQElements.trainersSelectjQ.append($('<option>').val(-1).text('Wybierz')).prop('selected',true);
+                                VARIABLES.jQElements.trainersSelectjQ.append($('<option>').val(-1).text('Wszyscy')).prop('selected',true);
                                 $.each(VARIABLES.trainers, function(index, trainer){
                                    if(trainer.department_info_id == VARIABLES.jQElements.departmentsSelectjQ.val()){
                                        VARIABLES.jQElements.trainersSelectjQ.append($('<option>').val(trainer.id).text(trainer.first_name+' '+trainer.last_name));
@@ -306,6 +486,11 @@
                         })();
                         (function trainersSelectHandler() {
                             VARIABLES.jQElements.trainersSelectjQ.change(function (e) {
+                                VARIABLES.DATA_TABLES.departmentsConfirmation.ajaxReload();
+                            });
+                        })();
+                        (function monthDatetimepickerHandler() {
+                            VARIABLES.jQElements.monthDatetimepicker.change(function (e) {
                                 VARIABLES.DATA_TABLES.departmentsConfirmation.ajaxReload();
                             });
                         })();
@@ -324,7 +509,45 @@
                                 trainerId: VARIABLES.jQElements.trainersSelectjQ.val()
                             },
                             success: function (response) {
-                                VARIABLES.DATA_TABLES.departmentsConfirmation.data.departmentsConfirmationStatistics = response;
+                                VARIABLES.DATA_TABLES.departmentsConfirmation.data.departmentsConfirmationStatistics = response.data;
+                                VARIABLES.DATA_TABLES.departmentsConfirmation.data.departmentsConfirmationStatisticsSums = response.sums;
+                                return response;
+                            },
+                            error: function (jqXHR, textStatus, thrownError) {
+                                console.log(jqXHR);
+                                console.log('textStatus: ' + textStatus);
+                                console.log('thrownError: ' + thrownError);
+                                swal({
+                                    type: 'error',
+                                    title: 'Błąd ' + jqXHR.status,
+                                    text: 'Wystąpił błąd: ' + thrownError+' "'+jqXHR.responseJSON.message+'"',
+                                });
+                            }
+                        });
+                    },
+                    allDepartmentsConfirmationStatisticsAjax: function() {
+                        return $.ajax({
+                            url: "{{ route('api.allDepartmentsConfirmationStatisticsAjax') }}",
+                            type: 'POST',
+                            headers: {'X-CSRF-TOKEN': '{{ csrf_token() }}'},
+                            data: {
+                                selectedMonth: VARIABLES.jQElements.monthDatetimepickerForDepartments.find('input').val(),
+                            },
+                            success: function (response) {
+                                VARIABLES.DATA_TABLES.allDepartmentsConfirmation.data.allDepartmentsConfirmationStatistics = response.data;
+
+                                //adding `name` of departments to sums of departments
+                                $.each(response.sums, function (weekIndex, week) {
+                                    $.each(week.secondGrouping,function (departmentIndex, departmentSums) {
+                                        $.each(VARIABLES.departments, function (depIndex, dep) {
+                                            if(departmentSums.secondGroup == dep.id){
+                                                departmentSums.name = dep.departments.name+' '+dep.department_type.name;
+                                                return false;
+                                            }
+                                        });
+                                    })
+                                });
+                                VARIABLES.DATA_TABLES.allDepartmentsConfirmation.data.allDepartmentsConfirmationStatisticsSums = response.sums;
                                 return response;
                             },
                             error: function (jqXHR, textStatus, thrownError) {
@@ -361,6 +584,48 @@
                             $($(rows).eq(i)[0]).before(elementToInsert);
                             last = group;
                         }
+                    });
+                },
+                insertSumRowAfterGroup: function (insideGrouping, dataTable, sumsData, cssOptionsTr = null) {
+                    let column = insideGrouping ? groupColumns[1] : groupColumns[0];
+                    let api = dataTable.api();
+                    let rows = api.rows({page: 'current'}).nodes();
+                    api.column(column, {page: 'current'}).data().each(function (group, i) {
+                       if(group !== api.column(column, {page: 'current'}).data()[i+1]){
+                           let data = null;
+                           $.each(sumsData, function (weekNr, weekSums) {
+                               if(weekSums.dateGroup === api.column(groupColumns[0], {page: 'current'}).data()[i]){
+                                   data = weekSums;
+                                   return false;
+                               }
+                           });
+                           if(insideGrouping){
+                               $.each(data.secondGrouping, function (secondGroupingNr, secondGroupingSums) {
+                                   console.log(api.column(groupColumns[1], {page: 'current'}).data()[i]);
+                                   if(secondGroupingSums.secondGroup === api.column(groupColumns[1], {page: 'current'}).data()[i]){
+                                       data = secondGroupingSums;
+                                       return false;
+                                   }
+                               });
+                           }
+                           let elementToInsert = $('<tr>').addClass('groupSum_'+column).css('font-weight','bold')
+                               .append($('<td>'))
+                               .append($('<td>').addClass('gray').text('Suma:'))
+                               .append($('<td>').addClass('gray').text(data.shows))
+                               .append($('<td>').addClass('gray').text(data.provision))
+                               .append($('<td>').addClass('strongGreen').text(data.successful))
+                               .append($('<td>').addClass('strongGreen').text(data.successfulPct+'%'))
+                               .append($('<td>').addClass('strongYellow').text(data.neutral))
+                               .append($('<td>').addClass('strongYellow').text(data.neutralPct+'%'))
+                               .append($('<td>').addClass('strongRed').text(data.unsuccessful))
+                               .append($('<td>').addClass('strongRed').text(data.unsuccessfulPct+'%'))
+                               .append($('<td>').addClass('strongRed').text(data.unsuccessfulBadly))
+                               .append($('<td>').addClass('strongRed').text(data.unsuccessfulBadlyPct+'%'))
+                               .append($('<td>').addClass('gray').text(data.avgFrequency))
+                               .append($('<td>').addClass('gray').text(data.avgPairs))
+                               .append($('<td>').addClass('gray').text(data.recordsCount));
+                           $($(rows).eq(i)[0]).after(elementToInsert);
+                       }
                     });
                 },
                 @php
@@ -413,23 +678,24 @@
                         });
                     });
                 },
-                setTableDataWithLpCounterByGroup: function(data, groupingData, dataTable){
+                setTableDataWithdepartmentsConfirmationStatisticsLpCounterByGroup: function(data, groupingData, dataTable){
                     if($.isArray(data)) {
                         $.each(data, function (index, row) {
-                            if(VARIABLES.conditionLpCounterZeroing !== row[groupingData]){  //if groupig data is diffrent than previous value, counter equals 0
-                                VARIABLES.lpCounter = 0;                                    //counting from beginning
-                                VARIABLES.conditionLpCounterZeroing = row[groupingData];    //setting condition to grouping data of current row
+                            if(VARIABLES.conditionDepartmentsConfirmationStatisticsLpCounterZeroing !== row[groupingData]){  //if groupig data is diffrent than previous value, counter equals 0
+                                VARIABLES.departmentsConfirmationStatisticsLpCounter = 0;                                    //counting from beginning
+                                VARIABLES.conditionDepartmentsConfirmationStatisticsLpCounterZeroing = row[groupingData];    //setting condition to grouping data of current row
                             }
-                            VARIABLES.lpCounter++;
-                            row.lp = VARIABLES.lpCounter;   //setting 'lp' row attribute
+                            VARIABLES.departmentsConfirmationStatisticsLpCounter++;
+                            row.lp = VARIABLES.departmentsConfirmationStatisticsLpCounter;   //setting 'lp' row attribute
                             dataTable.row.add(row);         //adding row to datatable
                         });
                     }
                 }
             };
             VARIABLES.DATA_TABLES.departmentsConfirmation.ajaxReload();
+            VARIABLES.DATA_TABLES.allDepartmentsConfirmation.ajaxReload();
             FUNCTIONS.EVENT_HANDLERS.callEvents();
-            resizeDatatablesOnMenuToggle([VARIABLES.DATA_TABLES.departmentsConfirmation.dataTable]);
+            resizeDatatablesOnMenuToggle([VARIABLES.DATA_TABLES.departmentsConfirmation.dataTable, VARIABLES.DATA_TABLES.allDepartmentsConfirmation.dataTable]);
         });
     </script>
 @endsection

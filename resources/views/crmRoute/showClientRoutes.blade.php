@@ -457,7 +457,7 @@
                 if( selectedClientIds.length !== 1)
                     swal('Aby wygenerować raport wybierz tylko jednego klienta');
                 else{
-                    console.log('raport');
+                    /*console.log('raport');*/
                     $.ajax({
                         type: 'POST',
                         headers: {
@@ -676,7 +676,7 @@
                         }
                         else {
                             selectedClientIds.push(thisClientId);
-                            if(selectedClientIds.length === $(this).closest('table').find('tr.client').length){
+                            if(selectedClientIds.length === settings["_iRecordsTotal"]){
                                 showAllClientsInput.prop('checked', true);
                                 showAllClientsInput.change();
                             }else{
@@ -811,7 +811,7 @@
                     {"data": "date"},
                     {
                         "data": function (data, type, dataToSet) {
-                            console.log(data);
+                            /*console.log(data);*/
                             let finalName = '';
                             if (data.type == '1') {
                                 finalName = data.route_name + ' (B)';
