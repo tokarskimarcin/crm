@@ -171,7 +171,7 @@
                             <div class="col-md-6" id="emailSection">
                                 <div class="form-group">
                                     <label class="myLabel">Adres email:</label>
-                                    <input class="form-control" type="mail" class="form-control" placeholder="Email" id="email" name="email"  value="">
+                                    <input class="form-control" type="mail" placeholder="Email" id="email" name="email"  value="">
                                 </div>
                             </div>
                             <div class="col-md-6">
