@@ -598,7 +598,7 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
     Route::Post('/view_summary_payment', 'FinancesController@viewSummaryPaymentPOST');
 
     Route::get('/viewEmployeeOfTheWeekCadreGet', 'FinancesController@viewEmployeeOfTheWeekCadreGet');
-    Route::post('/viewEmployeeOfTheWeekCadrePost', 'FinancesController@viewEmployeeOfTheWeekCadrePost');
+    Route::get('/viewEmployeeOfTheWeekGet','FinancesController@viewEmployeeOfTheWeekGet');
 
     Route::get('/medicalPackagesRaportExtended', 'UsersController@medicalPackagesRaportExtendedGet');
     Route::post('/medicalPackagesRaportExtended', 'UsersController@medicalPackagesRaportExtendedPost');

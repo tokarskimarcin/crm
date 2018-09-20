@@ -26,7 +26,7 @@
 @section('content')
     <div class="page-header">
         <div class="alert gray-nav ">
-            Rozliczenia / Pracownicy Tygodnia - Kadra
+            Rozliczenia / Pracownicy Tygodnia @if($type == 2)- Kadra @endif
         </div>
     </div>
     <div class="panel panel-default">

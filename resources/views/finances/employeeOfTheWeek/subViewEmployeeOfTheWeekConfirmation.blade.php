@@ -49,7 +49,7 @@
                                 <tr>
                                     <th>Lp.</th>
                                     <th>Imię i nazwisko</th>
-                                    <th>% zielonych (lb. pokazów)</th>
+                                    <th>{{$criterionHeader}}</th>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -67,7 +67,7 @@
                                 @if($employeeOfTheWeek->accepted == 0 )
                                 <div class="row">
                                     <div class="col-md-12">
-                                        <button class="btn btn-block btn-success acceptBonusButton" data-id="{{$employeeOfTheWeek->id}}">Akceptuj premie</button>
+                                        <button class="btn btn-block btn-success acceptBonusButton" data-id="{{$employeeOfTheWeek->id}}"><span class="glyphicon glyphicon-check"></span> Akceptuj premie</button>
                                     </div>
                                 </div>
                                 @endif
