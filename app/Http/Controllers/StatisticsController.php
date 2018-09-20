@@ -2543,6 +2543,7 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
         else if($level_coaching == 2){ // dla kierowników
             foreach ($manager as $manager_item){
                 $manager_user_relation = $manager_item->menager;
+                if(is_object($manager_user_relation))
                 for($i=1;$i<=3;$i++) {
                     $manager_in_list = $coach_week->where('user_id', '=', $manager_user_relation->id)
                         ->where('coaching_type','=',$i)
