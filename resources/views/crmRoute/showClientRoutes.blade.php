@@ -247,7 +247,7 @@
                                 <thead>
                                 <tr>
                                     <th>ID</th>
-                                    <th>Tydzień</th>
+                                    <th>Tydz.</th>
                                     <th>Klient</th>
                                     <th>Data I pokazu</th>
                                     <th>Trasa</th>
@@ -807,19 +807,21 @@
                         }, "name": "id"
                     },
                     {"data": "weekOfYear"},
-                    {"data": "clientName"},
+                    {"data": function (data, type, dataToSet) {
+                        let finalName = 'brak';
+                            if (data.type == '1') {
+                                finalName = data.clientName + ' (B)';
+                            }
+                            else {
+                                finalName = data.clientName + ' (W)';
+                            }
+                            return finalName;
+                        },"name": "client_name"
+                    },
                     {"data": "date"},
                     {
                         "data": function (data, type, dataToSet) {
-                            /*console.log(data);*/
-                            let finalName = '';
-                            if (data.type == '1') {
-                                finalName = data.route_name + ' (B)';
-                            }
-                            else {
-                                finalName = data.route_name + ' (W)';
-                            }
-                            return finalName;
+                            return data.route_name;
                         }, "name": "route_name"
                     },
                    /* {
