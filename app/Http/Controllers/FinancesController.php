@@ -894,12 +894,12 @@ class FinancesController extends Controller
         $this->setToSave($request->toSave);
         //Zapisanie infromacji o zaakceptowaniu wypłat
         $savePayment = 1;
+        $payment_saved = AcceptedPayment::
+        where('department_info_id',13)
+            ->where('cadrePayment',1)
+            ->where('payment_month','like', $request->search_money_month.'%')
+            ->get();
         if($this->getToSave() == 1){
-            $payment_saved = AcceptedPayment::
-                where('department_info_id',13)
-                ->where('cadrePayment',1)
-                ->where('payment_month','like', $request->search_money_month.'%')
-                ->get();
             if($payment_saved->isEmpty()){
                  $savePayment = 1;
                  $newAcceptedPaymentObj                         = new AcceptedPayment ();
@@ -912,7 +912,11 @@ class FinancesController extends Controller
                 $savePayment = 0;
             }
             $payment_saved = collect('123');
-        }else{
+        }else if($this->getToSave() == 0  && !$payment_saved->isEmpty()){
+            $savePayment = 0;
+            $payment_saved = collect('123');
+        }else if($this->getToSave() == 0  && $payment_saved->isEmpty()){
+            $savePayment = 0;
             $payment_saved = collect();
         }
 
