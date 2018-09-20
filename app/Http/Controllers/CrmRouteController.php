@@ -1160,7 +1160,8 @@ class CrmRouteController extends Controller
         }
 
         $selectedWeek = $request->selectedWeek;
-        $selectedWeek = $selectedWeek == '0' ? '%' : $selectedWeek;
+
+//        $selectedWeek = $selectedWeek == '0' ? '%' : $selectedWeek;
 
         $typ = $request->typ;
         $typ = $typ == '0' ? '%' : $typ;
@@ -1185,12 +1186,17 @@ class CrmRouteController extends Controller
             //->whereIn('client_route.client_id', $selectedClientIds)
             ->where('client_route_info.status', '=', 1)
             ->where('date', 'like', $year . '%')
-            ->where('weekOfYear', 'like', $selectedWeek)
+//            ->where('weekOfYear', 'like', $selectedWeek)
             ->where('client_route.type', 'like', $typ);
 
         if($selectedClientIds !== null){
             $client_route_info->whereIn('client_route.client_id', $selectedClientIds);
         }
+
+        if($selectedWeek[0] != '0') {
+            $campaignsInfo = $client_route_info->whereIn('weekOfYear', $selectedWeek);
+        }
+
 
         $client_route_info =  $client_route_info->get();
 

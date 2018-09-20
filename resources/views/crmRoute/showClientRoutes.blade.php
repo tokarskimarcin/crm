@@ -8,6 +8,7 @@
 @extends('layouts.main')
 @section('style')
     <link rel="stylesheet" href="{{asset('/css/fixedHeader.dataTables.min.css')}}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
 @endsection
 @section('content')
 
@@ -190,7 +191,7 @@
                         <div class="col-md-2">
                             <div class="form-group" style="margin-top:1em;">
                                 <label for="weekNumber">Tydzień</label>
-                                <select id="weekNumber" class="form-control">
+                                <select id="weekNumber" class="form-control" multiple="multiple">
                                     <option value="0">Wszystkie</option>
                                 </select>
                             </div>
@@ -339,6 +340,7 @@
 
 @section('script')
     <script src="{{ asset('/js/dataTables.bootstrap.min.js')}}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
     <script>
 
         let idOfRow = null;
@@ -440,6 +442,15 @@
             let arrayOfTableRows = []; //array of modal table rows
             const editButton = document.querySelector('#limitsButton');
             const clearButton = document.querySelector('#clearButton');
+
+
+            let APP = {
+                arrays: {
+                    selectedWeeks: ["0"]
+                }
+            }
+
+            $('#weekNumber').select2();
 
             (function init() {
                 @if(Session::has('adnotation'))
@@ -720,6 +731,7 @@
                 serverSide: true,
                 scrollY: '45vh',
                 scrollX: true,
+                order: [[1, 'asc'], [3, 'asc']],
                 fnDrawCallback: function (settings) {
                     objectArr = [];
                     $('#datatable2 select').change(changeStatus);
@@ -791,7 +803,7 @@
                         d.selectedClientIds =  selectedClientIds ;
                         d.showOnlyAssigned = showOnlyAssignedInput.prop('checked');
                         d.year = yearInput.val();
-                        d.selectedWeek = selectedWeekInput.val();
+                        d.selectedWeek = APP.arrays.selectedWeeks;
                         d.typ = typInput.val();
                         d.parameters = parametersInput.val();
                     },
@@ -1450,7 +1462,7 @@
                 sessionStorage.setItem('search', searchBox.value);
 
                 sessionStorage.setItem('year', yearInput.options[yearInput.selectedIndex].value);
-                sessionStorage.setItem('weekNumber', weekNumber.options[weekNumber.selectedIndex].value);
+                // sessionStorage.setItem('weekNumber', weekNumber.options[weekNumber.selectedIndex].value);
                 sessionStorage.setItem('type', type.options[type.selectedIndex].value);
                 sessionStorage.setItem('showAllClients', showAllClientsCheckbox.checked);
                 sessionStorage.setItem('showOnlyAssigned', showOnlyAssignedCheckbox.checked);
@@ -1571,6 +1583,33 @@
                 table2.ajax.reload();
             });
             stateInput.change(() => {
+                table2.ajax.reload();
+            });
+
+            /**
+             * This event listener change elements of array selecteWeeks while user selects another week
+             */
+            $('#weekNumber').on('select2:select', function() {
+                let weeksArr = $('#weekNumber').val();
+                if(weeksArr.length > 0) {
+                    APP.arrays.selectedWeeks = weeksArr;
+                }
+                else {
+                    APP.arrays.selectedWeeks = ["0"];
+                }
+                table2.ajax.reload();
+            });
+
+            /**
+             * This event listener change elements of array selectedWeeks while user unselects any week.
+             */
+            $("#weekNumber").on('select2:unselect', function() {
+                if($('#weekNumber').val().length != 0) {
+                    APP.arrays.selectedWeeks = $('#weekNumber').val();
+                }
+                else {
+                    APP.arrays.selectedWeeks = ['0'];
+                }
                 table2.ajax.reload();
             });
 
