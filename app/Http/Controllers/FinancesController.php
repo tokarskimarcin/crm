@@ -642,7 +642,7 @@ class FinancesController extends Controller
             $rbhTargetArr = $this->getDepartmentStatistics($weekDateArr, $month, $year, [$user->department_info_id]);
             foreach ($rbhTargetArr as $target) {
                 $provTarget = ProvisionLevels::get('HR', $target->janky_proc, $target->total_week_goal_proc, 2, 'ammount');
-                $prov = ProvisionLevels::get('HR', $target->janky_proc, $target->target_rbh_percentage,2, 1);
+                $prov = ProvisionLevels::get('HR', $target->janky_proc, $target->target_rbh_percentage,2, 'rbh');
                 $sumProv = $prov + $provTarget;
                 array_push($provisions, $sumProv);
                 $totalProvision += $sumProv;
