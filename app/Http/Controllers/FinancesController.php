@@ -493,7 +493,6 @@ class FinancesController extends Controller
     }
 
     private function provisionSystemForTrainers(&$user, $dividedMonth,&$arrayOfDepartmentStatistics = null) {
-        $user->provision = 0;
         if($user->department_type_id == 1){             //trener potwierdzeń
             $clientRouteInfo = ClientRouteInfo::select(
                 DB::raw('concat(users.first_name," ",users.last_name) as confirmingUserName'),
@@ -518,8 +517,8 @@ class FinancesController extends Controller
                 ->where('users.coach_id', $user->id)->get(); //client route info poszczególnych konsultantów wybranego trenera w miesiacu
             $confirmationStatistics = ConfirmationStatistics::getConsultantsConfirmationStatisticsForMonth($clientRouteInfo, $dividedMonth, 'coach_id');
             foreach ($confirmationStatistics['sums'] as $confirmationStatisticsWeek){
-                $user->provision = $user->provision + ProvisionLevels::get('trainer', $confirmationStatisticsWeek->successfulPct,2);
-                $user->provision = $user->provision + ProvisionLevels::get('trainer', $confirmationStatisticsWeek->unsuccessfulBadlyPct,1);
+                $user->bonus = $user->bonus + ProvisionLevels::get('trainer', $confirmationStatisticsWeek->successfulPct,2);
+                $user->bonus = $user->bonus + ProvisionLevels::get('trainer', $confirmationStatisticsWeek->unsuccessfulBadlyPct,1);
                 if($this->getToSave() == 1){
                     $this->saveBonus($user->id,ProvisionLevels::get('trainer', $confirmationStatisticsWeek->successfulPct,2),$dividedMonth[0]->firstDay,"Premia tygodniowa (".$dividedMonth[0]->firstDay." -- ".$dividedMonth[0]->lastDay." za osiągnięcie:  ".$confirmationStatisticsWeek->successfulPct."% pokazów zielonych.");
                     $this->saveBonus($user->id,ProvisionLevels::get('trainer', $confirmationStatisticsWeek->unsuccessfulBadlyPct,1),$dividedMonth[0]->firstDay,"Premia tygodniowa (".$dividedMonth[0]->firstDay." -- ".$dividedMonth[0]->lastDay." za osiągnięcie:  ".$confirmationStatisticsWeek->unsuccessfulBadlyPct."% czerwonych pokazów");
@@ -885,6 +884,23 @@ class FinancesController extends Controller
     public function viewPaymentCadrePost(Request $request)
     {
         $this->setToSave($request->toSave);
+        //Zapisanie infromacji o zaakceptowaniu wypłat
+        if($this->getToSave() == 1){
+            $payment_saved = AcceptedPayment::
+                where('department_info_id','=',1000)
+                ->where('payment_month','like', $request->search_money_month.'%')
+                ->get();
+            if(empty($payment_saved)){
+                 $savePayment = 1;
+                 $newAcceptedPaymentObj                         = new AcceptedPayment ();
+                 $newAcceptedPaymentObj->cadre_id               = 1364;
+                 $newAcceptedPaymentObj->payment_month          = $request->search_money_month.'-01';
+                 $newAcceptedPaymentObj->department_info_id     = 1000;
+            }else{
+                $savePayment = 0;
+            }
+        }
+        $payment_saved = collect();
         $date_to_post   = $request->search_money_month;
         $date           = $request->search_money_month.'%';
         $year           = substr($date, 0, 4);
@@ -934,37 +950,26 @@ class FinancesController extends Controller
         $arrayOfDepartmentStatistics = [];
         $dividedMonthForDepartmentStatistics = MonthFourWeeksDivision::get($year, $month);
 
-
-
-
-        foreach ($allDepartments as $item){
-            if($this->getToSave() == 1){
-                $payment_saved = AcceptedPayment::
-                where('department_info_id','=',$item->id)
-                    ->where('payment_month','like', $date.'%')
-                    ->where('cadrePayment',1)
-                    ->get();
-                if(empty($payment_saved)){
-
+        if($savePayment == 1){
+            foreach ($allDepartments as $item){
+                $arrayOfDepartmentStatistics[$item->id] =  $this->getDepartmentStatistics($dividedMonthForDepartmentStatistics, substr($dividedMonthForDepartmentStatistics[0]->firstDay,5,2), substr($dividedMonthForDepartmentStatistics[0]->firstDay,0,4), [$item->id]);
+            }
+            foreach($salary as $user) {
+                if($user->user_type_id == 4) {
+                    $this->provisionSystemForTrainers($user,  MonthFourWeeksDivision::get($year, $month),$arrayOfDepartmentStatistics[$user->department_info_id]);
                 }
-            }
-            $arrayOfDepartmentStatistics[$item->id] =  $this->getDepartmentStatistics($dividedMonthForDepartmentStatistics, substr($dividedMonthForDepartmentStatistics[0]->firstDay,5,2), substr($dividedMonthForDepartmentStatistics[0]->firstDay,0,4), [$item->id]);
-        }
-        foreach($salary as $user) {
-            if($user->user_type_id == 4) {
-                $this->provisionSystemForTrainers($user,  MonthFourWeeksDivision::get($year, $month),$arrayOfDepartmentStatistics[$user->department_info_id]);
-            }
-            else if($user->user_type_id == 5) {
-                $this->provisionSystemForHR($user, $month, $year,$arrayOfDepartmentStatistics[$user->department_info_id]);
-            }
-            else if($user->user_type_id == 19) {
-                $this->provisionSystemForInstructors($user,  MonthFourWeeksDivision::get($year, $month),$arrayOfDepartmentStatistics[$user->department_info_id]);
-            }
-            else if($user->user_type_id == 8 || $user->user_type_id == 22) { //koordynator + menager of coordinators
-                $this->provisionSystemForCoordinators($user, $month, $year);
-            }
-            else if($user->user_type_id == 17 ||  $user->user_type_id == 7 || $user->user_type_id == 14 || $user->user_type_id == 21) { // Kierownik + Kierownik Regionaly + kierownik HR + Kierownik Szkoleniowcow
-                $this->provisionSystemForManagers($user,MonthFourWeeksDivision::get($year, $month),$arrayOfDepartmentStatistics);
+                else if($user->user_type_id == 5) {
+                    $this->provisionSystemForHR($user, $month, $year,$arrayOfDepartmentStatistics[$user->department_info_id]);
+                }
+                else if($user->user_type_id == 19) {
+                    $this->provisionSystemForInstructors($user,  MonthFourWeeksDivision::get($year, $month),$arrayOfDepartmentStatistics[$user->department_info_id]);
+                }
+                else if($user->user_type_id == 8 || $user->user_type_id == 22) { //koordynator + menager of coordinators
+                    $this->provisionSystemForCoordinators($user, $month, $year);
+                }
+                else if($user->user_type_id == 17 ||  $user->user_type_id == 7 || $user->user_type_id == 14 || $user->user_type_id == 21) { // Kierownik + Kierownik Regionaly + kierownik HR + Kierownik Szkoleniowcow
+                    $this->provisionSystemForManagers($user,MonthFourWeeksDivision::get($year, $month),$arrayOfDepartmentStatistics);
+                }
             }
         }
 
@@ -1120,7 +1125,7 @@ class FinancesController extends Controller
             ->join('department_type','department_type.id','department_info.id_dep_type')
             ->get();
 
-        $payment_saved = collect(['123']);
+
 
         return view('finances.viewPaymentCadre')
             ->with('month',$date_to_post)
