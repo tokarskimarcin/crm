@@ -18,8 +18,8 @@
         min-width:2em;
         font-weight:bold;
     }
-
-    #conntent{
+    #page-wrapper{
         height: 100vh;
+        overflow: auto;
     }
 </style>
