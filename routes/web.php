@@ -165,6 +165,7 @@ Route::POST('/getManagerId', 'CoachingController@getManagerId')->name('api.getMa
 
 Route::POST('/paymentStory', 'FinancesController@paymentStory')->name('api.paymentStory');
 Route::post('/employeeOfTheWeekSubViewAjax','FinancesController@employeeOfTheWeekSubViewAjax')->name('api.employeeOfTheWeekSubViewAjax');
+Route::post('/acceptBonusEmployeeOfTheWeekAjax','FinancesController@acceptBonusEmployeeOfTheWeekAjax')->name('api.acceptBonusEmployeeOfTheWeekAjax');
 
 
 /* END FINANCES AJAX  */

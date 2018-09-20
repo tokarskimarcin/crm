@@ -1620,7 +1620,6 @@ class FinancesController extends Controller
                 if($confirmationStatisticWeek->firstDay == $employeeOfTheWeek->first_day_week && $confirmationStatisticWeek->lastDay == $employeeOfTheWeek->last_day_week){
                     $rankingPositionCounter = 0;
                     foreach ($confirmationStatisticWeek->secondGrouping->sortByDesc('successfulPct') as $trainerSum){
-
                         $employeeOfTheWeekRanking = new EmployeeOfTheWeekRanking();
                         $employeeOfTheWeekRanking->employee_of_the_week_id = $employeeOfTheWeek->id;
                         $employeeOfTheWeekRanking->user_id = $trainerSum->secondGroup;
@@ -1633,5 +1632,49 @@ class FinancesController extends Controller
                 }
             }
         }
+    }
+
+    public function acceptBonusEmployeeOfTheWeekAjax(Request $request){
+        if($request->ajax()){
+            $employeeOfTheWeekId = $request->employeeOfTheWeekId;
+            $bonusInfo = $request->bonusInfo;
+
+            EmployeeOfTheWeek::where('id',$employeeOfTheWeekId)->update(['accepted' => 1, 'accepted_by_user_id' => Auth::user()->id]);
+            if(is_array($bonusInfo) and count($bonusInfo)>0){
+                $employeeOfTheWeek = EmployeeOfTheWeek::where('id',$employeeOfTheWeekId)->first();
+
+                $userType = UserTypes::where('id',$employeeOfTheWeek->user_type_id)->first();
+
+                EmployeeOfTheWeekRanking::where('employee_of_the_week_id',$employeeOfTheWeekId)->update(['bonus' => 0]);
+                $employeesOfTheWeekRanking = EmployeeOfTheWeekRanking::where('employee_of_the_week_id',$employeeOfTheWeekId)->get();
+                foreach ($bonusInfo as $employeeBonus){
+                    $employeeOfTheWeekRankingWithBonus = $employeesOfTheWeekRanking->where('user_id', $employeeBonus['userId'])->first();
+                    $employeeOfTheWeekRankingToSwap = $employeesOfTheWeekRanking->where('ranking_position', $employeeBonus['bonusPosition'])->first();
+
+                    $employeeOfTheWeekRankingToSwap->ranking_position = $employeeOfTheWeekRankingWithBonus->ranking_position;
+                    $employeeOfTheWeekRankingToSwap->save();
+
+                    $employeeOfTheWeekRankingWithBonus->ranking_position = $employeeBonus['bonusPosition'];
+                    $employeeOfTheWeekRankingWithBonus->bonus = abs($employeeBonus['bonus']);
+                    $employeeOfTheWeekRankingWithBonus->save();
+
+                    $penaltyBonus = new PenaltyBonus();
+                    $penaltyBonus->type = 2;
+                    $penaltyBonus->id_user = $employeeBonus['userId'];
+                    $penaltyBonus->amount = abs($employeeBonus['bonus']);
+                    $penaltyBonus->comment = $userType->name.
+                        ' tygodnia: '.
+                        date('Y.m.d',strtotime($employeeOfTheWeek->first_day_week)).
+                        ' - '.
+                        date('Y.m.d',strtotime($employeeOfTheWeek->last_day_week)).
+                        ' Miejsce - '.$employeeBonus['bonusPosition'].'#';
+                    $penaltyBonus->id_manager = Auth::user()->id;
+                    $penaltyBonus->event_date = $employeeOfTheWeek->last_day_week;
+                    $penaltyBonus->save();
+                }
+            }
+            return 'success';
+        }
+        return 'fail';
     }
 }

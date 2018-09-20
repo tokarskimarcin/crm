@@ -63,7 +63,7 @@
                                 </tbody>
                             </table>
                         </div>
-                            <div class="col-md-6">
+                            <div class="col-md-6 myContentRight">
                                 @if($employeeOfTheWeek->accepted == 0 )
                                 <div class="row">
                                     <div class="col-md-12">
@@ -78,8 +78,8 @@
                                                 <div class="row">
                                                     <div class="col-md-8">
                                                         <div class="input-group input-group-lg">
-                                                            <span class="input-group-addon" id="employee_bonus_{{$i}}" data-position="{{$i}}">{{$i}}#</span>
-                                                            <select class="form-control" aria-describedby="employee_bonus_{{$i}}"
+                                                            <span class="input-group-addon bonusPosition" id="employee_bonus_{{$i}}" data-position="{{$i}}">{{$i}}#</span>
+                                                            <select class="form-control employeeSelect" aria-describedby="employee_bonus_{{$i}}"
                                                             @if($employeeOfTheWeek->accepted != 0 ) disabled @endif>
                                                                 <option value="0" selected>Brak</option>
                                                                 @foreach($employeesOfTheWeekRankings->where('employee_of_the_week_id',$employeeOfTheWeek->id) as $employeeOfTheWeekRanking)
@@ -91,13 +91,12 @@
                                                     </div>
                                                     <div class="col-md-4">
                                                         <div class="input-group input-group-lg">
-                                                            <input type="text" class="form-control" placeholder="Premia" aria-describedby="bonus_{{$i}}" @if($employeeOfTheWeek->accepted != 0 ) readonly @endif
+                                                            <input type="text" class="form-control bonus" placeholder="Premia" aria-describedby="bonus_{{$i}}" @if($employeeOfTheWeek->accepted != 0 ) readonly @endif
                                                             @foreach($employeesOfTheWeekRankings->where('employee_of_the_week_id',$employeeOfTheWeek->id) as $employeeOfTheWeekRanking)
                                                                 @if($employeeOfTheWeekRanking->ranking_position == $i)
                                                                      value="{{$employeeOfTheWeekRanking->bonus}}"
                                                                 @endif
                                                             @endforeach>
-
                                                             <span class="input-group-addon" id="bonus_{{$i}}" data-position="{{$i}}">zł</span>
                                                         </div>
                                                     </div>
@@ -118,7 +117,8 @@
         jQElements:{
             myPanels: $('.myPanels'),
             bonusSections: $('.bonusSection'),
-            acceptBonusButtons: $('.acceptBonusButton')
+            acceptBonusButtons: $('.acceptBonusButton'),
+            bonusInputs: $('.bonusSection .bonus')
         },
         DATA_TABLES: {
             tables: $('.datatable'),
@@ -135,12 +135,90 @@
                       VARIABLES.SUBVIEW.DATA_TABLES.dataTables[employeeOfTheWeekId].columns.adjust().draw();
                   });
               })();
+              (function bonusInputsHandler() {
+                  VARIABLES.SUBVIEW.jQElements.bonusInputs.on('input',function (e) {
+                      if(isNaN($(e.target).val())){
+                          $(e.target).val('');
+                      }
+                  });
+              })();
               (function acceptBonusButtonHandler() {
                   VARIABLES.SUBVIEW.jQElements.acceptBonusButtons.click(function (e) {
-                     console.log($(e.target).data('id'));
+                      swal({
+                          type: 'warning',
+                          title: 'Przydzielić premię?',
+                          text: 'Czy na pewno przydzielić premię dla wybranych pracowników?',
+                          showCancelButton: true
+                      }).then((result)=>{
+                          if(result.value){
+                              let bonusSection = $(e.target).closest('.myContentRight').find('.bonusSection');
+                              let bonusRows = bonusSection.find('.row');
+                              let bonusInfo = [];
+                              let validation = true;
+
+                              $.each(bonusRows, function (index, row) {
+                                  let userId =  $(row).find('.employeeSelect').val();
+                                  if(userId > 0){
+                                      let bonus = $(row).find('.bonus').val();
+                                      if(bonus > 0 ){
+                                          bonusInfo.push({
+                                              bonusPosition: $(row).find('.bonusPosition').data('position'),
+                                              userId: userId,
+                                              bonus: bonus
+                                          });
+                                      }else{
+                                          validation = false;
+                                          swal('Premia musi być dodatnia')
+                                      }
+                                  }
+                              });
+
+                              if(validation){
+                                  swal({
+                                      title: 'Ładowawnie...',
+                                      text: 'To może chwilę zająć',
+                                      showConfirmButton: false,
+                                      allowOutsideClick: false,
+                                      allowEscapeKey: false,
+                                      allowEnterKey: false,
+                                      onOpen: () => {
+                                          swal.showLoading();
+                                          FUNCTIONS.SUBVIEW.AJAXs.acceptBonusEmployeeOfTheWeekAjax({employeeOfTheWeekId: bonusSection.data('id'),bonusInfo: bonusInfo})
+                                              .then(function (response) {
+                                                  swal.close();
+                                                  if(response === 'success'){
+                                                      let panel = $(e.target).closest('.myPanels');
+                                                      panel.find('.panel-body').collapse('hide');
+                                                      bonusSection.find('.employeeSelect').attr('disabled',true);
+                                                      bonusSection.find('.bonus').attr('readonly',true);
+                                                      panel.find('.panel-heading').removeClass('green');
+                                                      $(e.target).closest('.row').remove();
+                                                  }
+                                              });
+                                      }
+                                  });
+                              }
+                          }
+                      });
+
                   });
               })();
           }
+        },
+        AJAXs: {
+            acceptBonusEmployeeOfTheWeekAjax: function (data) {
+                return $.ajax({
+                    type: 'POST',
+                    url: '{{route('api.acceptBonusEmployeeOfTheWeekAjax')}}',
+                    data: data,
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    success: function (response) {
+                        return response;
+                    }
+                });
+            }
         },
         call: function () {
             $.each(VARIABLES.SUBVIEW.DATA_TABLES.tables,function (index, table) {
