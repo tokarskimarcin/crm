@@ -4469,4 +4469,10 @@ class CrmRouteController extends Controller
         }
     }
 
+    //This method remove hotel permanently with all its references.
+    public function deletePermanentlyHotel($id) {
+        Hotel::removeHotelPermanently($id);
+        return $id;
+    }
+
 }

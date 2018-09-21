@@ -316,10 +316,14 @@
                                 <button type='submit' class="btn btn-default form-control" id="saveHotel">
                                     <span class='glyphicon glyphicon-plus'></span> Dodaj Hotel
                                 </button>
+
                             </div>
                         </div>
                     </div>
                 </form>
+                <button class="btn btn-danger form-control" id="removeHotel" style="display: none; margin-top: 1em;">
+                    <span class='glyphicon glyphicon-plus'></span> Usuń trwale hotel
+                </button>
             </div>{{--modal-body end--}}
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Zamknij</button>
@@ -353,6 +357,7 @@
             addNewHotelFlag = false;
             editHotelFlag = false;
 
+            let removeHotelButton = document.querySelector('#removeHotel');
             let nameInput = $("#name");
             let streetInput = $('#street');
             let voivodeAddInput = $('#voivodeAdd');
@@ -390,6 +395,7 @@
             }
             $('.invoiceTemplate_file').remove();
             $('#HotelModal .modal-title').first().text('Dodaj Hotel');
+            removeHotelButton.style.display = 'none';
 
 
             nameInput.val("");
@@ -687,10 +693,12 @@
                                 $('#HotelModal .modal-title').first().text('Edycja Hotelu');
 
                                 let saveHotelButton = $('#HotelModal #saveHotel');
+                                let removeButton = document.querySelector('#removeHotel');
                                 saveHotelButton.first().text('');
                                 saveHotelButton.first().prop('class', 'btn btn-success form-control');
                                 saveHotelButton.first().append($('<span class="glyphicon glyphicon-save"></span>'));
                                 saveHotelButton.first().append(' Zapisz Hotel');
+                                removeButton.style.display = 'block';
 
                                 fillHotelInformations(response);
 
@@ -1267,5 +1275,40 @@
                 }
             });
         }
+
+        let removeHotelButton = document.querySelector('#removeHotel');
+        removeHotelButton.addEventListener('click', function(e) {
+
+            swal({
+                title: 'Czy jesteś pewien?',
+                text: "Usunięcie jest nieodwracalne!",
+                type: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Usuń!'
+            }).then((result) => {
+                if (result.value) {
+                    let hotelId = $('#hotelId').val();
+                    let url = `{{url()->current()}}/${hotelId}`;
+                    let header = new Headers();
+                    header.append('X-CSRF-TOKEN', `{{csrf_token()}}`);
+
+                    fetch(url, {
+                        credentials: 'same-origin',
+                        method: 'delete',
+                        headers: header
+                    })
+                        .then(resp => resp.json())
+                        .then(resp => swal('Hotel został usunięty!'))
+                        .then(resp => {
+                            $('#HotelModal').modal('hide');
+                            table.ajax.reload();
+                        })
+                        .catch(err => console.log(err))
+                }
+            })
+
+        })
     </script>
 @endsection

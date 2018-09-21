@@ -1053,3 +1053,4 @@ Route::post('/checkForTheSameRoute', 'CrmRouteController@checkForTheSameRoute')-
 Route::get('/mailMonthReportUnpaidInvoices', 'StatisticsController@mailMonthReportUnpaidInvoices');
 
 Route::get('/setEngraverForConfirming', 'AutoScriptController@setEngraverForConfirming');
+Route::delete('/showHotels/{id}', 'CrmRouteController@deletePermanentlyHotel');
