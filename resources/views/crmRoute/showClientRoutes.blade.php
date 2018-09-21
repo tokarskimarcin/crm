@@ -162,10 +162,12 @@
                     <div class="row">
                         <div class="col-md-12">
                             <div class="form-group">
-                                <label for="showAllClients">Pokaż wszystkich klientów</label>
-                                <input type="radio" style="display:inline-block" id="showAllClients" checked="checked" >
+                                <button class="btn btn-default" id="clearClientsButton">
+                                    <span class='glyphicon glyphicon-unchecked'></span> Czyść zaznaczenia klientów <span class="badge">0</span></button>
                             </div>
                         </div>
+                    </div>
+                    <div class="row">
                         <div class="col-md-12">
                             <div class="form-group">
                                 <label for="showOnlyAssigned">Pokaż tylko trasy bez przypisanego hotelu lub
@@ -546,7 +548,6 @@
             });
 
             const showOnlyAssignedInput = $('#showOnlyAssigned');
-            const showAllClientsInput = $('#showAllClients');
             let selectedWeekInput = $('#weekNumber');
             let rowIterator = null;
             // let colorIterator = 0;
@@ -661,9 +662,6 @@
                     return row;
                 }, "fnDrawCallback": function (settings) {
                     $('#datatable tbody tr').click(function () {
-                        if (showAllClientsInput.prop('checked') === true) { //all clients checkbox = true + selecting one client
-                            showAllClientsInput.prop('checked', false)
-                        }
                         test = $(this).closest('table');
                         let thisClientId  = $(this).attr('id');
                         thisClientId =  thisClientId.substr(thisClientId.lastIndexOf('_')+1);
@@ -671,18 +669,18 @@
                             $(this).removeClass('check');
                             selectedClientIds.splice(selectedClientIds.indexOf(thisClientId),1);
                             if(selectedClientIds.length === 0){
-                                showAllClientsInput.prop('checked', true);
+                                /*showAllClientsInput.prop('checked', true);*/
                             }
                         }
                         else {
                             selectedClientIds.push(thisClientId);
                             if(selectedClientIds.length === settings["_iRecordsTotal"]){
-                                showAllClientsInput.prop('checked', true);
-                                showAllClientsInput.change();
+                                $('#clearClientsButton').click();
                             }else{
                                 $(this).addClass('check');
                             }
                         }
+                        $('#clearClientsButton').find('.badge').text(selectedClientIds.length);
                         rowIterator = null;
                         // colorIterator = 0;
                         objectArr = [];
@@ -1191,9 +1189,10 @@
                 $('#clearButton').find('.badge').text(clientRouteIdArr.length);
             }
 
-            function showAllClientsInputHandler(e) {
+            function clearClientsButtonHandler(e) {
                 $('#datatable tr').removeClass('check');
                 selectedClientIds  = [];
+                $(e.target).find('.badge').text(selectedClientIds.length);
                 table2.ajax.reload();
             }
 
@@ -1439,8 +1438,6 @@
                 const parameterSelect = document.querySelector('#parameters');
 
                 if (selectedClientIds.length > 0) {
-                    //let idsOfSelectedClients = document.querySelector('.check').id;
-                    console.log(selectedClientIds);
                     sessionStorage.setItem('idsOfSelectedClients', selectedClientIds.toString());
                 }
 
@@ -1511,19 +1508,6 @@
                     sessionStorage.removeItem('type');
                 }
 
-                let showAllClientsCheckbox = document.querySelector('#showAllClients');
-                if (sessionStorage.getItem('showAllClients')) {
-                    const isChecked = sessionStorage.getItem('showAllClients');
-                    somethingChanged = isChecked === 'true' ? true : somethingChanged;
-                    if (isChecked == 'false') {
-                        showAllClientsCheckbox.checked = false;
-                    }
-                    else {
-                        showAllClientsCheckbox.checked = true;
-                    }
-                    sessionStorage.removeItem('showAllClients');
-                }
-
                 if (sessionStorage.getItem('showOnlyAssigned')) {
                     const isChecked = sessionStorage.getItem('showOnlyAssigned');
                     somethingChanged = isChecked === 'true' ? true : somethingChanged;
@@ -1534,6 +1518,12 @@
                         showOnlyAssignedInput.prop('checked', true);
                     }
                     sessionStorage.removeItem('showOnlyAssigned');
+                }
+                let clearClientsButton = $('#clearClientsButton');
+                if (sessionStorage.getItem('idsOfSelectedClients')) {
+                    selectedClientIds = sessionStorage.getItem('idsOfSelectedClients').split(",");
+                    sessionStorage.removeItem('idsOfSelectedClients');
+                    clearClientsButton.find('.badge').text(selectedClientIds.length);
                 }
 
                 let parameterSelect = document.querySelector('#parameters');
@@ -1553,7 +1543,7 @@
                 }
             })();
 
-            showAllClientsInput.change(showAllClientsInputHandler);
+            $('#clearClientsButton').click(clearClientsButtonHandler);
             showOnlyAssignedInput.change(() => {
                 table2.ajax.reload();
             });
