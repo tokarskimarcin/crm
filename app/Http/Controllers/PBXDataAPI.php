@@ -10,6 +10,7 @@ use App\PBXDKJTeam;
 use App\PBXDKJTeamOtherCompany;
 use App\ReportCampaign;
 use App\User;
+use App\Work_Hour;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Pbx_report_extension;
@@ -233,6 +234,18 @@ class PBXDataAPI extends Controller
                                     $userWithThisPbxNumber = User::where('login_phone', '=', $rowItem)->first();
                                     $data_to_insert[$temp_key]['user_id'] = $userWithThisPbxNumber->id;
                                     $data_to_insert[$temp_key]['actual_coach_id'] = $userWithThisPbxNumber->coach_id;
+                                    $workHourSuccess = Work_Hour::where('id_user',$userWithThisPbxNumber->id)
+                                                                ->where('date',date('Y-m-d'))
+                                                                ->whereIn('status',[1,2,3])
+                                                                ->get()->first();
+                                    if($workHourSuccess != null){
+                                        $workHourSuccess->success = $data_to_insert[$temp_key]['success'];
+                                        try{
+                                            $workHourSuccess->save();
+                                        }catch (\Exception $exception){
+                                            //Do nothing
+                                        }
+                                    }
                                 }
                                 else {
                                     $data_to_insert[$temp_key]['user_id'] = null;

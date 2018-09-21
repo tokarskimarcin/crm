@@ -210,7 +210,13 @@
 
                     {"data":null,"targets": -4,"orderable": false, "searchable": false },
 
-                    {"data":null,"targets": -3,"orderable": false, "searchable": false },
+                    // {"data":null,"targets": -3,"orderable": false, "searchable": false },
+
+                    {"data": function (data, type, dataToSet) {
+                            if(data.success == null || data.success == 0)
+                                data.success = "";
+                            return "<input id='succes' style='width: 100px;' class='form-control' size='16' type='number' value="+data.success+">";
+                        },"name": "register_start"},
 
                     {"data": "time", "name": "time","searchable": false },
 
@@ -221,11 +227,13 @@
                     "targets": -1,
                     "data": "id",
                     "defaultContent": "<button class='button-save btn btn-default'>Zapisz</button>"
-                },{
-                    "targets": -3,
-                    "data": "id",
-                    "defaultContent": "<input id='succes' style='width: 100px;' class='form-control' size='16' type='number' value=''>"
-                },{
+                },
+                //     {
+                //     "targets": -3,
+                //     "data": "id",
+                //     "defaultContent": "<input id='succes' style='width: 100px;' class='form-control' size='16' type='number' value=''>"
+                // },
+                    {
                         "targets": -4,
                         "data": null,
                         "defaultContent": "" +

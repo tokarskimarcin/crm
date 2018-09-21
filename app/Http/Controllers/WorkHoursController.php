@@ -109,6 +109,7 @@ class WorkHoursController extends Controller
                     users.last_name,
                     work_hours.click_start,
                     work_hours.click_stop,
+                    work_hours.success,
                     work_hours.register_start,
                     work_hours.register_stop,
                     work_hours.date,
