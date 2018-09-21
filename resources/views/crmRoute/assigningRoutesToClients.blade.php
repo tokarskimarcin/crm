@@ -1179,7 +1179,7 @@
                     else {
                         cityOpt.setAttribute('data-max_hours', '0');
                         cityOpt.setAttribute('title', "KARENCJA od " + data.available_date_2 + " do " + data.available_date + ", przekroczono o " + data.used_hours + " godzin");
-                        cityOpt.textContent = data.city_name + '  (K_' + data.used_hours + ': ' + data.available_date + ')'
+                        cityOpt.textContent = data.city_name + '  (K_' + data.used_hours + ': ' + data.available_date + ')';
 
                     }
                 }
