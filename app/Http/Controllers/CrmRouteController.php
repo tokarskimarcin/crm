@@ -1110,10 +1110,12 @@ class CrmRouteController extends Controller
         ->whereIn('id_dep_type',[2]);
         $year = date('Y',strtotime("this year"));
         $numberOfThisYearsWeek = date('W',mktime(0, 0, 0, 12, 30, $year));
+        $thisMonth = date('W');
         return view('crmRoute.showClientRoutes')
             ->with('lastWeek', $numberOfThisYearsWeek)
             ->with('departments', $departments)
-            ->with('year', $year);
+            ->with('year', $year)
+            ->with('thisMonth', $thisMonth);
     }
 
     /**

@@ -539,6 +539,7 @@
             let typInput = $('#type');
             let stateInput = $('#campaignState');
             let parametersInput = $('#parameters');
+            let thisMonth = {{$thisMonth}};
 
             //This part is responsible for listing every week number into select
             const lastWeekOfYear ={{$lastWeek}};
@@ -548,6 +549,10 @@
                 optionElement.value = i;
                 optionElement.innerHTML = `${i}`;
                 weekSelect.appendChild(optionElement);
+                if(i == thisMonth) {
+                    $(weekSelect).val(i);
+                    APP.arrays.selectedWeeks = $(weekSelect).val();
+                }
             }
 
             //this part is responsible for redirect button
@@ -1425,6 +1430,7 @@
                             selectedWeekInput.append(basicOptionElement);
 
                             for (let i = 1; i <= weeksInYear + 1; i++) { //we are iterating to weeksInYear+1 because we are getting week number for 30.12, and in 31.12 can be monday(additional week)
+
                                 const optionElement = document.createElement('option');
                                 optionElement.value = i;
                                 optionElement.textContent = i;
