@@ -678,6 +678,7 @@ class CrmRouteController extends Controller
 //                    $gracePeriod = null;
 //                }
                 $goodDate = date_create($item->date);
+                $goodDate2 = date('Y-m-d', strtotime($item->date));
                 $dateDifference = date_diff($properDate,$goodDate, true);
                 $dateDifference = $dateDifference->format('%a');
                 $dateString = $dateDifference . " days";
@@ -687,6 +688,7 @@ class CrmRouteController extends Controller
                     $cityInfoObject = new \stdClass();
                     $cityInfoObject->city_id = $item->city_id;
                     $cityInfoObject->available_date =  date_format(date_add($goodDate,date_interval_create_from_date_string(($gracePeriod).' days') ), "Y-m-d");
+                    $cityInfoObject->available_date_2 = date('Y-m-d', strtotime($goodDate2 . ' -' . $gracePeriod . ' days'));
                     array_push($checkedCities, $cityInfoObject);
                 }
             }
@@ -731,6 +733,7 @@ class CrmRouteController extends Controller
                         $blockFlag = true;
                         $item->block = 1;
                         $item->available_date = $blockedCity->available_date;
+                        $item->available_date_2 = $blockedCity->available_date_2;
                         if($item->max_hour > $hourNumber) { // limit of hours isn't exceeded
                             $hourDifference = $item->max_hour - $hourNumber;
                             $item->exceeded = 0; // indices that this city is still available for couple of hours
@@ -748,6 +751,7 @@ class CrmRouteController extends Controller
                 if($blockFlag == false) {
                     $item->block = 0;
                     $item->available_date = 0;
+                    $item->available_date_2 = 0;
                     $item->used_hours = 0;
                     $item->exceeded = 0;
                 }
@@ -1474,6 +1478,7 @@ class CrmRouteController extends Controller
 //
                 $gracePeriod = $item->grace_period;
                 $goodDate = date_create($item->date);
+                $goodDate2 = date('Y-m-d', strtotime($item->date));
                 $dateDifference = date_diff($properDate,$goodDate, true);
                 $dateDifference = $dateDifference->format('%a');
                 $dateString = $dateDifference . " days";
@@ -1491,6 +1496,7 @@ class CrmRouteController extends Controller
                         $cityInfoObject = new \stdClass();
                         $cityInfoObject->city_id = $item->city_id;
                         $cityInfoObject->available_date =  date_format(date_add($goodDate,date_interval_create_from_date_string(($gracePeriod).' days') ), "Y-m-d");
+                        $cityInfoObject->available_date_2 = date('Y-m-d', strtotime($goodDate2 . ' -' . $gracePeriod . ' days'));
                         array_push($checkedCities, $cityInfoObject);
                     }
                 }
@@ -1538,6 +1544,7 @@ class CrmRouteController extends Controller
                         $blockFlag = true;
                         $item->block = 1;
                         $item->available_date = $blockedCity->available_date;
+                        $item->available_date_2 = $blockedCity->available_date_2;
                         if($item->max_hour > $hourNumber) { // limit of hours isn't exceeded
                             $hourDifference = $item->max_hour - $hourNumber;
                             $item->exceeded = 0; // indices that this city is still available for couple of hours
@@ -1556,6 +1563,7 @@ class CrmRouteController extends Controller
                 if($blockFlag == false) {
                     $item->block = 0;
                     $item->available_date = 0;
+                    $item->available_date_2 = 0;
                     $item->used_hours = 0;
                     $item->exceeded = 0;
                 }
@@ -2051,6 +2059,7 @@ class CrmRouteController extends Controller
 //                    $gracePeriod = null;
 //                }
                 $goodDate = date_create($item->date);
+                $goodDate2 = date('Y-m-d', strtotime($item->date));
                 $dateDifference = date_diff($properDate,$goodDate, true);
                 $dateDifference = $dateDifference->format('%a');
                 $dateString = $dateDifference . " days";
@@ -2060,6 +2069,7 @@ class CrmRouteController extends Controller
                         $cityInfoObject = new \stdClass();
                         $cityInfoObject->city_id = $item->city_id;
                         $cityInfoObject->available_date =  date_format(date_add($goodDate,date_interval_create_from_date_string(($gracePeriod).' days') ), "Y-m-d");
+                        $cityInfoObject->available_date_2 = date('Y-m-d', strtotime($goodDate2 . ' -' . $gracePeriod . ' days'));
                         array_push($checkedCities, $cityInfoObject);
                 }
             }
@@ -2090,6 +2100,7 @@ class CrmRouteController extends Controller
                         $blockFlag = true;
                         $item->block = 1;
                         $item->available_date = $blockedCity->available_date;
+                        $item->available_date_2 = $blockedCity->available_date_2;
                         if($item->max_hour > $hourNumber) { // limit of hours isn't exceeded
                             $hourDifference = $item->max_hour - $hourNumber;
                             $item->exceeded = 0; // indices that this city is still available for couple of hours
@@ -2107,6 +2118,7 @@ class CrmRouteController extends Controller
                 if($blockFlag == false) {
                     $item->block = 0;
                     $item->available_date = 0;
+                    $item->available_date_2 = 0;
                     $item->used_hours = 0;
                     $item->exceeded = 0;
                 }

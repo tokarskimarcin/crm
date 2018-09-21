@@ -44,6 +44,41 @@ class AutoScriptController extends Controller
         $limitDate = Date('W', strtotime('-50 days'));
 
         $limitDateFull = Date('Y-m-d', strtotime('-50 days'));
+        $lastMonthFull = Date('Y-m-d', strtotime('-30 days'));
+
+        $clientRouteInfoRecords = ClientRouteInfo::select(
+            'client_route_info.id as id',
+            'confirmDate',
+            'client.name',
+            'priority',
+            'client_route_info.date',
+            'confirmingUser',
+            'city_id',
+            'limits',
+            'frequency'
+        )
+            ->join('client_route', 'client_route_info.client_route_id', '=', 'client_route.id')
+            ->join('client', 'client_route.client_id', '=', 'client.id')
+            ->OnlyActive()
+            ->orderBy('priority', 'desc')
+            ->orderBy('client_route_info.date');
+
+        $clientRouteInfoRecords2 = ClientRouteInfo::select(
+            'client_route_info.id as id',
+            'confirmDate',
+            'client.name',
+            'priority',
+            'client_route_info.date',
+            'confirmingUser',
+            'city_id',
+            'limits',
+            'frequency'
+        )
+            ->join('client_route', 'client_route_info.client_route_id', '=', 'client_route.id')
+            ->join('client', 'client_route.client_id', '=', 'client.id')
+            ->OnlyActive()
+            ->orderBy('priority', 'desc')
+            ->orderBy('client_route_info.date');
 
         $scheduleData = Schedule::select('id_user as userId', 'users.first_name as name','department_info.id as depId' ,'users.last_name as surname', 'week_num', 'year', 'monday_comment as pon', 'tuesday_comment as wt', 'wednesday_comment as sr', 'thursday_comment as czw', 'friday_comment as pt', 'saturday_comment as sob','sunday_comment as nd')
             ->join('users', 'schedule.id_user', '=', 'users.id')
@@ -55,11 +90,14 @@ class AutoScriptController extends Controller
             ->get();
 
         $scheduleGroupedByUser = $scheduleData->groupBy('userId', 'week_num');
-
         $usersWorkingLessThan30RBH = Work_Hour::usersWorkingLessThan(30);
+        $cl = $clientRouteInfoRecords->where('confirmingUser', '!=', null)->where('confirmDate', '<>', null)->where('confirmDate', '>', $lastMonthFull);
 
+        $confirmingUsersArr = $cl->pluck('confirmingUser')->toArray();
+        $confirmingUsersArrWithoutDuplicates = array_unique($confirmingUsersArr); //array of confirming users ids
         //This part is responsible for creating user objects with date field and pass it to userArr
         $userArr = [];
+
         foreach($scheduleGroupedByUser as $id => $data) {
             $user = new \stdClass();
             $user->user_id = $id; //id of consultant
@@ -109,31 +147,63 @@ class AutoScriptController extends Controller
                 }
             }
             $user->date = $dataArr;
+            $user->info = []; //this field contains info about scoring for each city
+
+            $finalCoefficientArr = [];
+            $coefficientArr = [];
+
+            foreach($confirmingUsersArrWithoutDuplicates as $confUser) {
+                $cityArray = []; //array of all cities that user confirmed in past 30 days
+                if($id == $confUser) { //if user has client route info records from past 30 days where he was confirming person
+                    $allUserClRecords = ClientRouteInfo::where('confirmingUser', '=', $confUser)->where('confirmingUser', '!=', null)->where('confirmDate', '<>', null)->where('confirmDate', '>', $lastMonthFull)->get(); //all confirming user client route info records
+
+                    //computing scores based on city.
+                    foreach($allUserClRecords as $rec) {
+                        $coefficient = ($rec->limits != 0 || $rec->limits != null) && ($rec->frequency != 0 || $rec->frequency != null) ? round($rec->frequency / $rec->limits,2) : 0;
+
+                        $obj = new \stdClass();
+                        $obj->user_id = $rec->confirmingUser;
+                        $obj->city_id = $rec->city_id;
+                        $obj->coefficient = $coefficient;
+                        array_push($coefficientArr, $obj);
+                        array_push($cityArray, $rec->city_id);
+                    }
+
+                    $cityArray = array_unique($cityArray);
+                    foreach($cityArray as $cityItem) {
+                        $sumCoefficient = 0;
+                        $sumItems = 0;
+                        $i = 0;
+                        $city = null;
+                        $user_id = null;
+                        foreach($coefficientArr as $coefficientItem) {
+                           if($coefficientItem->city_id == $cityItem) {
+                               if($i == 0) {
+                                   $city = $coefficientItem->city_id;
+                                   $user_id = $coefficientItem->user_id;
+                               }
+                               $sumItems++;
+                               $sumCoefficient += $coefficientItem->coefficient;
+                               $i++;
+                           }
+                        }
+                        $avgCoefficient = $sumItems != 0 ? round($sumCoefficient / $sumItems,2) : 0;
+
+                        $finalObj = new \stdClass();
+                        $finalObj->coefficient = $avgCoefficient;
+                        $finalObj->city_id = $city;
+                        $finalObj->user_id = $user_id;
+                        array_push($finalCoefficientArr, $finalObj);
+                    }
+
+                $user->info = $finalCoefficientArr;
+                }
+            }
 
             //Now we are counting scoring for user
-            $user->scoring = rand(0,1);
+//            $user->scoring = rand(0,1);
             array_push($userArr, $user);
         }
-
-        $clientRouteInfoRecords = ClientRouteInfo::select(
-            'client_route_info.id as id',
-            'confirmDate',
-            'confirmingUser',
-            'client.name',
-            'priority',
-            'client_route_info.date',
-            'confirmingUser'
-        )
-            ->join('client_route', 'client_route_info.client_route_id', '=', 'client_route.id')
-            ->join('client', 'client_route.client_id', '=', 'client.id')
-            ->OnlyActive()
-            ->where('date', '>', $limitDateFull)
-            ->where('confirmDate', '<>', null)
-            ->where('confirmingUser', '=', null)
-            ->orderBy('priority', 'desc')
-            ->orderBy('client_route_info.date')
-            ->get();
-//        dd($clientRouteInfoRecords);
 
         $dayCollect = new \stdClass(); //creating object with fields indicating 100 days. Inside each day object there is array of people who are available this date with theier statistics
         for($i = 0; $i < 100; $i++) {
@@ -150,33 +220,43 @@ class AutoScriptController extends Controller
             $dayCollect->$givenDate = $availableUserArr;
         }
 
-//        dd($clientRouteInfoRecords);
+        $clientRouteInfoRec = $clientRouteInfoRecords2->where('confirmingUser', '=', null)->where('confirmDate', '>', $limitDateFull)->get();
 
-        foreach($clientRouteInfoRecords as $singleShow) {
+        //assigning confirming perseon for each client route info row without this person.
+        foreach($clientRouteInfoRec as $singleShow) {
             $day = $singleShow->confirmDate;
+            $city_id = $singleShow->city_id;
             $bestConsultant = null;
             $i = 0;
             $actualGreatesScore = 0;
             foreach($dayCollect->$day as $singleConsultant) {
+
                 if($i == 0) {
                     $bestConsultant = $singleConsultant;
-                }
-                else {
-                    if($bestConsultant->scoring < $singleConsultant->scoring) {
-                        $bestConsultant = $singleConsultant;
+
+                    foreach($singleConsultant->info as $scoring) {
+                        if($city_id == $scoring->city_id) {
+                            $actualGreatesScore = $scoring->coefficient;
+                        }
                     }
                 }
-                $i++;
+                else {
+                    foreach($singleConsultant->info as $scoring) {
+                        if($city_id == $scoring->city_id) {
+                            if($actualGreatesScore < $scoring->coefficient) {
+                                $bestConsultant = $singleConsultant;
+                                $actualGreatesScore = $scoring->coefficient;
+                            }
+                        }
+                    }
 
+                }
+                $i++;
             }
+
             if($bestConsultant != null) {
-//                dd('1');
                 ClientRouteInfo::where('id', '=', $singleShow->id)->update(['confirmingUser' => $bestConsultant->user_id]);
             }
         }
-
-//        $j = '2018-09-09';
-
-//        dd($userArr[0]);
     }
 }

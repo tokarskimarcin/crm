@@ -424,6 +424,24 @@
                     return row;
                 }, "fnDrawCallback": function (settings) {
 
+                    if(localStorage.getItem('selectedClient')) {
+                        let clientToSelect = localStorage.getItem('selectedClient');
+                        console.log('clientToSelect: ', clientToSelect);
+                        let thisTable = document.querySelector('#table_client');
+                        let allTr = thisTable.querySelectorAll('tr');
+                        allTr.forEach(clientRow => {
+                            if(clientRow.matches(`#${clientToSelect}`)) {
+                                console.log('clientRow', clientRow);
+                                $(clientRow).addClass('check');
+                                $(clientRow).find('.client_check').prop('checked', true);
+                                clientId = $(clientRow).attr('id');
+                                writeCheckedClientInfo();
+
+                                localStorage.removeItem('selectedClient');
+                            }
+                        })
+                    }
+
                     //Zaznaczenie kolumny
                     $('#table_client tbody tr').on('click', function (e) {
                         if ($(this).hasClass('check')) {
@@ -2344,6 +2362,9 @@
                             return false;
                         }
                         let selectedClientId = clientId;
+
+                        localStorage.setItem('selectedClient', `${selectedClientId}`);
+
                         selectedClientId = selectedClientId.substr(9);
 
                         const clientInfo = {

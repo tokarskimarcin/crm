@@ -2793,7 +2793,7 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
             $dep_id = $request->selected_dep;
 
             $departments = Department_info::where('id_dep_type', '=', 2)->get();
-
+//dd($dep_id);
             $data = $this->getDepartmentsData($first_day, $last_day, $month, $year, $dep_id, $days_in_month);
 
             return view('reportpage.ReportDepartments')
