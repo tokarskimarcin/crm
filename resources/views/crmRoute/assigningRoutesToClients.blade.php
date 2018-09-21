@@ -977,17 +977,23 @@
                                 let responseOption = document.createElement('option');
                                 responseOption.value = response[i].id;
                                 responseOption.textContent = response[i].name;
+                                responseOption.setAttribute('data-toggle', 'tooltip');
+                                responseOption.setAttribute('data-placement', 'right');
+                                // responseOption.setAttribute('title', 'Hej Hej');
                                 if(response[i].max_month_exceeded == 1) {
                                     responseOption.setAttribute('data-max_hours', `0`);
-                                    responseOption.textContent = response[i].name + '[miesięczny limit przekroczony]';
+                                    responseOption.textContent = response[i].name + '  (M)';
+                                    responseOption.setAttribute('title', 'miesięczny limit przekroczony');
                                 }
                                 else if(response[i].block == 1) {
                                     if(response[i].exceeded == 0) {
-                                        responseOption.textContent = response[i].name + " [dostępne jeszcze " + response[i].used_hours + " godzin]";
+                                        responseOption.textContent = response[i].name + "  (D: " + response[i].used_hours + ')';
+                                        responseOption.setAttribute('title', "dostępne jeszcze " + response[i].used_hours + " godzin");
                                         responseOption.setAttribute('data-max_hours', `${response[i].used_hours}`); //needed for auto setting hours
                                     }
                                     else {
-                                        responseOption.textContent = response[i].name + " (KARENCJA do " + response[i].available_date + ") [przekroczono o " + response[i].used_hours + " godzin]";
+                                        responseOption.textContent = response[i].name + '  (K_' + response[i].used_hours + ': ' + response[i].available_date + ')';
+                                        responseOption.setAttribute('title', "KARENCJA od " + response[i].available_date_2 + " do " + response[i].available_date + ", przekroczono o " + response[i].used_hours + " godzin");
                                         responseOption.setAttribute('data-max_hours', '0'); //needed for auto setting hours
                                     }
                                 }
@@ -1156,19 +1162,24 @@
                 let cityOpt = document.createElement('option');
                 cityOpt.value = data.city_id;
                 cityOpt.textContent = data.city_name;
+                cityOpt.setAttribute('data-toggle', 'tooltip');
+                cityOpt.setAttribute('data-placement', 'right');
 
                 if(data.max_month_exceeded == 1) {
                     cityOpt.setAttribute('data-max_hours', `0`);
-                    cityOpt.textContent = data.city_name + '[miesięczny limit przekroczony]';
+                    cityOpt.textContent = data.city_name + '  (M)';
+                    cityOpt.setAttribute('title', 'miesięczny limit przekroczony');
                 }
                 else if(data.block == 1) {
                     if(data.exceeded == 0) {
                         cityOpt.setAttribute('data-max_hours', `${data.used_hours}`);
-                        cityOpt.textContent = data.city_name + ' [dostępne jeszcze ' + data.used_hours + ' godzin]';
+                        cityOpt.setAttribute('title', "dostępne jeszcze " + data.used_hours + " godzin");
+                        cityOpt.textContent = data.city_name + "  (D: " + data.used_hours + ')';
                     }
                     else {
                         cityOpt.setAttribute('data-max_hours', '0');
-                        cityOpt.textContent = data.city_name + '(KARENCJA do ' + data.available_date + ') [przekroczono o ' + data.used_hours + ' godzin]';
+                        cityOpt.setAttribute('title', "KARENCJA od " + data.available_date_2 + " do " + data.available_date + ", przekroczono o " + data.used_hours + " godzin");
+                        cityOpt.textContent = data.city_name + '  (K_' + data.used_hours + ': ' + data.available_date + ')'
 
                     }
                 }
