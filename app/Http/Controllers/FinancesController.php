@@ -9,9 +9,10 @@ use App\Department_info;
 use App\Department_types;
 use App\Departments;
 use App\DoublingQueryLogs;
+use App\EmployeeOfTheWeek;
+use App\EmployeeOfTheWeekRanking;
 use App\JankyPenatlyProc;
 use App\PaymentAgencyStory;
-use App\Pbx_report_extension;
 use App\PenaltyBonus;
 use App\RecruitmentStory;
 use App\ReportCampaign;
@@ -20,6 +21,7 @@ use App\SuccessorHistory;
 use App\SummaryPayment;
 use App\User;
 use App\UserEmploymentStatus;
+use App\UserTypes;
 use App\Utilities\Dates\MonthFourWeeksDivision;
 use App\Utilities\DataProcessing\ConfirmationStatistics;
 use App\Utilities\Dates\MonthIntoCompanyWeeksDivision;
@@ -37,6 +39,25 @@ use App\ActivityRecorder;
 
 class FinancesController extends Controller
 {
+    public $toSave = 0;
+
+    /**
+     * @return int
+     */
+    public function getToSave()
+    {
+        return $this->toSave;
+    }
+
+    /**
+     * @param int $toSave
+     */
+    public function setToSave($toSave)
+    {
+        $this->toSave = $toSave;
+    }
+
+
     public function viewPaymentGet()
     {
         $logged_user = Auth::user();
@@ -474,8 +495,8 @@ class FinancesController extends Controller
 
     }
 
-    private function provisionSystemForTrainers(&$user, $dividedMonth) {
-        $user->provision = 0;
+    private function provisionSystemForTrainers(&$user, $dividedMonth,&$arrayOfDepartmentStatistics = null) {
+        $weekNumber = 0;
         if($user->department_type_id == 1){             //trener potwierdzeń
             $clientRouteInfo = ClientRouteInfo::select(
                 DB::raw('concat(users.first_name," ",users.last_name) as confirmingUserName'),
@@ -498,33 +519,115 @@ class FinancesController extends Controller
                 ->whereNotNull('confirmingUser')
                 ->whereNotNull('users.coach_id')
                 ->where('users.coach_id', $user->id)->get(); //client route info poszczególnych konsultantów wybranego trenera w miesiacu
-            $janky = collect();
-            foreach ($dividedMonth as $dateGroup){
-                $weekJanky = Pbx_report_extension::select(DB::raw('sum(all_bad_talks)*100/sum(all_checked_talks) as janky'))
-                    ->where('actual_coach_id','=',$user->id)
-                    ->whereBetween('report_date',[$dateGroup->firstDay,$dateGroup->lastDay])
-                    ->groupBy('actual_coach_id')
-                    ->first();
-                if($weekJanky !== null) {
-                    $weekJanky = (object)$weekJanky->toArray();
-                    $weekJanky->dateGroup = date('Y.m.d',strtotime($dateGroup->firstDay)). ' - ' . date('Y.m.d',strtotime($dateGroup->lastDay));
-                    $janky->push($weekJanky);
-                }
-            }
-            $departmentInfo = Department_info::find($user->department_info_id);
             $confirmationStatistics = ConfirmationStatistics::getConsultantsConfirmationStatisticsForMonth($clientRouteInfo, $dividedMonth, 'coach_id');
+
             foreach ($confirmationStatistics['sums'] as $confirmationStatisticsWeek){
-                if($janky->where('dateGroup',$confirmationStatisticsWeek->dateGroup)->first()->janky < $departmentInfo->commission_janky){
-                    $user->provision = $user->provision + ProvisionLevels::get($confirmationStatisticsWeek->successfulPct,'trainer',2);
-                    $user->provision = $user->provision + ProvisionLevels::get($confirmationStatisticsWeek->unsuccessfulBadlyPct,'trainer',1);
+                $user->bonus += ProvisionLevels::get('trainer', $confirmationStatisticsWeek->successfulPct,2);
+                $user->bonus += ProvisionLevels::get('trainer', $confirmationStatisticsWeek->unsuccessfulBadlyPct,1);
+                if($this->getToSave() == 1){
+                    $this->saveBonus($user->id,ProvisionLevels::get('trainer', $confirmationStatisticsWeek->successfulPct,2),$dividedMonth[$weekNumber]->lastDay,"Premia tygodniowa (".$dividedMonth[$weekNumber]->firstDay." -- ".$dividedMonth[0]->lastDay.") za osiągnięcie:  ".$confirmationStatisticsWeek->successfulPct."% pokazów zielonych.");
+                    $this->saveBonus($user->id,ProvisionLevels::get('trainer', $confirmationStatisticsWeek->unsuccessfulBadlyPct,1),$dividedMonth[$weekNumber]->lastDay,"Premia tygodniowa (".$dividedMonth[$weekNumber]->firstDay." -- ".$dividedMonth[0]->lastDay.") za osiągnięcie:  ".$confirmationStatisticsWeek->unsuccessfulBadlyPct."% czerwonych pokazów");
                 }
+                $weekNumber++;
             }
         }else if($user->department_type_id == 2){       //trener telemarketing
-
+            foreach ($arrayOfDepartmentStatistics as $item){
+                $commissionAvg = Department_info::find($user->department_info_id)->commission_avg;
+                $total_week_avg_proc = round((100*$item->total_week_avg)/$commissionAvg,2);
+                $user->bonus += ProvisionLevels::get('trainer', $item->janky_proc,3,$total_week_avg_proc, 'avg'); // Średnia
+                $user->bonus += ProvisionLevels::get('trainer', $item->janky_proc,3,$item->total_week_goal_proc, 'ammount'); // Cel zgód
+                if($this->getToSave() == 1){
+                    $this->saveBonus($user->id,ProvisionLevels::get('trainer', $item->janky_proc,3,$total_week_avg_proc, 'avg'),$dividedMonth[$weekNumber]->lastDay,"Premia tygodniowa (".$dividedMonth[$weekNumber]->firstDay." -- ".$dividedMonth[$weekNumber]->lastDay.") za osiągnięcie:  Średniej na projekcie");
+                    $this->saveBonus($user->id,ProvisionLevels::get('trainer', $item->janky_proc,3,$item->total_week_goal_proc, 'ammount'),$dividedMonth[$weekNumber]->lastDay,"Premia tygodniowa (".$dividedMonth[$weekNumber]->firstDay." -- ".$dividedMonth[$weekNumber]->lastDay.") za osiągnięcie: Celu na projekcie");
+                }
+                $weekNumber++;
+            }
         }
     }
 
-    private function provisionSystemForInstructors(&$user, $dividedMonth){
+
+    private function provisionSystemForManagers(&$user,$dividedMonth,$arrayOfDepartmentStatistics = null){
+        $weekNumber = 0;
+        $user->provision = 0;
+        if($user->department_type_id == 2){       //trener telemarketing
+            $allDepartments = Department_info::where(function ($querry) use ($user){
+               $querry->orwhere('menager_id',$user->id)
+                   ->orwhere('regionalManager_id',$user->id);
+            })->get();
+            $commissionAvg = 2.5;
+            for($i=0;$i<4;$i++){
+                $summaryScore[$i]['totalSuccess']       = 0;
+                $summaryScore[$i]['weekGoalSuccess']    = 0;
+                $summaryScore[$i]['weekRbh']            = 0;
+                $summaryScore[$i]['weekGoalRbh']        = 0;
+                $summaryScore[$i]['totalCheck']         = 0;
+                $summaryScore[$i]['totalBad']           = 0;
+            }
+            foreach ($allDepartments as $allDepartment){
+                    $commissionAvg = $allDepartment->commission_avg;
+                    $departmentStatistics   = $arrayOfDepartmentStatistics[$allDepartment->id];
+                    for ($i = 0; $i <count($departmentStatistics);$i++){
+                        $summaryScore[$i]['totalSuccess']      += $departmentStatistics[$i]->total_week_success;
+                        $summaryScore[$i]['weekGoalSuccess']   += $departmentStatistics[$i]->total_week_goal;
+                        $summaryScore[$i]['weekRbh']           += $departmentStatistics[$i]->real_week_rbh;
+                        $summaryScore[$i]['weekGoalRbh']       += $departmentStatistics[$i]->week_target_rbh;
+                        $summaryScore[$i]['totalCheck']        += $departmentStatistics[$i]->total_week_check;
+                        $summaryScore[$i]['totalBad']          += $departmentStatistics[$i]->total_week_bad;
+                    }
+            }
+            foreach ($summaryScore as $item){
+                    $total_week_avg_proc    = $item['weekRbh']          != 0 ? round($item['totalSuccess']/$item['weekRbh'],2)                          : 0;
+                    $total_week_avg_proc    = $commissionAvg            != 0 ? round((100*$total_week_avg_proc)/$commissionAvg,2)                       : 0;
+                    $total_week_goal_proc   = $item['weekGoalSuccess']  != 0 ? round((100*$item['totalSuccess'])/$item['weekGoalSuccess'],2)            : 0;
+                    $total_week_rbh_proc    = $item['weekGoalRbh']      != 0 ? round((100*$item['weekRbh'])/$item['weekGoalRbh'],2)                     : 0;
+                    $janky_proc             = ($item['totalCheck']      != null && $item['totalCheck'] > 0) ? round(($item['totalBad'] / $item['totalCheck']) * 100, 2)  : 0 ;
+                    if($user->user_type_id == 17 ||  $user->user_type_id == 7){
+                        $user->bonus += ProvisionLevels::get('manager', $janky_proc,3,$total_week_avg_proc, 'avg',count($allDepartments)); // Średnia
+                        $user->bonus += ProvisionLevels::get('manager', $janky_proc,3,$total_week_goal_proc, 'ammount',count($allDepartments)); // Cel zgód
+                        if($this->getToSave() == 1){
+                            $this->saveBonus($user->id,ProvisionLevels::get('manager', $janky_proc,3,$total_week_avg_proc, 'avg',count($allDepartments)),$dividedMonth[$weekNumber]->lastDay,"Premia tygodniowa (".$dividedMonth[$weekNumber]->firstDay." -- ".$dividedMonth[$weekNumber]->lastDay.") za osiągnięcie:  Średniej na projekcie");
+                            $this->saveBonus($user->id,ProvisionLevels::get('manager', $janky_proc,3,$total_week_goal_proc, 'ammount',count($allDepartments)),$dividedMonth[$weekNumber]->lastDay,"Premia tygodniowa (".$dividedMonth[$weekNumber]->firstDay." -- ".$dividedMonth[$weekNumber]->lastDay.") za osiągnięcie: Celu na projekcie");
+                        }
+                    }else if($user->user_type_id == 21){
+                        $user->bonus += ProvisionLevels::get('managerInctructor', $janky_proc,3,$total_week_avg_proc, 'avg'); // Średnia
+                        $user->bonus += ProvisionLevels::get('managerInctructor', $janky_proc,3,$total_week_goal_proc, 'ammount'); // Cel zgód
+                        if($this->getToSave() == 1){
+                            $this->saveBonus($user->id,ProvisionLevels::get('managerInctructor', $janky_proc,3,$total_week_avg_proc, 'avg'),$dividedMonth[$weekNumber]->lastDay,"Premia tygodniowa (".$dividedMonth[$weekNumber]->firstDay." -- ".$dividedMonth[$weekNumber]->lastDay.") za osiągnięcie:  Średniej na projekcie");
+                            $this->saveBonus($user->id,ProvisionLevels::get('managerInctructor', $janky_proc,3,$total_week_goal_proc, 'ammount'),$dividedMonth[$weekNumber]->lastDay,"Premia tygodniowa (".$dividedMonth[$weekNumber]->firstDay." -- ".$dividedMonth[$weekNumber]->lastDay.") za osiągnięcie: Celu na projekcie");
+                        }
+                    }else if($user->user_type_id == 14){
+                        $user->bonus += ProvisionLevels::get('managerHR', $janky_proc,3,$total_week_rbh_proc, 'rbh'); // Średnia
+                        $user->bonus += ProvisionLevels::get('managerHR', $janky_proc,3,$total_week_goal_proc, 'ammount'); // Cel zgód
+                        if($this->getToSave() == 1){
+                            $this->saveBonus($user->id,ProvisionLevels::get('managerHR', $janky_proc,3,$total_week_rbh_proc, 'rbh'),$dividedMonth[$weekNumber]->lastDay,"Premia tygodniowa (".$dividedMonth[$weekNumber]->firstDay." -- ".$dividedMonth[$weekNumber]->lastDay.") za osiągnięcie:  RBH na projekcie");
+                            $this->saveBonus($user->id,ProvisionLevels::get('managerHR', $janky_proc,3,$total_week_goal_proc, 'ammount'),$dividedMonth[$weekNumber]->lastDay,"Premia tygodniowa (".$dividedMonth[$weekNumber]->firstDay." -- ".$dividedMonth[$weekNumber]->lastDay.") za osiągnięcie: Celu na projekcie");
+                        }
+                    }
+                $weekNumber++;
+            }
+        }
+    }
+
+    private function saveBonus($userID,$amount,$event_date,$comment){
+        if($amount > 0 ){
+            $penaltyBonusObj                = new PenaltyBonus();
+            $penaltyBonusObj->type          = 2;
+            $penaltyBonusObj->id_user       = $userID;
+            $penaltyBonusObj->amount        = $amount;
+            $penaltyBonusObj->comment       = $comment;
+            $penaltyBonusObj->id_manager    = Auth::user()->id;
+            $penaltyBonusObj->event_date    = $event_date;
+            try{
+                $penaltyBonusObj->save();
+            }catch (\Exception $exception){
+                return 0;
+            }
+        }
+
+    }
+
+    private function provisionSystemForInstructors(&$user, $dividedMonth,$arrayOfDepartmentStatistics = null){
+        $weekNumber = 0;
         $user->provision = 0;
         if($user->department_type_id == 1){             //szkoleniowiec potwierdzeń
             $clientRouteInfo = ClientRouteInfo::select(
@@ -547,99 +650,146 @@ class FinancesController extends Controller
                 ->where('di.id_dep_type',1)
                 ->whereNotNull('confirmingUser')
                 ->whereNotNull('users.coach_id')->get(); //client route info poszczególnych konsultantów w calym oddziale w miesiacu
-            $janky = collect();
-            foreach ($dividedMonth as $dateGroup){
-                $weekJanky = Pbx_report_extension::select(DB::raw('sum(all_bad_talks)*100/sum(all_checked_talks) as janky'))
-                    ->join('users as consultants','consultants.id','pbx_report_extension.user_id')
-                    ->whereNotNull('pbx_report_extension.user_id')
-                    ->whereBetween('report_date',[$dateGroup->firstDay,$dateGroup->lastDay])
-                    ->where('consultants.department_info_id',$user->department_info_id)
-                    ->first();
-                if($weekJanky !== null) {
-                    $weekJanky = (object)$weekJanky->toArray();
-                    $weekJanky->dateGroup = date('Y.m.d',strtotime($dateGroup->firstDay)). ' - ' . date('Y.m.d',strtotime($dateGroup->lastDay));
-                    $janky->push($weekJanky);
-                }
-            }
-            $departmentInfo = Department_info::find($user->department_info_id);
             $confirmationStatistics = ConfirmationStatistics::getConsultantsConfirmationStatisticsForMonth($clientRouteInfo, $dividedMonth);
             foreach ($confirmationStatistics['sums'] as $confirmationStatisticsWeek){
-                if($janky->where('dateGroup',$confirmationStatisticsWeek->dateGroup)->first()->janky < $departmentInfo->commission_janky) {
-                    $user->provision = $user->provision + ProvisionLevels::get($confirmationStatisticsWeek->successfulPct, 'instructor', 2);
-                    $user->provision = $user->provision + ProvisionLevels::get($confirmationStatisticsWeek->unsuccessfulBadlyPct, 'instructor', 1);
+                $user->bonus += ProvisionLevels::get('instructor', $confirmationStatisticsWeek->successfulPct,2);
+                $user->bonus += ProvisionLevels::get('instructor', $confirmationStatisticsWeek->unsuccessfulBadlyPct,1);
+                if($this->getToSave() == 1){
+                    $this->saveBonus($user->id,ProvisionLevels::get('instructor', $confirmationStatisticsWeek->successfulPct,2),$dividedMonth[$weekNumber]->lastDay,"Premia tygodniowa (".$dividedMonth[$weekNumber]->firstDay." -- ".$dividedMonth[$weekNumber]->lastDay.") za osiągnięcie:  ".$confirmationStatisticsWeek->successfulPct."% pokazów zielonych.");
+                    $this->saveBonus($user->id,ProvisionLevels::get('instructor', $confirmationStatisticsWeek->unsuccessfulBadlyPct,1),$dividedMonth[$weekNumber]->lastDay,"Premia tygodniowa (".$dividedMonth[$weekNumber]->firstDay." -- ".$dividedMonth[$weekNumber]->lastDay.") za osiągnięcie:  ".$confirmationStatisticsWeek->unsuccessfulBadlyPct."% czerwonych pokazów");
                 }
+                $weekNumber++;
             }
         }else if($user->department_type_id == 2){       //szkoleniowiec telemarketing
-
+            foreach ($arrayOfDepartmentStatistics as $item){
+                $commissionAvg = Department_info::find($user->department_info_id)->commission_avg;
+                $total_week_avg_proc = round((100*$item->total_week_avg)/$commissionAvg,2);
+                $user->bonus +=  ProvisionLevels::get('instructor', $item->janky_proc,3,$total_week_avg_proc, 'avg'); // Średnia
+                $user->bonus += ProvisionLevels::get('instructor', $item->janky_proc,3,$item->total_week_goal_proc, 'ammount'); // Cel zgód
+                if($this->getToSave() == 1){
+                    $this->saveBonus($user->id,ProvisionLevels::get('instructor', $item->janky_proc,3,$total_week_avg_proc, 'avg'),$dividedMonth[$weekNumber]->lastDay,"Premia tygodniowa (".$dividedMonth[$weekNumber]->firstDay." -- ".$dividedMonth[$weekNumber]->lastDay.") za osiągnięcie:  Średniej na projekcie");
+                    $this->saveBonus($user->id,ProvisionLevels::get('instructor', $item->janky_proc,3,$item->total_week_goal_proc, 'ammount'),$dividedMonth[$weekNumber]->lastDay,"Premia tygodniowa (".$dividedMonth[$weekNumber]->firstDay." -- ".$dividedMonth[$weekNumber]->lastDay.") za osiągnięcie: Celu na projekcie");
+                }
+                $weekNumber++;
+            }
         }
     }
 
-    private function provisionSystemForHR(&$user, $month, $year) {
+    private function getDepartmentStatistics($weekDateArr, $month, $year, $departments) {
+        $firstDayOfMonth = new DateTime(date('Y-m-d', strtotime($year . '-' . $month . '-01')));
+        $lastDayOfMonth = new DateTime(date('Y-m-d', strtotime($year .'-'. $month . '-' . date('t', strtotime($year . '-' . $month . '-01')))));
 
-        $weekDateArr = MonthIntoCompanyWeeksDivision::get($month,$year); // array of objects with week info
+        $days_in_month = date('t', strtotime(date('Y').'-'. $month));
 
+        $today = date('Y-m-d'); //today
+        $todayDateTime = new DateTime($today);
+        $data = $this->getMultiDepartmentData($firstDayOfMonth->format('Y-m-d'), $lastDayOfMonth->format('Y-m-d'), $month, $year,$departments, $days_in_month);
+        $rbhTargetArr = [];
+        foreach($weekDateArr as $weekInfo) {
+            $total_week_proc_janky = 0;
+            $total_week_goal = 0;
+            $total_week_success = 0;
+            $real_week_RBH = 0;
+            $week_target_RBH = 0;
+            $total_week_checked = 0;
+            $total_week_bad = 0;
+            $hour_reports = $data['hour_reports'];
+            $dep_info = $data['dep_info'];
+            $firstDayOfMonthDateTime = new DateTime($weekInfo->firstDay);
+            $lastDayOfWeekDateTime = new DateTime($weekInfo->lastDay);
+            $dateDiff = $lastDayOfWeekDateTime->diff($firstDayOfMonthDateTime)->days;
+            for($i = 0; $i <= intval($dateDiff); $i++) {
+                $depAim = 0;
+                $date = date('Y-m-d', strtotime($weekInfo->firstDay . ' + ' . $i .' days'));
+                $report = $hour_reports->where('report_date', '=', $date)->where('success', '>', 0)->first();
+                $add_default_zero = ($report != null) ? false : true ;
+                if ($add_default_zero == false) {
+                    $day_number = date('N', strtotime($report->report_date));
+                    $real_RBH = round(($report->time_sum_real_RBH / 3600) ,2);
+                    if(date('w', strtotime($date)) == 6) { //saturday
+                        $depAim = $dep_info[0]['dep_aim_week'];
+                    }
+                    else { //other than saturday
+                        $depAim = $dep_info[0]['dep_aim'];
+                    }
+                    $goal = ($day_number < 6) ? $dep_info[0]['dep_aim'] : $dep_info[0]['dep_aim_week'];
+                    $total_week_goal += $goal;
+                    $total_week_success += $report->success;
+
+                    $commisionAvg = $dep_info[0]['commission_avg'];
+                    $targetRBH =$commisionAvg != 0 ? round($depAim / $commisionAvg, 2) : 0; //cel rbh
+                    $week_target_RBH += $targetRBH;
+                    $real_week_RBH += $real_RBH;
+                    $total_week_checked += $report->count_all_check;
+                    $total_week_bad += $report->count_bad_check;
+                }
+            }
+            $total_week_proc_janky = ($total_week_checked != null && $total_week_checked > 0) ? round(($total_week_bad / $total_week_checked) * 100, 2) : 0 ;
+            $total_week_goal_proc = ($total_week_goal != null && $total_week_goal > 0) ? round(($total_week_success / $total_week_goal) * 100, 2) : 0 ;
+            $tatal_week_avg = ($total_week_success <=0 || $real_week_RBH <=0)  ? 0: round($total_week_success/$real_week_RBH,2);
+
+            $obj = new \stdClass();
+            $obj->total_week_check = $total_week_checked;
+            $obj->total_week_bad   = $total_week_bad;
+            $obj->total_week_success = $total_week_success;
+            $obj->total_week_avg = $tatal_week_avg;
+            $obj->week_target_rbh = round($week_target_RBH);
+            $obj->real_week_rbh = $real_week_RBH;
+            $obj->total_week_goal = $total_week_goal;
+            $obj->janky_proc = $total_week_proc_janky;
+            $obj->target_rbh_percentage = round($week_target_RBH) != 0 ? 100 * $real_week_RBH / round($week_target_RBH) : 0;
+            $obj->total_week_goal_proc = $total_week_goal_proc;
+            array_push($rbhTargetArr, $obj);
+        }
+
+        return $rbhTargetArr;
+    }
+
+    private function provisionSystemForHR(&$user, $month, $year,$arrayOfDepartmentStatistics = null) {
+        $weekNumber = 0;
+        $weekDateArr = MonthFourWeeksDivision::get($year,$month); // array of objects with week info
         if($user->dep_type_id == 1) { //hr from confirming
             //*****Generating info how much account was added per week
             $infoArr = [];
+            $totalProv = 0;
             foreach($weekDateArr as $weekInfo) {
                 $data = RecruitmentStory::getReportNewAccountData($weekInfo->firstDay,$weekInfo->lastDay); //info about new accounts in teambox
 
                 foreach($data as $item) {
                     if($item->id == $user->id) {
+                        $provision = ProvisionLevels::get('HR',$item->add_user, 1,1);
+                        if($this->getToSave() == 1){
+                            $this->saveBonus($user->id,ProvisionLevels::get('HR',$item->add_user, 1,1),$weekDateArr[$weekNumber]->lastDay,"Premia tygodniowa (".$weekDateArr[$weekNumber]->firstDay." -- ".$weekDateArr[$weekNumber]->lastDay.") za zatrudnienie: ".$item->add_user ." osób");
+                        }
                         $obj = new \stdClass();
-                        $obj->week = $weekInfo->weekNumber;
-                        $obj->provision = ProvisionLevels::get($item->add_user, 'HR', 1);
+                        $obj->provision = $provision;
                         array_push($infoArr, $obj);
+                        $totalProv += $provision;
                     }
                 }
-
+                $weekNumber++;
             }
             $user->provisions = $infoArr;
+            $user->bonus = $totalProv;
+            //*****End of generating info how much account was added per week
         }
         else if($user->dep_type_id == 2) { //hr from telemarketing
-            $firstDayOfMonth = new DateTime(date('Y-m-d', strtotime($year . '-' . $month . '-01')));
-            $lastDayOfMonth = new DateTime(date('Y-m-d', strtotime($year .'-'. $month . '-' . date('t', strtotime($year . '-' . $month . '-01')))));
-
-            $days_in_month = date('t', strtotime(date('Y').'-'. $month));
-
-            $departments = Department_info::where('id_dep_type', '=', 2)->get();
-
-            $infoArr = [];
-            $today = date('Y-m-d'); //today
-            $todayDateTime = new DateTime($today);
             $provisions = [];
             $totalProvision = 0;
-            $data = $this->getMultiDepartmentData($firstDayOfMonth->format('Y-m-d'), $lastDayOfMonth->format('Y-m-d'), $month, $year,$user->department_info_id, $days_in_month);
-            $weekGoalsRBH = [];
-//            dd($dividedMonth);
-            foreach($weekDateArr as $weekInfo) {
-                $total_week_goal_RBH = 0;
-                $hour_reports = $data['hour_reports'];
-                $dep_info = $data['dep_info'];
-                $firstDayOfMonthDateTime = new DateTime($weekInfo->firstDay);
-                $lastDayOfWeekDateTime = new DateTime($weekInfo->lastDay);
-                $dateDiff = $lastDayOfWeekDateTime->diff($firstDayOfMonthDateTime)->days;
-                for($i = 0; $i <= intval($dateDiff); $i++) {
-                    $date = date('Y-m-d', strtotime($weekInfo->firstDay . ' + ' . $i .' days'));
-                    $report = $hour_reports->where('report_date', '=', $date)->where('success', '>', 0)->first();
-                    $add_default_zero = ($report != null) ? false : true ;
-                    if ($add_default_zero == false) {
-                        $day_number = date('N', strtotime($report->report_date));
-
-                        $goal = ($day_number < 6) ? $dep_info['dep_aim'] : $dep_info['dep_aim_week'];
-                        $working_hours_goal = ($dep_info['commission_avg'] > 0) ? $goal / $dep_info['commission_avg'] : 0 ;
-                        $total_week_goal_RBH += $working_hours_goal;
-                    }
+            foreach ($arrayOfDepartmentStatistics as $target) {
+                $provTarget = ProvisionLevels::get('HR', $target->janky_proc, $target->total_week_goal_proc, 2, 'ammount');
+                $prov = ProvisionLevels::get('HR', $target->janky_proc, $target->target_rbh_percentage,2, 1);
+                if($this->getToSave() == 1){
+                    $this->saveBonus($user->id,ProvisionLevels::get('HR', $target->janky_proc, $target->total_week_goal_proc, 2, 'ammount'),$weekDateArr[$weekNumber]->lastDay,"Premia tygodniowa (".$weekDateArr[$weekNumber]->firstDay." -- ".$weekDateArr[$weekNumber]->lastDay.") za osiągnięcie: Celu projektu");
+                    $this->saveBonus($user->id,ProvisionLevels::get('HR', $target->janky_proc, $target->target_rbh_percentage,2, 1),$weekDateArr[$weekNumber]->lastDay,"Premia tygodniowa (".$weekDateArr[$weekNumber]->firstDay." -- ".$weekDateArr[$weekNumber]->lastDay.") za zatrudnienie: wymaganego RBH na projekcie");
                 }
-                array_push($weekGoalsRBH, $total_week_goal_RBH);
+                $sumProv = $prov + $provTarget;
+                array_push($provisions, $sumProv);
+                $totalProvision += $sumProv;
+                $weekNumber++;
             }
-//            dd($user);
-            dd($weekGoalsRBH);
-
-
+            $user->bonus = $totalProvision;
         }
-
-        //*****End of generating info how much account was added per week
 
         //*****Generating info with audits score
 //        $departmentAudits = Audit::where('date_audit', 'like', $year . '-' . $month . '%')
@@ -668,7 +818,8 @@ class FinancesController extends Controller
         //*****End of generating info with audits score
     }
 
-    private function provisionSystemForCoordinators(&$user, $dividedMonth, $month, $year) {
+
+    private function provisionSystemForCoordinators(&$user, $month, $year) {
         $weekDateArr = MonthFourWeeksDivision::get($year, $month); //month divided on 4 weeks
         $firstDayOfMonth = new DateTime(date('Y-m-d', strtotime($year . '-' . $month . '-01')));
         $lastDayOfMonth = new DateTime(date('Y-m-d', strtotime($year .'-'. $month . '-' . date('t', strtotime($year . '-' . $month . '-01')))));
@@ -721,28 +872,63 @@ class FinancesController extends Controller
             }
             $total_week_goal_proc = ($total_week_goal != null && $total_week_goal > 0) ? round(($total_week_success / $total_week_goal) * 100, 2) : 0 ;
             $provision = 0;
-            if($user->id == 6) { //coordinators menager
-                $provision = ProvisionLevels::get($databasePercentageUsage, 'coordinator leader', $total_week_goal_proc);
+            if($user->user_type_id == 22) { //coordinators menager
+                $provision = ProvisionLevels::get('coordinator leader', $databasePercentageUsage, $total_week_goal_proc);
+                if($this->getToSave() == 1){
+                    $this->saveBonus($user->id,ProvisionLevels::get('coordinator leader', $databasePercentageUsage, $total_week_goal_proc),$weekInfo->lastDay,"Premia tygodniowa(".$weekInfo->firstDay." -- ".$weekInfo->lastDay.") za osiągnięcie celu");
+                }
             }
-            else {
-                $provision = ProvisionLevels::get($databasePercentageUsage, 'koordynator', $total_week_goal_proc, $daysInPosition);
+            else if($user->user_type_id == 8) {
+                $provision = ProvisionLevels::get('koordynator', $databasePercentageUsage, $total_week_goal_proc, $daysInPosition);
+                if($this->getToSave() == 1){
+                    $this->saveBonus($user->id,ProvisionLevels::get('koordynator', $databasePercentageUsage, $total_week_goal_proc, $daysInPosition),$weekInfo->lastDay,"Premia tygodniowa(".$weekInfo->firstDay." -- ".$weekInfo->lastDay.") za osiągnięcie celu");
+                }
             }
-
             array_push($goals, $total_week_goal_proc);
             array_push($provisions, $provision);
             $totalProvision+= $provision;
         }
-        $user->totalProvision = $totalProvision;
+        $user->bonus = $totalProvision;
         $user->provisions = $provisions;
     }
 
     public function viewPaymentCadrePost(Request $request)
     {
+        $this->setToSave($request->toSave);
+        //Zapisanie infromacji o zaakceptowaniu wypłat
+        $savePayment = 1;
+        $payment_saved = AcceptedPayment::
+        where('department_info_id',13)
+            ->where('cadrePayment',1)
+            ->where('payment_month','like', $request->search_money_month.'%')
+            ->get();
+        if($this->getToSave() == 1){
+            if($payment_saved->isEmpty()){
+                 $savePayment = 1;
+                 $newAcceptedPaymentObj                         = new AcceptedPayment ();
+                 $newAcceptedPaymentObj->cadre_id               = 1364;
+                 $newAcceptedPaymentObj->payment_month          = $request->search_money_month.'-01';
+                 $newAcceptedPaymentObj->department_info_id     = 13;
+                 $newAcceptedPaymentObj->cadrePayment           = 1;
+                 $newAcceptedPaymentObj->save();
+            }else{
+                $savePayment = 0;
+            }
+            $payment_saved = collect('123');
+        }else if($this->getToSave() == 0  && !$payment_saved->isEmpty()){
+            $savePayment = 0;
+            $payment_saved = collect('123');
+        }else if($this->getToSave() == 0  && $payment_saved->isEmpty()){
+            $savePayment = 0;
+            $payment_saved = collect();
+        }
 
-        $date_to_post = $request->search_money_month;
-        $date = $request->search_money_month.'%';
-        $year = substr($date, 0, 4);
-        $month = substr($date, 5, 2);
+        $payment_saved = collect('123'); //Do Usunięcia
+
+        $date_to_post   = $request->search_money_month;
+        $date           = $request->search_money_month.'%';
+        $year           = substr($date, 0, 4);
+        $month          = substr($date, 5, 2);
 
         $dividedMonth = $this->monthPerRealWeekDivision($month, $year);
         $agencies = Agencies::all();
@@ -784,21 +970,32 @@ class FinancesController extends Controller
             ->groupBy('users.id')
             ->orderBy('users.last_name')->get();
 
-        foreach($salary as $user) {
-            if($user->user_type_id == 4) {
-                //$this->provisionSystemForTrainers($user,  MonthFourWeeksDivision::get($year, $month));
-            }
-            else if($user->user_type_id == 5) {
-//                $this->provisionSystemForHR($user, $month, $year);
-            }
-            else if($user->user_type_id == 19) {
-//                $this->provisionSystemForInstructors($user,  MonthFourWeeksDivision::get($year, $month));
-            }
-            else if($user->user_type_id == 8 || $user->id == 6) { //koordynator + menager of coordinators
-//                $this->provisionSystemForCoordinators($user, MonthPerWeekDivision::get($month, $year), $month, $year);
-            }
-        }
-//        dd($salary->where('id', '=', 6));
+        $allDepartments = Department_info::all();
+        $arrayOfDepartmentStatistics = [];
+        $dividedMonthForDepartmentStatistics = MonthFourWeeksDivision::get($year, $month);
+
+//        if($savePayment == 1){
+//            foreach ($allDepartments as $item){
+//                $arrayOfDepartmentStatistics[$item->id] =  $this->getDepartmentStatistics($dividedMonthForDepartmentStatistics, substr($dividedMonthForDepartmentStatistics[0]->firstDay,5,2), substr($dividedMonthForDepartmentStatistics[0]->firstDay,0,4), [$item->id]);
+//            }
+//            foreach($salary as $user) {
+//                if($user->user_type_id == 4) {
+//                    $this->provisionSystemForTrainers($user,  MonthFourWeeksDivision::get($year, $month),$arrayOfDepartmentStatistics[$user->department_info_id]);
+//                }
+//                else if($user->user_type_id == 5) {
+//                    $this->provisionSystemForHR($user, $month, $year,$arrayOfDepartmentStatistics[$user->department_info_id]);
+//                }
+//                else if($user->user_type_id == 19) {
+//                    $this->provisionSystemForInstructors($user,  MonthFourWeeksDivision::get($year, $month),$arrayOfDepartmentStatistics[$user->department_info_id]);
+//                }
+//                else if($user->user_type_id == 8 || $user->user_type_id == 22) { //koordynator + menager of coordinators
+//                    $this->provisionSystemForCoordinators($user, $month, $year);
+//                }
+//                else if($user->user_type_id == 17 ||  $user->user_type_id == 7 || $user->user_type_id == 14 || $user->user_type_id == 21) { // Kierownik + Kierownik Regionaly + kierownik HR + Kierownik Szkoleniowcow
+//                    $this->provisionSystemForManagers($user,MonthFourWeeksDivision::get($year, $month),$arrayOfDepartmentStatistics);
+//                }
+//            }
+//        }
 
         $freeDaysData = $this->getFreeDays($dividedMonth); //[id_user, freeDays]
 //        dd($freeDaysData);
@@ -952,11 +1149,14 @@ class FinancesController extends Controller
             ->join('department_type','department_type.id','department_info.id_dep_type')
             ->get();
 
+
+
         return view('finances.viewPaymentCadre')
             ->with('month',$date_to_post)
             ->with('salary',$salary->groupby('agency_id'))
             ->with('agencies',$agencies)
-            ->with('departments',$departments);
+            ->with('departments',$departments)
+            ->with('payment_saved',$payment_saved);
     }
 
     public function viewPaymentPOST(Request $request)
@@ -1308,7 +1508,7 @@ class FinancesController extends Controller
                         $provisionSum = 0;
                         $badCampaigns = 0;
                         foreach($showRecordsOfGivenUser as $show) {
-                            $provision = ProvisionLevels::get($show->frequency, 'consultant', '1');
+                            $provision = ProvisionLevels::get('consultant', $show->frequency, '1');
                             array_push($weekScoreArr, $provision);
                             if($provision < 0) {
                                 $badCampaigns++;
@@ -1316,7 +1516,7 @@ class FinancesController extends Controller
                             $provisionSum += $provision;
                             $globalProvisionSum += $provision;
                         }
-                        $badCampaignsProvision = ProvisionLevels::get($badCampaigns, 'consultant', '2');
+                        $badCampaignsProvision = ProvisionLevels::get('consultant', $badCampaigns, '2');
                         $obj = new \stdClass();
                         $obj->weekNumber = $week->weekNumber;
                         $obj->provisions = $weekScoreArr;
@@ -1520,5 +1720,183 @@ class FinancesController extends Controller
         }
     }
 
+    public function viewEmployeeOfTheWeekGet(){
+        $userTypes = UserTypes::whereIn('id',[1,2,9,3])->get();
+        $departments_info = Department_info::with('departments')->with('department_type');
+        $accessToAllDepartments = UserTypes::find(Auth::user()->user_type_id)->all_departments;;
+        if($accessToAllDepartments != 1){
+            $departments_info->where('id', Auth::user()->department_info_id);
+        }else{
+            $departments_info->where('id_dep_type',1);
+        }
 
+        return view('finances.employeeOfTheWeek.viewEmployeeOfTheWeek')
+            ->with('type', 1)
+            ->with('accessToAllDepartments',$accessToAllDepartments)
+            ->with('userTypes', $userTypes->where('id',1))
+            ->with('departments_info', $departments_info->get());
+    }
+
+    public function viewEmployeeOfTheWeekCadreGet(){
+        $userTypes = UserTypes::whereNotIn('id',[1,2,9,3])->get();
+        $departments_info = Department_info::with('departments')->with('department_type');
+        $accessToAllDepartments = UserTypes::find(Auth::user()->user_type_id)->all_departments;;
+        if($accessToAllDepartments != 1){
+            $departments_info->where('id', Auth::user()->department_info_id);
+        }else{
+            $departments_info->where('id_dep_type',1);
+        }
+        return view('finances.employeeOfTheWeek.viewEmployeeOfTheWeek')
+            ->with('type', 2)
+            ->with('accessToAllDepartments',$accessToAllDepartments)
+            ->with('userTypes', $userTypes->where('id',4))
+            ->with('departments_info', $departments_info->get());
+    }
+
+    public function employeeOfTheWeekSubViewAjax( Request $request){
+        if($request->ajax()){
+            $selectedMonth = $request->selectedMonth;
+            $departmentInfoId = $request->departmentInfoId;
+            $userTypeId = $request->userTypeId;
+            $departmentInfo = Department_info::find($departmentInfoId);
+            $year = date('Y',strtotime($selectedMonth));
+            $month = date('m',strtotime($selectedMonth));
+            $dividedMonth = MonthFourWeeksDivision::get($year, $month);
+            if($userTypeId == 4 && $departmentInfo->id_dep_type == 1){          //confirmation trainers
+                $employeesOfTheWeek = $this->getEmployeesOfTheWeek($userTypeId, $departmentInfoId, $dividedMonth, 1);
+                $this->updateConfirmationRanking($employeesOfTheWeek->where('accepted',0), $dividedMonth, $departmentInfoId, [200], 'coach_id');
+
+                $employeesOfTheWeekRankings = EmployeeOfTheWeekRanking::whereIn('employee_of_the_week_id',$employeesOfTheWeek->pluck('id')->toArray())->with('user')->get();
+                return view('finances.employeeOfTheWeek.subViewEmployeeOfTheWeekConfirmation')
+                    ->with('employeesOfTheWeek',$employeesOfTheWeek->sortBy('first_day_week'))
+                    ->with('employeesOfTheWeekRankings',$employeesOfTheWeekRankings)
+                    ->with('criterionHeader', '% zielonych (lb. pokazów)');
+            }else if($userTypeId == 1 && $departmentInfo->id_dep_type == 1){        //confirmation consultants
+                $employeesOfTheWeek = $this->getEmployeesOfTheWeek($userTypeId, $departmentInfoId, $dividedMonth, 2);
+                $this->updateConfirmationRanking($employeesOfTheWeek->where('accepted',0), $dividedMonth, $departmentInfoId, [100,50], 'confirmingUser');
+
+                $employeesOfTheWeekRankings = EmployeeOfTheWeekRanking::whereIn('employee_of_the_week_id',$employeesOfTheWeek->pluck('id')->toArray())->with('user')->get();
+                return view('finances.employeeOfTheWeek.subViewEmployeeOfTheWeekConfirmation')
+                    ->with('employeesOfTheWeek',$employeesOfTheWeek->sortBy('first_day_week'))
+                    ->with('employeesOfTheWeekRankings',$employeesOfTheWeekRankings)
+                    ->with('criterionHeader', '% zielonych (lb. pokazów)');
+            }else{
+                return 'noView';
+            }
+        }else{
+            return view('errors.404');
+        }
+    }
+
+    private function getEmployeesOfTheWeek($userTypeId, $departmentInfoId, $dividedMonth, $bonusCount){
+        $employeesOfTheWeek = EmployeeOfTheWeek::where('user_type_id', $userTypeId)
+            ->where('department_info_id', $departmentInfoId)
+            ->where('first_day_week','>=',$dividedMonth[0]->firstDay)
+            ->where('last_day_week','<=',$dividedMonth[count($dividedMonth) - 1]->lastDay)
+            ->with('department_info')
+            ->get();
+        foreach($dividedMonth as $week){
+            $employeeOfTheWeek = $employeesOfTheWeek->where('first_day_week',$week->firstDay)->where('last_day_week',$week->lastDay);
+            if(count($employeeOfTheWeek) == 0){
+                $employeeOfTheWeek = new EmployeeOfTheWeek();
+                $employeeOfTheWeek->user_type_id = $userTypeId;
+                $employeeOfTheWeek->department_info_id = $departmentInfoId;
+                $employeeOfTheWeek->first_day_week = $week->firstDay;
+                $employeeOfTheWeek->last_day_week = $week->lastDay;
+                $employeeOfTheWeek->employees_with_bonus = $bonusCount;
+                $employeeOfTheWeek->save();
+                $employeesOfTheWeek->push($employeeOfTheWeek);
+            }
+        }
+        return $employeesOfTheWeek;
+    }
+    private function updateConfirmationRanking($employeesOfTheWeek, $dividedMonth, $departmentInfoId, $bonusArr, $secondGroup){
+        EmployeeOfTheWeekRanking::whereIn('employee_of_the_week_id',$employeesOfTheWeek->pluck('id')->toArray())->delete();
+        $clientRouteInfo = $this->getConfirmationConsultantsRoutesInformation($departmentInfoId, $dividedMonth);
+        $confirmationStatistics = ConfirmationStatistics::getConsultantsConfirmationStatisticsForMonth($clientRouteInfo, $dividedMonth, $secondGroup)['sums'];
+
+        foreach ($confirmationStatistics as $confirmationStatisticWeek){
+            foreach ($employeesOfTheWeek as $employeeOfTheWeek){
+                if($confirmationStatisticWeek->firstDay == $employeeOfTheWeek->first_day_week && $confirmationStatisticWeek->lastDay == $employeeOfTheWeek->last_day_week){
+                    $rankingPositionCounter = 0;
+                    foreach ($confirmationStatisticWeek->secondGrouping->sortByDesc('successfulPct') as $trainerSum){
+                        $employeeOfTheWeekRanking = new EmployeeOfTheWeekRanking();
+                        $employeeOfTheWeekRanking->employee_of_the_week_id = $employeeOfTheWeek->id;
+                        $employeeOfTheWeekRanking->user_id = $trainerSum->secondGroup;
+                        $employeeOfTheWeekRanking->bonus = array_key_exists($rankingPositionCounter, $bonusArr) ? $bonusArr[$rankingPositionCounter] : 0;
+                        $rankingPositionCounter = $rankingPositionCounter+1;
+                        $employeeOfTheWeekRanking->ranking_position = $rankingPositionCounter;
+                        $employeeOfTheWeekRanking->criterion = $trainerSum->successfulPct.'% ('.$trainerSum->shows.')';
+                        $employeeOfTheWeekRanking->save();
+                    }
+                }
+            }
+        }
+    }
+    private function getConfirmationConsultantsRoutesInformation($departmentInfoId, $dividedMonth) {
+        return ClientRouteInfo::select(
+            DB::raw('concat(users.first_name," ",users.last_name) as confirmingUserName'),
+            DB::raw('concat(trainer.first_name," ",trainer.last_name) as confirmingUserTrainerName'),
+            'confirmingUser',
+            'confirmDate',
+            'frequency',
+            'pairs',
+            'actual_success',
+            'users.department_info_id',
+            'users.coach_id'
+        )
+            ->join('users','confirmingUser', '=', 'users.id')
+            ->join('department_info as di', 'users.department_info_id','=','di.id')
+            ->join('users as trainer','users.coach_id','=','trainer.id')
+            ->where('confirmDate', '>=', $dividedMonth[0]->firstDay)
+            ->where('confirmDate', '<=', $dividedMonth[count($dividedMonth)-1]->lastDay)
+            ->where('users.department_info_id', $departmentInfoId)
+            ->where('di.id_dep_type',1)
+            ->whereNotNull('confirmingUser')
+            ->whereNotNull('users.coach_id')->get();
+    }
+
+    public function acceptBonusEmployeeOfTheWeekAjax(Request $request){
+        if($request->ajax()){
+            $employeeOfTheWeekId = $request->employeeOfTheWeekId;
+            $bonusInfo = $request->bonusInfo;
+
+            EmployeeOfTheWeek::where('id',$employeeOfTheWeekId)->update(['accepted' => 1, 'accepted_by_user_id' => Auth::user()->id]);
+            if(is_array($bonusInfo) and count($bonusInfo)>0){
+                $employeeOfTheWeek = EmployeeOfTheWeek::where('id',$employeeOfTheWeekId)->first();
+
+                $userType = UserTypes::where('id',$employeeOfTheWeek->user_type_id)->first();
+
+                EmployeeOfTheWeekRanking::where('employee_of_the_week_id',$employeeOfTheWeekId)->update(['bonus' => 0]);
+                $employeesOfTheWeekRanking = EmployeeOfTheWeekRanking::where('employee_of_the_week_id',$employeeOfTheWeekId)->get();
+                foreach ($bonusInfo as $employeeBonus){
+                    $employeeOfTheWeekRankingWithBonus = $employeesOfTheWeekRanking->where('user_id', $employeeBonus['userId'])->first();
+                    $employeeOfTheWeekRankingToSwap = $employeesOfTheWeekRanking->where('ranking_position', $employeeBonus['bonusPosition'])->first();
+
+                    $employeeOfTheWeekRankingToSwap->ranking_position = $employeeOfTheWeekRankingWithBonus->ranking_position;
+                    $employeeOfTheWeekRankingToSwap->save();
+
+                    $employeeOfTheWeekRankingWithBonus->ranking_position = $employeeBonus['bonusPosition'];
+                    $employeeOfTheWeekRankingWithBonus->bonus = abs($employeeBonus['bonus']);
+                    $employeeOfTheWeekRankingWithBonus->save();
+
+                    $penaltyBonus = new PenaltyBonus();
+                    $penaltyBonus->type = 2;
+                    $penaltyBonus->id_user = $employeeBonus['userId'];
+                    $penaltyBonus->amount = abs($employeeBonus['bonus']);
+                    $penaltyBonus->comment = $userType->name.
+                        ' tygodnia: '.
+                        date('Y.m.d',strtotime($employeeOfTheWeek->first_day_week)).
+                        ' - '.
+                        date('Y.m.d',strtotime($employeeOfTheWeek->last_day_week)).
+                        ' Miejsce '.$employeeBonus['bonusPosition'].'#';
+                    $penaltyBonus->id_manager = Auth::user()->id;
+                    $penaltyBonus->event_date = $employeeOfTheWeek->last_day_week;
+                    $penaltyBonus->save();
+                }
+            }
+            return 'success';
+        }
+        return 'fail';
+    }
 }

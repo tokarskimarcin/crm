@@ -20,4 +20,8 @@ class UserTypes extends Model
     public function users() {
         return $this->hasMany('App\User', 'user_type_id');
     }
+
+    public function employee_of_the_week() {
+        return $this->hasMany('App\EmployeeOfTheWeek', 'user_type_id');
+    }
 }

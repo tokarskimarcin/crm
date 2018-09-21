@@ -14,13 +14,13 @@ class ProvisionLevels
     /**
      * //This method return premium money amount in case of frequency amount
      * @param $level - float number sometimes it is percent sometimes it is value, depends of type or subtype
-     * @param $type - name of role
+     * @param $occupation - name of role
      * @param null $subtype - different variations of provisions for some type, defined as integer.
      * @return int - value of provision
      */
-    public static function get($level, $type, $subtype = 1, $subsubtype = null) {
+    public static function get($occupation, $level, $subtype = 1, $subsubtype = null, $subsubsubtype = null, $subsubsubsubtype = null) {
         $provision = 0;
-        switch($type) {
+        switch($occupation) {
             case 'consultant': {
                 switch($subtype) {
                     case '1': { //case of number of people who show up after invitation.
@@ -84,7 +84,129 @@ class ProvisionLevels
                         return $provision;
                         break;
                     }
+                    case '3':{ // Telemarketing
+                        if($level < 5) {
+                            switch($subsubsubtype) {
+                                case 'avg': {
+                                    if($subsubtype >= 100) { //target avg in %
+                                        $provision = 150;
+                                    }
+                                    else {
+                                        $provision = 0;
+                                    }
+                                    break;
+                                }
+                                case 'ammount': {
+                                    if($subsubtype >= 100) { //target ammount in %
+                                        $provision = 150;
+                                    }
+                                    else {
+                                        $provision = 0;
+                                    }
+                                    break;
+                                }
+                            }
+                        }else {
+                            $provision = 0;
+                        }
+                        return $provision;
+                        break;
+                    }
                 }
+                break;
+            }
+            case 'manager': {
+                if($level < 5) {
+                    switch($subsubsubtype) {
+                        case 'avg': {
+                            if($subsubtype >= 100) { //target avg in %
+                                if($subsubsubsubtype == 1)
+                                    $provision = 225;
+                                else if($subsubsubsubtype == 2)
+                                    $provision = 300;
+                                else if($subsubsubsubtype >= 3)
+                                    $provision = 450;
+                            }
+                            else {
+                                $provision = 0;
+                            }
+                            break;
+                        }
+                        case 'ammount': {
+                            if($subsubtype >= 100) { //target ammount in %
+                                if($subsubsubsubtype == 1)
+                                    $provision = 225;
+                                else if($subsubsubsubtype == 2)
+                                    $provision = 300;
+                                else if($subsubsubsubtype >= 3)
+                                    $provision = 450;
+                            }
+                            else {
+                                $provision = 0;
+                            }
+                            break;
+                        }
+                    }
+                }else {
+                    $provision = 0;
+                }
+                return $provision;
+                break;
+            }
+            case 'managerInctructor' : {
+                if($level < 5) {
+                    switch($subsubsubtype) {
+                        case 'avg': {
+                            if($subsubtype >= 100) { //target avg in %
+                                    $provision = 300;
+                            }
+                            else {
+                                $provision = 0;
+                            }
+                            break;
+                        }
+                        case 'ammount': {
+                            if($subsubtype >= 100) { //target ammount in %
+                                    $provision = 300;
+                            }
+                            else {
+                                $provision = 0;
+                            }
+                            break;
+                        }
+                    }
+                }else {
+                    $provision = 0;
+                }
+                return $provision;
+                break;
+            }
+            case 'managerHR' : {
+                if($level < 5) {
+                    switch($subsubsubtype) {
+                        case 'rbh': {
+                            if($subsubtype >= 100) { //target avg in %
+                                $provision = 300;
+                            }
+                            else {
+                                $provision = 0;
+                            }
+                            break;
+                        }
+                        case 'ammount': {
+                            if($subsubtype >= 100) { //target ammount in %
+                                $provision = 300;
+                            }
+                            else {
+                                $provision = 0;
+                            }
+                            break;
+                        }
+                    }
+                }else {
+                    $provision = 0;
+                }
+                return $provision;
                 break;
             }
             case 'HR': {
@@ -94,19 +216,35 @@ class ProvisionLevels
                             $provision = 450;
                         } else if($level >= 10){
                             $provision = 300;
-                        } else{
+                        } else if($level >= 5){
                             $provision = 150;
+                        }else {
+                            $provision = 0;
                         }
                         return $provision;
                         break;
                     }
                     case 2: { //telemarketing
                         if($level < 5) { //janki
-                            if($subtype > 100) { //target rbh, target ammout
-                                $provision = 150;
-                            }
-                            else {
-                                $provision = 0;
+                            switch($subsubsubtype) {
+                                case 'rbh': {
+                                    if($subtype >= 100) { //target rbh
+                                        $provision = 150;
+                                    }
+                                    else {
+                                        $provision = 0;
+                                    }
+                                    break;
+                                }
+                                case 'ammount': {
+                                    if($subtype >= 100) { //target ammount
+                                        $provision = 150;
+                                    }
+                                    else {
+                                        $provision = 0;
+                                    }
+                                    break;
+                                }
                             }
                         }
                         else {
@@ -145,13 +283,41 @@ class ProvisionLevels
                         return $provision;
                         break;
                     }
+                    case '3':{ // Telemarketing
+                        if($level < 5) {
+                            switch($subsubsubtype) {
+                                case 'avg': {
+                                    if($subsubtype >= 100) { //target avg in %
+                                        $provision = 150;
+                                    }
+                                    else {
+                                        $provision = 0;
+                                    }
+                                    break;
+                                }
+                                case 'ammount': {
+                                    if($subsubtype >= 100) { //target ammount in %
+                                        $provision = 150;
+                                    }
+                                    else {
+                                        $provision = 0;
+                                    }
+                                    break;
+                                }
+                            }
+                        }else {
+                            $provision = 0;
+                        }
+                        return $provision;
+                        break;
+                    }
                 }
                 break;
             }
             case 'koordynator': {
                 if($level < 10) { //database use
-                    if($subtype > 100) { //target > 100%
-                        if($subsubtype > 90) { //working more than 90 days as coordinator
+                    if($subtype >= 100) { //target > 100%
+                        if($subsubtype >= 90) { //working more than 90 days as coordinator
                             $provision = 500;
                         }
                         else { //working less or equal than 90 days as coordinator
@@ -170,7 +336,7 @@ class ProvisionLevels
             }
             case 'coordinator leader': {
                 if($level < 10) { //database use
-                    if($subtype > 100) { //target > 100%
+                    if($subtype >= 100) { //target > 100%
                         $provision = 1000;
                     }
                     else {

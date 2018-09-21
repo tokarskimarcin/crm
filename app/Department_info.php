@@ -43,6 +43,10 @@ class Department_info extends Model
         return $this->hasMany('App\Notifications', 'department_info_id');
     }
 
+    public function employee_of_the_week() {
+        return $this->hasMany('App\EmployeeOfTheWeek', 'department_info_id');
+    }
+
     public function multiple_departments(){
         return $this->hasMany('App\MultipleDepartments', 'department_info_id');
     }
