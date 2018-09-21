@@ -920,6 +920,8 @@ class FinancesController extends Controller
             $payment_saved = collect();
         }
 
+        $payment_saved = collect('123'); //Do Usunięcia
+
         $date_to_post   = $request->search_money_month;
         $date           = $request->search_money_month.'%';
         $year           = substr($date, 0, 4);
@@ -969,28 +971,28 @@ class FinancesController extends Controller
         $arrayOfDepartmentStatistics = [];
         $dividedMonthForDepartmentStatistics = MonthFourWeeksDivision::get($year, $month);
 
-        if($savePayment == 1){
-            foreach ($allDepartments as $item){
-                $arrayOfDepartmentStatistics[$item->id] =  $this->getDepartmentStatistics($dividedMonthForDepartmentStatistics, substr($dividedMonthForDepartmentStatistics[0]->firstDay,5,2), substr($dividedMonthForDepartmentStatistics[0]->firstDay,0,4), [$item->id]);
-            }
-            foreach($salary as $user) {
-                if($user->user_type_id == 4) {
-                    $this->provisionSystemForTrainers($user,  MonthFourWeeksDivision::get($year, $month),$arrayOfDepartmentStatistics[$user->department_info_id]);
-                }
-                else if($user->user_type_id == 5) {
-                    $this->provisionSystemForHR($user, $month, $year,$arrayOfDepartmentStatistics[$user->department_info_id]);
-                }
-                else if($user->user_type_id == 19) {
-                    $this->provisionSystemForInstructors($user,  MonthFourWeeksDivision::get($year, $month),$arrayOfDepartmentStatistics[$user->department_info_id]);
-                }
-                else if($user->user_type_id == 8 || $user->user_type_id == 22) { //koordynator + menager of coordinators
-                    $this->provisionSystemForCoordinators($user, $month, $year);
-                }
-                else if($user->user_type_id == 17 ||  $user->user_type_id == 7 || $user->user_type_id == 14 || $user->user_type_id == 21) { // Kierownik + Kierownik Regionaly + kierownik HR + Kierownik Szkoleniowcow
-                    $this->provisionSystemForManagers($user,MonthFourWeeksDivision::get($year, $month),$arrayOfDepartmentStatistics);
-                }
-            }
-        }
+//        if($savePayment == 1){
+//            foreach ($allDepartments as $item){
+//                $arrayOfDepartmentStatistics[$item->id] =  $this->getDepartmentStatistics($dividedMonthForDepartmentStatistics, substr($dividedMonthForDepartmentStatistics[0]->firstDay,5,2), substr($dividedMonthForDepartmentStatistics[0]->firstDay,0,4), [$item->id]);
+//            }
+//            foreach($salary as $user) {
+//                if($user->user_type_id == 4) {
+//                    $this->provisionSystemForTrainers($user,  MonthFourWeeksDivision::get($year, $month),$arrayOfDepartmentStatistics[$user->department_info_id]);
+//                }
+//                else if($user->user_type_id == 5) {
+//                    $this->provisionSystemForHR($user, $month, $year,$arrayOfDepartmentStatistics[$user->department_info_id]);
+//                }
+//                else if($user->user_type_id == 19) {
+//                    $this->provisionSystemForInstructors($user,  MonthFourWeeksDivision::get($year, $month),$arrayOfDepartmentStatistics[$user->department_info_id]);
+//                }
+//                else if($user->user_type_id == 8 || $user->user_type_id == 22) { //koordynator + menager of coordinators
+//                    $this->provisionSystemForCoordinators($user, $month, $year);
+//                }
+//                else if($user->user_type_id == 17 ||  $user->user_type_id == 7 || $user->user_type_id == 14 || $user->user_type_id == 21) { // Kierownik + Kierownik Regionaly + kierownik HR + Kierownik Szkoleniowcow
+//                    $this->provisionSystemForManagers($user,MonthFourWeeksDivision::get($year, $month),$arrayOfDepartmentStatistics);
+//                }
+//            }
+//        }
 
         $freeDaysData = $this->getFreeDays($dividedMonth); //[id_user, freeDays]
 //        dd($freeDaysData);
