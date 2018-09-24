@@ -119,7 +119,6 @@
                     }
                 },"orderable": false, "searchable": false },
                 {"data": function (data, type, dataToSet) {
-                    console.log(data);
                         if(show_action == 1) {
                             if(userType == 15) {
                                 if(data.department_type_name == 'Potwierdzanie') {
