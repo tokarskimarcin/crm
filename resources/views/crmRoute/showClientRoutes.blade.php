@@ -831,24 +831,6 @@
                             }
                         }, "name": "weekOfYear"
                     },
-                    // {
-                    //     "data": function(data, type, dataToSet) {
-                    //     let weekNr = null;
-                    //     console.log(data);
-                    //     if(data.dateOfLastShow) {
-                    //         if(data.weekOfYear != data.dateOfLastShow) {
-                    //             weekNr = data.weekOfYear + '/' + data.dateOfLastShow;
-                    //         }
-                    //         else {
-                    //             weekNr = data.wekkOfYear;
-                    //         }
-                    //     }
-                    //     else {
-                    //         weekNr = data.weekOfYear;
-                    //     }
-                    //     return weekNr;
-                    //     }, "name": "weekOfYear"
-                    // },
                     {"data": function (data, type, dataToSet) {
                         let finalName = 'brak';
                             if (data.type == '1') {
