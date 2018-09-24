@@ -195,7 +195,6 @@
                table.columns.adjust().draw();
            });
 
-
            /**
             * This function shows notification.
             */
