@@ -17,6 +17,7 @@
     <style>
         textarea.baseDivision {
             resize: none;
+
         }
 
         .colorRow {
@@ -193,7 +194,6 @@
            $('#menu-toggle').change(()=>{
                table.columns.adjust().draw();
            });
-
 
            /**
             * This function shows notification.
