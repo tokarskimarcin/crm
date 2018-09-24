@@ -759,7 +759,7 @@ class FinancesController extends Controller
                     if($item->id == $user->id) {
                         $provision = ProvisionLevels::get('HR',$item->add_user, 1,1);
                         if($this->getToSave() == 1){
-                            $this->saveBonus($user->id,ProvisionLevels::get('HR',$item->add_user, 1,1),$weekDateArr[$weekNumber]->lastDay,"Premia tygodniowa (".$weekDateArr[$weekNumber]->firstDay." -- ".$weekDateArr[$weekNumber]->lastDay.") za zatrudnienie: ".$item->add_user ." osób");
+                            $this->saveBonus($user->id,$provision,$weekDateArr[$weekNumber]->lastDay,"Premia tygodniowa (".$weekDateArr[$weekNumber]->firstDay." -- ".$weekDateArr[$weekNumber]->lastDay.") za zatrudnienie: ".$item->add_user ." osób");
                         }
                         $obj = new \stdClass();
                         $obj->provision = $provision;
@@ -770,7 +770,7 @@ class FinancesController extends Controller
                 $weekNumber++;
             }
             $user->provisions = $infoArr;
-            $user->bonus = $totalProv;
+            $user->bonus += $totalProv;
             //*****End of generating info how much account was added per week
         }
         else if($user->dep_type_id == 2) { //hr from telemarketing
@@ -778,17 +778,17 @@ class FinancesController extends Controller
             $totalProvision = 0;
             foreach ($arrayOfDepartmentStatistics as $target) {
                 $provTarget = ProvisionLevels::get('HR', $target->janky_proc, $target->total_week_goal_proc, 2, 'ammount');
-                $prov = ProvisionLevels::get('HR', $target->janky_proc, $target->target_rbh_percentage,2, 1);
+                $prov = ProvisionLevels::get('HR', $target->janky_proc, $target->target_rbh_percentage,2, 'rbh');
                 if($this->getToSave() == 1){
-                    $this->saveBonus($user->id,ProvisionLevels::get('HR', $target->janky_proc, $target->total_week_goal_proc, 2, 'ammount'),$weekDateArr[$weekNumber]->lastDay,"Premia tygodniowa (".$weekDateArr[$weekNumber]->firstDay." -- ".$weekDateArr[$weekNumber]->lastDay.") za osiągnięcie: Celu projektu");
-                    $this->saveBonus($user->id,ProvisionLevels::get('HR', $target->janky_proc, $target->target_rbh_percentage,2, 1),$weekDateArr[$weekNumber]->lastDay,"Premia tygodniowa (".$weekDateArr[$weekNumber]->firstDay." -- ".$weekDateArr[$weekNumber]->lastDay.") za zatrudnienie: wymaganego RBH na projekcie");
+                    $this->saveBonus($user->id,$provTarget,$weekDateArr[$weekNumber]->lastDay,"Premia tygodniowa (".$weekDateArr[$weekNumber]->firstDay." -- ".$weekDateArr[$weekNumber]->lastDay.") za osiągnięcie: Celu projektu");
+                    $this->saveBonus($user->id,$prov,$weekDateArr[$weekNumber]->lastDay,"Premia tygodniowa (".$weekDateArr[$weekNumber]->firstDay." -- ".$weekDateArr[$weekNumber]->lastDay.") za zatrudnienie: wymaganego RBH na projekcie");
                 }
                 $sumProv = $prov + $provTarget;
                 array_push($provisions, $sumProv);
                 $totalProvision += $sumProv;
                 $weekNumber++;
             }
-            $user->bonus = $totalProvision;
+            $user->bonus += $totalProvision;
         }
 
         //*****Generating info with audits score
@@ -875,21 +875,20 @@ class FinancesController extends Controller
             if($user->user_type_id == 22) { //coordinators menager
                 $provision = ProvisionLevels::get('coordinator leader', $databasePercentageUsage, $total_week_goal_proc);
                 if($this->getToSave() == 1){
-                    $this->saveBonus($user->id,ProvisionLevels::get('coordinator leader', $databasePercentageUsage, $total_week_goal_proc),$weekInfo->lastDay,"Premia tygodniowa(".$weekInfo->firstDay." -- ".$weekInfo->lastDay.") za osiągnięcie celu");
+                    $this->saveBonus($user->id,$provision,$weekInfo->lastDay,"Premia tygodniowa(".$weekInfo->firstDay." -- ".$weekInfo->lastDay.") za osiągnięcie celu");
                 }
             }
             else if($user->user_type_id == 8) {
                 $provision = ProvisionLevels::get('koordynator', $databasePercentageUsage, $total_week_goal_proc, $daysInPosition);
                 if($this->getToSave() == 1){
-                    $this->saveBonus($user->id,ProvisionLevels::get('koordynator', $databasePercentageUsage, $total_week_goal_proc, $daysInPosition),$weekInfo->lastDay,"Premia tygodniowa(".$weekInfo->firstDay." -- ".$weekInfo->lastDay.") za osiągnięcie celu");
+                    $this->saveBonus($user->id,$provision,$weekInfo->lastDay,"Premia tygodniowa(".$weekInfo->firstDay." -- ".$weekInfo->lastDay.") za osiągnięcie celu");
                 }
             }
             array_push($goals, $total_week_goal_proc);
             array_push($provisions, $provision);
             $totalProvision+= $provision;
         }
-        $user->bonus = $totalProvision;
-        $user->provisions = $provisions;
+        $user->bonus += $totalProvision;
     }
 
     public function viewPaymentCadrePost(Request $request)
@@ -1478,7 +1477,7 @@ class FinancesController extends Controller
             id_dep_type')->get();
 
 
-        $weekDayArr = MonthIntoCompanyWeeksDivision::get($realMonth,$realYear);
+        $weekDayArr = MonthFourWeeksDivision::get($realYear, $realMonth);
 
             $result = $r->map(function($item) use($month, $clientRouteInfoRecords, $weekDayArr) {
                 $user_empl_status = UserEmploymentStatus::
@@ -1516,15 +1515,13 @@ class FinancesController extends Controller
                         }
                         $badCampaignsProvision = ProvisionLevels::get('consultant', $badCampaigns, '2');
                         $obj = new \stdClass();
-                        $obj->weekNumber = $week->weekNumber;
                         $obj->provisions = $weekScoreArr;
                         $obj->provisionSum =  $provisionSum;
                         $obj->badCampaignsProvision = $badCampaignsProvision; // 50zl for each week without bad campaigns
                         $globalProvisionSum += $badCampaignsProvision;
                         array_push($campaignScoresArr, $obj);
                     }
-                    $item->provision = $campaignScoresArr;
-                    $item->totalProvision = $globalProvisionSum < 0 ? 0 : $globalProvisionSum;
+//                    $item->premia += $globalProvisionSum < 0 ? 0 : $globalProvisionSum;
                 }
                 $user_empl_status = $user_empl_status->where('user_id','=',$item->id);
                 if(count($user_empl_status) == 0 || count($user_empl_status) == 1) {
