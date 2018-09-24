@@ -333,6 +333,21 @@
 
                },
                "rowCallback": function( row, data, index ) {
+                   let frequencyCell = row.cells['9'];
+                   let frequencyInput = frequencyCell.firstChild;
+                   console.log(frequencyInput.value);
+                   if(frequencyInput.value != null && frequencyInput.value != '') {
+                       if(frequencyInput.value < 15) {
+                           frequencyCell.style.backgroundColor = 'red';
+                       }
+                       else if(frequencyInput.value >= 15 && frequencyInput.value < 19) {
+                           frequencyCell.style.backgroundColor = 'yellow';
+                       }
+                       else {
+                           frequencyCell.style.backgroundColor = 'green';
+                       }
+                   }
+
                    row.setAttribute('data-id', data.id); //clientRouteInfo Id
                    row.setAttribute('data-depid', data.depId); //department info Id
 

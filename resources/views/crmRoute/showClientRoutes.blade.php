@@ -8,6 +8,7 @@
 @extends('layouts.main')
 @section('style')
     <link rel="stylesheet" href="{{asset('/css/fixedHeader.dataTables.min.css')}}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
 @endsection
 @section('content')
 
@@ -190,7 +191,7 @@
                         <div class="col-md-2">
                             <div class="form-group" style="margin-top:1em;">
                                 <label for="weekNumber">Tydzień</label>
-                                <select id="weekNumber" class="form-control">
+                                <select id="weekNumber" class="form-control" multiple="multiple">
                                     <option value="0">Wszystkie</option>
                                 </select>
                             </div>
@@ -247,7 +248,7 @@
                                 <thead>
                                 <tr>
                                     <th>ID</th>
-                                    <th>Tydzień</th>
+                                    <th>Tydz.</th>
                                     <th>Klient</th>
                                     <th>Data I pokazu</th>
                                     <th>Trasa</th>
@@ -339,6 +340,7 @@
 
 @section('script')
     <script src="{{ asset('/js/dataTables.bootstrap.min.js')}}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
     <script>
 
         let idOfRow = null;
@@ -441,6 +443,15 @@
             const editButton = document.querySelector('#limitsButton');
             const clearButton = document.querySelector('#clearButton');
 
+
+            let APP = {
+                arrays: {
+                    selectedWeeks: ["0"]
+                }
+            }
+
+            $('#weekNumber').select2();
+
             (function init() {
                 @if(Session::has('adnotation'))
                     notify(`{{Session::get('adnotation') }}`, 'success');
@@ -528,6 +539,7 @@
             let typInput = $('#type');
             let stateInput = $('#campaignState');
             let parametersInput = $('#parameters');
+            let thisMonth = {{$thisMonth}};
 
             //This part is responsible for listing every week number into select
             const lastWeekOfYear ={{$lastWeek}};
@@ -537,6 +549,10 @@
                 optionElement.value = i;
                 optionElement.innerHTML = `${i}`;
                 weekSelect.appendChild(optionElement);
+                if(i == thisMonth) {
+                    $(weekSelect).val(i);
+                    APP.arrays.selectedWeeks = $(weekSelect).val();
+                }
             }
 
             //this part is responsible for redirect button
@@ -720,6 +736,7 @@
                 serverSide: true,
                 scrollY: '45vh',
                 scrollX: true,
+                order: [[1, 'asc'], [3, 'asc']],
                 fnDrawCallback: function (settings) {
                     objectArr = [];
                     $('#datatable2 select').change(changeStatus);
@@ -791,7 +808,7 @@
                         d.selectedClientIds =  selectedClientIds ;
                         d.showOnlyAssigned = showOnlyAssignedInput.prop('checked');
                         d.year = yearInput.val();
-                        d.selectedWeek = selectedWeekInput.val();
+                        d.selectedWeek = APP.arrays.selectedWeeks;
                         d.typ = typInput.val();
                         d.parameters = parametersInput.val();
                     },
@@ -807,19 +824,21 @@
                         }, "name": "id"
                     },
                     {"data": "weekOfYear"},
-                    {"data": "clientName"},
+                    {"data": function (data, type, dataToSet) {
+                        let finalName = 'brak';
+                            if (data.type == '1') {
+                                finalName = data.clientName + ' (B)';
+                            }
+                            else {
+                                finalName = data.clientName + ' (W)';
+                            }
+                            return finalName;
+                        },"name": "client_name"
+                    },
                     {"data": "date"},
                     {
                         "data": function (data, type, dataToSet) {
-                            /*console.log(data);*/
-                            let finalName = '';
-                            if (data.type == '1') {
-                                finalName = data.route_name + ' (B)';
-                            }
-                            else {
-                                finalName = data.route_name + ' (W)';
-                            }
-                            return finalName;
+                            return data.route_name;
                         }, "name": "route_name"
                     },
                    /* {
@@ -1411,6 +1430,7 @@
                             selectedWeekInput.append(basicOptionElement);
 
                             for (let i = 1; i <= weeksInYear + 1; i++) { //we are iterating to weeksInYear+1 because we are getting week number for 30.12, and in 31.12 can be monday(additional week)
+
                                 const optionElement = document.createElement('option');
                                 optionElement.value = i;
                                 optionElement.textContent = i;
@@ -1448,7 +1468,7 @@
                 sessionStorage.setItem('search', searchBox.value);
 
                 sessionStorage.setItem('year', yearInput.options[yearInput.selectedIndex].value);
-                sessionStorage.setItem('weekNumber', weekNumber.options[weekNumber.selectedIndex].value);
+                // sessionStorage.setItem('weekNumber', weekNumber.options[weekNumber.selectedIndex].value);
                 sessionStorage.setItem('type', type.options[type.selectedIndex].value);
                 sessionStorage.setItem('showAllClients', showAllClientsCheckbox.checked);
                 sessionStorage.setItem('showOnlyAssigned', showOnlyAssignedCheckbox.checked);
@@ -1569,6 +1589,33 @@
                 table2.ajax.reload();
             });
             stateInput.change(() => {
+                table2.ajax.reload();
+            });
+
+            /**
+             * This event listener change elements of array selecteWeeks while user selects another week
+             */
+            $('#weekNumber').on('select2:select', function() {
+                let weeksArr = $('#weekNumber').val();
+                if(weeksArr.length > 0) {
+                    APP.arrays.selectedWeeks = weeksArr;
+                }
+                else {
+                    APP.arrays.selectedWeeks = ["0"];
+                }
+                table2.ajax.reload();
+            });
+
+            /**
+             * This event listener change elements of array selectedWeeks while user unselects any week.
+             */
+            $("#weekNumber").on('select2:unselect', function() {
+                if($('#weekNumber').val().length != 0) {
+                    APP.arrays.selectedWeeks = $('#weekNumber').val();
+                }
+                else {
+                    APP.arrays.selectedWeeks = ['0'];
+                }
                 table2.ajax.reload();
             });
 
