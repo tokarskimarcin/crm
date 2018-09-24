@@ -3083,6 +3083,7 @@ class CrmRouteController extends Controller
         $allInfoCollect = collect();
         $allInfoCollect->offsetSet('aheadPlanningData', $aheadPlanningData);
         $allInfoCollect->offsetSet('departmentsInvitationsAveragesData',$departmentsInvitationsAverages);
+
         return $allInfoCollect;
     }
 
@@ -3184,6 +3185,8 @@ class CrmRouteController extends Controller
                 $weightAverageSaturday = $denominatorSat == 0 ? 0 : ($averageNumeratorSat+(($weightAverageWeek*$factors['saturday']/100) * $saturdayNullDivider))/ ($denominatorSat+$saturdayNullDivider);
                 $weightedVarianceSaturday = ($varianceNumeratorSat / $denominatorSat) - pow($weightAverageSaturday, 2);
                 $stdDevSaturday = ($saturdayDivider >= 2 && $saturdayDivider <= 75) ? sqrt($weightedVarianceSaturday) / $this->getCzynnikC4($saturdayDivider) : sqrt($weightedVarianceSaturday); // ważone odchylenie standardowe.
+
+
             }else{
                 $weightAverageSaturday = $weightAverageWeek*$factors['saturday']/100;
 
@@ -3199,6 +3202,12 @@ class CrmRouteController extends Controller
 
                 $weightedVarianceSaturday = ($varianceNumeratorSat / $denominatorSat) - pow($weightAverageSaturday, 2);
                 $stdDevSaturday = ($weekDivider >= 2 && $weekDivider <= 75) ? sqrt($weightedVarianceSaturday) / $this->getCzynnikC4($weekDivider) : sqrt($weightedVarianceSaturday); // ważone odchylenie standardowe.
+
+            }
+
+            // $weightedVarianceSaturday wychodzi ujemny w szczegolnym przypadku!!! przyjrzec sie
+            if(is_nan($stdDevSaturday)){
+                $stdDevSaturday = 0;
             }
             $coefficientOfVariationSaturday = $weightAverageSaturday != 0 ? (100 * $stdDevSaturday / $weightAverageSaturday) / 100 : 0; // procent średniej jakim jest odchylenie standardowe
 
