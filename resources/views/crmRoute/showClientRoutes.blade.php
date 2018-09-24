@@ -845,7 +845,12 @@
                     {"data": "date"},
                     {
                         "data": function (data, type, dataToSet) {
-                            return data.route_name;
+                            if(data.route_name_display) {
+                                return data.route_name_display;
+                            }
+                            else {
+                                return data.route_name;
+                            }
                         }, "name": "route_name"
                     },
                    /* {

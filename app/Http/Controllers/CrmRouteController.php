@@ -507,19 +507,24 @@ class CrmRouteController extends Controller
 
             $dateFlag = $client_route_info2[0]->date;
             $name = '';
+            $name2 = '';
             $allCities = Cities::select('id','name')->get();
 
             foreach($client_route_info2 as $show) {
                 if($show->date != $dateFlag) {
                     $name = substr($name, 0,strlen($name) - 3) .  ' | ';
+                    $name2 = substr($name2, 0,strlen($name2) - 3) .  ' | ';
                 }
 
                 $name .= $allCities->where('id', '=', $show->cityId)->first()->name . ' + ';
+                $name2 .= $allCities->where('id', '=', $show->cityId)->first()->name . ' ' . $show->hours . ' + ';
                 $dateFlag = $show->date;
             }
 
             $name = substr($name, 0,strlen($name) - 3); // removing last + in name
+            $name2 = substr($name2, 0,strlen($name2) - 3); // removing last + in name
             $clientRoute->route_name = $name;
+            $clientRoute->route_name_display = $name2;
             $clientRoute->save();
 
             new ActivityRecorder(array_merge(['T' => 'Edycja trasy'], $clientRoute->toArray()), 230, 2);
@@ -1186,6 +1191,7 @@ class CrmRouteController extends Controller
         $client_route_info = DB::table('client_route_info')
             ->select('route_name',
                 'client_route_info.id',
+                'route_name_display',
                 'weekOfYear',
                 'hour',
                 'hotel_id',
