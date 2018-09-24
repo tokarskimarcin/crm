@@ -1433,7 +1433,6 @@
                 const yearInput = document.querySelector('#year');
                 const weekNumber = document.querySelector('#weekNumber');
                 const type = document.querySelector('#type');
-                const showAllClientsCheckbox = document.querySelector('#showAllClients');
                 const showOnlyAssignedCheckbox = document.querySelector('#showOnlyAssigned');
                 const parameterSelect = document.querySelector('#parameters');
 
@@ -1447,7 +1446,6 @@
                 sessionStorage.setItem('year', yearInput.options[yearInput.selectedIndex].value);
                 sessionStorage.setItem('weekNumber', weekNumber.options[weekNumber.selectedIndex].value);
                 sessionStorage.setItem('type', type.options[type.selectedIndex].value);
-                sessionStorage.setItem('showAllClients', showAllClientsCheckbox.checked);
                 sessionStorage.setItem('showOnlyAssigned', showOnlyAssignedCheckbox.checked);
                 sessionStorage.setItem('parameters', parameterSelect.options[parameterSelect.selectedIndex].value);
             }
