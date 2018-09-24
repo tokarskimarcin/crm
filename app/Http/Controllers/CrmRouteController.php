@@ -1171,7 +1171,8 @@ class CrmRouteController extends Controller
         $client_route_info = DB::table('client_route_info')
             ->select('route_name',
                 'client_route_info.id',
-                'weekOfYear','hour',
+                'weekOfYear',
+                'hour',
                 'hotel_id',
                 'client.name as clientName',
                 'city.name as cityName',
@@ -1229,6 +1230,9 @@ class CrmRouteController extends Controller
                 }
                 return $a->date < $b->date ? -1 : 1;
             });
+
+            $clientRoutes = ClientRouteInfo::where('client_route_id', '=', $client_routes->first()->client_route_id)->OnlyActive()->orderBy('date')->get();
+            $dateOfLastShow = date('W', strtotime($clientRoutes->last()->date));
             //$client_routes = $this->getClientRouteGroupedByDateSortedByHour($client_route_id->first()->client_route_id, $client_route_info);
 
             //$route_name = $this->createRouteName($client_routes);
@@ -1238,6 +1242,7 @@ class CrmRouteController extends Controller
                     $hourOrHotelAssigned = false;
             }
             //dd($client_routes->first());
+            $client_routes->first()->dateOfLastShow = $dateOfLastShow;
             $client_routes->first()->hotelOrHour = $hourOrHotelAssigned;
             $client_routes->first()->hasAllLimits = $limitFlag ? 1 : 0;
             $client_routes->first()->hasAllDepartments = $departmentsFlag ? 1 : 0;
