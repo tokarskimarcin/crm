@@ -889,18 +889,29 @@ class CoachingController extends Controller
 
                 if($isHr){
                     $columnName = 'hr_id';
-                }else{
-                    $columnName = 'menager_id';
-                }
-                $manager = DB::table('department_info')
-                    ->select(DB::raw('users.id as manager_id,
+                    $manager = DB::table('department_info')
+                        ->select(DB::raw('users.id as manager_id,
                                 users.first_name,
                                 users.last_name,
                                 secondHR.first_name as secondHRFirstName,
                                 secondHR.last_name as secondHRLastName,
                                 secondHR.id as secondHRID,
                                 department_info.id as department_info_id'))
-                    ->leftjoin('users', 'users.id', $columnName);
+                        ->leftjoin('users', 'users.id', $columnName);
+                }else{
+                    $columnName = 'menager_id';
+                    $manager = DB::table('department_info')
+                        ->select(DB::raw('users.id as manager_id,
+                                users.first_name,
+                                users.last_name,
+                                null as secondHRFirstName,
+                                null as secondHRLastName,
+                                null as secondHRID,
+                                department_info.id as department_info_id'))
+                        ->leftjoin('users', 'users.id', $columnName);
+                }
+
+
                 if($isHr)
                     $manager = $manager->leftjoin('users as secondHR', 'secondHR.id', "department_info.hr_id_second");
                 $manager = $manager
