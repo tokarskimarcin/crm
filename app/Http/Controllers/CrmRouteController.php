@@ -266,14 +266,19 @@ class CrmRouteController extends Controller
             $name = '';
             $allCities = Cities::select('id','name')->get();
             $reverseNameArr = [];
+            $reverseNameArr2 = []; //names for table display
 
             foreach($allData as $show) {
                 $name = '';
                 $name .=  $allCities->where('id', '=', $show->city)->first()->name . ' + ';
+                $name2 = '';
+                $name2 .= $allCities->where('id', '=', $show->city)->first()->name . ' ' . $show->hours . ' + ';
                 if($show->date != $dateFlag) {
                     $name = substr($name, 0,strlen($name) - 3) . ' | ';
+                    $name2 = substr($name2, 0,strlen($name2) - 3) . ' | ';
                 }
                 array_push($reverseNameArr, $name);
+                array_push($reverseNameArr2, $name2);
                 $dateFlag = $show->date;
 
                 $clientRouteCampaigns = new ClientRouteCampaigns();
@@ -307,14 +312,24 @@ class CrmRouteController extends Controller
             }
 
             $fullName = '';
+            $fullName2 = '';
+
             $nameArr = array_reverse($reverseNameArr);
+            $nameArr2 = array_reverse($reverseNameArr2);
 
             foreach($nameArr as $key => $value) {
                 $fullName .= $value;
             }
 
+            foreach($nameArr2 as $key => $value) {
+                $fullName2 .= $value;
+            }
+
             $fullName = substr($fullName, 0,strlen($fullName) - 3); // removing last | in name
+            $fullName2 = substr($fullName2, 0,strlen($fullName2) - 3); // removing last | in name
+
             $clientRoute->route_name = $fullName;
+            $clientRoute->route_name_display = $fullName2;
             $clientRoute->save();
 
             new ActivityRecorder(array_merge(['T'=>'Dodanie trasy dla klienta'],$clientRoute->toArray()),209,1);
