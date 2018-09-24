@@ -14,4 +14,5 @@ class ClientRouteInfo extends Model
         $query->where('client_route_info.status', '=', 1);
     }
 
+
 }

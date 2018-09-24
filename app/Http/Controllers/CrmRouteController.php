@@ -3880,7 +3880,7 @@ class CrmRouteController extends Controller
                 $users->last_name = '';
                 $accepted_users->push($users);
             }
-            $this::sendMail($mail_type,$data,$accepted_users,$messageTitle,$storageURL);
+            $this::sendMail($mail_type,$data,$accepted_users,$messageTitle,$storageURL,Auth::user()->email_off);
             $campaing->invoice_status_id = 3;
             $campaing->invoice_send_date = date('Y-m-d G:i');
             $campaing->save();
@@ -3890,11 +3890,17 @@ class CrmRouteController extends Controller
         return 500;
     }
 
-    public function sendMail($mail_type,$data,$accepted_users,$mail_title,$storageURL){
+    public function sendMail($mail_type,$data,$accepted_users,$mail_title,$storageURL,$mailFrom){
         /* UWAGA !!! ODKOMENTOWANIE TEGO POWINNO ZACZĄC WYSYŁAĆ MAILE*/
-        Mail::send('mail.' . $mail_type, $data, function($message) use ($accepted_users, $mail_title,$storageURL)
+        Mail::send('mail.' . $mail_type, $data, function($message) use ($accepted_users, $mail_title,$storageURL,$mailFrom)
         {
-            $message->from('noreply.verona@gmail.com', 'Verona Consulting');
+            if($mailFrom == null)
+                $message->from('noreply.verona@gmail.com', 'Verona Consulting');
+            else{
+                $message->from($mailFrom, 'Verona Consulting');
+                $message->cc($mailFrom, 'Verona Consulting');
+            }
+            $message->cc('pawel.zielinski@veronaconsulting.pl', 'Paweł Zieliński');
             foreach($accepted_users as $user) {
                 if (filter_var($user->username, FILTER_VALIDATE_EMAIL)) {
                     $message->to($user->username, $user->first_name . ' ' . $user->last_name)->subject($mail_title);

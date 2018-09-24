@@ -142,8 +142,6 @@ Route::POST('/deleteTester', 'TestsController@deleteTester')->name('api.deleteTe
 
 Route::POST('/datatableAllTests', 'AdminController@datatableAllTests')->name('api.datatableAllTests');
 
-Route::POST('/paymentStory', 'FinancesController@paymentStory')->name('api.paymentStory');
-
 Route::POST('/saveCoaching', 'CoachingController@saveCoaching')->name('api.saveCoaching');
 Route::POST('/deleteCoaching', 'CoachingController@deleteCoaching')->name('api.deleteCoaching');
 Route::POST('/getCoaching', 'CoachingController@getCoaching')->name('api.getCoaching');
@@ -162,6 +160,15 @@ Route::POST('/getManagerId', 'CoachingController@getManagerId')->name('api.getMa
 
 
 /* TEST AJAX ROUTES STOP */
+
+/* FINANCES AJAX  */
+
+Route::POST('/paymentStory', 'FinancesController@paymentStory')->name('api.paymentStory');
+Route::post('/employeeOfTheWeekSubViewAjax','FinancesController@employeeOfTheWeekSubViewAjax')->name('api.employeeOfTheWeekSubViewAjax');
+Route::post('/acceptBonusEmployeeOfTheWeekAjax','FinancesController@acceptBonusEmployeeOfTheWeekAjax')->name('api.acceptBonusEmployeeOfTheWeekAjax');
+
+
+/* END FINANCES AJAX  */
 
 //** RECRUITMENT AJAX */
 
@@ -589,6 +596,9 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
 
     Route::get('/view_summary_payment', 'FinancesController@viewSummaryPaymentGet');
     Route::Post('/view_summary_payment', 'FinancesController@viewSummaryPaymentPOST');
+
+    Route::get('/viewEmployeeOfTheWeekCadreGet', 'FinancesController@viewEmployeeOfTheWeekCadreGet');
+    Route::get('/viewEmployeeOfTheWeekGet','FinancesController@viewEmployeeOfTheWeekGet');
 
     Route::get('/medicalPackagesRaportExtended', 'UsersController@medicalPackagesRaportExtendedGet');
     Route::post('/medicalPackagesRaportExtended', 'UsersController@medicalPackagesRaportExtendedPost');
