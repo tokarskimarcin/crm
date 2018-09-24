@@ -50,7 +50,7 @@ class CrmRouteController extends Controller
      * @return view route Templates
      */
     public function addNewRouteTemplateGet() {
-        $voivodes = Voivodes::all();
+        $voivodes = Voivodes::all()->sortBy('name');
 
         return view('crmRoute.routeTemplates')
             ->with('voivodes', $voivodes);
@@ -266,14 +266,19 @@ class CrmRouteController extends Controller
             $name = '';
             $allCities = Cities::select('id','name')->get();
             $reverseNameArr = [];
+            $reverseNameArr2 = []; //names for table display
 
             foreach($allData as $show) {
                 $name = '';
                 $name .=  $allCities->where('id', '=', $show->city)->first()->name . ' + ';
+                $name2 = '';
+                $name2 .= $allCities->where('id', '=', $show->city)->first()->name . ' ' . $show->hours . ' + ';
                 if($show->date != $dateFlag) {
                     $name = substr($name, 0,strlen($name) - 3) . ' | ';
+                    $name2 = substr($name2, 0,strlen($name2) - 3) . ' | ';
                 }
                 array_push($reverseNameArr, $name);
+                array_push($reverseNameArr2, $name2);
                 $dateFlag = $show->date;
 
                 $clientRouteCampaigns = new ClientRouteCampaigns();
@@ -307,14 +312,24 @@ class CrmRouteController extends Controller
             }
 
             $fullName = '';
+            $fullName2 = '';
+
             $nameArr = array_reverse($reverseNameArr);
+            $nameArr2 = array_reverse($reverseNameArr2);
 
             foreach($nameArr as $key => $value) {
                 $fullName .= $value;
             }
 
+            foreach($nameArr2 as $key => $value) {
+                $fullName2 .= $value;
+            }
+
             $fullName = substr($fullName, 0,strlen($fullName) - 3); // removing last | in name
+            $fullName2 = substr($fullName2, 0,strlen($fullName2) - 3); // removing last | in name
+
             $clientRoute->route_name = $fullName;
+            $clientRoute->route_name_display = $fullName2;
             $clientRoute->save();
 
             new ActivityRecorder(array_merge(['T'=>'Dodanie trasy dla klienta'],$clientRoute->toArray()),209,1);
@@ -331,7 +346,7 @@ class CrmRouteController extends Controller
         $departments = Department_info::all();
         $today = date('Y-m-d');
         $today .= '';
-        $voivodes = Voivodes::all();
+        $voivodes = Voivodes::all()->sortBy('name');
         $year = date('Y',strtotime("this year"));
         $numberOfLastYearsWeek = date('W',mktime(0, 0, 0, 12, 27, $year));
         return view('crmRoute.assigningRoutesToClients')
@@ -342,7 +357,7 @@ class CrmRouteController extends Controller
     }
 
     public function editAssignedRouteGet($id) {
-        $voivodes = Voivodes::all();
+        $voivodes = Voivodes::all()->sortBy('name');
         $client_route = ClientRoute::select(
             'client.name as name',
             'client.id as clientId',
@@ -571,7 +586,7 @@ class CrmRouteController extends Controller
 
             $city = Cities::where('id', '=', $cityId)->first();
             $voievodeshipRound = $this::findCityByDistanceWithoutGracePeriod($city, $limit);
-            $voievodeshipRound = $voievodeshipRound->groupBy('id');
+            $voievodeshipRound = $voievodeshipRound->groupBy('id')->sortBy('name');
             $voievodeshipDistinc = array();
             foreach ($voievodeshipRound as $item){
                 array_push($voievodeshipDistinc,$item->first());
@@ -606,12 +621,13 @@ class CrmRouteController extends Controller
                 ->get();
             $voievodeshipRound = $this::findCityByDistanceWithDistanceLimit($city, $currentDate, $clientRouteInfoAll, $limit);
 
-            $voievodeshipRound = $voievodeshipRound->groupBy('id');
+            $voievodeshipRound = $voievodeshipRound->groupBy('id')->sortBy('name');
             $voievodeshipDistinc = array();
             foreach ($voievodeshipRound as $item){
                 array_push($voievodeshipDistinc,$item->first());
             }
             $responseArray['voievodeInfo'] = $voievodeshipDistinc;
+
             $responseArray['cityInfo'] = $voievodeshipRound;
             return $responseArray;
         }
@@ -633,6 +649,7 @@ class CrmRouteController extends Controller
                 (SELECT count(*) from client_route_info e where e.city_id = cityAlias.`id` and e.date >= "'.$firstDayOfThisMonth.'"
                 and e.date <= "'.$lastDayOfThisMonth.'"  and e.status = 1) as numberOfRecords'))
                 ->join('voivodeship', 'voivodeship.id', 'cityAlias.voivodeship_id')
+                ->orderBy('voivodeship.name')
                 ->orderBy('cityAlias.name')
                 ->get();
         }else {
@@ -660,6 +677,7 @@ class CrmRouteController extends Controller
             ))
                 ->join('voivodeship', 'voivodeship.id', 'cityAlias.voivodeship_id')
                 ->having('distance', '<=', $limit)
+                ->orderBy('voivodeship.name')
                 ->orderBy('cityAlias.name')
                 ->get();
         }
@@ -768,6 +786,7 @@ class CrmRouteController extends Controller
         if($limit == 'infinity'){
             $voievodeshipRound = Cities::select(DB::raw('voivodeship.id as id,voivodeship.name,city.name as city_name,city.id as city_id, city.max_hour as max_hour'))
                 ->join('voivodeship', 'voivodeship.id', 'city.voivodeship_id')
+                ->orderBy('voivodeship.name')
                 ->orderBy('city.name')
                 ->get();
         }else {
@@ -787,6 +806,7 @@ class CrmRouteController extends Controller
            AS distance'))
                 ->join('voivodeship', 'voivodeship.id', 'city.voivodeship_id')
                 ->having('distance', '<=', $limit)
+                ->orderBy('voivodeship.name')
                 ->orderBy('city.name')
                 ->get();
         }
@@ -1105,10 +1125,12 @@ class CrmRouteController extends Controller
         ->whereIn('id_dep_type',[2]);
         $year = date('Y',strtotime("this year"));
         $numberOfThisYearsWeek = date('W',mktime(0, 0, 0, 12, 30, $year));
+        $thisMonth = date('W');
         return view('crmRoute.showClientRoutes')
             ->with('lastWeek', $numberOfThisYearsWeek)
             ->with('departments', $departments)
-            ->with('year', $year);
+            ->with('year', $year)
+            ->with('thisMonth', $thisMonth);
     }
 
     /**
@@ -1155,7 +1177,8 @@ class CrmRouteController extends Controller
         }
 
         $selectedWeek = $request->selectedWeek;
-        $selectedWeek = $selectedWeek == '0' ? '%' : $selectedWeek;
+
+//        $selectedWeek = $selectedWeek == '0' ? '%' : $selectedWeek;
 
         $typ = $request->typ;
         $typ = $typ == '0' ? '%' : $typ;
@@ -1163,7 +1186,8 @@ class CrmRouteController extends Controller
         $client_route_info = DB::table('client_route_info')
             ->select('route_name',
                 'client_route_info.id',
-                'weekOfYear','hour',
+                'weekOfYear',
+                'hour',
                 'hotel_id',
                 'client.name as clientName',
                 'city.name as cityName',
@@ -1180,12 +1204,17 @@ class CrmRouteController extends Controller
             //->whereIn('client_route.client_id', $selectedClientIds)
             ->where('client_route_info.status', '=', 1)
             ->where('date', 'like', $year . '%')
-            ->where('weekOfYear', 'like', $selectedWeek)
+//            ->where('weekOfYear', 'like', $selectedWeek)
             ->where('client_route.type', 'like', $typ);
 
         if($selectedClientIds !== null){
             $client_route_info->whereIn('client_route.client_id', $selectedClientIds);
         }
+
+        if($selectedWeek[0] != '0') {
+            $campaignsInfo = $client_route_info->whereIn('weekOfYear', $selectedWeek);
+        }
+
 
         $client_route_info =  $client_route_info->get();
 
@@ -1216,15 +1245,17 @@ class CrmRouteController extends Controller
                 }
                 return $a->date < $b->date ? -1 : 1;
             });
-            //$client_routes = $this->getClientRouteGroupedByDateSortedByHour($client_route_id->first()->client_route_id, $client_route_info);
 
-            //$route_name = $this->createRouteName($client_routes);
+            $clientRoutes = ClientRouteInfo::where('client_route_id', '=', $client_routes->first()->client_route_id)->OnlyActive()->orderBy('date')->get();
+            $dateOfLastShow = date('W', strtotime($clientRoutes->last()->date));
+
             $hourOrHotelAssigned = $client_routes->first()->hour == null || $client_routes->first()->hotel_id == null ? false : true;
             for($i = 1; $i < count($client_routes);$i++){
                 if($hourOrHotelAssigned && ($client_routes[$i]->hotel_id == null || $client_routes[$i]->hour == null) )
                     $hourOrHotelAssigned = false;
             }
-            //dd($client_routes->first());
+
+            $client_routes->first()->dateOfLastShow = $dateOfLastShow;
             $client_routes->first()->hotelOrHour = $hourOrHotelAssigned;
             $client_routes->first()->hasAllLimits = $limitFlag ? 1 : 0;
             $client_routes->first()->hasAllDepartments = $departmentsFlag ? 1 : 0;
@@ -3083,6 +3114,7 @@ class CrmRouteController extends Controller
         $allInfoCollect = collect();
         $allInfoCollect->offsetSet('aheadPlanningData', $aheadPlanningData);
         $allInfoCollect->offsetSet('departmentsInvitationsAveragesData',$departmentsInvitationsAverages);
+
         return $allInfoCollect;
     }
 
@@ -3184,6 +3216,8 @@ class CrmRouteController extends Controller
                 $weightAverageSaturday = $denominatorSat == 0 ? 0 : ($averageNumeratorSat+(($weightAverageWeek*$factors['saturday']/100) * $saturdayNullDivider))/ ($denominatorSat+$saturdayNullDivider);
                 $weightedVarianceSaturday = ($varianceNumeratorSat / $denominatorSat) - pow($weightAverageSaturday, 2);
                 $stdDevSaturday = ($saturdayDivider >= 2 && $saturdayDivider <= 75) ? sqrt($weightedVarianceSaturday) / $this->getCzynnikC4($saturdayDivider) : sqrt($weightedVarianceSaturday); // ważone odchylenie standardowe.
+
+
             }else{
                 $weightAverageSaturday = $weightAverageWeek*$factors['saturday']/100;
 
@@ -3199,6 +3233,12 @@ class CrmRouteController extends Controller
 
                 $weightedVarianceSaturday = ($varianceNumeratorSat / $denominatorSat) - pow($weightAverageSaturday, 2);
                 $stdDevSaturday = ($weekDivider >= 2 && $weekDivider <= 75) ? sqrt($weightedVarianceSaturday) / $this->getCzynnikC4($weekDivider) : sqrt($weightedVarianceSaturday); // ważone odchylenie standardowe.
+
+            }
+
+            // $weightedVarianceSaturday wychodzi ujemny w szczegolnym przypadku!!! przyjrzec sie
+            if(is_nan($stdDevSaturday)){
+                $stdDevSaturday = 0;
             }
             $coefficientOfVariationSaturday = $weightAverageSaturday != 0 ? (100 * $stdDevSaturday / $weightAverageSaturday) / 100 : 0; // procent średniej jakim jest odchylenie standardowe
 
@@ -3770,9 +3810,14 @@ class CrmRouteController extends Controller
             ->join('city', 'city.id', '=', 'client_route_info.city_id')
             ->leftjoin('hotels', 'hotels.id','=','hotel_id')
             ->where('client_route_info.status', '=', 1)
-            ->where('client_route.status', '=', 1)
-            ->whereBetween('client_route_info.date', [$request->dateStart, $request->dateStop])
-            ->orderby('weekOfYear','ASC')
+            ->where('client_route.status', '=', 1);
+            if($request->dateStart == null && $request->dateStop != null)
+                $clientRouteInfo =$clientRouteInfo->whereBetween('client_route_info.date', ['%', $request->dateStop]);
+            else if($request->dateStart != null && $request->dateStop == null)
+                $clientRouteInfo =$clientRouteInfo->where('client_route_info.date', '>=',$request->dateStart);
+            else if($request->dateStart != null && $request->dateStop != null)
+                $clientRouteInfo = $clientRouteInfo->whereBetween('client_route_info.date', [$request->dateStart, $request->dateStop]);
+             $clientRouteInfo = $clientRouteInfo->orderby('weekOfYear','ASC')
             ->orderby('city.name','ASC')
             ->orderby('date','ASC')
             ->orderby('clientName','ASC')
@@ -4460,6 +4505,12 @@ class CrmRouteController extends Controller
 
             new ActivityRecorder($log,230, 4);
         }
+    }
+
+    //This method remove hotel permanently with all its references.
+    public function deletePermanentlyHotel($id) {
+        Hotel::removeHotelPermanently($id);
+        return $id;
     }
 
 }

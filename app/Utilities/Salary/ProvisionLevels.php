@@ -23,8 +23,8 @@ class ProvisionLevels
         switch($occupation) {
             case 'consultant': {
                 switch($subtype) {
-                    case '1': { //case of number of people who show up after invitation.
-                        if($level >= 40){
+                    case '1': {
+                        if($level >= 40){ //case of number of people who show up after invitation.
                             $provision = 40;
                         }else if($level >= 35){
                             $provision = 35;
@@ -44,11 +44,11 @@ class ProvisionLevels
                         return $provision;
                         break;
                     }
-                    case '2': { //case when at least one of shows is bad.
+                    case '2': {
                         if($level == 0) {
                             $provision = 50;
                         }
-                        else {
+                        else { //case when at least one of shows is bad.
                             $provision = 0;
                         }
                         return $provision;
@@ -214,11 +214,14 @@ class ProvisionLevels
                     case 1: { //confirmation
                         if($level >= 15) { // ammout of new peoples
                             $provision = 450;
-                        } else if($level >= 10){
+                        }
+                        else if($level >= 10){
                             $provision = 300;
-                        } else if($level >= 5){
+                        }
+                        else if($level >= 5){
                             $provision = 150;
-                        }else {
+                        }
+                        else {
                             $provision = 0;
                         }
                         return $provision;

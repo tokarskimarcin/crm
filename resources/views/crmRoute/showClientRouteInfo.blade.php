@@ -237,7 +237,6 @@
                 legendBar.style.display = 'block';
             }
         });
-
         fullscreen.addEventListener('click', fullScreenHandler);
     </script>
 @endsection
