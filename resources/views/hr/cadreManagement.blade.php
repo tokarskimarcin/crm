@@ -119,13 +119,19 @@
                     }
                 },"orderable": false, "searchable": false },
                 {"data": function (data, type, dataToSet) {
+                    console.log(data);
                         if(show_action == 1) {
                             if(userType == 15) {
-                                if((userId == 4272 && data.id == 4272) || (userId == 29 && data.id == 29)) {
-                                    return null;
+                                if(data.department_type_name == 'Potwierdzanie') {
+                                    if((userId == 4272 && data.id == 4272) || (userId == 29 && data.id == 29)) {
+                                        return null;
+                                    }
+                                    else {
+                                        return '<a href="edit_cadre/'+data.id+'" >Edytuj</a>';
+                                    }
                                 }
                                 else {
-                                    return '<a href="edit_cadre/'+data.id+'" >Edytuj</a>';
+                                    return null;
                                 }
                             }
                             else {

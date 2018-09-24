@@ -821,7 +821,16 @@
                             return data.client_route_id
                         }, "name": "id"
                     },
-                    {"data": "weekOfYear"},
+                    {
+                        "data": function (data, type, dataToSet) {
+                            if(data.weekOfYear != data.dateOfLastShow) {
+                                return data.weekOfYear + '/' + data.dateOfLastShow;
+                            }
+                            else {
+                                return data.weekOfYear;
+                            }
+                        }, "name": "weekOfYear"
+                    },
                     {"data": function (data, type, dataToSet) {
                         let finalName = 'brak';
                             if (data.type == '1') {

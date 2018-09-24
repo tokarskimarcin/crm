@@ -266,14 +266,19 @@ class CrmRouteController extends Controller
             $name = '';
             $allCities = Cities::select('id','name')->get();
             $reverseNameArr = [];
+            $reverseNameArr2 = []; //names for table display
 
             foreach($allData as $show) {
                 $name = '';
                 $name .=  $allCities->where('id', '=', $show->city)->first()->name . ' + ';
+                $name2 = '';
+                $name2 .= $allCities->where('id', '=', $show->city)->first()->name . ' ' . $show->hours . ' + ';
                 if($show->date != $dateFlag) {
                     $name = substr($name, 0,strlen($name) - 3) . ' | ';
+                    $name2 = substr($name2, 0,strlen($name2) - 3) . ' | ';
                 }
                 array_push($reverseNameArr, $name);
+                array_push($reverseNameArr2, $name2);
                 $dateFlag = $show->date;
 
                 $clientRouteCampaigns = new ClientRouteCampaigns();
@@ -307,14 +312,24 @@ class CrmRouteController extends Controller
             }
 
             $fullName = '';
+            $fullName2 = '';
+
             $nameArr = array_reverse($reverseNameArr);
+            $nameArr2 = array_reverse($reverseNameArr2);
 
             foreach($nameArr as $key => $value) {
                 $fullName .= $value;
             }
 
+            foreach($nameArr2 as $key => $value) {
+                $fullName2 .= $value;
+            }
+
             $fullName = substr($fullName, 0,strlen($fullName) - 3); // removing last | in name
+            $fullName2 = substr($fullName2, 0,strlen($fullName2) - 3); // removing last | in name
+
             $clientRoute->route_name = $fullName;
+            $clientRoute->route_name_display = $fullName2;
             $clientRoute->save();
 
             new ActivityRecorder(array_merge(['T'=>'Dodanie trasy dla klienta'],$clientRoute->toArray()),209,1);
@@ -1171,7 +1186,8 @@ class CrmRouteController extends Controller
         $client_route_info = DB::table('client_route_info')
             ->select('route_name',
                 'client_route_info.id',
-                'weekOfYear','hour',
+                'weekOfYear',
+                'hour',
                 'hotel_id',
                 'client.name as clientName',
                 'city.name as cityName',
@@ -1229,15 +1245,17 @@ class CrmRouteController extends Controller
                 }
                 return $a->date < $b->date ? -1 : 1;
             });
-            //$client_routes = $this->getClientRouteGroupedByDateSortedByHour($client_route_id->first()->client_route_id, $client_route_info);
 
-            //$route_name = $this->createRouteName($client_routes);
+            $clientRoutes = ClientRouteInfo::where('client_route_id', '=', $client_routes->first()->client_route_id)->OnlyActive()->orderBy('date')->get();
+            $dateOfLastShow = date('W', strtotime($clientRoutes->last()->date));
+
             $hourOrHotelAssigned = $client_routes->first()->hour == null || $client_routes->first()->hotel_id == null ? false : true;
             for($i = 1; $i < count($client_routes);$i++){
                 if($hourOrHotelAssigned && ($client_routes[$i]->hotel_id == null || $client_routes[$i]->hour == null) )
                     $hourOrHotelAssigned = false;
             }
-            //dd($client_routes->first());
+
+            $client_routes->first()->dateOfLastShow = $dateOfLastShow;
             $client_routes->first()->hotelOrHour = $hourOrHotelAssigned;
             $client_routes->first()->hasAllLimits = $limitFlag ? 1 : 0;
             $client_routes->first()->hasAllDepartments = $departmentsFlag ? 1 : 0;
