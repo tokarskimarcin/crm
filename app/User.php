@@ -55,6 +55,10 @@ class User extends Authenticatable
         return $this->belongsTo('App\Agencies', 'agency_id');
     }
 
+    public function employee_of_the_week_ranking(){
+        return $this->belongsTo('App\EmployeeOfTheWeekRanking','user_id');
+    }
+
     public function schedule() {
         return $this->hasMany('App\Schedule', 'id_user');
     }

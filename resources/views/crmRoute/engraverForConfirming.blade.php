@@ -99,13 +99,13 @@
                     </div>
                 </div>
                 <div class="row">
-                    <table id="datatable" class="thead-inverse table table-striped table-bordered" style="max-width:100%;">
+                    <table id="datatable" class="thead-inverse table table-striped table-bordered compact" style="max-width:100%;">
                         <thead>
                         <tr>
                             <th>T</th>
                             <th>Data</th>
                             <th>Miasto</th>
-                            <th>Nazwa klienta</th>
+                            <th>Nazwa_klienta</th>
                             <th>G</th>
                             <th>Oddział</th>
                             <th>Potwierdzająca osoba</th>
@@ -333,6 +333,21 @@
 
                },
                "rowCallback": function( row, data, index ) {
+                   let frequencyCell = row.cells['9'];
+                   let frequencyInput = frequencyCell.firstChild;
+                   console.log(frequencyInput.value);
+                   if(frequencyInput.value != null && frequencyInput.value != '') {
+                       if(frequencyInput.value < 15) {
+                           frequencyCell.style.backgroundColor = 'red';
+                       }
+                       else if(frequencyInput.value >= 15 && frequencyInput.value < 19) {
+                           frequencyCell.style.backgroundColor = 'yellow';
+                       }
+                       else {
+                           frequencyCell.style.backgroundColor = 'green';
+                       }
+                   }
+
                    row.setAttribute('data-id', data.id); //clientRouteInfo Id
                    row.setAttribute('data-depid', data.depId); //department info Id
 

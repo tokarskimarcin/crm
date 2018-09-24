@@ -288,6 +288,7 @@ class RecruitmentStory extends Model
             ->join('department_type', 'department_type.id', 'department_info.id_dep_type')
             ->where('status_work','=',1)
             ->get();
+
         $all_hr_from_departments->map(function ($item) use ($date_start, $date_stop) {
 
         $all_candidate = Candidate::where('cadre_id','=',$item->id)

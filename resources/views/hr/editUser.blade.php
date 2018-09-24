@@ -193,12 +193,14 @@
                         </div>
                         @if($type == 2)
                             <div class="row">
-                                <div class="col-md-6">
+                                @if($user->user_type->id != 9)
+                                <div class="col-md-6" id="emailSection">
                                     <div class="form-group">
                                         <label class="myLabel">Adres email:</label>
-                                        <input class="form-control" type="mail" class="form-control" placeholder="Email" id="email" name="email"  value="{{$user->email_off}}">
+                                        <input type="mail" class="form-control" placeholder="Email" id="email" name="email"  value="{{$user->email_off}}">
                                     </div>
                                 </div>
+                                @endif
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label class="myLabel">Telefon służbowy:</label>
@@ -207,7 +209,8 @@
                                 </div>
                             </div>
                             <div class="row">
-                                <div class="col-md-3">
+                                @if($user->user_type->id != 9)
+                                <div class="col-md-3" id="salarySection">
                                     <div class="form-group">
                                         <label class="myLabel">Wynagrodzenie:</label>
                                         @if(isset($user->salary))
@@ -217,6 +220,7 @@
                                         @endif
                                     </div>
                                 </div>
+                                @endif
                                 <div class="col-md-3">
                                     <div class="form-group">
                                         <label class="myLabel">Dodatek służbowy:</label>
@@ -588,7 +592,8 @@
             if('{{$type}}' === '1' && user_type == 9){
                 swal('Nie można nadać uprawnień sukcesora podczas edycji konta!',
                     'Należy stworzyć konto kadrowe z uprawnieniami sukcesora i przypisać do niego już stworzone konto konsultanta. ' +
-                    'Konsultant podczas dzwonienia ma być zalogowany na konto konsulanta, natomiast pełniąc funkcję sukcesora logować się na konto sukcesora.');
+                    'Konsultant podczas dzwonienia ma być zalogowany na konto konsulanta, natomiast pełniąc funkcję sukcesora logować się na konto sukcesora.' +
+                    'Awans na trenera ma się odbywać na koncie konsultanckim.');
                 return false;
             }
             if (first_name.trim().length == 0) {
@@ -660,9 +665,13 @@
                 return false;
             }
 
-            if (email != null && email.trim().length == 0) {
-                swal('Podaj adres email!');
-                return false;
+            if(user_type != 9){
+                if (email != null && email.trim().length == 0) {
+                    swal('Podaj adres email!');
+                    return false;
+                }
+            }else{
+                email = '';
             }
 
             if (user_type != null && user_type == 'Wybierz') {
@@ -704,7 +713,7 @@
                 }
             }
 
-            if (email != null) {
+            if (email != null && user_type != 9) {
                 $.ajax({
                     type: "POST",
                     async: false,
@@ -783,11 +792,11 @@
                         },
                         success: function(response) {
                             if (response == 1) {
-                                swal("Pomyślnie usunięto karę/premię!")
+                                swal("Pomyślnie usunięto karę/premię!");
                                 $('tr[name=' + id + ']').fadeOut(0);
                             } else {
-                                swal('Ups! Coś poszło nie tak. Skontaktuj się z administratorem!')
-                                return;
+                                swal('Ups! Coś poszło nie tak. Skontaktuj się z administratorem!');
+                                return false;
                             }
                         }
                     });
@@ -1044,12 +1053,16 @@
                 let selectedObject = $(this);
                 if(selectedObject.val() == 9){
                     $('#successorUserSelect').attr('hidden',false);
+                    $('#salarySection').attr('hidden',true);
+                    $('#emailSection').attr('hidden',true);
                     if(departmentInfoId.val() == 'Wybierz'){
                         successorSelect.empty();
                         successorSelect.append(getSelectOption("Wybierz oddział sukcesora"));
                     }
                 }else{
                     $('#successorUserSelect').attr('hidden',true);
+                    $('#salarySection').attr('hidden',false);
+                    $('#emailSection').attr('hidden',false);
                 }
             });
             departmentInfoId.on('change',function () {

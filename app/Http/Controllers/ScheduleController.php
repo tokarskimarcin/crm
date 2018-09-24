@@ -216,7 +216,6 @@ class ScheduleController extends Controller
 
         $getters = ScheduleRelation::where('setter_type_id', '=', $setter)->pluck('getter_type_id')->toArray();
         $userDepartmentInfo = Auth::user()->department_info_id;
-//        dd($getters);
 
         $query = DB::table('users')
             ->join('department_info', 'users.department_info_id', '=', 'department_info.id')
@@ -238,7 +237,7 @@ class ScheduleController extends Controller
             ->where('users.status_work', '=', 1)
             ->whereIn('users.user_type_id', $getters);
 
-        if($setter == 4 || $setter == 12 || $setter == 22) {
+        if($setter == 4 || $setter == 12) {
             $query = $query->where('users.department_info_id', $userDepartmentInfo);
         }
 

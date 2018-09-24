@@ -50,7 +50,7 @@ class CrmRouteController extends Controller
      * @return view route Templates
      */
     public function addNewRouteTemplateGet() {
-        $voivodes = Voivodes::all();
+        $voivodes = Voivodes::all()->sortBy('name');
 
         return view('crmRoute.routeTemplates')
             ->with('voivodes', $voivodes);
@@ -331,7 +331,7 @@ class CrmRouteController extends Controller
         $departments = Department_info::all();
         $today = date('Y-m-d');
         $today .= '';
-        $voivodes = Voivodes::all();
+        $voivodes = Voivodes::all()->sortBy('name');
         $year = date('Y',strtotime("this year"));
         $numberOfLastYearsWeek = date('W',mktime(0, 0, 0, 12, 27, $year));
         return view('crmRoute.assigningRoutesToClients')
@@ -342,7 +342,7 @@ class CrmRouteController extends Controller
     }
 
     public function editAssignedRouteGet($id) {
-        $voivodes = Voivodes::all();
+        $voivodes = Voivodes::all()->sortBy('name');
         $client_route = ClientRoute::select(
             'client.name as name',
             'client.id as clientId',
@@ -571,7 +571,7 @@ class CrmRouteController extends Controller
 
             $city = Cities::where('id', '=', $cityId)->first();
             $voievodeshipRound = $this::findCityByDistanceWithoutGracePeriod($city, $limit);
-            $voievodeshipRound = $voievodeshipRound->groupBy('id');
+            $voievodeshipRound = $voievodeshipRound->groupBy('id')->sortBy('name');
             $voievodeshipDistinc = array();
             foreach ($voievodeshipRound as $item){
                 array_push($voievodeshipDistinc,$item->first());
@@ -606,12 +606,13 @@ class CrmRouteController extends Controller
                 ->get();
             $voievodeshipRound = $this::findCityByDistanceWithDistanceLimit($city, $currentDate, $clientRouteInfoAll, $limit);
 
-            $voievodeshipRound = $voievodeshipRound->groupBy('id');
+            $voievodeshipRound = $voievodeshipRound->groupBy('id')->sortBy('name');
             $voievodeshipDistinc = array();
             foreach ($voievodeshipRound as $item){
                 array_push($voievodeshipDistinc,$item->first());
             }
             $responseArray['voievodeInfo'] = $voievodeshipDistinc;
+
             $responseArray['cityInfo'] = $voievodeshipRound;
             return $responseArray;
         }
@@ -633,6 +634,7 @@ class CrmRouteController extends Controller
                 (SELECT count(*) from client_route_info e where e.city_id = cityAlias.`id` and e.date >= "'.$firstDayOfThisMonth.'"
                 and e.date <= "'.$lastDayOfThisMonth.'"  and e.status = 1) as numberOfRecords'))
                 ->join('voivodeship', 'voivodeship.id', 'cityAlias.voivodeship_id')
+                ->orderBy('voivodeship.name')
                 ->orderBy('cityAlias.name')
                 ->get();
         }else {
@@ -660,6 +662,7 @@ class CrmRouteController extends Controller
             ))
                 ->join('voivodeship', 'voivodeship.id', 'cityAlias.voivodeship_id')
                 ->having('distance', '<=', $limit)
+                ->orderBy('voivodeship.name')
                 ->orderBy('cityAlias.name')
                 ->get();
         }
@@ -678,6 +681,7 @@ class CrmRouteController extends Controller
 //                    $gracePeriod = null;
 //                }
                 $goodDate = date_create($item->date);
+                $goodDate2 = date('Y-m-d', strtotime($item->date));
                 $dateDifference = date_diff($properDate,$goodDate, true);
                 $dateDifference = $dateDifference->format('%a');
                 $dateString = $dateDifference . " days";
@@ -687,6 +691,7 @@ class CrmRouteController extends Controller
                     $cityInfoObject = new \stdClass();
                     $cityInfoObject->city_id = $item->city_id;
                     $cityInfoObject->available_date =  date_format(date_add($goodDate,date_interval_create_from_date_string(($gracePeriod).' days') ), "Y-m-d");
+                    $cityInfoObject->available_date_2 = date('Y-m-d', strtotime($goodDate2 . ' -' . $gracePeriod . ' days'));
                     array_push($checkedCities, $cityInfoObject);
                 }
             }
@@ -731,6 +736,7 @@ class CrmRouteController extends Controller
                         $blockFlag = true;
                         $item->block = 1;
                         $item->available_date = $blockedCity->available_date;
+                        $item->available_date_2 = $blockedCity->available_date_2;
                         if($item->max_hour > $hourNumber) { // limit of hours isn't exceeded
                             $hourDifference = $item->max_hour - $hourNumber;
                             $item->exceeded = 0; // indices that this city is still available for couple of hours
@@ -748,6 +754,7 @@ class CrmRouteController extends Controller
                 if($blockFlag == false) {
                     $item->block = 0;
                     $item->available_date = 0;
+                    $item->available_date_2 = 0;
                     $item->used_hours = 0;
                     $item->exceeded = 0;
                 }
@@ -764,6 +771,7 @@ class CrmRouteController extends Controller
         if($limit == 'infinity'){
             $voievodeshipRound = Cities::select(DB::raw('voivodeship.id as id,voivodeship.name,city.name as city_name,city.id as city_id, city.max_hour as max_hour'))
                 ->join('voivodeship', 'voivodeship.id', 'city.voivodeship_id')
+                ->orderBy('voivodeship.name')
                 ->orderBy('city.name')
                 ->get();
         }else {
@@ -783,6 +791,7 @@ class CrmRouteController extends Controller
            AS distance'))
                 ->join('voivodeship', 'voivodeship.id', 'city.voivodeship_id')
                 ->having('distance', '<=', $limit)
+                ->orderBy('voivodeship.name')
                 ->orderBy('city.name')
                 ->get();
         }
@@ -1101,10 +1110,12 @@ class CrmRouteController extends Controller
         ->whereIn('id_dep_type',[2]);
         $year = date('Y',strtotime("this year"));
         $numberOfThisYearsWeek = date('W',mktime(0, 0, 0, 12, 30, $year));
+        $thisMonth = date('W');
         return view('crmRoute.showClientRoutes')
             ->with('lastWeek', $numberOfThisYearsWeek)
             ->with('departments', $departments)
-            ->with('year', $year);
+            ->with('year', $year)
+            ->with('thisMonth', $thisMonth);
     }
 
     /**
@@ -1151,7 +1162,8 @@ class CrmRouteController extends Controller
         }
 
         $selectedWeek = $request->selectedWeek;
-        $selectedWeek = $selectedWeek == '0' ? '%' : $selectedWeek;
+
+//        $selectedWeek = $selectedWeek == '0' ? '%' : $selectedWeek;
 
         $typ = $request->typ;
         $typ = $typ == '0' ? '%' : $typ;
@@ -1176,12 +1188,17 @@ class CrmRouteController extends Controller
             //->whereIn('client_route.client_id', $selectedClientIds)
             ->where('client_route_info.status', '=', 1)
             ->where('date', 'like', $year . '%')
-            ->where('weekOfYear', 'like', $selectedWeek)
+//            ->where('weekOfYear', 'like', $selectedWeek)
             ->where('client_route.type', 'like', $typ);
 
         if($selectedClientIds !== null){
             $client_route_info->whereIn('client_route.client_id', $selectedClientIds);
         }
+
+        if($selectedWeek[0] != '0') {
+            $campaignsInfo = $client_route_info->whereIn('weekOfYear', $selectedWeek);
+        }
+
 
         $client_route_info =  $client_route_info->get();
 
@@ -1474,6 +1491,7 @@ class CrmRouteController extends Controller
 //
                 $gracePeriod = $item->grace_period;
                 $goodDate = date_create($item->date);
+                $goodDate2 = date('Y-m-d', strtotime($item->date));
                 $dateDifference = date_diff($properDate,$goodDate, true);
                 $dateDifference = $dateDifference->format('%a');
                 $dateString = $dateDifference . " days";
@@ -1491,6 +1509,7 @@ class CrmRouteController extends Controller
                         $cityInfoObject = new \stdClass();
                         $cityInfoObject->city_id = $item->city_id;
                         $cityInfoObject->available_date =  date_format(date_add($goodDate,date_interval_create_from_date_string(($gracePeriod).' days') ), "Y-m-d");
+                        $cityInfoObject->available_date_2 = date('Y-m-d', strtotime($goodDate2 . ' -' . $gracePeriod . ' days'));
                         array_push($checkedCities, $cityInfoObject);
                     }
                 }
@@ -1538,6 +1557,7 @@ class CrmRouteController extends Controller
                         $blockFlag = true;
                         $item->block = 1;
                         $item->available_date = $blockedCity->available_date;
+                        $item->available_date_2 = $blockedCity->available_date_2;
                         if($item->max_hour > $hourNumber) { // limit of hours isn't exceeded
                             $hourDifference = $item->max_hour - $hourNumber;
                             $item->exceeded = 0; // indices that this city is still available for couple of hours
@@ -1556,6 +1576,7 @@ class CrmRouteController extends Controller
                 if($blockFlag == false) {
                     $item->block = 0;
                     $item->available_date = 0;
+                    $item->available_date_2 = 0;
                     $item->used_hours = 0;
                     $item->exceeded = 0;
                 }
@@ -2051,6 +2072,7 @@ class CrmRouteController extends Controller
 //                    $gracePeriod = null;
 //                }
                 $goodDate = date_create($item->date);
+                $goodDate2 = date('Y-m-d', strtotime($item->date));
                 $dateDifference = date_diff($properDate,$goodDate, true);
                 $dateDifference = $dateDifference->format('%a');
                 $dateString = $dateDifference . " days";
@@ -2060,6 +2082,7 @@ class CrmRouteController extends Controller
                         $cityInfoObject = new \stdClass();
                         $cityInfoObject->city_id = $item->city_id;
                         $cityInfoObject->available_date =  date_format(date_add($goodDate,date_interval_create_from_date_string(($gracePeriod).' days') ), "Y-m-d");
+                        $cityInfoObject->available_date_2 = date('Y-m-d', strtotime($goodDate2 . ' -' . $gracePeriod . ' days'));
                         array_push($checkedCities, $cityInfoObject);
                 }
             }
@@ -2090,6 +2113,7 @@ class CrmRouteController extends Controller
                         $blockFlag = true;
                         $item->block = 1;
                         $item->available_date = $blockedCity->available_date;
+                        $item->available_date_2 = $blockedCity->available_date_2;
                         if($item->max_hour > $hourNumber) { // limit of hours isn't exceeded
                             $hourDifference = $item->max_hour - $hourNumber;
                             $item->exceeded = 0; // indices that this city is still available for couple of hours
@@ -2107,6 +2131,7 @@ class CrmRouteController extends Controller
                 if($blockFlag == false) {
                     $item->block = 0;
                     $item->available_date = 0;
+                    $item->available_date_2 = 0;
                     $item->used_hours = 0;
                     $item->exceeded = 0;
                 }
@@ -3855,7 +3880,7 @@ class CrmRouteController extends Controller
                 $users->last_name = '';
                 $accepted_users->push($users);
             }
-            $this::sendMail($mail_type,$data,$accepted_users,$messageTitle,$storageURL);
+            $this::sendMail($mail_type,$data,$accepted_users,$messageTitle,$storageURL,Auth::user()->email_off);
             $campaing->invoice_status_id = 3;
             $campaing->invoice_send_date = date('Y-m-d G:i');
             $campaing->save();
@@ -3865,11 +3890,17 @@ class CrmRouteController extends Controller
         return 500;
     }
 
-    public function sendMail($mail_type,$data,$accepted_users,$mail_title,$storageURL){
+    public function sendMail($mail_type,$data,$accepted_users,$mail_title,$storageURL,$mailFrom){
         /* UWAGA !!! ODKOMENTOWANIE TEGO POWINNO ZACZĄC WYSYŁAĆ MAILE*/
-        Mail::send('mail.' . $mail_type, $data, function($message) use ($accepted_users, $mail_title,$storageURL)
+        Mail::send('mail.' . $mail_type, $data, function($message) use ($accepted_users, $mail_title,$storageURL,$mailFrom)
         {
-            $message->from('noreply.verona@gmail.com', 'Verona Consulting');
+            if($mailFrom == null)
+                $message->from('noreply.verona@gmail.com', 'Verona Consulting');
+            else{
+                $message->from($mailFrom, 'Verona Consulting');
+                $message->cc($mailFrom, 'Verona Consulting');
+            }
+            $message->cc('pawel.zielinski@veronaconsulting.pl', 'Paweł Zieliński');
             foreach($accepted_users as $user) {
                 if (filter_var($user->username, FILTER_VALIDATE_EMAIL)) {
                     $message->to($user->username, $user->first_name . ' ' . $user->last_name)->subject($mail_title);
@@ -4442,6 +4473,12 @@ class CrmRouteController extends Controller
 
             new ActivityRecorder($log,230, 4);
         }
+    }
+
+    //This method remove hotel permanently with all its references.
+    public function deletePermanentlyHotel($id) {
+        Hotel::removeHotelPermanently($id);
+        return $id;
     }
 
 }

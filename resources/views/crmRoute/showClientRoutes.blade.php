@@ -8,6 +8,7 @@
 @extends('layouts.main')
 @section('style')
     <link rel="stylesheet" href="{{asset('/css/fixedHeader.dataTables.min.css')}}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
 @endsection
 @section('content')
 
@@ -162,10 +163,12 @@
                     <div class="row">
                         <div class="col-md-12">
                             <div class="form-group">
-                                <label for="showAllClients">Pokaż wszystkich klientów</label>
-                                <input type="radio" style="display:inline-block" id="showAllClients" checked="checked" >
+                                <button class="btn btn-default" id="clearClientsButton">
+                                    <span class='glyphicon glyphicon-unchecked'></span> Czyść zaznaczenia klientów <span class="badge">0</span></button>
                             </div>
                         </div>
+                    </div>
+                    <div class="row">
                         <div class="col-md-12">
                             <div class="form-group">
                                 <label for="showOnlyAssigned">Pokaż tylko trasy bez przypisanego hotelu lub
@@ -190,7 +193,7 @@
                         <div class="col-md-2">
                             <div class="form-group" style="margin-top:1em;">
                                 <label for="weekNumber">Tydzień</label>
-                                <select id="weekNumber" class="form-control">
+                                <select id="weekNumber" class="form-control" multiple="multiple">
                                     <option value="0">Wszystkie</option>
                                 </select>
                             </div>
@@ -247,7 +250,7 @@
                                 <thead>
                                 <tr>
                                     <th>ID</th>
-                                    <th>Tydzień</th>
+                                    <th>Tydz.</th>
                                     <th>Klient</th>
                                     <th>Data I pokazu</th>
                                     <th>Trasa</th>
@@ -339,6 +342,7 @@
 
 @section('script')
     <script src="{{ asset('/js/dataTables.bootstrap.min.js')}}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
     <script>
 
         let idOfRow = null;
@@ -441,6 +445,15 @@
             const editButton = document.querySelector('#limitsButton');
             const clearButton = document.querySelector('#clearButton');
 
+
+            let APP = {
+                arrays: {
+                    selectedWeeks: ["0"]
+                }
+            }
+
+            $('#weekNumber').select2();
+
             (function init() {
                 @if(Session::has('adnotation'))
                     notify(`{{Session::get('adnotation') }}`, 'success');
@@ -457,7 +470,7 @@
                 if( selectedClientIds.length !== 1)
                     swal('Aby wygenerować raport wybierz tylko jednego klienta');
                 else{
-                    console.log('raport');
+                    /*console.log('raport');*/
                     $.ajax({
                         type: 'POST',
                         headers: {
@@ -528,6 +541,7 @@
             let typInput = $('#type');
             let stateInput = $('#campaignState');
             let parametersInput = $('#parameters');
+            let thisMonth = {{$thisMonth}};
 
             //This part is responsible for listing every week number into select
             const lastWeekOfYear ={{$lastWeek}};
@@ -537,6 +551,10 @@
                 optionElement.value = i;
                 optionElement.innerHTML = `${i}`;
                 weekSelect.appendChild(optionElement);
+                if(i == thisMonth) {
+                    $(weekSelect).val(i);
+                    APP.arrays.selectedWeeks = $(weekSelect).val();
+                }
             }
 
             //this part is responsible for redirect button
@@ -546,7 +564,6 @@
             });
 
             const showOnlyAssignedInput = $('#showOnlyAssigned');
-            const showAllClientsInput = $('#showAllClients');
             let selectedWeekInput = $('#weekNumber');
             let rowIterator = null;
             // let colorIterator = 0;
@@ -661,9 +678,6 @@
                     return row;
                 }, "fnDrawCallback": function (settings) {
                     $('#datatable tbody tr').click(function () {
-                        if (showAllClientsInput.prop('checked') === true) { //all clients checkbox = true + selecting one client
-                            showAllClientsInput.prop('checked', false)
-                        }
                         test = $(this).closest('table');
                         let thisClientId  = $(this).attr('id');
                         thisClientId =  thisClientId.substr(thisClientId.lastIndexOf('_')+1);
@@ -671,18 +685,18 @@
                             $(this).removeClass('check');
                             selectedClientIds.splice(selectedClientIds.indexOf(thisClientId),1);
                             if(selectedClientIds.length === 0){
-                                showAllClientsInput.prop('checked', true);
+                                /*showAllClientsInput.prop('checked', true);*/
                             }
                         }
                         else {
                             selectedClientIds.push(thisClientId);
-                            if(selectedClientIds.length === $(this).closest('table').find('tr.client').length){
-                                showAllClientsInput.prop('checked', true);
-                                showAllClientsInput.change();
+                            if(selectedClientIds.length === settings["_iRecordsTotal"]){
+                                $('#clearClientsButton').click();
                             }else{
                                 $(this).addClass('check');
                             }
                         }
+                        $('#clearClientsButton').find('.badge').text(selectedClientIds.length);
                         rowIterator = null;
                         // colorIterator = 0;
                         objectArr = [];
@@ -720,6 +734,7 @@
                 serverSide: true,
                 scrollY: '45vh',
                 scrollX: true,
+                order: [[1, 'asc'], [3, 'asc']],
                 fnDrawCallback: function (settings) {
                     objectArr = [];
                     $('#datatable2 select').change(changeStatus);
@@ -791,7 +806,7 @@
                         d.selectedClientIds =  selectedClientIds ;
                         d.showOnlyAssigned = showOnlyAssignedInput.prop('checked');
                         d.year = yearInput.val();
-                        d.selectedWeek = selectedWeekInput.val();
+                        d.selectedWeek = APP.arrays.selectedWeeks;
                         d.typ = typInput.val();
                         d.parameters = parametersInput.val();
                     },
@@ -807,19 +822,21 @@
                         }, "name": "id"
                     },
                     {"data": "weekOfYear"},
-                    {"data": "clientName"},
+                    {"data": function (data, type, dataToSet) {
+                        let finalName = 'brak';
+                            if (data.type == '1') {
+                                finalName = data.clientName + ' (B)';
+                            }
+                            else {
+                                finalName = data.clientName + ' (W)';
+                            }
+                            return finalName;
+                        },"name": "client_name"
+                    },
                     {"data": "date"},
                     {
                         "data": function (data, type, dataToSet) {
-                            console.log(data);
-                            let finalName = '';
-                            if (data.type == '1') {
-                                finalName = data.route_name + ' (B)';
-                            }
-                            else {
-                                finalName = data.route_name + ' (W)';
-                            }
-                            return finalName;
+                            return data.route_name;
                         }, "name": "route_name"
                     },
                    /* {
@@ -1191,9 +1208,10 @@
                 $('#clearButton').find('.badge').text(clientRouteIdArr.length);
             }
 
-            function showAllClientsInputHandler(e) {
+            function clearClientsButtonHandler(e) {
                 $('#datatable tr').removeClass('check');
                 selectedClientIds  = [];
+                $(e.target).find('.badge').text(selectedClientIds.length);
                 table2.ajax.reload();
             }
 
@@ -1411,6 +1429,7 @@
                             selectedWeekInput.append(basicOptionElement);
 
                             for (let i = 1; i <= weeksInYear + 1; i++) { //we are iterating to weeksInYear+1 because we are getting week number for 30.12, and in 31.12 can be monday(additional week)
+
                                 const optionElement = document.createElement('option');
                                 optionElement.value = i;
                                 optionElement.textContent = i;
@@ -1439,8 +1458,6 @@
                 const parameterSelect = document.querySelector('#parameters');
 
                 if (selectedClientIds.length > 0) {
-                    //let idsOfSelectedClients = document.querySelector('.check').id;
-                    console.log(selectedClientIds);
                     sessionStorage.setItem('idsOfSelectedClients', selectedClientIds.toString());
                 }
 
@@ -1448,7 +1465,7 @@
                 sessionStorage.setItem('search', searchBox.value);
 
                 sessionStorage.setItem('year', yearInput.options[yearInput.selectedIndex].value);
-                sessionStorage.setItem('weekNumber', weekNumber.options[weekNumber.selectedIndex].value);
+                // sessionStorage.setItem('weekNumber', weekNumber.options[weekNumber.selectedIndex].value);
                 sessionStorage.setItem('type', type.options[type.selectedIndex].value);
                 sessionStorage.setItem('showAllClients', showAllClientsCheckbox.checked);
                 sessionStorage.setItem('showOnlyAssigned', showOnlyAssignedCheckbox.checked);
@@ -1511,19 +1528,6 @@
                     sessionStorage.removeItem('type');
                 }
 
-                let showAllClientsCheckbox = document.querySelector('#showAllClients');
-                if (sessionStorage.getItem('showAllClients')) {
-                    const isChecked = sessionStorage.getItem('showAllClients');
-                    somethingChanged = isChecked === 'true' ? true : somethingChanged;
-                    if (isChecked == 'false') {
-                        showAllClientsCheckbox.checked = false;
-                    }
-                    else {
-                        showAllClientsCheckbox.checked = true;
-                    }
-                    sessionStorage.removeItem('showAllClients');
-                }
-
                 if (sessionStorage.getItem('showOnlyAssigned')) {
                     const isChecked = sessionStorage.getItem('showOnlyAssigned');
                     somethingChanged = isChecked === 'true' ? true : somethingChanged;
@@ -1534,6 +1538,12 @@
                         showOnlyAssignedInput.prop('checked', true);
                     }
                     sessionStorage.removeItem('showOnlyAssigned');
+                }
+                let clearClientsButton = $('#clearClientsButton');
+                if (sessionStorage.getItem('idsOfSelectedClients')) {
+                    selectedClientIds = sessionStorage.getItem('idsOfSelectedClients').split(",");
+                    sessionStorage.removeItem('idsOfSelectedClients');
+                    clearClientsButton.find('.badge').text(selectedClientIds.length);
                 }
 
                 let parameterSelect = document.querySelector('#parameters');
@@ -1553,7 +1563,7 @@
                 }
             })();
 
-            showAllClientsInput.change(showAllClientsInputHandler);
+            $('#clearClientsButton').click(clearClientsButtonHandler);
             showOnlyAssignedInput.change(() => {
                 table2.ajax.reload();
             });
@@ -1569,6 +1579,33 @@
                 table2.ajax.reload();
             });
             stateInput.change(() => {
+                table2.ajax.reload();
+            });
+
+            /**
+             * This event listener change elements of array selecteWeeks while user selects another week
+             */
+            $('#weekNumber').on('select2:select', function() {
+                let weeksArr = $('#weekNumber').val();
+                if(weeksArr.length > 0) {
+                    APP.arrays.selectedWeeks = weeksArr;
+                }
+                else {
+                    APP.arrays.selectedWeeks = ["0"];
+                }
+                table2.ajax.reload();
+            });
+
+            /**
+             * This event listener change elements of array selectedWeeks while user unselects any week.
+             */
+            $("#weekNumber").on('select2:unselect', function() {
+                if($('#weekNumber').val().length != 0) {
+                    APP.arrays.selectedWeeks = $('#weekNumber').val();
+                }
+                else {
+                    APP.arrays.selectedWeeks = ['0'];
+                }
                 table2.ajax.reload();
             });
 
