@@ -3810,9 +3810,14 @@ class CrmRouteController extends Controller
             ->join('city', 'city.id', '=', 'client_route_info.city_id')
             ->leftjoin('hotels', 'hotels.id','=','hotel_id')
             ->where('client_route_info.status', '=', 1)
-            ->where('client_route.status', '=', 1)
-            ->whereBetween('client_route_info.date', [$request->dateStart, $request->dateStop])
-            ->orderby('weekOfYear','ASC')
+            ->where('client_route.status', '=', 1);
+            if($request->dateStart == null && $request->dateStop != null)
+                $clientRouteInfo =$clientRouteInfo->whereBetween('client_route_info.date', ['%', $request->dateStop]);
+            else if($request->dateStart != null && $request->dateStop == null)
+                $clientRouteInfo =$clientRouteInfo->where('client_route_info.date', '>=',$request->dateStart);
+            else if($request->dateStart != null && $request->dateStop != null)
+                $clientRouteInfo = $clientRouteInfo->whereBetween('client_route_info.date', [$request->dateStart, $request->dateStop]);
+             $clientRouteInfo = $clientRouteInfo->orderby('weekOfYear','ASC')
             ->orderby('city.name','ASC')
             ->orderby('date','ASC')
             ->orderby('clientName','ASC')
