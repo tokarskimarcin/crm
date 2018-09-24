@@ -17,6 +17,7 @@
     <style>
         textarea.baseDivision {
             resize: none;
+
         }
 
         .colorRow {

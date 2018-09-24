@@ -82,6 +82,9 @@
 
     $(document).ready( function () {
         var show_action = {{Auth::user()->user_type->all_departments}};
+        let userType = {{Auth::user()->user_type_id}};
+        let userId = {{Auth::user()->id}};
+
 
         table = $('#datatable').DataTable({
             "autoWidth": false,
@@ -116,10 +119,24 @@
                     }
                 },"orderable": false, "searchable": false },
                 {"data": function (data, type, dataToSet) {
-                    if(show_action == 1)
-                        return '<a href="edit_cadre/'+data.id+'" >Edytuj</a>';
-                    else return null;
-                },"orderable": false, "searchable": false }
+                        if(show_action == 1) {
+                            if(userType == 15) {
+                                if((userId == 4272 && data.id == 4272) || (userId == 29 && data.id == 29)) {
+                                    return null;
+                                }
+                                else {
+                                    return '<a href="edit_cadre/'+data.id+'" >Edytuj</a>';
+                                }
+                            }
+                            else {
+                                return '<a href="edit_cadre/'+data.id+'" >Edytuj</a>';
+                            }
+
+                        }
+                        else {
+                            return null;
+                        }
+                    },"orderable": false, "searchable": false }
                 ]
         });
 
