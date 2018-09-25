@@ -208,6 +208,15 @@
         });
 
         $('#date_start, #date_stop').change(function (e) {
+            let dateStart = $('#date_start');
+            let dateStop = $('#date_stop');
+            if(moment(dateStart.val())> moment(dateStop.val())){
+                if($(e.target).attr('id') === dateStart.attr('id')){
+                    dateStop.val(dateStart.val());
+                }else{
+                    dateStart.val(dateStop.val());
+                }
+            }
             getDepartmentsAveragesForEveryDayAjax($('#date_start').val(), $('#date_stop').val()).then(function (resolve) {
                 drawProperTypeChart($('#departmentsSelect').val());
             });
