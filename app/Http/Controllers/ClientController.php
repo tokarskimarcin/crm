@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\ActivityRecorder;
 use App\ClientGiftType;
+use App\ClientLimits;
 use App\ClientMeetingType;
 use App\Clients;
 use Illuminate\Http\Request;
@@ -232,5 +233,38 @@ class ClientController extends Controller
         }
     }
 
+    public function getClientLimits(Request $request){
+        if($request->ajax()){
+            $clientLimits = ClientLimits::where('client_id', $request->clientId)->get();
+            for($i = 1; $i <= 4; $i++){
+                if(empty($clientLimits->where('limit_order', $i)->first())){
+                    $clientLimit = new ClientLimits();
+                    $clientLimit->client_id = $request->clientId;
+                    $clientLimit->limit_order = $i;
+                    $clientLimit->limit = 0;
+                    $clientLimit->save();
+                    $clientLimits->push($clientLimit);
+                }
+            }
+            return $clientLimits->sortBy('limit_order');
+        }
+    }
 
+    public function saveClientLimits(Request $request){
+        if($request->ajax()){
+            $clientLimits = ClientLimits::where('client_id', $request->clientId)->get();
+            foreach($request->limitsToSave as $limit){
+                $clientLimit = $clientLimits->where('limit_order', $limit['order'])->first();
+                $clientLimit->limit = $limit['limit'];
+                $clientLimit->save();
+            }
+            return 'success';
+        }
+    }
+
+    public function getClients(Request $request){
+        if($request->ajax()){
+            return Clients::all();
+        }
+    }
 }
