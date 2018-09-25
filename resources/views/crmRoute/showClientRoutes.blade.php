@@ -48,6 +48,18 @@
             animation-duration: 1s;
             animation-fill-mode: forwards;
         }
+        #clientsTable td:hover{
+            cursor: pointer;
+        }
+        .headingSubtext{
+            color: #a2a2a2
+        }
+        .leftPart{
+             border-right: 1px solid #e2e2e2;
+         }
+        .rightPart{
+            border-left: 1px solid #e2e2e2;
+        }
 
         @keyframes example {
             from {background-color: white;}
@@ -319,15 +331,11 @@
                 </div>
                 <div class="modal-body edit-modal-body">
                     <div class="row">
-                        <div class="col-md-6">
-                            <div class="leftPart">
-
-                            </div>
+                        <div class="col-md-4 leftPart" style="height:100%">
                         </div>
-                        <div class="col-md-6">
-                            <div class="rightPart">
-
-                            </div>
+                        <div class="col-md-4 middlePart" style="height:100%">
+                        </div>
+                        <div class="col-md-4 rightPart" style="height:100%">
                         </div>
                     </div>
                 </div>
@@ -348,6 +356,7 @@
         let idOfRow = null;
 
         let selectedClientIds = []; //after user click on 1st table row, it assing clientRouteId to this variable
+        let clientsDatatable = null;
         var toDay = '{{date('Y-m-d')}}';
         var tableToExcel = (function() {
             var uri = 'data:application/vnd.ms-excel;base64,'
@@ -450,7 +459,7 @@
                 arrays: {
                     selectedWeeks: ["0"]
                 }
-            }
+            };
 
             $('#weekNumber').select2();
 
@@ -924,6 +933,35 @@
             /**
              * This function append to modal limit input
              */
+            function appendClientsTable(placeToAppend) {
+                $.ajax({
+                    url: '{{route('api.getClients')}}',
+                    type: 'GET'
+                }).done(function (response) {
+                    let thead = $('<thead>').append($('<tr>').append($('<th>').text('Klient')));
+
+                    let tbody = $('<tbody>');
+                    $.each(response, function (index, client) {
+                        tbody.append($('<tr>').append($('<td>').attr('data-id',client.id).text(client.name)))
+                    });
+
+                    tbody.click(function (e) {
+                       clientsTableClickHandle(e);
+                    });
+                    let table = $('<table>').attr('id','clientsTable').addClass('table display compact').css('width','100%').append(thead).append(tbody);
+                    $(placeToAppend).append(table);
+                    clientsDatatable = table.DataTable({
+                        paging:false,
+                        scrollY: '20vh',
+                        dom: 't'
+                    });
+
+                });
+            }
+
+            /**
+             * This function append to modal limit input
+             */
             function appendSingleLimitInput(placeToAppend, limitNumber = 0) {
                 let label = document.createElement('label');
                 label.setAttribute('for', 'singleLimit_' + limitNumber);
@@ -1026,14 +1064,22 @@
                 placeToAppend.insertAdjacentElement('afterbegin', infoTable);
             }
 
-            function appendHeading(placeToAppend, text) {
+            function appendHeading(placeToAppend, text, subtext = null) {
                 let heading = document.createElement('div');
                 heading.classList.add('heading');
                 heading.style.fontSize = '1.4em';
                 heading.textContent = text;
+
                 let line = document.createElement('hr');
                 line.classList.add('horizontal-line');
                 placeToAppend.insertAdjacentElement('afterbegin', line);
+                if(subtext != null){
+                    let subtextHeading = document.createElement('div');
+                    subtextHeading.classList.add('headingSubtext');
+                    subtextHeading.style.fontSize = '0.8em';
+                    subtextHeading.textContent = subtext;
+                    placeToAppend.insertAdjacentElement('afterbegin', subtextHeading);
+                }
                 placeToAppend.insertAdjacentElement('afterbegin', heading);
             }
 
@@ -1043,7 +1089,8 @@
             function addModalBodyContext() {
                 let modalBody = document.querySelector('.edit-modal-body');
                 let modalBody1 = document.querySelector('.leftPart');
-                let modalBody2 = document.querySelector('.rightPart');
+                let modalBody2 = document.querySelector('.middlePart');
+                let modalBody3 = document.querySelector('.rightPart');
 
                 if(modalBody.querySelector('table')) {
                     let modalTable = modalBody.querySelector('table');
@@ -1066,9 +1113,11 @@
 
                 modalBody1.innerHTML = ''; //clear modal body1
                 modalBody2.innerHTML = ''; //clear modal body2
+                modalBody3.innerHTML = ''; //clear modal body2
 
                 appendHeading(modalBody1, 'Limity dla kampanii 2 i 3 pokazowej');
                 appendHeading(modalBody2, 'Limit dla kampanii 1 pokazowej');
+                appendHeading(modalBody3, 'Limity klientów', '(wybierz klienta)');
 
                 createModalTable(modalBody); //table part of modal
                 appendHeading(modalBody, 'Przypisywanie limitów działa poprawnie dla tras, które mają max 3 dni oraz max 3 godziny pokazów w poszczególnym dniu');
@@ -1077,6 +1126,8 @@
                 appendLimitInput(modalBody1, 3);
 
                 appendSingleLimitInput(modalBody2, 1);
+
+                appendClientsTable(modalBody3);
 
                 let submitButton = document.createElement('button');
                 submitButton.id = 'submitEdition';
@@ -1608,6 +1659,19 @@
                 table2.ajax.reload();
             });
 
+            $('#editModal').on('shown.bs.modal', function (e) {
+                    clientsDatatable.columns.adjust().draw();
+            });
+
+            function findObjectByKey(array, key, value) {
+                for (var i = 0; i < array.length; i++) {
+                    if (array[i][key] === value) {
+                        return array[i];
+                    }
+                }
+                return null;
+            }
+
             function colorSelectedClients(selectedClients) {
                 const allClientsInTable = document.querySelectorAll('#datatable tr');
                 allClientsInTable.forEach(client => {
@@ -1648,6 +1712,35 @@
                 }
             }
 
+            function clientsTableClickHandle(e){
+                if($(e.target).is('td')){
+                    document.body.style.cursor = "wait";
+                    $.ajax({
+                        url: '{{route('api.getClientLimits')}}',
+                        type: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        },
+                        data: {
+                            clientId: $(e.target).data('id')
+                        }
+                    }).done(function (response) {
+                        document.body.style.cursor = "default";
+                        $.each($('.limitInp'),function (index, input) {
+                            let id = $(input).attr('id').split('_');
+                            if(id[0] === 'changeLimits'){
+                                console.log(response);
+                                console.log(id[0]);
+                                console.log(id[1]);
+                                console.log(findObjectByKey(response,'limit_order',id[1]));
+                                $(input).val(findObjectByKey(response,'limit_order', parseInt(id[1])).limit);
+                            }else{
+                                $(input).val(findObjectByKey(response,'limit_order',4).limit);
+                            }
+                        });
+                    });
+                }
+            }
             window.addEventListener('pagehide', setItemsToSeessionStorage);
             clearButton.addEventListener('click', function (e) {
                 clearAllSelections(e);
