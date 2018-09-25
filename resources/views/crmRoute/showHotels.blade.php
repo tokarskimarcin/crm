@@ -250,22 +250,23 @@
                                     </select>
                                 </div>
                             </div>
-                        </div>
-                        <div class="row">
-                            {{--<div class="col-md-4">
-                                <label for="order">Zamówienie</label>
-                                <input type="file" name="order" id="order" class="form-control" style="padding-bottom: 3em">
-                            </div>--}}
-                            <div class="col-md-4">
-                                <label for="invoiceTemplate">Nowy szablon faktury</label>
-                                <input type="file" name="invoice_template" id="invoiceTemplate" class="form-control file" style="padding-bottom: 3em">
-                            </div>
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label for="comment">Uwagi</label>
                                     <input type="text" name="comment" id="comment" class="form-control" placeholder="Tutaj wprowadź krótki komentarz max 255 znaków" value="">
                                 </div>
                             </div>
+                        </div>
+                        <div class="row">
+                            {{--<div class="col-md-4">
+                                <label for="order">Zamówienie</label>
+                                <input type="file" name="order" id="order" class="form-control" style="padding-bottom: 3em">
+                            </div>--}}
+                            {{--<div class="col-md-4">--}}
+                                {{--<label for="invoiceTemplate">Nowy szablon faktury</label>--}}
+                                {{--<input type="file" name="invoice_template" id="invoiceTemplate" class="form-control file" style="padding-bottom: 3em">--}}
+                            {{--</div>--}}
+
                         </div>
                         <div class="row" style="margin-top: 1em">
                             <div class="col-md-12">
@@ -962,24 +963,24 @@
             $('#newHotelForm').submit(function (e) {
                 e.preventDefault();
                 saveNewHotel().done(function(){
-                    //let orderFileInput = $('#order');
-                    let invoiceTemplateFileInput = $('#invoiceTemplate');
-                    /*if(orderFileInput.prop("files").length !== 0){
-                        formData.append(orderFileInput.prop('name'), orderFileInput.prop("files")[0]);
-                        uploadFiles = true;
-                    }*/
-                    let formData = new FormData();
-                    let uploadFiles = false;
-                    if(invoiceTemplateFileInput.prop("files").length !== 0){
-                        let fileNames = [];
-                        formData.append(invoiceTemplateFileInput.prop('name'), invoiceTemplateFileInput.prop("files")[0]);
-                        fileNames.push(invoiceTemplateFileInput.prop('name'));
-                        uploadFiles = true;
-
-                        formData.append('fileNames', JSON.stringify(fileNames));
-                    }
-                    if(uploadFiles)
-                        uploadFilesAjax(formData);
+                    // //let orderFileInput = $('#order');
+                    // let invoiceTemplateFileInput = $('#invoiceTemplate');
+                    // /*if(orderFileInput.prop("files").length !== 0){
+                    //     formData.append(orderFileInput.prop('name'), orderFileInput.prop("files")[0]);
+                    //     uploadFiles = true;
+                    // }*/
+                    // let formData = new FormData();
+                    // let uploadFiles = false;
+                    // if(invoiceTemplateFileInput.prop("files").length !== 0){
+                    //     let fileNames = [];
+                    //     formData.append(invoiceTemplateFileInput.prop('name'), invoiceTemplateFileInput.prop("files")[0]);
+                    //     fileNames.push(invoiceTemplateFileInput.prop('name'));
+                    //     uploadFiles = true;
+                    //
+                    //     formData.append('fileNames', JSON.stringify(fileNames));
+                    // }
+                    // if(uploadFiles)
+                    //     uploadFilesAjax(formData);
                 });
             });
 
