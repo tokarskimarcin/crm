@@ -3,6 +3,9 @@
     <style> .nameHead {
             width: 100%;
         }
+        .colLeft{
+            border-right: 1px solid #e2e2e2;
+        }
     </style>
 @endsection
 @section('content') {{--Header page --}}
@@ -44,6 +47,7 @@
                                 <th>Uwaga</th>
                                 <th>Podgląd</th>
                                 <th style="text-align: center">Akcja</th>
+                                <th style="width:10%">Limity</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -150,6 +154,15 @@
     </div>
 </div>
 
+<div id="ModalLimits" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header"></div>
+            <div class="modal-body"></div>
+            <div class="modal-footer"></div>
+        </div>
+    </div>
+</div>
 {{--MODAL Dodaj Klienta--}}
 <div id="ModalClient" class="modal fade" role="dialog">
     <div class="modal-dialog modal-lg" style="width: 90%">
@@ -365,6 +378,7 @@
 
         let editFlag = false;
         let saveButton = document.querySelector('#saveClient');
+        let modalLimits = $('#ModalLimits');
         var saveCityButtonClicked = false;
 
         /**
@@ -988,6 +1002,9 @@
                     return row;
                 }, "fnDrawCallback": function (settings) {
 
+                    $('.editLimitsButton').click(function (e) {
+                        editLimitsButtonHandler(e);
+                    });
                     /**
                      * Zmiana statusu klienta
                      */
@@ -1061,10 +1078,59 @@
                                 returnButton += "<button class='button-status-client btn btn-success btn-block' data-id=" + data.id + " data-status=1 ><span class='glyphicon glyphicon-off'></span> Włącz</button>";
                             return returnButton;
                         }, "orderable": false, "searchable": false, width: '10%'
-                    }
+                    },
+                    {
+                        'data': function (data) {
+                            let editLimitsSpan = $('<span>').addClass('glyphicon glyphicon-wrench');
+                            let editLimitsButton = $('<button>').addClass('btn btn-block btn-default editLimitsButton').append(editLimitsSpan).append(' Limity').attr('data-id', data.id);
+                            return editLimitsButton.prop('outerHTML');
+                        }, 'orderable': false, 'searchable': false}
                 ],
             });
         });
+        function createModalLimits(clientId, limits) {
+            let modalHeader = modalLimits.find('.modal-header');
+            let modalBody = modalLimits.find('.modal-body');
+            let modalFooter = modalLimits.find('.modal-footer');
+            modalHeader.text('');
+            modalBody.text('');
+            modalFooter.text('');
+            modalHeader.append($('<h2>').append('Edytuj limity'));
+
+            let colLeft = $('<div>').addClass('col-md-6 colLeft');
+            for(let i = 1; i<4; i++){
+                colLeft.append($('<label>').append('Limit '+i).attr('for','limit_'+i))
+                    .append($('<input>').attr('id','limit_'+1).addClass('form-control limitInput').attr('type','text').attr('data-order',i).val(findObjectByKey(limits,'limit_order', i).limit));
+            }
+
+            let colRight = $('<div>').addClass('col-md-6 colRight').
+                append($('<label>').append('Limit '+1).attr('for','limit_'+1))
+                .append($('<input>').attr('id','limit_'+4).addClass('form-control limitInput').attr('type','text').attr('data-order',4).val(findObjectByKey(limits,'limit_order', 4).limit));
+
+            modalBody.append($('<div>').addClass('row').append(colLeft).append(colRight));
+
+            let saveLimitsButton = $('<button>').addClass('btn btn-block btn-success').attr('data-dismiss','modal').append($('<span>').addClass('glyphicon glyphicon-save')).append(' Zapisz').click(
+                function () {
+                    let limitsToSave = [];
+                    $('.limitInput').each(function (index, input) {
+                        limitsToSave.push({'order': $(input).data('order'), 'limit': $(input).val()});
+                    });
+
+                    saveLimitsButtonHandler(clientId, limitsToSave);
+                }
+            );
+            modalFooter.append(saveLimitsButton);
+            modalLimits.modal('show');
+        }
+
+        function findObjectByKey(array, key, value) {
+            for (var i = 0; i < array.length; i++) {
+                if (array[i][key] === value) {
+                    return array[i];
+                }
+            }
+            return null;
+        }
 
         function createLimitRow(data = null) {
             let lpSpanColumn = $(document.createElement('td')).addClass('limitNr').attr('scope','row');//.css('font-weight: bold');//.addClass('col-md-1')
@@ -1113,6 +1179,42 @@
             $(limitEndingInputs.get(limitEndingInputs.length-1)).val('23:59').attr('disabled', true);
 
 
+        }
+
+        function editLimitsButtonHandler(e){
+            let clientId = $(e.target).data('id');
+            $.ajax({
+                url:'{{route('api.getClientLimits')}}',
+                type: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                data: {
+                    clientId: clientId
+                },
+                success: function (response) {
+                    createModalLimits(clientId, response);
+                }
+            });
+        }
+        function saveLimitsButtonHandler(clientId, limitsToSave){
+            $.ajax({
+                url:'{{route('api.saveClientLimits')}}',
+                type: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                data: {
+                    clientId: clientId,
+                    limitsToSave: limitsToSave
+                },
+                success: function (response) {
+
+                    if(response == 'success'){
+                        notify('<strong>Limity zostały edytowane</strong>', 'success');
+                    }
+                }
+            });
         }
 
         function handleStartingHourInput(){

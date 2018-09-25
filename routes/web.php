@@ -285,6 +285,9 @@ Route::POST('/clientReport', 'CrmRouteController@clientReport')->name('api.clien
 Route::post('/getClient', 'ClientController@getClient')->name('api.getClient');
 Route::post('/getGiftType', 'ClientController@getGiftType')->name('api.getGiftType');
 Route::post('/getMeetingType', 'ClientController@getMeetingType')->name('api.getMeetingType');
+Route::post('/getClientLimits', 'ClientController@getClientLimits')->name('api.getClientLimits');
+Route::post('/saveClientLimits', 'ClientController@saveClientLimits')->name('api.saveClientLimits');
+Route::get('/getClients', 'ClientController@getClients')->name('api.getClients');
 
 Route::post('/saveNewGift', 'ClientController@saveNewGift')->name('api.saveNewGift');
 Route::post('/saveNewMeeting', 'ClientController@saveNewMeeting')->name('api.saveNewMeeting');
