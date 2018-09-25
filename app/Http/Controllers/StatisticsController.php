@@ -5373,18 +5373,20 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
     public function pbxReportDetailedAjax(Request $request) {
         $dateStart = $request->dateStart;
         $dateStop = $request->dateStop;
-        $pbxReport = PBXDetailedCampaign::
-        whereIn('id', function($query) use($dateStart, $dateStop){
-            $query->select(DB::raw(
-                'MAX(id)'
-            ))
-                ->from('pbx_detailed_campaign_report')
-                ->whereBetween('date', [$dateStart, $dateStop])
-                ->groupBy('campaign_pbx_id');
-        })
-            ->groupBy('campaign_pbx_id')
-            ->get();
+        $pbxReport = collect($this::pbxReportDetailedQuerry($dateStart,$dateStop))
+            ->where('date','>=',$dateStart)
+            ->where('date','<=',$dateStop);
         return datatables($pbxReport)->make(true);
+    }
+
+    public function pbxReportDetailedQuerry($dateStart,$dateStop){
+        return $pbxReport = DB::select( DB::raw("
+        SELECT * FROM `pbx_detailed_campaign_report`
+        a inner join (select `campaign_pbx_id`,max(success) as 'success' FROM `pbx_detailed_campaign_report`
+        group by `campaign_pbx_id`) b
+        on a.campaign_pbx_id = b.campaign_pbx_id and
+        a.success = b.success
+        where a.success > 0") );
     }
 
     public function autoConsultantsLoginsChecking($dep_id)

@@ -25,14 +25,15 @@
         </div>
         <div class="alert alert-info">
             Moduł <strong>Baza miejscowości/hotele</strong> prezentuje informacje o miastach i hotelach przypisanych do tras dla poszczególnych klientów.
-            Lista <strong>klienci </strong> jest wielokrotnego wyboru. Tryb pełnoekranowy, można go opuścić naciskająć przycisk "ESC" na klawiaturze.
+            Lista <strong>klienci </strong> jest wielokrotnego wyboru. Tryb pełnoekranowy, można go opuścić naciskająć przycisk "ESC" na klawiaturze. <br>
+            Odznaczenie checkboxa <strong>tylko pokazy bez hoteli</strong> powoduje wyświetlenie zarówno pokazów z przypisanymi hotelami jak również bez przypisanych hoteli.
         </div>
 
             <div class="row">
                 <div class="col-md-12">
                         <div class="form-group">
                             <input type="checkbox" style="display:inline-block; margin-right: 0.5em; margin-left: 0.5em;" id="showWithoutHotel">
-                            <label for="showWithoutHotel">Pokazy bez hoteli</label>
+                            <label for="showWithoutHotel">Tylko pokazy bez hoteli</label>
                         </div>
                 </div>
                 <div class="col-md-3">
