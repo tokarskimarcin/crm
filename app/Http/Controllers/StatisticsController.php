@@ -5373,7 +5373,9 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
     public function pbxReportDetailedAjax(Request $request) {
         $dateStart = $request->dateStart;
         $dateStop = $request->dateStop;
-        $pbxReport = collect($this::pbxReportDetailedQuerry($dateStart,$dateStop));
+        $pbxReport = collect($this::pbxReportDetailedQuerry($dateStart,$dateStop))
+            ->where('date','>=',$dateStart)
+            ->where('date','<=',$dateStop);
         return datatables($pbxReport)->make(true);
     }
 
@@ -5384,7 +5386,7 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
         group by `campaign_pbx_id`) b
         on a.campaign_pbx_id = b.campaign_pbx_id and
         a.success = b.success
-        where a.date >= '$dateStart' and a.date <= '$dateStop' and a.success > 0") );
+        where a.success > 0") );
     }
 
     public function autoConsultantsLoginsChecking($dep_id)
