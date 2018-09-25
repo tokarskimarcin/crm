@@ -18,6 +18,7 @@ use App\Http\StaticMemory;
 use App\InvoiceStatus;
 use App\PaymentMethod;
 use App\PbxCrmInfo;
+use App\PBXDetailedCampaign;
 use App\Route;
 use App\RouteInfo;
 use App\Schedule;
@@ -2481,6 +2482,93 @@ class CrmRouteController extends Controller
             ->join('departments', 'department_info.id_dep', '=', 'departments.id')
             ->get();
 
+        $sixMonthsAgo = date('Y-m-d', strtotime('-6 months'));
+//        dd($sixMonthsAgo);
+
+        //Info about campaigns from last six months
+        $pbxReportInfo = PBXDetailedCampaign::select('name')
+            ->where('date', '>', $sixMonthsAgo)
+            ->orderBy('date')
+            ->get();
+
+        //list of all cities from database
+//        $allCities = Cities::select('name')->get();
+//        $inputs = ['ą', 'ć', 'ę', 'ł', 'ń', 'ó', 'ś', 'ź', 'ż', 'Ą', 'Ć', 'Ę', 'Ł', 'Ń', 'Ó', 'Ś', 'Ź', 'Ż' ];
+//        $outputs = ['a', 'c', 'e', 'l', 'n', 'o', 's', 'x', 'z', 'A', 'C', 'E', 'L', 'N', 'O', 'S', 'X', 'Z'];
+
+        $allCitiesUsedInCampaignsArr = [];
+        foreach($pbxReportInfo as $record) {
+            $partsOfCapaignName = explode('_', $record['name']);
+            if(count($partsOfCapaignName) > 2 && $partsOfCapaignName != null) {
+
+//                array_push($allCitiesUsedInCampaignsArr, mb_strtolower(str_replace($inputs,$outputs, $partsOfCapaignName[1]),'UTF-8'));
+                array_push($allCitiesUsedInCampaignsArr, $partsOfCapaignName[1]);
+            }
+        }
+
+        $allCitiesUsedInCampaignsUniqueArr = array_unique($allCitiesUsedInCampaignsArr);
+//        dd($allCitiesUsedInCampaignsUniqueArr);
+
+        dd($allCitiesUsedInCampaignsUniqueArr);
+        $cityMedianArr = [];
+        foreach($allCitiesUsedInCampaignsUniqueArr as $uniqueCity) {
+            $campaignData = PBXDetailedCampaign::select(
+                'name',
+                'database_use',
+                'success',
+                'campaign_pbx_id',
+                'id')
+                ->where('name', 'LIKE', '%\_' . $uniqueCity . '\_%')
+                ->where('date', '>', $sixMonthsAgo)
+                ->orderBy('id', 'desc')
+                ->get()
+                ->groupBy('campaign_pbx_id');
+
+            $allCampaignInfoArr = []; //This array contains of only final records from each campaign
+
+            dd($campaignData[39455]);
+            foreach ($campaignData as $singleCampaign) {
+                $mostActualRecord = $singleCampaign->first();
+                if($mostActualRecord['success'] != 0 && $mostActualRecord['database_use'] != 0) {
+                    array_push($allCampaignInfoArr, $mostActualRecord);
+                }
+            }
+
+            uasort($allCampaignInfoArr, function($a, $b) {
+                if ($a['database_use'] == $b['database_use']) {
+                    return 0;
+                }
+                return ($a['database_use'] < $b['database_use']) ? -1 : 1;
+            });
+
+//            dd('1');
+            $allCampaignsWithNewIndexes = [];
+            foreach($allCampaignInfoArr as $item) {
+                array_push($allCampaignsWithNewIndexes, $item);
+            }
+
+            $median = 0;
+            if(count($allCampaignsWithNewIndexes) > 0) {
+                if(count($allCampaignsWithNewIndexes) % 2 == 1) {
+                    $median = $allCampaignsWithNewIndexes[floor(count($allCampaignsWithNewIndexes) / 2)]['database_use'];
+                }
+                else {
+                    $firstElementIndex = (count($allCampaignsWithNewIndexes) / 2) - 1;
+                    $secondElementIndex = (count($allCampaignsWithNewIndexes) / 2);
+                    $firstElement = $allCampaignsWithNewIndexes[$firstElementIndex]['database_use'];
+                    $secondElement = $allCampaignsWithNewIndexes[$secondElementIndex]['database_use'];
+                    $median = round(($firstElement + $secondElement) / 2,2);
+                }
+
+            }
+
+            $obj = new \stdClass();
+            $obj->city = $uniqueCity;
+            $obj->median = $median;
+            array_push($cityMedianArr, $obj);
+        }
+        dd($cityMedianArr);
+
         return view('crmRoute.showRoutesDetailed')
             ->with('lastWeek', $numberOfLastYearsWeek)
             ->with('currentWeek', $weeksString)
@@ -2570,7 +2658,6 @@ class CrmRouteController extends Controller
                 }
             });
         }
-
 
         if($typ[0] != '0') {
             $campaignsInfo = $campaignsInfo->whereIn('client_route.type', $typ);
