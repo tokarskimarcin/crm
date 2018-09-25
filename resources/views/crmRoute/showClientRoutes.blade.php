@@ -1212,6 +1212,7 @@
                 $('#datatable tr').removeClass('check');
                 selectedClientIds  = [];
                 $(e.target).find('.badge').text(selectedClientIds.length);
+                notify("<strong>Wszystkie zaznaczenia klientów zostały usuniete</strong>", 'success', 4000);
                 table2.ajax.reload();
             }
 
@@ -1628,7 +1629,7 @@
                         coloredRows.forEach(colorRow => {
                             colorRow.classList.remove('colorRow');
                         });
-                        notify("<strong>Wszystkie zaznaczenia zostały usuniete</strong>", 'success', 4000);
+                        notify("<strong>Wszystkie zaznaczenia tras zostały usuniete</strong>", 'success', 4000);
                     }
                 }
                 arrayOfTableRows = [];
