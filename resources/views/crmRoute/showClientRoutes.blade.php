@@ -854,7 +854,7 @@
                             return finalName;
                         },"name": "client_name"
                     },
-                    {"data": "date"},
+                    {"data": "dateOfFirstShowFull"},
                     {
                         "data": function (data, type, dataToSet) {
                             if(data.route_name_display) {
