@@ -1012,6 +1012,8 @@ Route::get('/TeamDKJHourData', 'PBXDataAPI@TeamDKJHourData');
 //Dane Czasu na rekord
 Route::get('/TimeOnRecordData', 'PBXDataAPI@TimeOnRecordData');
 
+Route::get('/ConfirmationReport', 'PBXDataAPI@ConfirmationReport');
+
 //campaign reports mothod for database
 Route::get('/report_campaign', 'PBXDataAPI@report_campaign');
 
@@ -1019,6 +1021,7 @@ Route::get('/pbxDetailedReport', 'PBXDataAPI@pbx_detailed_campaign_report');
 
 //Dane z Aktuanlnego stanu kampanii
 Route::get('/pbx_crm_info', 'PBXDataAPI@pbx_crm_info');
+
 
 Route::get('/ReportCoaching', 'StatisticsController@MailpageReportCoaching');
 Route::get('/MailToDirectors', 'StatisticsController@MailToEveryDirector');
