@@ -4276,11 +4276,24 @@ class CrmRouteController extends Controller
         $limitDate = Date('W', strtotime('-100 days'));
         $limitDateFull = Date('Y-m-d', strtotime('-100 days'));
 
-        $scheduleData = Schedule::select('id_user as userId', 'users.first_name as name','department_info.id as depId' ,'users.last_name as surname', 'week_num', 'year', 'monday_comment as pon', 'tuesday_comment as wt', 'wednesday_comment as sr', 'thursday_comment as czw', 'friday_comment as pt', 'saturday_comment as sob','sunday_comment as nd')
+        $scheduleData = Schedule::select(
+            'id_user as userId',
+            'users.first_name as name',
+            'department_info.id as depId',
+            'users.last_name as surname',
+            'week_num',
+            'year',
+            'monday_comment as pon',
+            'tuesday_comment as wt',
+            'wednesday_comment as sr',
+            'thursday_comment as czw',
+            'friday_comment as pt',
+            'saturday_comment as sob',
+            'sunday_comment as nd')
             ->join('users', 'schedule.id_user', '=', 'users.id')
             ->join('department_info', 'users.department_info_id', '=', 'department_info.id')
             ->where('week_num', '>', $limitDate)
-//            ->where('department_info.id_dep_type', '=', 1) //gdy beda juz grafiki dla potwierdzen
+            ->where('department_info.id_dep_type', '=', 1) //gdy beda juz grafiki dla potwierdzen
             ->where('users.status_work', '=', 1)
             ->orderBy('surname')
             ->get();
@@ -4299,7 +4312,7 @@ class CrmRouteController extends Controller
         ))
             ->join('users', 'work_hours.id_user', '=', 'users.id')
             ->join('department_info', 'users.department_info_id', '=', 'department_info.id')
-//            ->where('department_info.id_dep_type', '=', 1) //gdy beda juz grafiki dla potwierdzen
+            ->where('department_info.id_dep_type', '=', 1) //gdy beda juz grafiki dla potwierdzen
             ->where('users.status_work', '=', 1)
             ->get();
 
@@ -4310,6 +4323,7 @@ class CrmRouteController extends Controller
         //This part is responsible for creating user objects with date field and pass it to userArr
         $userArr = [];
         foreach($scheduleGroupedByUser as $id => $data) {
+
             $user = new \stdClass();
             $user->userId = $id;
             $dataArr = [];
@@ -4322,31 +4336,31 @@ class CrmRouteController extends Controller
                 }
                 $i++;
                 $firstDayOfGivenWeek = Date('Y-m-d', strtotime($item->year . 'W' . $item->week_num));
-                if($item->pon != '') {
+                if($item->pon == '') {
                     array_push($dataArr, $firstDayOfGivenWeek);
                 }
 
-                if($item->wt != '') {
+                if($item->wt == '') {
                     array_push($dataArr, Date('Y-m-d', strtotime($firstDayOfGivenWeek . '+ 1 day')));
                 }
 
-                if($item->sr != '') {
+                if($item->sr == '') {
                     array_push($dataArr, Date('Y-m-d', strtotime($firstDayOfGivenWeek . '+ 2 days')));
                 }
 
-                if($item->czw != '') {
+                if($item->czw == '') {
                     array_push($dataArr, Date('Y-m-d', strtotime($firstDayOfGivenWeek . '+ 3 days')));
                 }
 
-                if($item->pt != '') {
+                if($item->pt == '') {
                     array_push($dataArr, Date('Y-m-d', strtotime($firstDayOfGivenWeek . '+ 4 days')));
                 }
 
-                if($item->sob != '') {
+                if($item->sob == '') {
                     array_push($dataArr, Date('Y-m-d', strtotime($firstDayOfGivenWeek . '+ 5 days')));
                 }
 
-                if($item->nd != '') {
+                if($item->nd == '') {
                     array_push($dataArr, Date('Y-m-d', strtotime($firstDayOfGivenWeek . '+ 6 days')));
                 }
             }
@@ -4393,7 +4407,9 @@ class CrmRouteController extends Controller
         department_type.name as departmentName2,
         city.name as cityName,
         client_route.type as typ,
-        client_route.canceled
+        client_route.canceled,
+        users.first_name,
+        users.last_name
         '))
             ->join('client_route','client_route.id','client_route_info.client_route_id')
             ->leftjoin('client','client.id','client_route.client_id')
@@ -4401,6 +4417,7 @@ class CrmRouteController extends Controller
             ->leftjoin('department_info','department_info.id','client_route_info.department_info_id')
             ->leftjoin('departments','departments.id','department_info.id_dep')
             ->leftjoin('department_type', 'department_type.id', '=', 'department_info.id_dep_type')
+            ->leftjoin('users', 'client_route_info.confirmingUser', '=', 'users.id')
             ->where('client_route_info.status', '=', 1) //now it's important
             ->whereIn('client_route.status',[1,2]);
 
