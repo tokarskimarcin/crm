@@ -776,7 +776,7 @@
                     });
 
                     $('#datatable2 tbody tr').on('click', function(e) {
-                        if(!(e.target.matches('.btn'))) {
+                        if(!$(e.target).is('button')) {
                             let thisRow = $(this);
                             const clientRouteId = thisRow.attr('id');
                             colorRowAndAddIdToArray(clientRouteId, thisRow);
@@ -1729,10 +1729,6 @@
                         $.each($('.limitInp'),function (index, input) {
                             let id = $(input).attr('id').split('_');
                             if(id[0] === 'changeLimits'){
-                                console.log(response);
-                                console.log(id[0]);
-                                console.log(id[1]);
-                                console.log(findObjectByKey(response,'limit_order',id[1]));
                                 $(input).val(findObjectByKey(response,'limit_order', parseInt(id[1])).limit);
                             }else{
                                 $(input).val(findObjectByKey(response,'limit_order',4).limit);
