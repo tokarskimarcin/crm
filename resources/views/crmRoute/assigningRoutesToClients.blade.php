@@ -426,7 +426,6 @@
 
                     if(localStorage.getItem('selectedClient')) {
                         let clientToSelect = localStorage.getItem('selectedClient');
-                        console.log('clientToSelect: ', clientToSelect);
                         let thisTable = document.querySelector('#table_client');
                         let allTr = thisTable.querySelectorAll('tr');
                         allTr.forEach(clientRow => {
@@ -998,7 +997,8 @@
                                     }
                                 }
                                 else if(response[i].block == 0) {
-                                    responseOption.textContent = response[i].name;
+                                    responseOption.textContent = response[i].name + "  (D: " + response[i].max_hour + ')';
+                                    responseOption.setAttribute('title', "dostępne jeszcze " + response[i].max_hour + " godzin");
                                     if (response[i].max_hour >= 0) {
                                         responseOption.setAttribute('data-max_hours', `${response[i].max_hour}`); //needed for auto setting hours
                                     }
@@ -1184,6 +1184,8 @@
                     }
                 }
                 else if(data.block == 0) {
+                    cityOpt.textContent = data.name + "  (D: " + data.max_hour + ')';
+                    cityOpt.setAttribute('title', "dostępne jeszcze " + data.max_hour + " godzin");
                     if(data.max_hour >= 0) {
                         cityOpt.setAttribute('data-max_hours', `${data.max_hour}`);
                     }
@@ -2153,9 +2155,7 @@
                                         }
                                         else { //prev container is in the same day
                                             console.log('next exist & next day, grandnext doesnt exist, prevshowcontaier Exist & in same day');
-                                            let changeDistanceArr = [100, 100];
-                                            console.log('nextShowContainer', nextShowContainer);
-                                            console.log('prevShowContainer', prevShowContainer);
+                                            let changeDistanceArr = [100, 100];;
                                             limitSelectsWhenBetweenSameDayContainer(nextShowContainer, prevShowContainer, nextShowContainer, changeDistanceArr);
 
                                             // limitSelectsWhenExtreme(nextShowContainer, prevShowContainer, 100);
@@ -2245,7 +2245,6 @@
                             if(allDayContainers.length > 1) {
                                 $(showContainer).slideUp('slow',function () {
                                     if($(showContainer).is(':hidden')){
-                                        console.log('hidden');
                                         dayContainer.parentNode.removeChild(dayContainer);
                                     }
                                 });
