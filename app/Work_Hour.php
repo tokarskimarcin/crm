@@ -40,7 +40,7 @@ class Work_Hour extends Model
         $cAllUsers = Work_Hour::select(DB::raw('
         id_user,
         Concat(users.first_name," ",users.last_name) as userNameInfo,
-        SUM(TIME_TO_SEC(TIMEDIFF(accept_stop, accept_start))) as sec_sum,
+        IFNULL(SUM(TIME_TO_SEC(TIMEDIFF(accept_stop, accept_start))), 0) as sec_sum,
         sum(success) as success,
         departments.name as dep_city,
         department_type.name as dep_type,
@@ -56,7 +56,7 @@ class Work_Hour extends Model
             })
             ->whereIn('users.user_type_id', [1,2])
             ->groupBy('id_user')
-            ->having(DB::raw('SUM(TIME_TO_SEC(TIMEDIFF(accept_stop, accept_start)))'), '<', $iNumberOfSeconds)
+            ->having(DB::raw('IFNULL(SUM(TIME_TO_SEC(TIMEDIFF(accept_stop, accept_start))), 0)'), '<', $iNumberOfSeconds)
             ->get();
 
         return $cAllUsers;
