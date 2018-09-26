@@ -1230,19 +1230,6 @@ class CrmRouteController extends Controller
         $fullArray = [];
         foreach($client_route_ids as $client_route_id){
 
-            //this part check whether all limits are assigned
-            $infoRecords = $client_route_id;
-            $limitFlag = true;
-            $departmentsFlag = true;
-            foreach($infoRecords as $oneRecord) {
-                if($oneRecord->limits == null || $oneRecord->limits == 0) {
-                    $limitFlag = false;
-                }
-                if($oneRecord->department_info_id == null || $oneRecord->department_info_id == 0) {
-                    $departmentsFlag = false;
-                }
-            }
-
             $client_routes = $client_route_id->sort(function($a, $b) {
                 if($a->date === $b->date) {
                     if($a->id === $b->id) {
@@ -1254,8 +1241,21 @@ class CrmRouteController extends Controller
             });
 
             $clientRoutes = ClientRouteInfo::where('client_route_id', '=', $client_routes->first()->client_route_id)->OnlyActive()->orderBy('date')->get();
+
+            $limitFlag = true;
+            $departmentsFlag = true;
+            foreach($clientRoutes as $singleRecord) {
+                if($singleRecord->limits == null || $singleRecord->limits == 0) {
+                    $limitFlag = false;
+                }
+                if($singleRecord->department_info_id == null || $singleRecord->department_info_id == 0) {
+                    $departmentsFlag = false;
+                }
+            }
+
             $dateOfLastShow = date('W', strtotime($clientRoutes->last()->date));
             $dateOfFirstShow = date('W', strtotime($clientRoutes->first()->date));
+            $dateOfFirstShowFull = date('Y-m-d', strtotime($clientRoutes->first()->date));
 
             $hourOrHotelAssigned = $clientRoutes->first()->hour == null || $client_routes->first()->hotel_id == null ? false : true;
             for($i = 1; $i < count($clientRoutes);$i++){
@@ -1264,6 +1264,7 @@ class CrmRouteController extends Controller
             }
 
             $client_routes->first()->dateOfFirstShow = $dateOfFirstShow;
+            $client_routes->first()->dateOfFirstShowFull = $dateOfFirstShowFull;
             $client_routes->first()->dateOfLastShow = $dateOfLastShow;
             $client_routes->first()->hotelOrHour = $hourOrHotelAssigned;
             $client_routes->first()->hasAllLimits = $limitFlag ? 1 : 0;
