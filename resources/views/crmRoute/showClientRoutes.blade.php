@@ -835,6 +835,9 @@
                             if(data.weekOfYear != data.dateOfLastShow) {
                                 return data.weekOfYear + '/' + data.dateOfLastShow;
                             }
+                            else if(data.weekOfYear != data.dateOfFirstShow) {
+                                return data.dateOfFirstShow + '/' + data.weekOfYear;
+                            }
                             else {
                                 return data.weekOfYear;
                             }
@@ -1528,9 +1531,8 @@
 
                 const searchBox = document.querySelector('input[type="search"][aria-controls="datatable2"');
                 sessionStorage.setItem('search', searchBox.value);
-
                 sessionStorage.setItem('year', yearInput.options[yearInput.selectedIndex].value);
-                // sessionStorage.setItem('weekNumber', weekNumber.options[weekNumber.selectedIndex].value);
+                sessionStorage.setItem('weekNumber',JSON.stringify($(weekNumber).val()));
                 sessionStorage.setItem('type', type.options[type.selectedIndex].value);
                 sessionStorage.setItem('showOnlyAssigned', showOnlyAssignedCheckbox.checked);
                 sessionStorage.setItem('parameters', parameterSelect.options[parameterSelect.selectedIndex].value);
@@ -1569,14 +1571,26 @@
 
                 const weekNumber = document.querySelector('#weekNumber');
                 if (sessionStorage.getItem('weekNumber')) {
-                    const week = sessionStorage.getItem('weekNumber');
-                    somethingChanged = week !== '0' ? true : somethingChanged;
-                    for (let i = 0; i < weekNumber.length; i++) {
-                        if (weekNumber[i].value == week) {
-                            weekNumber[i].selected = true;
-                            // selectedWeek = weekNumber[i].value;
+                    let week = sessionStorage.getItem('weekNumber');
+                    if(week != []) {
+                        week = JSON.parse(week);
+                        if(week.length == 0) {
+                            somethingChanged = true;
+                            APP.arrays.selectedWeeks = ['0'];
+                            $(weekNumber).val(week);
+                        }
+                        else {
+                            somethingChanged = week !== '0' ? true : somethingChanged;
+                            $(weekNumber).val(week);
+                            APP.arrays.selectedWeeks = week;
                         }
                     }
+                    else {
+                        APP.arrays.selectedWeeks = ['0'];
+                        somethingChanged = true;
+                    }
+                    console.log('somethingChanged', somethingChanged);
+                    console.log('APP.arrays.selectedWeeks',  APP.arrays.selectedWeeks);
                     sessionStorage.removeItem('weekNumber');
                 }
 

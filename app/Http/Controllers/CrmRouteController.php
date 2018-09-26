@@ -18,6 +18,7 @@ use App\Http\StaticMemory;
 use App\InvoiceStatus;
 use App\PaymentMethod;
 use App\PbxCrmInfo;
+use App\PBXDetailedCampaign;
 use App\Route;
 use App\RouteInfo;
 use App\Schedule;
@@ -1254,13 +1255,15 @@ class CrmRouteController extends Controller
 
             $clientRoutes = ClientRouteInfo::where('client_route_id', '=', $client_routes->first()->client_route_id)->OnlyActive()->orderBy('date')->get();
             $dateOfLastShow = date('W', strtotime($clientRoutes->last()->date));
+            $dateOfFirstShow = date('W', strtotime($clientRoutes->first()->date));
 
-            $hourOrHotelAssigned = $client_routes->first()->hour == null || $client_routes->first()->hotel_id == null ? false : true;
-            for($i = 1; $i < count($client_routes);$i++){
-                if($hourOrHotelAssigned && ($client_routes[$i]->hotel_id == null || $client_routes[$i]->hour == null) )
+            $hourOrHotelAssigned = $clientRoutes->first()->hour == null || $client_routes->first()->hotel_id == null ? false : true;
+            for($i = 1; $i < count($clientRoutes);$i++){
+                if($hourOrHotelAssigned && ($clientRoutes[$i]->hotel_id == null || $clientRoutes[$i]->hour == null) )
                     $hourOrHotelAssigned = false;
             }
 
+            $client_routes->first()->dateOfFirstShow = $dateOfFirstShow;
             $client_routes->first()->dateOfLastShow = $dateOfLastShow;
             $client_routes->first()->hotelOrHour = $hourOrHotelAssigned;
             $client_routes->first()->hasAllLimits = $limitFlag ? 1 : 0;
@@ -2570,7 +2573,6 @@ class CrmRouteController extends Controller
                 }
             });
         }
-
 
         if($typ[0] != '0') {
             $campaignsInfo = $campaignsInfo->whereIn('client_route.type', $typ);

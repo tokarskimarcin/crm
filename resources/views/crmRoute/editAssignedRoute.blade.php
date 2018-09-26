@@ -998,7 +998,8 @@
                                     }
                                 }
                                 else if(response[i].block == 0) {
-                                    responseOption.textContent = response[i].name;
+                                    responseOption.textContent = response[i].name + "  (D: " + response[i].max_hour + ')';
+                                    responseOption.setAttribute('title', "dostępne jeszcze " + response[i].max_hour + " godzin");
                                     if (response[i].max_hour >= 0) {
                                         responseOption.setAttribute('data-max_hours', `${response[i].max_hour}`); //needed for auto setting hours
                                     }
@@ -1184,6 +1185,8 @@
                     }
                 }
                 else if(data.block == 0) {
+                    cityOpt.textContent = data.city_name + "  (D: " + data.max_hour + ')';
+                    cityOpt.setAttribute('title', "dostępne jeszcze " + data.max_hour + " godzin");
                     if(data.max_hour >= 0) {
                         cityOpt.setAttribute('data-max_hours', `${data.max_hour}`);
                     }
