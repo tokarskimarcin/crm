@@ -50,8 +50,8 @@
             </div>
             <div class="panel-body">
                 <div class="alert alert-info page-info">
-                    Moduł <strong>Grafik dla potwierdzeń</strong> wyświetla informacje o pokazo-godzinach. <br>
-                    W kolumnie <i>"Potwierdzająca osoba"</i> dostępne są osoby, które wg. grafiku są dostępne dla danej daty potwierdzenia dla danego oddziału. <br>
+                    Moduł <strong>Grafik dla potwierdzeń</strong> wyświetla informacje o pokazo-godzinach.<br>
+                    W kolumnie <i>"Potwierdzająca osoba"</i> dostępne są osoby, które wg. grafiku są dostępne dla danej daty potwierdzenia w oddziale osoby wyświetlającej tą zakładkę. <br>
                     Gdy wiersz jest podświetlony na <span style="background-color: indianred;">czerwono</span>, oznacza to, że osoba potwierdzająca w dniu potwierdzania nie nacisneła przycisku start do godziny 9:00 lub wogóle go nie nacisneła. <br>
                     Dla otrzymania lepszego wyglądu tabeli zaleca się <i>wyłącznie</i> panelu nawigacyjnego naciskając przycisk <u>"OFF"</u> w górnym lewym rogu strony. <br>
                     Pokazy <u>anulowane</u> mają cały wiersz w kolorze <span style="background-color: #fdff78;">żółtym</span>.
@@ -157,9 +157,12 @@
                globalVariables: {
                    numberOfChanges: 0,
                    dataTableData: null,
-                   datatableHeight: '75vh' //this variable defines height of table
+                   datatableHeight: '75vh', //this variable defines height of table
+                   loggedUserDepartment: {{Auth::user()->department_info_id}}
                }
            }
+
+           console.log(APP.JSONS.userData);
 
            /********* END OF GLOBAL VARIABLES*********/
 
@@ -357,10 +360,14 @@
                    let alreadyIn = false;
                     APP.JSONS.userData.forEach(person => { //looping over all data about people
                        alreadyIn = false;
+                       //Confirming user is deremined and saved in database
+                       if(data.confirmingUser == person.userId) {
+                           alreadyIn = true;
+                       }
                        if(person.hasOwnProperty('date')) {
                            person.date.forEach(day => {
                                if(day == confirmDate && !alreadyIn) { //current person is available this day
-                                   if(data.depId == person.depId) {
+                                   if(APP.globalVariables.loggedUserDepartment == person.depId) {
                                        alreadyIn = true;
                                        addPersonToConfirmationList(person, confirmingPeopleSelect);
                                    }
@@ -548,9 +555,14 @@
                        },"name":"departmentName", "searchable": "false", "orderable": false
                    },
                    {"data":function(data, type, dataToSet) {
-                       return `<select class="confirming form-control" style="width: 100%;">
-                                    <option value="0">Wybierz</option>
-                                </select>`;
+                       let customSelect =  `<select class="confirming form-control" style="width: 100%;">
+                                    <option value="0">Wybierz</option>`;
+                                if(data.confirmingUser) {
+                                    customSelect += `<option value="${data.confirmingUser}" selected>${data.first_name} ${data.last_name}</option>`;
+                               }
+
+                           customSelect += `</select>`;
+                                    return customSelect;
                         }, "name": "potwierdzający", "width": "20%", "orderable": false, "searchable": false
                    },
                    {"data":function (data, type, dataToSet) {
