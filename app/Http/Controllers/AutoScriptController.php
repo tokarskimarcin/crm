@@ -33,10 +33,9 @@ class AutoScriptController extends Controller
         }
     }
     public function setCityApprovalPart2(){
-        $allCity = Cities::all();
-        $partCity = $allCity->whereBetween('id',[200, 400]);
+        $allCity = Cities::whereBetween('id',[200, 400])->get();
         set_time_limit(10000);
-        foreach ($partCity as $item){
+        foreach ($allCity as $item){
             $url = 'http://baza.teambox.pl/baza/getRaportCityInfoAPI/'.$item->name;
             $url = preg_replace("/ /", "%20", $url);
             $json =  file_get_contents($url);
@@ -51,10 +50,9 @@ class AutoScriptController extends Controller
     }
 
     public function setCityApprovalPart3(){
-        $allCity = Cities::all();
-        $partCity = $allCity->whereBetween('id',[400, 600]);
+        $allCity = Cities::whereBetween('id',[400, 600])->get();
         set_time_limit(10000);
-        foreach ($partCity as $item){
+        foreach ($allCity as $item){
             $url = 'http://baza.teambox.pl/baza/getRaportCityInfoAPI/'.$item->name;
             $url = preg_replace("/ /", "%20", $url);
             $json =  file_get_contents($url);
@@ -69,10 +67,9 @@ class AutoScriptController extends Controller
     }
 
     public function setCityApprovalPart4(){
-        $allCity = Cities::all();
-        $partCity = $allCity->whereBetween('id',[600, 800]);
+        $allCity = Cities::whereBetween('id',[600, 800])->get();
         set_time_limit(10000);
-        foreach ($partCity as $item){
+        foreach ($allCity as $item){
             $url = 'http://baza.teambox.pl/baza/getRaportCityInfoAPI/'.$item->name;
             $url = preg_replace("/ /", "%20", $url);
             $json =  file_get_contents($url);
