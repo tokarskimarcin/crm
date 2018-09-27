@@ -1071,6 +1071,7 @@ Route::get('/mailMonthReportUnpaidInvoices', 'StatisticsController@mailMonthRepo
 Route::get('/setEngraverForConfirming', 'AutoScriptController@setEngraverForConfirming');
 Route::delete('/showHotels/{id}', 'CrmRouteController@deletePermanentlyHotel');
 
-
 Route::get('/setCityApprovalPart1','AutoScriptController@setCityApprovalPart1');
-Route::get('/setCityApprovalPart1','AutoScriptController@setCityApprovalPart2');
+Route::get('/setCityApprovalPart2','AutoScriptController@setCityApprovalPart2');
+Route::get('/setCityApprovalPart3','AutoScriptController@setCityApprovalPart3');
+Route::get('/setCityApprovalPart4','AutoScriptController@setCityApprovalPart4');
