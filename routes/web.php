@@ -285,6 +285,9 @@ Route::POST('/clientReport', 'CrmRouteController@clientReport')->name('api.clien
 Route::post('/getClient', 'ClientController@getClient')->name('api.getClient');
 Route::post('/getGiftType', 'ClientController@getGiftType')->name('api.getGiftType');
 Route::post('/getMeetingType', 'ClientController@getMeetingType')->name('api.getMeetingType');
+Route::post('/getClientLimits', 'ClientController@getClientLimits')->name('api.getClientLimits');
+Route::post('/saveClientLimits', 'ClientController@saveClientLimits')->name('api.saveClientLimits');
+Route::get('/getClients', 'ClientController@getClients')->name('api.getClients');
 
 Route::post('/saveNewGift', 'ClientController@saveNewGift')->name('api.saveNewGift');
 Route::post('/saveNewMeeting', 'ClientController@saveNewMeeting')->name('api.saveNewMeeting');
@@ -1009,6 +1012,8 @@ Route::get('/TeamDKJHourData', 'PBXDataAPI@TeamDKJHourData');
 //Dane Czasu na rekord
 Route::get('/TimeOnRecordData', 'PBXDataAPI@TimeOnRecordData');
 
+Route::get('/ConfirmationReport', 'PBXDataAPI@ConfirmationReport');
+
 //campaign reports mothod for database
 Route::get('/report_campaign', 'PBXDataAPI@report_campaign');
 
@@ -1016,6 +1021,7 @@ Route::get('/pbxDetailedReport', 'PBXDataAPI@pbx_detailed_campaign_report');
 
 //Dane z Aktuanlnego stanu kampanii
 Route::get('/pbx_crm_info', 'PBXDataAPI@pbx_crm_info');
+
 
 Route::get('/ReportCoaching', 'StatisticsController@MailpageReportCoaching');
 Route::get('/MailToDirectors', 'StatisticsController@MailToEveryDirector');
@@ -1064,3 +1070,6 @@ Route::get('/mailMonthReportUnpaidInvoices', 'StatisticsController@mailMonthRepo
 
 Route::get('/setEngraverForConfirming', 'AutoScriptController@setEngraverForConfirming');
 Route::delete('/showHotels/{id}', 'CrmRouteController@deletePermanentlyHotel');
+
+
+Route::get('/setCityApproval','AutoScriptController@setCityApproval');

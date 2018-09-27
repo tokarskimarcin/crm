@@ -18,6 +18,7 @@ use App\Http\StaticMemory;
 use App\InvoiceStatus;
 use App\PaymentMethod;
 use App\PbxCrmInfo;
+use App\PBXDetailedCampaign;
 use App\Route;
 use App\RouteInfo;
 use App\Schedule;
@@ -507,19 +508,24 @@ class CrmRouteController extends Controller
 
             $dateFlag = $client_route_info2[0]->date;
             $name = '';
+            $name2 = '';
             $allCities = Cities::select('id','name')->get();
 
             foreach($client_route_info2 as $show) {
                 if($show->date != $dateFlag) {
                     $name = substr($name, 0,strlen($name) - 3) .  ' | ';
+                    $name2 = substr($name2, 0,strlen($name2) - 3) .  ' | ';
                 }
 
                 $name .= $allCities->where('id', '=', $show->cityId)->first()->name . ' + ';
+                $name2 .= $allCities->where('id', '=', $show->cityId)->first()->name . ' ' . $show->hours . ' + ';
                 $dateFlag = $show->date;
             }
 
             $name = substr($name, 0,strlen($name) - 3); // removing last + in name
+            $name2 = substr($name2, 0,strlen($name2) - 3); // removing last + in name
             $clientRoute->route_name = $name;
+            $clientRoute->route_name_display = $name2;
             $clientRoute->save();
 
             new ActivityRecorder(array_merge(['T' => 'Edycja trasy'], $clientRoute->toArray()), 230, 2);
@@ -1186,6 +1192,7 @@ class CrmRouteController extends Controller
         $client_route_info = DB::table('client_route_info')
             ->select('route_name',
                 'client_route_info.id',
+                'route_name_display',
                 'weekOfYear',
                 'hour',
                 'hotel_id',
@@ -1223,19 +1230,6 @@ class CrmRouteController extends Controller
         $fullArray = [];
         foreach($client_route_ids as $client_route_id){
 
-            //this part check whether all limits are assigned
-            $infoRecords = $client_route_id;
-            $limitFlag = true;
-            $departmentsFlag = true;
-            foreach($infoRecords as $oneRecord) {
-                if($oneRecord->limits == null || $oneRecord->limits == 0) {
-                    $limitFlag = false;
-                }
-                if($oneRecord->department_info_id == null || $oneRecord->department_info_id == 0) {
-                    $departmentsFlag = false;
-                }
-            }
-
             $client_routes = $client_route_id->sort(function($a, $b) {
                 if($a->date === $b->date) {
                     if($a->id === $b->id) {
@@ -1247,14 +1241,30 @@ class CrmRouteController extends Controller
             });
 
             $clientRoutes = ClientRouteInfo::where('client_route_id', '=', $client_routes->first()->client_route_id)->OnlyActive()->orderBy('date')->get();
-            $dateOfLastShow = date('W', strtotime($clientRoutes->last()->date));
 
-            $hourOrHotelAssigned = $client_routes->first()->hour == null || $client_routes->first()->hotel_id == null ? false : true;
-            for($i = 1; $i < count($client_routes);$i++){
-                if($hourOrHotelAssigned && ($client_routes[$i]->hotel_id == null || $client_routes[$i]->hour == null) )
+            $limitFlag = true;
+            $departmentsFlag = true;
+            foreach($clientRoutes as $singleRecord) {
+                if($singleRecord->limits == null || $singleRecord->limits == 0) {
+                    $limitFlag = false;
+                }
+                if($singleRecord->department_info_id == null || $singleRecord->department_info_id == 0) {
+                    $departmentsFlag = false;
+                }
+            }
+
+            $dateOfLastShow = date('W', strtotime($clientRoutes->last()->date));
+            $dateOfFirstShow = date('W', strtotime($clientRoutes->first()->date));
+            $dateOfFirstShowFull = date('Y-m-d', strtotime($clientRoutes->first()->date));
+
+            $hourOrHotelAssigned = $clientRoutes->first()->hour == null || $client_routes->first()->hotel_id == null ? false : true;
+            for($i = 1; $i < count($clientRoutes);$i++){
+                if($hourOrHotelAssigned && ($clientRoutes[$i]->hotel_id == null || $clientRoutes[$i]->hour == null) )
                     $hourOrHotelAssigned = false;
             }
 
+            $client_routes->first()->dateOfFirstShow = $dateOfFirstShow;
+            $client_routes->first()->dateOfFirstShowFull = $dateOfFirstShowFull;
             $client_routes->first()->dateOfLastShow = $dateOfLastShow;
             $client_routes->first()->hotelOrHour = $hourOrHotelAssigned;
             $client_routes->first()->hasAllLimits = $limitFlag ? 1 : 0;
@@ -2564,7 +2574,6 @@ class CrmRouteController extends Controller
                 }
             });
         }
-
 
         if($typ[0] != '0') {
             $campaignsInfo = $campaignsInfo->whereIn('client_route.type', $typ);
@@ -4267,11 +4276,24 @@ class CrmRouteController extends Controller
         $limitDate = Date('W', strtotime('-100 days'));
         $limitDateFull = Date('Y-m-d', strtotime('-100 days'));
 
-        $scheduleData = Schedule::select('id_user as userId', 'users.first_name as name','department_info.id as depId' ,'users.last_name as surname', 'week_num', 'year', 'monday_comment as pon', 'tuesday_comment as wt', 'wednesday_comment as sr', 'thursday_comment as czw', 'friday_comment as pt', 'saturday_comment as sob','sunday_comment as nd')
+        $scheduleData = Schedule::select(
+            'id_user as userId',
+            'users.first_name as name',
+            'department_info.id as depId',
+            'users.last_name as surname',
+            'week_num',
+            'year',
+            'monday_comment as pon',
+            'tuesday_comment as wt',
+            'wednesday_comment as sr',
+            'thursday_comment as czw',
+            'friday_comment as pt',
+            'saturday_comment as sob',
+            'sunday_comment as nd')
             ->join('users', 'schedule.id_user', '=', 'users.id')
             ->join('department_info', 'users.department_info_id', '=', 'department_info.id')
             ->where('week_num', '>', $limitDate)
-//            ->where('department_info.id_dep_type', '=', 1) //gdy beda juz grafiki dla potwierdzen
+            ->where('department_info.id_dep_type', '=', 1) //gdy beda juz grafiki dla potwierdzen
             ->where('users.status_work', '=', 1)
             ->orderBy('surname')
             ->get();
@@ -4290,7 +4312,7 @@ class CrmRouteController extends Controller
         ))
             ->join('users', 'work_hours.id_user', '=', 'users.id')
             ->join('department_info', 'users.department_info_id', '=', 'department_info.id')
-//            ->where('department_info.id_dep_type', '=', 1) //gdy beda juz grafiki dla potwierdzen
+            ->where('department_info.id_dep_type', '=', 1) //gdy beda juz grafiki dla potwierdzen
             ->where('users.status_work', '=', 1)
             ->get();
 
@@ -4301,6 +4323,7 @@ class CrmRouteController extends Controller
         //This part is responsible for creating user objects with date field and pass it to userArr
         $userArr = [];
         foreach($scheduleGroupedByUser as $id => $data) {
+
             $user = new \stdClass();
             $user->userId = $id;
             $dataArr = [];
@@ -4313,31 +4336,31 @@ class CrmRouteController extends Controller
                 }
                 $i++;
                 $firstDayOfGivenWeek = Date('Y-m-d', strtotime($item->year . 'W' . $item->week_num));
-                if($item->pon != '') {
+                if($item->pon == '') {
                     array_push($dataArr, $firstDayOfGivenWeek);
                 }
 
-                if($item->wt != '') {
+                if($item->wt == '') {
                     array_push($dataArr, Date('Y-m-d', strtotime($firstDayOfGivenWeek . '+ 1 day')));
                 }
 
-                if($item->sr != '') {
+                if($item->sr == '') {
                     array_push($dataArr, Date('Y-m-d', strtotime($firstDayOfGivenWeek . '+ 2 days')));
                 }
 
-                if($item->czw != '') {
+                if($item->czw == '') {
                     array_push($dataArr, Date('Y-m-d', strtotime($firstDayOfGivenWeek . '+ 3 days')));
                 }
 
-                if($item->pt != '') {
+                if($item->pt == '') {
                     array_push($dataArr, Date('Y-m-d', strtotime($firstDayOfGivenWeek . '+ 4 days')));
                 }
 
-                if($item->sob != '') {
+                if($item->sob == '') {
                     array_push($dataArr, Date('Y-m-d', strtotime($firstDayOfGivenWeek . '+ 5 days')));
                 }
 
-                if($item->nd != '') {
+                if($item->nd == '') {
                     array_push($dataArr, Date('Y-m-d', strtotime($firstDayOfGivenWeek . '+ 6 days')));
                 }
             }
@@ -4384,7 +4407,9 @@ class CrmRouteController extends Controller
         department_type.name as departmentName2,
         city.name as cityName,
         client_route.type as typ,
-        client_route.canceled
+        client_route.canceled,
+        users.first_name,
+        users.last_name
         '))
             ->join('client_route','client_route.id','client_route_info.client_route_id')
             ->leftjoin('client','client.id','client_route.client_id')
@@ -4392,6 +4417,7 @@ class CrmRouteController extends Controller
             ->leftjoin('department_info','department_info.id','client_route_info.department_info_id')
             ->leftjoin('departments','departments.id','department_info.id_dep')
             ->leftjoin('department_type', 'department_type.id', '=', 'department_info.id_dep_type')
+            ->leftjoin('users', 'client_route_info.confirmingUser', '=', 'users.id')
             ->where('client_route_info.status', '=', 1) //now it's important
             ->whereIn('client_route.status',[1,2]);
 

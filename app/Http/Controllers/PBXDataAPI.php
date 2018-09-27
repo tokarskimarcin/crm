@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\ClientRouteInfo;
 use App\Department_info;
+use App\PbxConfirmationReport;
 use App\PbxCrmInfo;
 use App\PBXDetailedCampaign;
 use App\PBXDKJTeam;
@@ -124,6 +125,55 @@ class PBXDataAPI extends Controller
         }
         DB::table('pbx_time_record')->insert($spreadsheet_data);
 
+    }
+
+    // pobierania informacji dla potwierdzeń (czas na rekord)
+    public function ConfirmationReport()
+    {
+        $lp = 0;
+        $spreadsheet_data = null;
+        $report_type = 1;
+        $department_id = null;
+        $url = "https://vc.e-pbx.pl/callcenter/api/statistic-report?statType=27&groupType=" . $this->report_type_array[$report_type];
+        $header_array = array(0 => 'consultant_name', 1=> 'team_name', 3 => 'records_remaining', 4 => 'records_later', 5 => 'records_in_progress', 6 => 'records_uncertain',
+            7 => 'records_agreement', 8 => 'records_refusal', 9 => 'records_janky', 10 => 'records_missed', 11 => 'records_sum', 12 => 'records_closed', 13 => 'time_on_record',
+            14 => 'call_time_pct', 15 => 'logged_time', 16 => 'pbx_id');
+        if (!ini_set('default_socket_timeout', 15)) echo "<!-- unable to change socket timeout -->";
+        if (($handle = fopen($url, "r")) !== FALSE) {
+            $data_to_insert = [];
+            while (($data1 = fgetcsv($handle, 1000, ";")) !== FALSE) {
+                if ($lp > 2) {
+                    $toSave = true;
+                    $column = 0;
+                    foreach ($data1 as $key => $item) {
+                        if ($column == array_search('consultant_name', $header_array)){
+                            $consultant = explode(" ",$this::w1250_to_utf8($item));
+                            if(count($consultant)<2){
+                                $toSave = false;
+                                break;
+                            }
+                            $data_to_insert[$lp][$header_array[$key]] = $consultant[0].' '.$consultant[1];
+                        }else if($column == array_search('team_name', $header_array)){
+                            $data_to_insert[$lp][$header_array[$key]] = $item;
+                        }else if($column == array_search('call_time_pct', $header_array)){
+                            $data_to_insert[$lp][$header_array[$key]] = floatval(explode(" ",$item)[0]);
+                        }else if($column == array_search('time_on_record', $header_array) || $column == array_search('logged_time', $header_array)){
+                            $data_to_insert[$lp][$header_array[$key]] = $item == 'null' ? null : $item;
+                        }else if($column >= array_search('records_remaining', $header_array)){
+                            $data_to_insert[$lp][$header_array[$key]] = intval($item);
+                        }
+                        $column++;
+                    }
+                    if($toSave){
+                        $data_to_insert[$lp]['report_date'] = date('Y-m-d');
+                        $data_to_insert[$lp]['report_hour'] = date('H').":00:00";
+                    }
+                }
+                $lp++;
+            }
+            PbxConfirmationReport::insert($data_to_insert);
+            fclose($handle);
+        }
     }
 
     function w1250_to_utf8($text) {

@@ -48,6 +48,18 @@
             animation-duration: 1s;
             animation-fill-mode: forwards;
         }
+        #clientsTable td:hover{
+            cursor: pointer;
+        }
+        .headingSubtext{
+            color: #a2a2a2
+        }
+        .leftPart{
+             border-right: 1px solid #e2e2e2;
+         }
+        .rightPart{
+            border-left: 1px solid #e2e2e2;
+        }
 
         @keyframes example {
             from {background-color: white;}
@@ -319,15 +331,11 @@
                 </div>
                 <div class="modal-body edit-modal-body">
                     <div class="row">
-                        <div class="col-md-6">
-                            <div class="leftPart">
-
-                            </div>
+                        <div class="col-md-4 leftPart" style="height:100%">
                         </div>
-                        <div class="col-md-6">
-                            <div class="rightPart">
-
-                            </div>
+                        <div class="col-md-4 middlePart" style="height:100%">
+                        </div>
+                        <div class="col-md-4 rightPart" style="height:100%">
                         </div>
                     </div>
                 </div>
@@ -348,6 +356,7 @@
         let idOfRow = null;
 
         let selectedClientIds = []; //after user click on 1st table row, it assing clientRouteId to this variable
+        let clientsDatatable = null;
         var toDay = '{{date('Y-m-d')}}';
         var tableToExcel = (function() {
             var uri = 'data:application/vnd.ms-excel;base64,'
@@ -450,7 +459,7 @@
                 arrays: {
                     selectedWeeks: ["0"]
                 }
-            }
+            };
 
             $('#weekNumber').select2();
 
@@ -767,7 +776,7 @@
                     });
 
                     $('#datatable2 tbody tr').on('click', function(e) {
-                        if(!(e.target.matches('.btn'))) {
+                        if(!$(e.target).is('button')) {
                             let thisRow = $(this);
                             const clientRouteId = thisRow.attr('id');
                             colorRowAndAddIdToArray(clientRouteId, thisRow);
@@ -826,6 +835,9 @@
                             if(data.weekOfYear != data.dateOfLastShow) {
                                 return data.weekOfYear + '/' + data.dateOfLastShow;
                             }
+                            else if(data.weekOfYear != data.dateOfFirstShow) {
+                                return data.dateOfFirstShow + '/' + data.weekOfYear;
+                            }
                             else {
                                 return data.weekOfYear;
                             }
@@ -842,10 +854,15 @@
                             return finalName;
                         },"name": "client_name"
                     },
-                    {"data": "date"},
+                    {"data": "dateOfFirstShowFull"},
                     {
                         "data": function (data, type, dataToSet) {
-                            return data.route_name;
+                            if(data.route_name_display) {
+                                return data.route_name_display;
+                            }
+                            else {
+                                return data.route_name;
+                            }
                         }, "name": "route_name"
                     },
                    /* {
@@ -928,6 +945,35 @@
                    }
                 });
                 placeToAppend.appendChild(limitInput);
+            }
+
+            /**
+             * This function append to modal limit input
+             */
+            function appendClientsTable(placeToAppend) {
+                $.ajax({
+                    url: '{{route('api.getClients')}}',
+                    type: 'GET'
+                }).done(function (response) {
+                    let thead = $('<thead>').append($('<tr>').append($('<th>').text('Klient')));
+
+                    let tbody = $('<tbody>');
+                    $.each(response, function (index, client) {
+                        tbody.append($('<tr>').append($('<td>').attr('data-id',client.id).text(client.name)))
+                    });
+
+                    tbody.click(function (e) {
+                       clientsTableClickHandle(e);
+                    });
+                    let table = $('<table>').attr('id','clientsTable').addClass('table display compact').css('width','100%').append(thead).append(tbody);
+                    $(placeToAppend).append(table);
+                    clientsDatatable = table.DataTable({
+                        paging:false,
+                        scrollY: '20vh',
+                        dom: 't'
+                    });
+
+                });
             }
 
             /**
@@ -1035,14 +1081,22 @@
                 placeToAppend.insertAdjacentElement('afterbegin', infoTable);
             }
 
-            function appendHeading(placeToAppend, text) {
+            function appendHeading(placeToAppend, text, subtext = null) {
                 let heading = document.createElement('div');
                 heading.classList.add('heading');
                 heading.style.fontSize = '1.4em';
                 heading.textContent = text;
+
                 let line = document.createElement('hr');
                 line.classList.add('horizontal-line');
                 placeToAppend.insertAdjacentElement('afterbegin', line);
+                if(subtext != null){
+                    let subtextHeading = document.createElement('div');
+                    subtextHeading.classList.add('headingSubtext');
+                    subtextHeading.style.fontSize = '0.8em';
+                    subtextHeading.textContent = subtext;
+                    placeToAppend.insertAdjacentElement('afterbegin', subtextHeading);
+                }
                 placeToAppend.insertAdjacentElement('afterbegin', heading);
             }
 
@@ -1052,7 +1106,8 @@
             function addModalBodyContext() {
                 let modalBody = document.querySelector('.edit-modal-body');
                 let modalBody1 = document.querySelector('.leftPart');
-                let modalBody2 = document.querySelector('.rightPart');
+                let modalBody2 = document.querySelector('.middlePart');
+                let modalBody3 = document.querySelector('.rightPart');
 
                 if(modalBody.querySelector('table')) {
                     let modalTable = modalBody.querySelector('table');
@@ -1075,9 +1130,11 @@
 
                 modalBody1.innerHTML = ''; //clear modal body1
                 modalBody2.innerHTML = ''; //clear modal body2
+                modalBody3.innerHTML = ''; //clear modal body2
 
                 appendHeading(modalBody1, 'Limity dla kampanii 2 i 3 pokazowej');
                 appendHeading(modalBody2, 'Limit dla kampanii 1 pokazowej');
+                appendHeading(modalBody3, 'Limity klientów', '(wybierz klienta)');
 
                 createModalTable(modalBody); //table part of modal
                 appendHeading(modalBody, 'Przypisywanie limitów działa poprawnie dla tras, które mają max 3 dni oraz max 3 godziny pokazów w poszczególnym dniu');
@@ -1086,6 +1143,8 @@
                 appendLimitInput(modalBody1, 3);
 
                 appendSingleLimitInput(modalBody2, 1);
+
+                appendClientsTable(modalBody3);
 
                 let submitButton = document.createElement('button');
                 submitButton.id = 'submitEdition';
@@ -1221,6 +1280,7 @@
                 $('#datatable tr').removeClass('check');
                 selectedClientIds  = [];
                 $(e.target).find('.badge').text(selectedClientIds.length);
+                notify("<strong>Wszystkie zaznaczenia klientów zostały usuniete</strong>", 'success', 4000);
                 table2.ajax.reload();
             }
 
@@ -1471,9 +1531,8 @@
 
                 const searchBox = document.querySelector('input[type="search"][aria-controls="datatable2"');
                 sessionStorage.setItem('search', searchBox.value);
-
                 sessionStorage.setItem('year', yearInput.options[yearInput.selectedIndex].value);
-                // sessionStorage.setItem('weekNumber', weekNumber.options[weekNumber.selectedIndex].value);
+                sessionStorage.setItem('weekNumber',JSON.stringify($(weekNumber).val()));
                 sessionStorage.setItem('type', type.options[type.selectedIndex].value);
                 sessionStorage.setItem('showOnlyAssigned', showOnlyAssignedCheckbox.checked);
                 sessionStorage.setItem('parameters', parameterSelect.options[parameterSelect.selectedIndex].value);
@@ -1512,14 +1571,26 @@
 
                 const weekNumber = document.querySelector('#weekNumber');
                 if (sessionStorage.getItem('weekNumber')) {
-                    const week = sessionStorage.getItem('weekNumber');
-                    somethingChanged = week !== '0' ? true : somethingChanged;
-                    for (let i = 0; i < weekNumber.length; i++) {
-                        if (weekNumber[i].value == week) {
-                            weekNumber[i].selected = true;
-                            // selectedWeek = weekNumber[i].value;
+                    let week = sessionStorage.getItem('weekNumber');
+                    if(week != []) {
+                        week = JSON.parse(week);
+                        if(week.length == 0) {
+                            somethingChanged = true;
+                            APP.arrays.selectedWeeks = ['0'];
+                            $(weekNumber).val(week);
+                        }
+                        else {
+                            somethingChanged = week !== '0' ? true : somethingChanged;
+                            $(weekNumber).val(week);
+                            APP.arrays.selectedWeeks = week;
                         }
                     }
+                    else {
+                        APP.arrays.selectedWeeks = ['0'];
+                        somethingChanged = true;
+                    }
+                    console.log('somethingChanged', somethingChanged);
+                    console.log('APP.arrays.selectedWeeks',  APP.arrays.selectedWeeks);
                     sessionStorage.removeItem('weekNumber');
                 }
 
@@ -1616,6 +1687,19 @@
                 table2.ajax.reload();
             });
 
+            $('#editModal').on('shown.bs.modal', function (e) {
+                    clientsDatatable.columns.adjust().draw();
+            });
+
+            function findObjectByKey(array, key, value) {
+                for (var i = 0; i < array.length; i++) {
+                    if (array[i][key] === value) {
+                        return array[i];
+                    }
+                }
+                return null;
+            }
+
             function colorSelectedClients(selectedClients) {
                 const allClientsInTable = document.querySelectorAll('#datatable tr');
                 allClientsInTable.forEach(client => {
@@ -1637,7 +1721,7 @@
                         coloredRows.forEach(colorRow => {
                             colorRow.classList.remove('colorRow');
                         });
-                        notify("<strong>Wszystkie zaznaczenia zostały usuniete</strong>", 'success', 4000);
+                        notify("<strong>Wszystkie zaznaczenia tras zostały usuniete</strong>", 'success', 4000);
                     }
                 }
                 arrayOfTableRows = [];
@@ -1656,6 +1740,31 @@
                 }
             }
 
+            function clientsTableClickHandle(e){
+                if($(e.target).is('td')){
+                    document.body.style.cursor = "wait";
+                    $.ajax({
+                        url: '{{route('api.getClientLimits')}}',
+                        type: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        },
+                        data: {
+                            clientId: $(e.target).data('id')
+                        }
+                    }).done(function (response) {
+                        document.body.style.cursor = "default";
+                        $.each($('.limitInp'),function (index, input) {
+                            let id = $(input).attr('id').split('_');
+                            if(id[0] === 'changeLimits'){
+                                $(input).val(findObjectByKey(response,'limit_order', parseInt(id[1])).limit);
+                            }else{
+                                $(input).val(findObjectByKey(response,'limit_order',4).limit);
+                            }
+                        });
+                    });
+                }
+            }
             window.addEventListener('pagehide', setItemsToSeessionStorage);
             clearButton.addEventListener('click', function (e) {
                 clearAllSelections(e);

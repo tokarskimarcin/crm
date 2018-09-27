@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Cities;
 use App\ClientRoute;
 use App\ClientRouteInfo;
 use App\Schedule;
@@ -12,6 +13,26 @@ use Illuminate\Support\Facades\DB;
 
 class AutoScriptController extends Controller
 {
+    //Pobranie zgód dla miast
+    public function setCityApproval(){
+
+        $allCity = Cities::all();
+        set_time_limit(10000);
+        foreach ($allCity as $item){
+            $url = 'http://baza.teambox.pl/baza/getRaportCityInfoAPI/'.$item->name;
+            $url = preg_replace("/ /", "%20", $url);
+            $json =  file_get_contents($url);
+            $obj = json_decode($json);
+            $item->approval_count = $obj->zgody;
+            try{
+                $item->save();
+            }catch (\Exception $exception){
+                // did nothing
+            }
+
+        }
+    }
+
     //AutoChange Route Status from 1 to 2
     public function autoChangeRouteStatus(){
         $toDay = date('Y-m-d');
@@ -259,4 +280,5 @@ class AutoScriptController extends Controller
             }
         }
     }
+
 }
