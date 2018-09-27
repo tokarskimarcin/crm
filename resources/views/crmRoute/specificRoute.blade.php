@@ -118,13 +118,13 @@
                     </table>
 
                     <div class="row">
-                        <div class="col-lg-6">
+                        <div class="col-lg-5">
                             <label for="user_reservation" style="margin-right: 10px;">Osoba Rezerwująca: </label>
                             <input id="user_reservation" name="user_reservation" type="text" class="form-control price-input" @if(!empty($campaign[0]->user_reservation)) value="{{$campaign[0]->user_reservation}}" @else value="Brak"@endif>
 
                         </div>
-                        <div class="col-lg-2">
-                            <label for="hotel-price" style="margin-right: 10px;">Cena za hotel: </label>
+                        <div class="col-lg-3">
+                            <label for="hotel-price" style="margin-right: 10px;">Cena za hotel:</label>
                             <input id="hotel-price" name="hotel-price" type="text" class="form-control hotel-price-input" @if(!empty($campaign[0]->hotel_price)) value="{{$campaign[0]->hotel_price}}" @else value="0"@endif>
                         </div>
                         <div class="col-lg-4">
@@ -300,21 +300,23 @@
 
                                 $(this).find('tr').on('click', function(e) {
                                     if(!e.target.matches('.button-preview-hotel')) { //not highlighting row when click on loop glyphicon
-                                        let datatables = $('.datatable');
-                                        let test = $(this).closest('table');
-                                        if($(this).hasClass('check')) {
-                                            $(this).removeClass('check');
-                                            $(this).find('.checkbox_info').prop('checked',false);
-                                            hotelInfoArr[key].hotel_id = null;
-                                        }
-                                        else {
-                                            test.find('tr.check').removeClass('check');
-                                            $.each(test.find('.checkbox_info'), function (item, val) {
-                                                $(val).prop('checked', false);
-                                            });
-                                            $(this).addClass('check');
-                                            $(this).find('.checkbox_info').prop('checked', true);
-                                            hotelInfoArr[key].hotel_id = $(this).data('hotel_id');
+                                        if(e.target.matches('.checkbox_info')) {
+                                            let datatables = $('.datatable');
+                                            let test = $(this).closest('table');
+                                            if($(this).hasClass('check')) {
+                                                $(this).removeClass('check');
+                                                $(this).find('.checkbox_info').prop('checked',false);
+                                                hotelInfoArr[key].hotel_id = null;
+                                            }
+                                            else {
+                                                test.find('tr.check').removeClass('check');
+                                                $.each(test.find('.checkbox_info'), function (item, val) {
+                                                    $(val).prop('checked', false);
+                                                });
+                                                $(this).addClass('check');
+                                                $(this).find('.checkbox_info').prop('checked', true);
+                                                hotelInfoArr[key].hotel_id = $(this).data('hotel_id');
+                                            }
                                         }
                                     }
                                 });
@@ -336,7 +338,6 @@
                                     'id',"orderable": false, visible: false
                             },
                             {"data":function (data, type, dataToSet) {
-                                console.log(data);
                                     return data.name;
                                 },"name":"name","orderable": false
                             },
@@ -387,7 +388,7 @@
                                              }
                                          }
                                      }*/
-                                    return '<input class="checkbox_info btn-block" type="checkbox" value="' + data.id + '" style="display:inline-block;">';
+                                    return '<input class="checkbox_info btn-block form-control" type="checkbox" value="' + data.id + '" style="display:inline-block;">';
                                 },"orderable": false, "searchable": false, width:'10%'
                             },
                         {
