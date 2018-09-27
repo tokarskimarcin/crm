@@ -1072,4 +1072,5 @@ Route::get('/setEngraverForConfirming', 'AutoScriptController@setEngraverForConf
 Route::delete('/showHotels/{id}', 'CrmRouteController@deletePermanentlyHotel');
 
 
-Route::get('/setCityApproval','AutoScriptController@setCityApproval');
+Route::get('/setCityApprovalPart1','AutoScriptController@setCityApprovalPart1');
+Route::get('/setCityApprovalPart1','AutoScriptController@setCityApprovalPart2');
