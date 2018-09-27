@@ -17,7 +17,7 @@ class AutoScriptController extends Controller
     public function setCityApprovalPart1(){
 
         $allCity = Cities::all();
-        $partCity = $allCity->where('id','<=',intval($allCity->count()/2));
+        $partCity = $allCity->where('id','<=',200);
         set_time_limit(10000);
         foreach ($partCity as $item){
             $url = 'http://baza.teambox.pl/baza/getRaportCityInfoAPI/'.$item->name;
@@ -34,7 +34,43 @@ class AutoScriptController extends Controller
     }
     public function setCityApprovalPart2(){
         $allCity = Cities::all();
-        $partCity = $allCity->where('id','>=',intval($allCity->count()/2));
+        $partCity = $allCity->whereBetween('id',[200, 400]);
+        set_time_limit(10000);
+        foreach ($partCity as $item){
+            $url = 'http://baza.teambox.pl/baza/getRaportCityInfoAPI/'.$item->name;
+            $url = preg_replace("/ /", "%20", $url);
+            $json =  file_get_contents($url);
+            $obj = json_decode($json);
+            $item->approval_count = $obj->zgody;
+            try{
+                $item->save();
+            }catch (\Exception $exception){
+                // did nothing
+            }
+        }
+    }
+
+    public function setCityApprovalPart3(){
+        $allCity = Cities::all();
+        $partCity = $allCity->whereBetween('id',[400, 600]);
+        set_time_limit(10000);
+        foreach ($partCity as $item){
+            $url = 'http://baza.teambox.pl/baza/getRaportCityInfoAPI/'.$item->name;
+            $url = preg_replace("/ /", "%20", $url);
+            $json =  file_get_contents($url);
+            $obj = json_decode($json);
+            $item->approval_count = $obj->zgody;
+            try{
+                $item->save();
+            }catch (\Exception $exception){
+                // did nothing
+            }
+        }
+    }
+
+    public function setCityApprovalPart4(){
+        $allCity = Cities::all();
+        $partCity = $allCity->whereBetween('id',[600, 800]);
         set_time_limit(10000);
         foreach ($partCity as $item){
             $url = 'http://baza.teambox.pl/baza/getRaportCityInfoAPI/'.$item->name;
