@@ -14,11 +14,12 @@ use Illuminate\Support\Facades\DB;
 class AutoScriptController extends Controller
 {
     //Pobranie zgód dla miast
-    public function setCityApproval(){
+    public function setCityApprovalPart1(){
 
         $allCity = Cities::all();
+        $partCity = $allCity->where('id','<=',intval($allCity->count()/2));
         set_time_limit(10000);
-        foreach ($allCity as $item){
+        foreach ($partCity as $item){
             $url = 'http://baza.teambox.pl/baza/getRaportCityInfoAPI/'.$item->name;
             $url = preg_replace("/ /", "%20", $url);
             $json =  file_get_contents($url);
@@ -29,7 +30,23 @@ class AutoScriptController extends Controller
             }catch (\Exception $exception){
                 // did nothing
             }
-
+        }
+    }
+    public function setCityApprovalPart2(){
+        $allCity = Cities::all();
+        $partCity = $allCity->where('id','>=',intval($allCity->count()/2));
+        set_time_limit(10000);
+        foreach ($partCity as $item){
+            $url = 'http://baza.teambox.pl/baza/getRaportCityInfoAPI/'.$item->name;
+            $url = preg_replace("/ /", "%20", $url);
+            $json =  file_get_contents($url);
+            $obj = json_decode($json);
+            $item->approval_count = $obj->zgody;
+            try{
+                $item->save();
+            }catch (\Exception $exception){
+                // did nothing
+            }
         }
     }
 
