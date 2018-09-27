@@ -17,7 +17,7 @@ class AutoScriptController extends Controller
     public function setCityApprovalPart1(){
 
         $allCity = Cities::all();
-        $partCity = $allCity->where('id','<=',200);
+        $partCity = $allCity->where('id','<=',150);
         set_time_limit(10000);
         foreach ($partCity as $item){
             $url = 'http://baza.teambox.pl/baza/getRaportCityInfoAPI/'.$item->name;
@@ -33,7 +33,7 @@ class AutoScriptController extends Controller
         }
     }
     public function setCityApprovalPart2(){
-        $allCity = Cities::whereBetween('id',[200, 400])->get();
+        $allCity = Cities::whereBetween('id',[150, 300])->get();
         set_time_limit(10000);
         foreach ($allCity as $item){
             $url = 'http://baza.teambox.pl/baza/getRaportCityInfoAPI/'.$item->name;
@@ -50,7 +50,7 @@ class AutoScriptController extends Controller
     }
 
     public function setCityApprovalPart3(){
-        $allCity = Cities::whereBetween('id',[400, 600])->get();
+        $allCity = Cities::whereBetween('id',[300, 450])->get();
         set_time_limit(10000);
         foreach ($allCity as $item){
             $url = 'http://baza.teambox.pl/baza/getRaportCityInfoAPI/'.$item->name;
@@ -67,7 +67,39 @@ class AutoScriptController extends Controller
     }
 
     public function setCityApprovalPart4(){
-        $allCity = Cities::whereBetween('id',[600, 800])->get();
+        $allCity = Cities::whereBetween('id',[450, 600])->get();
+        set_time_limit(10000);
+        foreach ($allCity as $item){
+            $url = 'http://baza.teambox.pl/baza/getRaportCityInfoAPI/'.$item->name;
+            $url = preg_replace("/ /", "%20", $url);
+            $json =  file_get_contents($url);
+            $obj = json_decode($json);
+            $item->approval_count = $obj->zgody;
+            try{
+                $item->save();
+            }catch (\Exception $exception){
+                // did nothing
+            }
+        }
+    }
+    public function setCityApprovalPart5(){
+        $allCity = Cities::whereBetween('id',[600, 750])->get();
+        set_time_limit(10000);
+        foreach ($allCity as $item){
+            $url = 'http://baza.teambox.pl/baza/getRaportCityInfoAPI/'.$item->name;
+            $url = preg_replace("/ /", "%20", $url);
+            $json =  file_get_contents($url);
+            $obj = json_decode($json);
+            $item->approval_count = $obj->zgody;
+            try{
+                $item->save();
+            }catch (\Exception $exception){
+                // did nothing
+            }
+        }
+    }
+    public function setCityApprovalPart6(){
+        $allCity = Cities::where('id','>=',750)->get();
         set_time_limit(10000);
         foreach ($allCity as $item){
             $url = 'http://baza.teambox.pl/baza/getRaportCityInfoAPI/'.$item->name;
