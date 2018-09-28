@@ -246,7 +246,8 @@
                 trainers: <?php echo json_encode($trainers->toArray()) ?>,
                 departmentsConfirmationStatisticsLpCounter: 0,
                 allDepartmentsConfirmationStatisticsLpCounter: 0,
-                conditionDepartmentsConfirmationStatisticsLpCounterZeroing: null, //condition for pointing row that start a group
+                conditionDepartmentsConfirmationStatisticsLpCounterZeroing: null, //condition for pointing row that start a group,
+                dateGroupConditionDepartmentsConfirmationStatisticsLpCounterZeroing: null,
                 DATA_TABLES:{
                     departmentsConfirmation: {
                         data: {
@@ -291,17 +292,15 @@
                                 {data: 'avgFrequency'},
                                 {data: 'avgPairs'},
                                 {data: 'recordsCount'},
-                                {data: function () {
-                                        return 1;
+                                {data: 'avgTimeOnRecord'},
+                                {data: function (data) {
+                                        return data.agreementPct+'%';
                                     }},
-                                {data: function () {
-                                        return 1;
+                                {data: function (data) {
+                                        return data.uncertainPct+'%';
                                     }},
-                                {data: function () {
-                                        return 1;
-                                    }},
-                                {data: function () {
-                                        return 1;
+                                {data: function (data) {
+                                        return data.refusalPct+'%';
                                     }},
                                 {data: 'dateGroup'},
                                 {data: 'secondGroup'}
@@ -344,10 +343,10 @@
                             $.each(data,function (dateGroup, week) {
                                 if(VARIABLES.jQElements.trainersGroupingCheckboxjQ.get(0).checked){
                                     $.each(week, function (trainer, data) {
-                                        FUNCTIONS.setTableDataWithdepartmentsConfirmationStatisticsLpCounterByGroup(data, 'trainer', dataTable);
+                                        FUNCTIONS.setTableDataWithDepartmentsConfirmationStatisticsLpCounterByGroup(data, 'trainer', dataTable);
                                     });
                                 }else{
-                                    FUNCTIONS.setTableDataWithdepartmentsConfirmationStatisticsLpCounterByGroup(week, 'dateGroup', dataTable);
+                                    FUNCTIONS.setTableDataWithDepartmentsConfirmationStatisticsLpCounterByGroup(week, 'dateGroup', dataTable);
                                 }
                             });
                             dataTable.draw();
@@ -400,17 +399,15 @@
                                 {data: 'avgFrequency'},
                                 {data: 'avgPairs'},
                                 {data: 'recordsCount'},
-                                {data: function () {
-                                        return 1;
+                                {data: 'avgTimeOnRecord'},
+                                {data: function (data) {
+                                        return data.agreementPct+'%';
                                     }},
-                                {data: function () {
-                                        return 1;
+                                {data: function (data) {
+                                        return data.uncertainPct+'%';
                                     }},
-                                {data: function () {
-                                        return 1;
-                                    }},
-                                {data: function () {
-                                        return 1;
+                                {data: function (data) {
+                                        return data.refusalPct+'%';
                                     }},
                                 {data: 'dateGroup'},
                                 {data: 'secondGroup'}
@@ -447,7 +444,7 @@
                                 $.each(week.secondGrouping, function (secondGroupingIndex, secondGrouping) {
                                     secondGrouping.dateGroup = week.dateGroup;
                                 });
-                                FUNCTIONS.setTableDataWithdepartmentsConfirmationStatisticsLpCounterByGroup(week.secondGrouping, 'dateGroup', dataTable);
+                                FUNCTIONS.setTableDataWithDepartmentsConfirmationStatisticsLpCounterByGroup(week.secondGrouping, 'dateGroup', dataTable);
                             });
                             dataTable.draw();
 
@@ -575,31 +572,38 @@
                     let api = dataTable.api();
                     let rows = api.rows({page: 'current'}).nodes();
                     let last = null;
+                    let lastDateGroup = null;
                     api.column(column, {page: 'current'}).data().each(function (group, i) {
-                        if (last !== group) {
+                        let dateGroup = api.row(i).data().dateGroup;
+                        if (last !== group || lastDateGroup !== dateGroup) {
                             let elementToInsert = $('<tr>').addClass('group_'+column).append($('<td>').attr('colspan',colspan).text(group));
                             if(cssOptionsTr != null){
                                 elementToInsert.css(cssOptionsTr);
                             }
                             $($(rows).eq(i)[0]).before(elementToInsert);
                             last = group;
+                            lastDateGroup = dateGroup;
                         }
                     });
                 },
+
                 insertSumRowAfterGroup: function (insideGrouping, dataTable, sumsData, cssOptionsTr = null) {
                     let column = insideGrouping ? groupColumns[1] : groupColumns[0];
                     let api = dataTable.api();
                     let rows = api.rows({page: 'current'}).nodes();
+                    let lastDateGroup = null;
                     api.column(column, {page: 'current'}).data().each(function (group, i) {
-                       if(group !== api.column(column, {page: 'current'}).data()[i+1]){
-                           let data = null;
-                           $.each(sumsData, function (weekNr, weekSums) {
+                        let dateGroup = api.column(groupColumns[0], {page: 'current'}).data()[i+1];
+                        if(group !== api.column(column, {page: 'current'}).data()[i+1] || lastDateGroup !== dateGroup){
+                            lastDateGroup = dateGroup;
+                            let data = null;
+                            $.each(sumsData, function (weekNr, weekSums) {
                                if(weekSums.dateGroup === api.column(groupColumns[0], {page: 'current'}).data()[i]){
                                    data = weekSums;
                                    return false;
                                }
-                           });
-                           if(insideGrouping){
+                            });
+                            if(insideGrouping){
                                $.each(data.secondGrouping, function (secondGroupingNr, secondGroupingSums) {
                                    console.log(api.column(groupColumns[1], {page: 'current'}).data()[i]);
                                    if(secondGroupingSums.secondGroup === api.column(groupColumns[1], {page: 'current'}).data()[i]){
@@ -607,8 +611,8 @@
                                        return false;
                                    }
                                });
-                           }
-                           let elementToInsert = $('<tr>').addClass('groupSum_'+column).css('font-weight','bold')
+                            }
+                            let elementToInsert = $('<tr>').addClass('groupSum_'+column).css('font-weight','bold')
                                .append($('<td>'))
                                .append($('<td>').addClass('gray').text('Suma:'))
                                .append($('<td>').addClass('gray').text(data.shows))
@@ -623,9 +627,13 @@
                                .append($('<td>').addClass('strongRed').text(data.unsuccessfulBadlyPct+'%'))
                                .append($('<td>').addClass('gray').text(data.avgFrequency))
                                .append($('<td>').addClass('gray').text(data.avgPairs))
-                               .append($('<td>').addClass('gray').text(data.recordsCount));
-                           $($(rows).eq(i)[0]).after(elementToInsert);
-                       }
+                               .append($('<td>').addClass('gray').text(data.recordsCount))
+                               .append($('<td>').addClass('gray').text(data.avgTimeOnRecord))
+                               .append($('<td>').addClass('gray').text(data.agreementPct+'%'))
+                               .append($('<td>').addClass('gray').text(data.uncertainPct+'%'))
+                               .append($('<td>').addClass('gray').text(data.refusalPct+'%'));
+                            $($(rows).eq(i)[0]).after(elementToInsert);
+                        }
                     });
                 },
                 @php
@@ -678,14 +686,17 @@
                         });
                     });
                 },
-                setTableDataWithdepartmentsConfirmationStatisticsLpCounterByGroup: function(data, groupingData, dataTable){
+                setTableDataWithDepartmentsConfirmationStatisticsLpCounterByGroup: function(data, groupingData, dataTable){
                     if($.isArray(data)) {
                         $.each(data, function (index, row) {
-                            if(VARIABLES.conditionDepartmentsConfirmationStatisticsLpCounterZeroing !== row[groupingData]){  //if groupig data is diffrent than previous value, counter equals 0
+                            console.log(VARIABLES.conditionDepartmentsConfirmationStatisticsLpCounterZeroing+"=="+row[groupingData]+" "+ (VARIABLES.conditionDepartmentsConfirmationStatisticsLpCounterZeroing!==row[groupingData]));
+                            if(VARIABLES.conditionDepartmentsConfirmationStatisticsLpCounterZeroing !== row[groupingData] || VARIABLES.dateGroupConditionDepartmentsConfirmationStatisticsLpCounterZeroing !== row['dateGroup']){  //if groupig data is diffrent than previous value, counter equals 0
                                 VARIABLES.departmentsConfirmationStatisticsLpCounter = 0;                                    //counting from beginning
                                 VARIABLES.conditionDepartmentsConfirmationStatisticsLpCounterZeroing = row[groupingData];    //setting condition to grouping data of current row
+                                VARIABLES.dateGroupConditionDepartmentsConfirmationStatisticsLpCounterZeroing = row['dateGroup'];
                             }
                             VARIABLES.departmentsConfirmationStatisticsLpCounter++;
+                            console.log(VARIABLES.departmentsConfirmationStatisticsLpCounter);
                             row.lp = VARIABLES.departmentsConfirmationStatisticsLpCounter;   //setting 'lp' row attribute
                             dataTable.row.add(row);         //adding row to datatable
                         });

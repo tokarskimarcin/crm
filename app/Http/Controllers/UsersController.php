@@ -530,7 +530,12 @@ class UsersController extends Controller
                     }
 
                     $userEmployment3->user_id = $user->id;
-                    $userEmployment3->pbx_id_add_date = $request->start_date;
+                    if(\DateTime::createFromFormat('Y-m-d', date('Y-m-d'))->getTimestamp() <
+                        \DateTime::createFromFormat('Y-m-d', $request->start_date)->getTimestamp()){
+                        $userEmployment3->pbx_id_add_date = $request->start_date;
+                    }else{
+                        $userEmployment3->pbx_id_add_date = date('Y-m-d');
+                    }
                     $userEmployment3->pbx_id_remove_date = null;
                     $userEmployment3->save();
                 }
