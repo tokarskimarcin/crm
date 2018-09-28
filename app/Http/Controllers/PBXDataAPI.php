@@ -431,7 +431,7 @@ class PBXDataAPI extends Controller
      */
     public function report_campaign() {
         $department_id = null;
-        $url = "https://vc.e-pbx.pl/callcenter/api/statistic-report?statType=26&groupType=PRESENTATION";
+        $url = "https://vc.e-pbx.pl/callcenter/api/statistic-report?statType=26&groupType=PRESENTATION&date=2018-09-24";
 
         if (!ini_set('default_socket_timeout', 15)) echo "<!-- unable to change socket timeout -->";
         if (($handle = fopen($url, "r")) !== FALSE) {
@@ -458,7 +458,8 @@ class PBXDataAPI extends Controller
                         else{
                             $removeData = true;
                         }
-                        $data_to_insert[$temp_key]['date'] = date('Y-m-d');
+//                        $data_to_insert[$temp_key]['date'] = date('Y-m-d');
+                        $data_to_insert[$temp_key]['date'] = '2018-09-24';
                         $data_to_insert[$temp_key]['time'] = date('H:i:sa');
 
                     }
