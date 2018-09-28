@@ -193,6 +193,9 @@ function getStartAndEndDate($week, $year) {
     $('#week_text').on('change', function() {
         setYear();
     });
+
+    let userDepartment = {{$department_type}};
+
     moment().format();
     function format ( d ) {
         var start_work = Array(d.monday_start,d.tuesday_start,d.wednesday_start,d.thursday_start,d.friday_start,d.saturday_start,d.sunday_start);
@@ -216,59 +219,95 @@ function getStartAndEndDate($week, $year) {
             '</thead>' +
             '<tbody> <tr id='+d.id_user+'>';
             var time = moment('07'+':'+'45','HH:mm');
+            console.table(reason);
+
             for(var i=0;i<7;i++)
             {
-                table +='<td class='+d.id+'>';
-                if(reason[i] != null)
-                    table+='<div class="hour" style="display: none;">';
-                else
-                    table+='<div class="hour">';
-
-                table+= '<select name='+week_array[i]+'_start_work class="form-control" style="font-size:12px">'+
-                '<option value='+null+'>Wybierz</option>';
-                while(time.format("HH")!='21')
-                {
-                    time.add(15,'m');
-                    if(start_work[i] != null && start_work[i] == time.format("HH:mm:ss"))
-                    {
-                        table+='<option selected>'+time.format("HH:mm")+'</option>';
-                    }else
-                    table+='<option>'+time.format("HH:mm")+'</option>';
-                }
-                table+='</select>';
-                table+='<span class="glyphicon glyphicon-arrow-down" style="display: block; margin-top: 1em; margin-bottom: 1em;"></span>';
-
-                time = moment('07'+':'+'45','HH:mm');
-                table+='<select name='+week_array[i]+'_stop_work class="form-control" style="font-size:12px; min-width: 90px">'+
-                    '<option>Wybierz</option>';
-                while(time.format("HH")!='21')
-                {
-                    time.add(15,'m');
-                    if(stop_work[i] != null && stop_work[i] == time.format("HH:mm:ss")) {
-                        table += '<option selected>' + time.format("HH:mm") + '</option>';
-                    }else
-                    {
-                        table += '<option>' + time.format("HH:mm") + '</option>';
+                if(userDepartment == 1) {
+                    table += `<td class="${d.id}">`;
+                    table += `<div class="radio">`;
+                                    if(start_work[i] != null && stop_work != null && reason[i] == null) {
+                                        table += `<label><input type="radio" class="radio-button r_${i}" name="r_${i}" value="1" checked>W pracy</label>`;
+                                    }
+                                    else {
+                                        table += `<label><input type="radio" class="radio-button r_${i}" name="r_${i}" value="1">W pracy</label>`;
+                                    }
+                                table += `</div>
+                                <div class="radio">`;
+                                if(reason[i] != null) {
+                                    table += `<label><input type="radio" class="radio-button r_${i} reasons" name="r_${i}" value="0" checked>Wolne</label>`;
+                                }
+                                else {
+                                    table += `<label><input type="radio" class="radio-button r_${i} reasons" name="r_${i}" value="0">Wolne</label>`;
+                                }
+                                table += `</div>`;
+                    table+='</div>';
+                    if(reason[i] != null) {
+                    table+='<div class="reason">';
+                        table+='<input type="text" value="' + reason[i] + '" name="'+week_array[i]+'_reason" class="form-control" placeholder="Powód">';
                     }
+                    else {
+                        table+='<div class="reason" style="display: none;">';
+                        table+='<input type="text" name="'+week_array[i]+'_reason" class="form-control" placeholder="Powód">';
+                    }
+
+                    table+='</div>';
+                    table+=`</td>`;
                 }
-                table+='</select></div>';
-                if(reason[i] != null) {
-                    table += '<div class="reason">';
-                    table += '<input type="text" value="' + reason[i] + '" name=' + week_array[i] + '_reason class="form-control" placeholder="Powód">';
-                }
+                else {
+                    table +='<td class='+d.id+'>';
+                    if(reason[i] != null)
+                        table+='<div class="hour" style="display: none;">';
+                    else
+                        table+='<div class="hour">';
+
+                    table+= '<select name='+week_array[i]+'_start_work class="form-control" style="font-size:12px">'+
+                        '<option value='+null+'>Wybierz</option>';
+                    while(time.format("HH")!='21')
+                    {
+                        time.add(15,'m');
+                        if(start_work[i] != null && start_work[i] == time.format("HH:mm:ss"))
+                        {
+                            table+='<option selected>'+time.format("HH:mm")+'</option>';
+                        }else
+                            table+='<option>'+time.format("HH:mm")+'</option>';
+                    }
+                    table+='</select>';
+                    table+='<span class="glyphicon glyphicon-arrow-down" style="display: block; margin-top: 1em; margin-bottom: 1em;"></span>';
+
+                    time = moment('07'+':'+'45','HH:mm');
+                    table+='<select name='+week_array[i]+'_stop_work class="form-control" style="font-size:12px; min-width: 90px">'+
+                        '<option>Wybierz</option>';
+                    while(time.format("HH")!='21')
+                    {
+                        time.add(15,'m');
+                        if(stop_work[i] != null && stop_work[i] == time.format("HH:mm:ss")) {
+                            table += '<option selected>' + time.format("HH:mm") + '</option>';
+                        }else
+                        {
+                            table += '<option>' + time.format("HH:mm") + '</option>';
+                        }
+                    }
+                    table+='</select></div>';
+                    if(reason[i] != null) {
+                        table += '<div class="reason">';
+                        table += '<input type="text" value="' + reason[i] + '" name=' + week_array[i] + '_reason class="form-control" placeholder="Powód">';
+                    }
                     else{
                         table+='<div class="reason" style="display: none;">';
                         table+= '<input type="text" name='+week_array[i]+'_reason class="form-control" placeholder="Powód">';
-                }
-                table+=
-                    '</div>';
-                if(reason[i] != null)
-                    table+='<input type="checkbox" style="display: inline-block; margin-right: 1em;" checked class="checkbox '+week_array[i]+'_reasonCheck"><label>Wolne</label>';
-                else
-                    table+='<input type="checkbox" style="display: inline-block; margin-right: 1em;" class="checkbox '+week_array[i]+'_reasonCheck"><label>Wolne</label>';
+                    }
+                    table+=
+                        '</div>';
+                    if(reason[i] != null)
+                        table+='<input type="checkbox" style="display: inline-block; margin-right: 1em;" checked class="checkbox '+week_array[i]+'_reasonCheck"><label>Wolne</label>';
+                    else
+                        table+='<input type="checkbox" style="display: inline-block; margin-right: 1em;" class="checkbox '+week_array[i]+'_reasonCheck"><label>Wolne</label>';
 
                     '</td>';
-                time = moment('07'+':'+'45','HH:mm');
+                    time = moment('07'+':'+'45','HH:mm');
+                }
+
             }
         table+=
             '<td>'+
@@ -280,6 +319,7 @@ function getStartAndEndDate($week, $year) {
         return table+'</table>';
     }
     $(document).ready(function() {
+        let clicked = null;
         var year = $("#week_text option:selected").text();
         var week_number = $("select[name='show_schedule']").val();
         year = year.split(".");
@@ -340,6 +380,16 @@ function getStartAndEndDate($week, $year) {
 
 
         $('#datatable tbody').on('click', 'td.details-control', function () {
+            if(userDepartment == 1) {
+                if(clicked != null) {
+                    let closestTrrow = clicked.closest('tr');
+                    let row2 = table.row( closestTrrow );
+                    row2.child.hide();
+                    closestTrrow.removeClass('shown');
+                }
+            }
+
+            clicked = $(this);
             var tr = $(this).closest('tr');
             var row = table.row( tr );
 
@@ -353,72 +403,112 @@ function getStartAndEndDate($week, $year) {
                 row.child( format(row.data()) ).show();
                 tr.addClass('shown');
             }
-            $('.checkbox').change(function(){
-                if( $(this).is(':checked') )
-                {
-                     $(this).closest('td').find('.hour').hide();
-                     $(this).closest('td').find('.reason').show();
-                }else{
-                    $(this).closest('td').find('.hour').show();
-                    $(this).closest('td').find('.reason').hide();
-                }
-            });
+
+            if(userDepartment == 2) {
+                $('.checkbox').change(function(){
+                    if( $(this).is(':checked') )
+                    {
+                        $(this).closest('td').find('.hour').hide();
+                        $(this).closest('td').find('.reason').show();
+                    }else{
+                        $(this).closest('td').find('.hour').show();
+                        $(this).closest('td').find('.reason').hide();
+                    }
+                });
+            }
+            else {
+                $('.radio-button').on('click', function(e) {
+                    let closestTd = $(this).closest('td');
+
+                    if($(this).val() == 0) {
+                        closestTd.find('.reason').show();
+                    }
+                    else {
+                        closestTd.find('.reason').hide();
+                    }
+                });
+            }
 
             $(".saved").click(function(){
-                var week_array = ['Pon','Wt','Śr','Czw','Pt','Sob','Nie'];
-                var $start_hour_array = new Array();
-                var $stop_hour_array = new Array();
-                var $reason_array  = new Array();
                 var closestTR =  $(this).closest('tr');
                 var id_user = closestTR.attr('id');
                 var schedule_id =  $(this).attr('id');
-                var checkbox;
+                var $reason_array  = new Array();
+                var $start_hour_array = new Array();
+                var $stop_hour_array = new Array();
+                var week_array = ['Pon','Wt','Śr','Czw','Pt','Sob','Nie'];
                 var paid = [];
                 var valid = true;
                 var time = true;
-                for(var i=0;i<week_array.length;i++)
-                {
-                    checkbox = closestTR.find('.'+week_array[i]+"_reasonCheck");
-                    $start_hour_array.push(closestTR.find("select[name="+week_array[i]+"_start_work]").val());
-                    $stop_hour_array.push(closestTR.find("select[name="+week_array[i]+"_stop_work]").val());
-                    $reason_array.push(closestTR.find("input[name="+week_array[i]+"_reason]").val());
-                    if(checkbox.is(':checked')) {
-                        paid.push('false');
-                    }
-                    else {
-                        paid.push('true');
-                    }
-                    if(($start_hour_array[i] == "null" || $stop_hour_array[i] == "null") && !checkbox.is(':checked'))
+
+                if(userDepartment == 1) {
+                    for(var i=0;i<week_array.length;i++)
                     {
-                        valid = false;
-                    }
-                    else if($start_hour_array[i] > $stop_hour_array[i] && !checkbox.is(':checked'))
-                    {
-                        valid = false;
-                        time = false;
-                    }
-                    else if($start_hour_array[i] == "Wybierz" ||  $stop_hour_array[i] == "Wybierz" && !checkbox.is(':checked'))
-                    {
-                        valid = false;
-                        time = false;
-                    }
-                    if(checkbox.is(':checked'))
-                    {
-                        $start_hour_array[i] = null;
-                        $stop_hour_array[i] = null;
+                        let element = $(`input[name=r_${i}]:checked`).val();
+                        if(element == 1) {
+                            paid.push('true');
+                            $start_hour_array.push('8:00');
+                            $stop_hour_array.push('16:00');
+                        }
+                        else if(element == 0) {
+                            paid.push('false');
+                            $start_hour_array.push(null);
+                            $stop_hour_array.push(null);
+                        }
+                        else {
+                            valid = false;
+                        }
+
+                        $reason_array.push(closestTR.find("input[name="+week_array[i]+"_reason]").val());
                     }
                 }
-                if(valid == true)
-                {
-                    $(this).attr('disabled',true);
-                    $.ajax({
-                        type: "POST",
-                        url: '{{ route('api.saveSchedule') }}',
-                        headers: {
-                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                        },
-                        data:{"isPaid": paid,"start_hours":$start_hour_array,"stop_hours":$stop_hour_array,"reasons":$reason_array,"id_user":id_user,"schedule_id":schedule_id},
-                        success: function(response) {
+                else {
+                    var checkbox;
+
+                    for(var i=0;i<week_array.length;i++)
+                    {
+                        checkbox = closestTR.find('.'+week_array[i]+"_reasonCheck");
+                        $start_hour_array.push(closestTR.find("select[name="+week_array[i]+"_start_work]").val());
+                        $stop_hour_array.push(closestTR.find("select[name="+week_array[i]+"_stop_work]").val());
+                        $reason_array.push(closestTR.find("input[name="+week_array[i]+"_reason]").val());
+                        if(checkbox.is(':checked')) {
+                            paid.push('false');
+                        }
+                        else {
+                            paid.push('true');
+                        }
+                        if(($start_hour_array[i] == "null" || $stop_hour_array[i] == "null") && !checkbox.is(':checked'))
+                        {
+                            valid = false;
+                        }
+                        else if($start_hour_array[i] > $stop_hour_array[i] && !checkbox.is(':checked'))
+                        {
+                            valid = false;
+                            time = false;
+                        }
+                        else if($start_hour_array[i] == "Wybierz" ||  $stop_hour_array[i] == "Wybierz" && !checkbox.is(':checked'))
+                        {
+                            valid = false;
+                            time = false;
+                        }
+                        if(checkbox.is(':checked'))
+                        {
+                            $start_hour_array[i] = null;
+                            $stop_hour_array[i] = null;
+                        }
+                    }
+                }
+                    if(valid == true)
+                    {
+                        $(this).attr('disabled',true);
+                        $.ajax({
+                            type: "POST",
+                            url: '{{ route('api.saveSchedule') }}',
+                            headers: {
+                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                            },
+                            data:{"isPaid": paid,"start_hours":$start_hour_array,"stop_hours":$stop_hour_array,"reasons":$reason_array,"id_user":id_user,"schedule_id":schedule_id},
+                            success: function(response) {
                                 swal({
                                     title: 'Godziny zostały zarejestrowane!',
                                     text: '',
@@ -428,15 +518,15 @@ function getStartAndEndDate($week, $year) {
                                     } else {
                                         $('#show_week_grafik_send').trigger('click');
                                     }});
-                        }
-                    });
-                }else {
-                    if(time == false)
-                    {
-                        swal("Godziny są nieprawidłowe")
-                    }else
-                    swal("Nie wszystkie dane zostały uzupełnione.")
-                }
+                            }
+                        });
+                    }else {
+                        if(time == false)
+                        {
+                            swal("Godziny są nieprawidłowe")
+                        }else
+                            swal("Nie wszystkie dane zostały uzupełnione.")
+                    }
 
             });
         } );

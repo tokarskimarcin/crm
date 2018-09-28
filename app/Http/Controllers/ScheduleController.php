@@ -20,10 +20,14 @@ class ScheduleController extends Controller
     public function setScheduleGet()
     {
         $userTypes = UserTypes::all();
-        return view('schedule.setSchedule')->with('userTypes', $userTypes);
+        $departmentType = Department_info::where('id', '=', Auth::user()->department_info_id)->first()->id_dep_type;
+        return view('schedule.setSchedule')
+            ->with('userTypes', $userTypes)
+            ->with('department_type', $departmentType);
     }
     public function setSchedulePost(Request $request)
     {
+        $departmentType = Department_info::where('id', '=', Auth::user()->department_info_id)->first()->id_dep_type;
         $userTypes = UserTypes::all();
         $number_of_week = $request->show_schedule;
         $request->session()->put('number_of_week', $number_of_week);
@@ -32,7 +36,8 @@ class ScheduleController extends Controller
         return view('schedule.setSchedule')
             ->with('number_of_week',$number_of_week)
             ->with('schedule_analitics',$schedule_analitics)
-            ->with('userTypes', $userTypes);
+            ->with('userTypes', $userTypes)
+            ->with('department_type', $departmentType);
     }
     public function viewScheduleGet()
     {
