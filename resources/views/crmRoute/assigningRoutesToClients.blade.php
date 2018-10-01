@@ -764,7 +764,8 @@
                         data: {
                             'limit': previousCityDistance,
                             "currentDate": date,
-                            "cityId": previousCityId
+                            "cityId": previousCityId,
+                            "client_route": 0
                         },
                         headers: {
                             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -779,7 +780,8 @@
                                 data: {
                                     'limit': nextCityDistance,
                                     "currentDate": date,
-                                    "cityId": nextCityId
+                                    "cityId": nextCityId,
+                                    "client_route": 0
                                 },
                                 headers: {
                                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -881,7 +883,8 @@
                         data: {
                             'limit': limit,
                             'currentDate': date,
-                            "cityId": nextCityId
+                            "cityId": nextCityId,
+                            "client_route": 0
                         },
                         headers: {
                             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -962,7 +965,8 @@
                         url: '{{ route('api.getCitiesNames') }}',
                         data: {
                             "id": voivodeId,
-                            "currentDate": date
+                            "currentDate": date,
+                            "client_route": 0
                         },
                         headers: {
                             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -1184,7 +1188,7 @@
                     }
                 }
                 else if(data.block == 0) {
-                    cityOpt.textContent = data.name + "  (D: " + data.max_hour + ')';
+                    cityOpt.textContent = data.city_name + "  (D: " + data.max_hour + ')';
                     cityOpt.setAttribute('title', "dostępne jeszcze " + data.max_hour + " godzin");
                     if(data.max_hour >= 0) {
                         cityOpt.setAttribute('data-max_hours', `${data.max_hour}`);

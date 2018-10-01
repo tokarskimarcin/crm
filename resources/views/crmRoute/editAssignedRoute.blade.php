@@ -328,6 +328,7 @@
     <script>
 
         $(document).ready(function () {
+            let client_route_id = {{$client_route_id}};
             let globalDateIndicator = null;
             let globalSwalFlag = false;
 
@@ -759,7 +760,8 @@
                         data: {
                             'limit': previousCityDistance,
                             "currentDate": date,
-                            "cityId": previousCityId
+                            "cityId": previousCityId,
+                            'client_route': client_route_id
                         },
                         headers: {
                             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -774,7 +776,8 @@
                                 data: {
                                     'limit': nextCityDistance,
                                     "currentDate": date,
-                                    "cityId": nextCityId
+                                    "cityId": nextCityId,
+                                    'client_route': client_route_id
                                 },
                                 headers: {
                                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -878,7 +881,8 @@
                         data: {
                             'limit': limit,
                             'currentDate': date,
-                            "cityId": nextCityId
+                            "cityId": nextCityId,
+                            'client_route': client_route_id
                         },
                         headers: {
                             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -956,6 +960,7 @@
                 // }
 
 
+                console.log('cl', client_route_id);
                 function getCitiesNamesAjax() {
                     return $.ajax({
                         type: "POST",
@@ -963,7 +968,8 @@
                         url: '{{ route('api.getCitiesNames') }}',
                         data: {
                             "id": voivodeId,
-                            "currentDate": date
+                            "currentDate": date,
+                            "client_route": client_route_id
                         },
                         headers: {
                             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
