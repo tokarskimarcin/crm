@@ -556,6 +556,9 @@ class WorkHoursController extends Controller
         $myDepartment_info = Department_info::find(Auth::user()->department_info_id);
         $count_agreement = Department_types::find($myDepartment_info->id_dep_type);
         $count_agreement= $count_agreement->count_agreement;
+        if(!in_array(Auth::user()->user_type_id, WorkHoursController::getUserTypesPermissionToEditSuccess())) {
+            $count_agreement = 0;
+        }
         Session::put('count_agreement', $count_agreement);
         $user_info = $this->user_info($userid,$month);
         $department_id = Auth::user()->department_info_id;
