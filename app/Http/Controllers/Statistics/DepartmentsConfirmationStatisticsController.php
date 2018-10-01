@@ -75,16 +75,28 @@ class DepartmentsConfirmationStatisticsController extends Controller
 
         $confirmationStatistics = ConfirmationStatistics::getConsultantsConfirmationStatisticsForMonth($clientRouteInfo, $monthFourWeeksDivision);
 
-        $confirmationStatistics['data'] = $confirmationStatistics['data']->groupBy('dateGroup');
+        $confirmationStatistics['data'] = $confirmationStatistics['data']->sortByDesc('provision')->groupBy('dateGroup');
+        $dateGroupArrays = [];
         foreach ($confirmationStatistics['data'] as $dateGroup => $dateGroupCollection){
-            $confirmationStatistics['data'][$dateGroup] = $dateGroupCollection->sortByDesc('provision');
-        }
-        if($trainersGrouping == 'true'){
-            foreach ($confirmationStatistics['data'] as $dateGroup => $dateGroupCollection){
+            if($trainersGrouping == 'true'){
                 $confirmationStatistics['data'][$dateGroup] = $dateGroupCollection->groupBy('secondGroup');
             }
+            $weekArr = explode(' ',$dateGroup);
+            array_push($dateGroupArrays, (object)['dateGroup'=>$dateGroup,'firstDayTimestamp'=>\DateTime::createFromFormat('Y.m.d',$weekArr[0])->getTimestamp()]);
         }
 
+        for($i = 1; $i < count($dateGroupArrays); $i++){
+            if($dateGroupArrays[$i]->firstDayTimestamp < $dateGroupArrays[$i-1]->firstDayTimestamp){
+                $temp = $dateGroupArrays[$i-1];
+                $dateGroupArrays[$i-1] = $dateGroupArrays[$i];
+                $dateGroupArrays[$i] = $temp;
+            }
+        }
+        $temp = [];
+        foreach ($dateGroupArrays as $week){
+            $temp[$week->dateGroup] = $confirmationStatistics['data'][$week->dateGroup];
+        }
+        $confirmationStatistics['data']= collect($temp);
         return $confirmationStatistics;
     }
 

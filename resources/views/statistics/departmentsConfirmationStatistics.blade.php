@@ -225,7 +225,7 @@
     <script>
         $(document).ready(function () {
             const columnsNr = {'lp':0,'name':1,'shows':2,'provision':3,'avgTimeOnRecord': 15,'dateGroup':19,'secondGroup':20};
-            let hiddenColumns = [];//[columnsNr['dateGroup'], columnsNr['secondGroup']];
+            let hiddenColumns = [columnsNr['dateGroup'], columnsNr['secondGroup']];
             let groupColumns = [columnsNr['dateGroup'], columnsNr['secondGroup']];
             let VARIABLES  = {
                 jQElements:{
@@ -361,6 +361,7 @@
                             //data is grouped by weeks and trainers  (/week/: [ trainer1:[], trainer2:[]])
                             let dataTable = this.dataTable;
                             dataTable.clear();
+                            console.log(data);
                             $.each(data,function (dateGroup, week) {
                                 if(VARIABLES.jQElements.trainersGroupingCheckboxjQ.get(0).checked){
                                     $.each(week, function (trainer, data) {
@@ -620,7 +621,8 @@
                     let api = dataTable.api();
                     let rows = api.rows({page: 'current'}).nodes();
                     api.column(column, {page: 'current'}).data().each(function (group, i) {
-                        if(group !== api.column(column, {page: 'current'}).data()[i+1]){
+                        let dateGroup = api.column(columnsNr['dateGroup']).data()[i]; //variable need to exist only for inside grouping
+                        if(group !== api.column(column).data()[i+1] || dateGroup !== api.column(columnsNr['dateGroup']).data()[i+1]){
                             let data = null;
                             $.each(sumsData, function (weekNr, weekSums) {
                                if(weekSums.dateGroup === api.column(groupColumns[0], {page: 'current'}).data()[i]){
