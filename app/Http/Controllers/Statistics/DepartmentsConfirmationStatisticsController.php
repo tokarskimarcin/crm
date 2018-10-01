@@ -37,8 +37,16 @@ class DepartmentsConfirmationStatisticsController extends Controller
         $trainersGrouping = $request->trainersGrouping;
         $departmentId = $request->departmentId;
         $trainerId = $request->trainerId;
+        $period = $request->period;
 
-        $monthFourWeeksDivision = MonthFourWeeksDivision::get(date('Y',strtotime($month)),date('m',strtotime($month)));
+        $monthFourWeeksDivision = null;
+        if($period == 1) {
+            $monthFourWeeksDivision = MonthFourWeeksDivision::get(date('Y', strtotime($month)), date('m', strtotime($month)));
+        }else if($period == 3){
+            $monthFourWeeksDivision = [(object)['firstDay'=> date('Y-m-', strtotime($month)).'01', 'lastDay' => date('Y-m-', strtotime($month)).date('t', strtotime($month))]];
+        }else{
+            return false;
+        }
         $clientRouteInfo = ClientRouteInfo::select(
             DB::raw('concat(users.first_name," ",users.last_name) as confirmingUserName'),
             DB::raw('concat(trainer.first_name," ",trainer.last_name) as confirmingUserTrainerName'),
@@ -67,7 +75,10 @@ class DepartmentsConfirmationStatisticsController extends Controller
 
         $confirmationStatistics = ConfirmationStatistics::getConsultantsConfirmationStatisticsForMonth($clientRouteInfo, $monthFourWeeksDivision);
 
-        $confirmationStatistics['data'] = $confirmationStatistics['data']->sortByDesc('provision')->groupBy('dateGroup');
+        $confirmationStatistics['data'] = $confirmationStatistics['data']->groupBy('dateGroup');
+        foreach ($confirmationStatistics['data'] as $dateGroup => $dateGroupCollection){
+            $confirmationStatistics['data'][$dateGroup] = $dateGroupCollection->sortByDesc('provision');
+        }
         if($trainersGrouping == 'true'){
             foreach ($confirmationStatistics['data'] as $dateGroup => $dateGroupCollection){
                 $confirmationStatistics['data'][$dateGroup] = $dateGroupCollection->groupBy('secondGroup');

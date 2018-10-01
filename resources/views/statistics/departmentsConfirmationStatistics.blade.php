@@ -68,7 +68,7 @@
         </div>
         <div class="panel-body">
             <div class="row">
-                <div class="col-md-4">
+                <div class="col-md-2">
                     <label>Miesiąc:</label>
                     <div class="form-group">
                         <div class='input-group date' id='monthDatetimepicker'>
@@ -78,6 +78,13 @@
                             <input type='text' class="form-control" value="{{date('Y-m')}}" readonly/>
                         </div>
                     </div>
+                </div>
+                <div class="col-md-2">
+                    <label>Okres:</label>
+                    <select class="form-control selectpicker" id="periodSelect">
+                        <option value="1" selected>Tygodniowy</option>
+                        <option value="3">Miesięczny</option>
+                    </select>
                 </div>
                 <div class="col-md-4">
                     <label>Oddział:</label>
@@ -218,13 +225,14 @@
     <script>
         $(document).ready(function () {
             const columnsNr = {'lp':0,'name':1,'shows':2,'provision':3,'avgTimeOnRecord': 15,'dateGroup':19,'secondGroup':20};
-            let hiddenColumns = [columnsNr['dateGroup'], columnsNr['secondGroup']];
+            let hiddenColumns = [];//[columnsNr['dateGroup'], columnsNr['secondGroup']];
             let groupColumns = [columnsNr['dateGroup'], columnsNr['secondGroup']];
             let VARIABLES  = {
                 jQElements:{
                     trainersGroupingCheckboxjQ: $('#trainersGroupingCheckbox'),
                     departmentsSelectjQ: $('#departmentsSelect'),
                     trainersSelectjQ: $('#trainersSelect'),
+                    periodSelectjQ: $('#periodSelect'),
                     monthDatetimepicker: $('#monthDatetimepicker').datetimepicker({
                         language: 'pl',
                         minView: 3,
@@ -494,6 +502,12 @@
                                 VARIABLES.DATA_TABLES.departmentsConfirmation.ajaxReload();
                             });
                         })();
+                        (function periodSelectHandler() {
+                            VARIABLES.jQElements.periodSelectjQ.change(function (e) {
+                                console.log($(e.target).val());
+                                VARIABLES.DATA_TABLES.departmentsConfirmation.ajaxReload();
+                            });
+                        })();
                         (function trainersSelectHandler() {
                             VARIABLES.jQElements.trainersSelectjQ.change(function (e) {
                                 VARIABLES.DATA_TABLES.departmentsConfirmation.ajaxReload();
@@ -516,7 +530,8 @@
                                 trainersGrouping: VARIABLES.jQElements.trainersGroupingCheckboxjQ.get(0).checked,
                                 departmentId: VARIABLES.jQElements.departmentsSelectjQ.val(),
                                 selectedMonth: VARIABLES.jQElements.monthDatetimepicker.find('input').val(),
-                                trainerId: VARIABLES.jQElements.trainersSelectjQ.val()
+                                trainerId: VARIABLES.jQElements.trainersSelectjQ.val(),
+                                period: VARIABLES.jQElements.periodSelectjQ.val()
                             },
                             success: function (response) {
                                 VARIABLES.DATA_TABLES.departmentsConfirmation.data.departmentsConfirmationStatistics = response.data;
@@ -604,11 +619,8 @@
                     let column = insideGrouping ? groupColumns[1] : groupColumns[0];
                     let api = dataTable.api();
                     let rows = api.rows({page: 'current'}).nodes();
-                    let lastDateGroup = null;
                     api.column(column, {page: 'current'}).data().each(function (group, i) {
-                        let dateGroup = api.column(groupColumns[0], {page: 'current'}).data()[i+1];
-                        if(group !== api.column(column, {page: 'current'}).data()[i+1] || lastDateGroup !== dateGroup){
-                            lastDateGroup = dateGroup;
+                        if(group !== api.column(column, {page: 'current'}).data()[i+1]){
                             let data = null;
                             $.each(sumsData, function (weekNr, weekSums) {
                                if(weekSums.dateGroup === api.column(groupColumns[0], {page: 'current'}).data()[i]){
@@ -617,12 +629,12 @@
                                }
                             });
                             if(insideGrouping){
-                               $.each(data.secondGrouping, function (secondGroupingNr, secondGroupingSums) {
-                                   if(secondGroupingSums.secondGroup === api.column(groupColumns[1], {page: 'current'}).data()[i]){
-                                       data = secondGroupingSums;
-                                       return false;
-                                   }
-                               });
+                                $.each(data.secondGrouping, function (secondGroupingNr, secondGroupingSums) {
+                                    if(secondGroupingSums.secondGroup === api.column(groupColumns[1], {page: 'current'}).data()[i]){
+                                        data = secondGroupingSums;
+                                        return false;
+                                    }
+                                });
                             }
                             let elementToInsert = $('<tr>').addClass('groupSum_'+column).css('font-weight','bold')
                                .append($('<td>'))

@@ -119,16 +119,16 @@ class ConfirmationStatistics
                      */
                     foreach ($consultantConfirmationData as $confirmationInfo){
                         //consultant sums
-                        $consultantConfirmationStatistics->provision = $consultantConfirmationStatistics->provision + ProvisionLevels::get($confirmationInfo->frequency,'consultant');
+                        $consultantConfirmationStatistics->provision += ProvisionLevels::get('consultant', $confirmationInfo->frequency);
                         //sums for average
                         if($confirmationInfo->frequency > 19){
-                            $consultantConfirmationStatistics->successful = $consultantConfirmationStatistics->successful + 1;
+                            $consultantConfirmationStatistics->successful += 1;
                         }else if($confirmationInfo->frequency > 15){
-                            $consultantConfirmationStatistics->neutral = $consultantConfirmationStatistics->neutral + 1;
+                            $consultantConfirmationStatistics->neutral += 1;
                         }else if($confirmationInfo->frequency > 11){
-                            $consultantConfirmationStatistics->unsuccessful = $consultantConfirmationStatistics->unsuccessful + 1;
+                            $consultantConfirmationStatistics->unsuccessful += 1;
                         }else{
-                            $consultantConfirmationStatistics->unsuccessfulBadly = $consultantConfirmationStatistics->unsuccessfulBadly +1;
+                            $consultantConfirmationStatistics->unsuccessfulBadly += 1;
                         }
                         $consultantConfirmationStatistics->recordsCount += $confirmationInfo->actual_success;
                         $consultantFrequencySum += $confirmationInfo->frequency;
