@@ -198,6 +198,7 @@ class WorkHoursController extends Controller
             $start_date_month = date('W', strtotime($start_date));
             $dep_info = $request->dep_info;
             $engraved = $request->engraved; //true || false
+            $leaders = $request->leaders; //true || false
             $query = DB::table('users')
                 ->leftjoin("work_hours", function ($join) use ($start_date) {
                     $join->on("users.id", "=", "work_hours.id_user")
@@ -234,6 +235,7 @@ class WorkHoursController extends Controller
                     schedule.saturday_stop,
                     schedule.sunday_start,
                     schedule.sunday_stop,
+                    schedule.leader,
                     null as scheduleToDayStart,
                     null as scheduleToDayStop,
                     null as freeDay,
@@ -245,6 +247,9 @@ class WorkHoursController extends Controller
             }
             if($engraved == 'true') { //show only engravered users. If user is in schedule table for given week number then id_user is not null.
                 $query = $query->where('schedule.id_user', '!=', null);
+            }
+            if($leaders == 'true') { //show only leaders of shift.
+                $query = $query->where('schedule.leader', '=', 1);
             }
             $query = $query->wherenotin('users.user_type_id',[1,2,9])
             ->where('users.id','!=',11)
