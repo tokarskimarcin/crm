@@ -50,6 +50,7 @@
                             <li class="list-group-item">Osoby podświetlone na <span style="background-color: #ffd932;">pomarańczowo</span> nacisneły "rozpoczynam pracę" po czasie przewidzianym w grafiku.</li>
                             <li class="list-group-item">Osoby podświetlone na <span style="background-color: #ff514e;">czerwono</span> nie nacisneły "rozpoczynam pracę" w czasie przewidzianym w grafiku.</li>
                         </ul>
+                        Osoby, których wiersze mają pogrubioną czcionkę są <u>liderami zmiany</u>
                     </div>
                     <div class="row">
                         <div class="col-lg-12">
