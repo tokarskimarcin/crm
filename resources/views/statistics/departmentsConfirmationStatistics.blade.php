@@ -163,7 +163,7 @@
         </div>
         <div class="panel-body">
             <div class="row">
-                <div class="col-md-4">
+                <div class="col-md-2">
                     <label>Miesiąc:</label>
                     <div class="form-group">
                         <div class='input-group date' id='monthDatetimepickerForDepartments'>
@@ -173,6 +173,13 @@
                             <input type='text' class="form-control" value="{{date('Y-m')}}" readonly/>
                         </div>
                     </div>
+                </div>
+                <div class="col-md-2">
+                    <label>Okres:</label>
+                    <select class="form-control selectpicker" id="periodSelectForDepartments">
+                        <option value="1" selected>Tygodniowy</option>
+                        <option value="3">Miesięczny</option>
+                    </select>
                 </div>
             </div>
             <div class="row">
@@ -233,6 +240,7 @@
                     departmentsSelectjQ: $('#departmentsSelect'),
                     trainersSelectjQ: $('#trainersSelect'),
                     periodSelectjQ: $('#periodSelect'),
+                    periodSelectForDepartmentsjQ: $('#periodSelectForDepartments'),
                     monthDatetimepicker: $('#monthDatetimepicker').datetimepicker({
                         language: 'pl',
                         minView: 3,
@@ -518,6 +526,9 @@
                             VARIABLES.jQElements.monthDatetimepicker.change(function (e) {
                                 VARIABLES.DATA_TABLES.departmentsConfirmation.ajaxReload();
                             });
+                        })();
+                        (function periodSelectForDepartmentsHandler() {
+
                         })();
                     }
                 },
