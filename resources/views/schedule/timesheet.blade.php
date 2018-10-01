@@ -98,7 +98,7 @@
                             @endif
                             <td><b>{{$total_success}}</b></td>
                             @if($lp > 0)
-                                <td><b>{{round($total_success / $total_time, 2)}}</b></td>
+                                <td><b>{{$total_time > 0 ? round($total_success / $total_time, 2) : 0}}</b></td>
                             @else
                                 <td><b>0</b></td>
                             @endif
