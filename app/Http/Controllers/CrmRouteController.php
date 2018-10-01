@@ -258,6 +258,7 @@ class CrmRouteController extends Controller
             //New insertion into ClientRoute table
             $clientRoute = new ClientRoute();
             $clientRoute->client_id = $clientId;
+            $clientRoute->created_at = date('Y-m-d');
             $clientRoute->user_id = $loggedUser->id;
             $clientRoute->status = 1;
             $clientRoute->type = $clientType; // 1 - badania, 2 - wysyłka
@@ -387,7 +388,8 @@ class CrmRouteController extends Controller
         return view('crmRoute.editAssignedRoute')
             ->with('voivodes', $voivodes)
             ->with('clientRouteInfo', $client_route_info)
-            ->with('client_route', $client_route);
+            ->with('client_route', $client_route)
+            ->with('client_route_id', $id);
     }
 
     public function editAssignedRoutePost($id, Request $request) {
@@ -609,6 +611,20 @@ class CrmRouteController extends Controller
     public function getVoivodeshipRoundWithDistanceLimit(Request $request){
         if($request->ajax()) {
             $cityId = $request->cityId;
+            $clientRoute = $request->client_route;
+
+            $created_at = null;
+            if($clientRoute == 0) {
+                $created_at = date('Y-m-d');
+            }
+            else {
+                $created_at = ClientRoute::where('id', '=', $clientRoute)->first()->created_at; //value of column created_at
+                if($created_at == null) {
+                    $created_at = date('Y-m-d');
+                }
+            }
+
+
             if(strlen($request->currentDate) > 10) {
                 $currentDate = substr($request->currentDate, 6);
             }
@@ -625,7 +641,7 @@ class CrmRouteController extends Controller
                 ->where('client_route_info.status', '=', 1)
                 ->orderBy('city.name')
                 ->get();
-            $voievodeshipRound = $this::findCityByDistanceWithDistanceLimit($city, $currentDate, $clientRouteInfoAll, $limit);
+            $voievodeshipRound = $this::findCityByDistanceWithDistanceLimit($city, $currentDate, $clientRouteInfoAll, $limit, $created_at);
 
             $voievodeshipRound = $voievodeshipRound->groupBy('id')->sortBy('name');
             $voievodeshipDistinc = array();
@@ -639,7 +655,7 @@ class CrmRouteController extends Controller
         }
     }
 
-    public function findCityByDistanceWithDistanceLimit($city, $currentDate,$clientRoutesInfoWithUsedCities, $limit){
+    public function findCityByDistanceWithDistanceLimit($city, $currentDate,$clientRoutesInfoWithUsedCities, $limit, $created_at){
 
         $firstDayOfThisMonth = date('Y-m-01', strtotime($currentDate));
         $lastDayOfThisMonth = date('Y-m-t', strtotime($currentDate));
@@ -652,8 +668,13 @@ class CrmRouteController extends Controller
             cityAlias.id as city_id,
             cityAlias.max_hour as max_hour,
             cityAlias.max_month_show as max_month_show,
+            cityAlias.block_date as block_date,
                 (SELECT count(*) from client_route_info e where e.city_id = cityAlias.`id` and e.date >= "'.$firstDayOfThisMonth.'"
                 and e.date <= "'.$lastDayOfThisMonth.'"  and e.status = 1) as numberOfRecords'))
+                ->where(function($querry) use($created_at) {
+                    $querry->orwhere('block_date', '>', $created_at)
+                        ->orwhere('block_date', '=', null);
+                })
                 ->join('voivodeship', 'voivodeship.id', 'cityAlias.voivodeship_id')
                 ->orderBy('voivodeship.name')
                 ->orderBy('cityAlias.name')
@@ -666,6 +687,7 @@ class CrmRouteController extends Controller
             cityAlias.id as city_id, 
             cityAlias.max_hour as max_hour,
             cityAlias.max_month_show as max_month_show,
+            cityAlias.block_date as block_date,
             (SELECT count(*) from client_route_info e where e.city_id = cityAlias.`id` and e.date >= "'.$firstDayOfThisMonth.'"
             and e.date <= "'.$lastDayOfThisMonth.'" and e.status = 1) as numberOfRecords,
            CASE
@@ -682,6 +704,10 @@ class CrmRouteController extends Controller
            END AS distance'
             ))
                 ->join('voivodeship', 'voivodeship.id', 'cityAlias.voivodeship_id')
+                ->where(function($querry) use($created_at) {
+                    $querry->orwhere('block_date', '>', $created_at)
+                        ->orwhere('block_date', '=', null);
+                })
                 ->having('distance', '<=', $limit)
                 ->orderBy('voivodeship.name')
                 ->orderBy('cityAlias.name')
@@ -1491,9 +1517,32 @@ class CrmRouteController extends Controller
     public function addNewRouteAjax(Request $request) {
         $voivodeId = $request->id;
         $currentDate = $request->currentDate;
-        $cities = Cities::all();
+        $clientRoute = $request->client_route;
+
         if($currentDate != 0) {
-            $all_cities = Cities::where('voivodeship_id', '=', $voivodeId)->orderBy('name')->get();
+            $all_cities = null;
+            if($clientRoute == 0) { //There is no client route records yet
+                $all_cities = Cities::where('voivodeship_id', '=', $voivodeId) //list of cities without blocked ones
+                    ->where('block_date', '=', null)
+                    ->OnlyActive()
+                    ->orderBy('name')
+                    ->get();
+            }
+            else { //There is client route record(route exist already)
+                $created_at = ClientRoute::where('id', '=', $clientRoute)->first()->created_at; //value of column created_at
+                if($created_at == null) {
+                    $created_at = date('Y-m-d');
+                }
+                $all_cities = Cities::where('voivodeship_id', '=', $voivodeId)
+                    ->where(function($querry) use($created_at) {
+                        $querry->orwhere('block_date', '>', $created_at)
+                            ->orwhere('block_date', '=', null);
+                    })
+                    ->orderBy('name')
+                    ->get();
+
+            }
+
             $properDate = date_create($currentDate);
             $properDatePom = date_create($currentDate);
 
@@ -2427,11 +2476,14 @@ class CrmRouteController extends Controller
             $newCity = Cities::find($request->cityId);
             if($newCity->status == 0) {
                 $newCity->status = 1;
+                $newCity->block_date = date('Y-m-d');
+                RouteInfo::disableRouteTemplates($request->cityId); //disable all associated route tempaltes
                 //new ActivityRecorder(null, 193, 3);
             }
 
             else {
                 $newCity->status = 0;
+                $newCity->block_date = null;
                 //new ActivityRecorder(null, 193, 4);
             }
 

@@ -12,4 +12,8 @@ class Cities extends Model
     public function voivodes_info() {
         return $this->belongsTo('App\Voivodes','voivodeship_id');
     }
+
+    public function scopeOnlyActive($query) {
+        return $query->where('status', '=', 0);
+    }
 }
