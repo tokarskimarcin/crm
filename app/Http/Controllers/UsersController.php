@@ -301,7 +301,7 @@ class UsersController extends Controller
             ->with('userTypes', $userTypes)
             ->with('type', 1)
             ->with('allActiveUser', [])
-            ->with('userTypesPermissionToGivePenaltyBonus', $this->getUserTypesPermissionToGivePenaltyBonus())
+            ->with('userTypesPermissionToGivePenaltyBonus', UsersController::getUserTypesPermissionToGivePenaltyBonus())
             ->with('userIdsPermisionToGivePenaltyBonus', [])
             ->with('succesorVisableStatus', "hidden")
             ->with('recomendingPeople', $workingUsers)
@@ -376,6 +376,7 @@ class UsersController extends Controller
                 ->with('month', $months)
                 ->with('department_info', $department_info)
                 ->with('allActiveUser', $allActiveUser)
+                ->with('userTypesPermissionToGivePenaltyBonus', UsersController::getUserTypesPermissionToGivePenaltyBonus())
                 ->with('succesorVisableStatus', $succesorVisableStatus)
                 ->with('type', 2);
         } else if ($flag == "true") {
