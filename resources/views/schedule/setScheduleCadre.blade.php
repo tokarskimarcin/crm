@@ -111,7 +111,12 @@ function getStartAndEndDate($week, $year) {
                                             </table>
                                         </div>
                                 </div>
+                                    @if (isset($number_of_week))
                                     <div class="col-md-12">
+                                        <div class="alert alert-info">W przypadku, gdy wybrana osoba ma wolny weekend, należy <b>zostawić zaznaczony</b> checkbox "Czy płatne". Odznaczyć go należy <u>jedynie</u>, gdy osoba nie przyszła do pracy w przewidzianym przez grafik dniu!</div>
+                                    </div>
+                                    <div class="col-md-12">
+                                    @endif
                                         @if (isset($number_of_week))
                                           <div class="table-responsive">
                                             <table id="datatable" class="table table-striped table-bordered" cellspacing="0" width="100%">
