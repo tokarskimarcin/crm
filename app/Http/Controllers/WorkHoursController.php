@@ -24,12 +24,15 @@ class WorkHoursController extends Controller
     }
 
 
+    public static function getUserTypesPermissionToEditSuccess(){
+        return [3,23];
+    }
     //******************acceptHour****************** START
     public function acceptHour()
     {
         $myDepartment_info = Department_info::find(Auth::user()->department_info_id);
         $count_agreement = Department_types::find($myDepartment_info->id_dep_type);
-        if($count_agreement->count_agreement == 1) // czy zliczane są zagody
+        if($count_agreement->count_agreement == 1 && in_array(Auth::user()->user_type_id,WorkHoursController::getUserTypesPermissionToEditSuccess())) // czy zliczane są zagody
         {
             return view('workhours.acceptHourSucces');
         }
@@ -62,7 +65,7 @@ class WorkHoursController extends Controller
             ->orderby($dayOfWeekArray[$day_number].'_start')
             ->get();
 
-        $workingLessThan30RBH = Work_Hour::usersWorkingLessThan(30);
+        $workingLessThan30RBH = Work_Hour::usersWorkingRBHSelector(30,'<');
 
         //we are adding field newUser with value 1 if user is new, otherwise 0.
         $sheduleWithNewUsers = $shedule->map(function($item) use($workingLessThan30RBH) {

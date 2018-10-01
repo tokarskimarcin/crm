@@ -35,7 +35,7 @@
 
     @foreach($data as $item)
         @php
-            if($onlyNewUser == 1){
+            if($onlyNewUser > 0){
                 if(in_array($item['consultant']->id,$onlyUserID) && count($onlyUserID) != 0){
                     $total_success += $item['success'];
                     $total_received_calls += $item['received_calls'];

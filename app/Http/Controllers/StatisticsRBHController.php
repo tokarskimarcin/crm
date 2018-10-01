@@ -25,7 +25,7 @@ class StatisticsRBHController extends Controller
         $iTimeInSHours = 30;
         $iTimeInSeconds = $iTimeInSHours * 60 * 60;
 
-        $CusersWorkingLessThan30RBH = Work_Hour::usersWorkingLessThan($iTimeInSHours);
+        $CusersWorkingLessThan30RBH = Work_Hour::usersWorkingRBHSelector($iTimeInSHours, '<');
         $CallUsersThisMonth = Work_Hour::usersWhoStartedWorkThisMonth($sThisMonth, $sThisYear);
 
         $CallUsersThisMonthExtended = Work_Hour::mergeCollection($CallUsersThisMonth,$iTimeInSeconds);
@@ -55,7 +55,7 @@ class StatisticsRBHController extends Controller
         $sActualMonth = date('Y').'-'.$request->month_selected;
         $iTimeInSHours = 30;
         $iTimeInSeconds = $iTimeInSHours * 60 * 60;
-        $CusersWorkingLessThan30RBH = Work_Hour::usersWorkingLessThan($iTimeInSHours,$sActualMonth);
+        $CusersWorkingLessThan30RBH = Work_Hour::usersWorkingRBHSelector($iTimeInSHours,'<', $sActualMonth);
         $CallUsersThisMonth = Work_Hour::usersWhoStartedWorkThisMonth($sThisMonth, $sThisYear,$sActualMonth);
         $CallUsersThisMonthExtended = Work_Hour::mergeCollection($CallUsersThisMonth,$iTimeInSeconds);
         $CallUsersForReport = collect(array_merge($CusersWorkingLessThan30RBH->toArray(), $CallUsersThisMonthExtended->toArray()))->unique('id_user');
@@ -82,7 +82,7 @@ class StatisticsRBHController extends Controller
         $iTimeInSHours = 30;
         $iTimeInSeconds = $iTimeInSHours * 60 * 60;
 
-        $CusersWorkingLessThan30RBH = Work_Hour::usersWorkingLessThan($iTimeInSHours);
+        $CusersWorkingLessThan30RBH = Work_Hour::usersWorkingRBHSelector($iTimeInSHours,'<');
         $CallUsersThisMonth = Work_Hour::usersWhoStartedWorkThisMonth($sThisMonth, $sThisYear);
 
         $CallUsersThisMonthExtended = Work_Hour::mergeCollection($CallUsersThisMonth,$iTimeInSeconds);

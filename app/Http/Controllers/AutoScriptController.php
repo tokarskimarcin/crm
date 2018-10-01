@@ -193,7 +193,7 @@ class AutoScriptController extends Controller
             ->get();
 
         $scheduleGroupedByUser = $scheduleData->groupBy('userId', 'week_num');
-        $usersWorkingLessThan30RBH = Work_Hour::usersWorkingLessThan(30);
+        $usersWorkingLessThan30RBH = Work_Hour::usersWorkingRBHSelector(30,'<');
         $cl = $clientRouteInfoRecords->where('confirmingUser', '!=', null)->where('confirmDate', '<>', null)->where('confirmDate', '>', $lastMonthFull);
 
         $confirmingUsersArr = $cl->pluck('confirmingUser')->toArray();

@@ -45,7 +45,7 @@
             </tr>
             @foreach($coach as $item)
                 @if(is_object($item))
-                    @if($onlyNewUser == 1)
+                    @if($onlyNewUser > 0)
                         @if(in_array($item->user_id,$onlyUserID) && count($onlyUserID) != 0)
                             @php
                                 if($item->all_checked_talks != 0 && $item->all_checked_talks != null) {

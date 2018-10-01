@@ -3348,8 +3348,11 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
             $coaches = $coaches->where('department_info_id', '=', Auth::user()->department_info_id);
         $onlyUserID = [];
         if($request->onlyNewUser == 1){
-            $onlyUserID = $this::getUserLessThan30RBH()->pluck('id_user')->toArray();
+            $onlyUserID = $this::getUser30RBH('<')->pluck('id_user')->toArray();
+        }else if($request->onlyNewUser == 2){
+            $onlyUserID = $this::getUser30RBH('>=')->pluck('id_user')->toArray();
         }
+
         return view('reportpage.MonthReportCoach')
             ->with([
                 'coaches'           => $coaches,
@@ -3360,7 +3363,8 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
                 'months'            => self::getMonthsNames(),
                 'month_selected'    => $request->month_selected,
                 'onlyNewUser'       => $request->onlyNewUser,
-                'onlyUserID'       => $onlyUserID
+                'withoutNewUser'    => $request->withoutNewUser,
+                'onlyUserID'        => $onlyUserID
             ]);
     }
 
@@ -3968,8 +3972,11 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
         }
 
         $newUserID = [];
-        if($request->onlyNewUser == 1)
-            $newUserID = $this::getUserLessThan30RBH()->pluck('id_user')->toArray();
+        if($request->onlyNewUser == 1){
+            $newUserID = $this::getUser30RBH('<')->pluck('id_user')->toArray();
+        }else if($request->onlyNewUser == 1){
+            $newUserID = $this::getUser30RBH('>=')->pluck('id_user')->toArray();
+        }
 
 
         return view('reportpage.monthReportCoachSummary')
@@ -4085,11 +4092,12 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
             ]);
     }
 
-    function getUserLessThan30RBH(){
+    function getUser30RBH($comparator){
         $iTimeInSHours = 30;
-        $CusersWorkingLessThan30RBH = Work_Hour::usersWorkingLessThan($iTimeInSHours)->unique('id_user');
+        $CusersWorkingLessThan30RBH = Work_Hour::usersWorkingRBHSelector($iTimeInSHours, $comparator)->unique('id_user');
         return $CusersWorkingLessThan30RBH;
     }
+
     /**
      * Raport dzienny trenerzy (po wyborze)
      */
@@ -4134,8 +4142,12 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
             $data = $data->where('report_hour', '=', $request->hour_select)
             ->orderBy('pbx_report_extension.average', 'desc')
             ->get();
-            if($request->onlyNewUser == 1)
-                $data = $data->whereIn('user_id',$this::getUserLessThan30RBH()->pluck('id_user'));
+
+            if($request->onlyNewUser == 1){
+                $data = $data->whereIn('user_id',$this::getUser30RBH('<')->pluck('id_user'));
+            }else if($request->onlyNewUser == 2){
+                $data = $data->whereIn('user_id',$this::getUser30RBH('>=')->pluck('id_user'));
+            }
 
         return view('reportpage.dayReportCoaches')
             ->with([
@@ -4197,7 +4209,9 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
         $data = $this->getDayCoachStatistics($request->dep_id, $request->day_select);
         $onlyUserID = [];
         if($request->onlyNewUser == 1){
-            $onlyUserID = $this::getUserLessThan30RBH()->pluck('id_user')->toArray();
+            $onlyUserID = $this::getUser30RBH('<')->pluck('id_user')->toArray();
+        }else if($request->onlyNewUser == 2){
+            $onlyUserID = $this::getUser30RBH('>=')->pluck('id_user')->toArray();
         }
         return view('reportpage.DayReportSummaryCoaches')
             ->with([
@@ -4773,8 +4787,11 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
 
         $data = self::monthReportConsultantsData($request->coach_id, $date_start, $date_stop);
         $newUserID = [];
-        if($request->onlyNewUser == 1)
-            $newUserID = $this::getUserLessThan30RBH()->pluck('id_user')->toArray();
+        if($request->onlyNewUser == 1){
+            $newUserID = $this::getUser30RBH('<')->pluck('id_user')->toArray();
+        } else if($request->onlyNewUser == 2){
+            $newUserID = $this::getUser30RBH('>=')->pluck('id_user')->toArray();
+        }
 
         return view('reportpage.monthReportConsultant')
             ->with([
