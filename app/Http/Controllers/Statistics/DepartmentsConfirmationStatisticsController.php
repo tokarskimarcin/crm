@@ -46,7 +46,8 @@ class DepartmentsConfirmationStatisticsController extends Controller
             'pairs',
             'actual_success',
             'users.department_info_id',
-            'users.coach_id'
+            'users.coach_id',
+            'users.login_phone'
             )
             ->join('users','confirmingUser', '=', 'users.id')
             ->join('department_info as di', 'users.department_info_id','=','di.id')
