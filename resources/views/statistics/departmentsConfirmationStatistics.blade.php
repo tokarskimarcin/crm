@@ -269,7 +269,7 @@
                             ordering: false,
                             columns:[
                                 {data: 'lp'},
-                                {data: 'name'},
+                                {data: 'confirmingUserName'},
                                 {data: 'shows'},
                                 {data: 'provision'},
                                 {data: 'successful'},
