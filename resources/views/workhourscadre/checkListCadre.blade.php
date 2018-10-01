@@ -48,7 +48,7 @@
                         <ul class="list-group">
                             <li class="list-group-item">Osoby podświetlone na <span style="background-color: #83e05c;">zielono</span> nacisneły "rozpoczynam pracę" w czasie przewidzianym w grafiku.</li>
                             <li class="list-group-item">Osoby podświetlone na <span style="background-color: #ffd932;">pomarańczowo</span> nacisneły "rozpoczynam pracę" po czasie przewidzianym w grafiku.</li>
-                            <li class="list-group-item">Osoby podświetlone na <span style="background-color: #E03838;">czerwono</span> nie nacisneły "rozpoczynam pracę" w czasie przewidzianym w grafiku.</li>
+                            <li class="list-group-item">Osoby podświetlone na <span style="background-color: #ff514e;">czerwono</span> nie nacisneły "rozpoczynam pracę" w czasie przewidzianym w grafiku.</li>
                         </ul>
                     </div>
                     <div class="row">
@@ -81,6 +81,12 @@
                             <div class="form-group">
                                 <input type="checkbox" id="onlyEngraved" style="display: inline-block; margin-right: 0.5em;">
                                 <label for="onlyEngraved">Pokaż tylko zagrafikowanych</label>
+                            </div>
+                        </div>
+                        <div class="col-lg-12">
+                            <div class="form-group">
+                                <input type="checkbox" id="leaders" style="display: inline-block; margin-right: 0.5em;">
+                                <label for="leaders">Pokaż tylko liderów zmiany</label>
                             </div>
                         </div>
                     </div>
@@ -140,6 +146,7 @@
 
             let userTypes = @json($userTypes);
             let engravedCheckboxElement = document.querySelector('#onlyEngraved');
+            let leadersCheckboxElement = document.querySelector('#leaders');
 
             table = $('#datatable').DataTable({
                 "processing": true,
@@ -159,13 +166,17 @@
                     });
                 },
                 "rowCallback": function( row, data, index ) {
+                    if(data.leader == 1) {
+                        $(row).css('font-weight', 'bold');
+                    }
+
                     if(data.onTime == 2){ // na czas w pracy
                         $(row).css('background-color', '#83e05c');
                     }
                     else if(data.onTime == 3){ // spóźniony do pracy
                         $(row).css('background-color', 'rgb(255, 217, 50)');
                     }else if(data.onTime == 1){
-                        $(row).css('background-color', '#ff0f00');
+                        $(row).css('background-color', '#ff514e');
                     }
                 },
                 "ajax": {
@@ -175,6 +186,7 @@
                         d.start_date = $('#start_date').val();
                         d.dep_info =$("select[name='department_id_info']").val();
                         d.engraved = engravedCheckboxElement.checked;
+                        d.leaders = leadersCheckboxElement.checked;
                     },
                     'headers': {'X-CSRF-TOKEN': '{{ csrf_token() }}'}
                 },
@@ -186,7 +198,6 @@
                     {"data":"first_name"},
                     {"data":"last_name"},
                     {"data": function (data, type, dataToSet) {
-                        console.log(data);
                         if(data.click_start == null)
                             data.click_start = "Brak infromacji";
                         if(data.click_stop == null)
@@ -241,6 +252,7 @@
             }
 
             engravedCheckboxElement.addEventListener('change', checkboxChangeHandler);
+            leadersCheckboxElement.addEventListener('change', checkboxChangeHandler);
 
         });
 
