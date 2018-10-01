@@ -68,12 +68,12 @@
                         @foreach($hours as $hour)
                             @php
                                 $lp++;
-                                $avg = round($hour->user_success / $hour->user_sum, 2);
+                                $avg = $hour->user_sum != 0 ? round($hour->user_success / $hour->user_sum, 2) : 0;
                                 $user_cash = round($hour->user_sum * $hour->rate , 2);
                                 $total_time += $hour->user_sum;
                                 $total_avg_rate += $hour->rate;
                                 $total_success += $hour->user_success;
-                                $total_avg += round($hour->user_success / $hour->user_sum, 2);
+                                $total_avg += $hour->user_sum != 0 ? round($hour->user_success / $hour->user_sum, 2) : 0;
                                 $total_cash += $user_cash;
                             @endphp
                             <tr>
