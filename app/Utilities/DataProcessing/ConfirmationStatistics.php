@@ -67,9 +67,11 @@ class ConfirmationStatistics
 
                 $clientRouteInfo[$dateGroup][$secondGroup] = $clientRouteInfoByDateGroupByCoachId->groupBy('confirmingUserName');
                 foreach ($clientRouteInfo[$dateGroup][$secondGroup] as $consultantConfirmationData){
-                    $consultantConfirmationStatistics               = (object)[];
-                    $consultantConfirmationStatistics->name         = $consultantConfirmationData[0]->confirmingUserName;
-                    $consultantConfirmationStatistics->trainer      = $consultantConfirmationData[0]->confirmingUserTrainerName;
+                    $consultantConfirmationStatistics               = (collect($consultantConfirmationData[0])->toArray());
+                    unset($consultantConfirmationStatistics['frequency']);
+                    unset($consultantConfirmationStatistics['pairs']);
+                    unset($consultantConfirmationStatistics['actual_success']);
+                    $consultantConfirmationStatistics               = (object)$consultantConfirmationStatistics;
                     $consultantConfirmationStatistics->shows        = count($consultantConfirmationData);
                     $consultantConfirmationStatistics->dateGroup    = $dateGroup;
                     $consultantConfirmationStatistics->secondGroup  = $secondGroup;
