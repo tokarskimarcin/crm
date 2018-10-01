@@ -28,12 +28,17 @@ class Work_Hour extends Model
     }
 
     /**
-     * Return users who work less than 30H
+     * Return users who work <comparator> than number of hours
      * @param $iNumberOfHours
+     * @param $comparator
      * @param null $SactualMonth
      * @return Collection
      */
-    public static function usersWorkingLessThan($iNumberOfHours,$SactualMonth = null): Collection {
+    public static function usersWorkingRBHSelector($iNumberOfHours, $comparator, $SactualMonth = null): Collection {
+        $availableComparators = ['<','>','<=','>=','=','<>'];
+        if(!in_array($comparator, $availableComparators)){
+            throw new \Exception('Wrong param (comparator) in usersWorkingRBHSelector function');
+        }
         if($SactualMonth == null) $SactualMonth = date('Y-m');
         $iNumberOfSeconds = $iNumberOfHours * 60 * 60;
 
@@ -50,19 +55,20 @@ class Work_Hour extends Model
             ->join('department_info', 'users.department_info_id', '=', 'department_info.id')
             ->join('departments', 'department_info.id_dep', '=', 'departments.id')
             ->join('department_type', 'department_info.id_dep_type', '=', 'department_type.id')
-            ->where(function ($querry) use ($SactualMonth){
-                $querry->orwhere('users.status_work',1)
-                    ->orwhere('users.end_work','like',$SactualMonth.'%');
+            ->where(function ($querry) use ($SactualMonth, $comparator){
+                if($comparator == '<' || $comparator == '<=' ){
+                    $querry->orwhere('users.status_work',1)
+                        ->orwhere('users.end_work','like',$SactualMonth.'%');
+                }
             })
             ->whereIn('users.user_type_id', [1,2])
             ->groupBy('id_user')
-            ->having(DB::raw('IFNULL(SUM(TIME_TO_SEC(TIMEDIFF(accept_stop, accept_start))), 0)'), '<', $iNumberOfSeconds)
+            ->having(DB::raw('IFNULL(SUM(TIME_TO_SEC(TIMEDIFF(accept_stop, accept_start))), 0)'), $comparator, $iNumberOfSeconds)
             ->get();
 
         return $cAllUsers;
     }
-
-
+    
     /**
      * Pobranie tablicy z miesiącami
      */

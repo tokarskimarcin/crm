@@ -37,8 +37,9 @@
                 <div class="form-group">
                     <label>Nowi konsultanci ~30RBH:</label>
                     <select class="form-control" name="onlyNewUser" id="onlyNewUser">
-                        <option value="0" @if(isset($onlyNewUser) && $onlyNewUser == 0) selected  @endif>Nie</option>
-                        <option value="1" @if(isset($onlyNewUser) && $onlyNewUser == 1) selected @endif>Tak</option>
+                        <option value="0" @if(isset($onlyNewUser) && $onlyNewUser == 0) selected  @endif>Z konsultantami ~30RBH</option>
+                        <option value="1" @if(isset($onlyNewUser) && $onlyNewUser == 1) selected @endif>Tylko konsultanci ~30RBH</option>
+                        <option value="2" @if(isset($onlyNewUser) && $onlyNewUser == 2) selected @endif>Bez konsultantów ~30RBH</option>
                     </select>
                 </div>
             </div>
@@ -69,7 +70,7 @@
                                     @include('mail.monthReportConsultant')
                                 @else
                                     <div class="alert alert-info">
-                                        Wybierz konsultanta
+                                        Wybierz trenera
                                     </div>
                                 @endif
                             </div>

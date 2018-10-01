@@ -1196,6 +1196,11 @@ class FinancesController extends Controller
     public function viewPenaltyBonusPostEdit(Request $request) {
         $id_manager = Auth::user()->id;
 
+        if(!in_array($id_manager, UsersController::getUserTypesPermissionToGivePenaltyBonus())){
+            $LogData = array_merge(['T ' => 'Dodanie kary/premii '],['userID:'=>$id_manager]);
+            new ActivityRecorder($LogData, 10, 5);
+            return view('errors.404');
+        }
         $user = User::find($request->user_id);
 
         if ($user == null || ($request->penalty_type != 1 && $request->penalty_type != 2)) {

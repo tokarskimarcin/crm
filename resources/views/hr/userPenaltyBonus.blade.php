@@ -30,6 +30,7 @@
        <div class="alert alert-success">{{ Session::get('message') }}</div>
     @endif
 
+    @if(in_array(Auth::user()->user_type_id, $userTypesPermissionToGivePenaltyBonus) || in_array(Auth::user()->id, $userIdsPermisionToGivePenaltyBonus))
     <tr>
         <form method="POST" action="{{URL::to('/view_penalty_bonus_edit/')}}" id="pb">
             <input type="hidden" name="_token" value="{{ csrf_token() }}">
@@ -51,6 +52,7 @@
             <td><input value="Dodaj" type="submit" id="addpbsubmit" class="btn btn-info"></td>
         </form>
     </tr>
+    @endif
   </tbody>
 </table>
 <div class="alert alert-danger" style="display: none" id="alert_reason">
