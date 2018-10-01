@@ -28,6 +28,9 @@ use App\MedicalPackage;
 
 class UsersController extends Controller
 {
+    public static function getUserTypesPermissionToGivePenaltyBonus(){
+        return [3,23];
+    }
     /**
      * Wyświetlanie widou dla telemarketera
      */
@@ -298,6 +301,8 @@ class UsersController extends Controller
             ->with('userTypes', $userTypes)
             ->with('type', 1)
             ->with('allActiveUser', [])
+            ->with('userTypesPermissionToGivePenaltyBonus', $this->getUserTypesPermissionToGivePenaltyBonus())
+            ->with('userIdsPermisionToGivePenaltyBonus', [])
             ->with('succesorVisableStatus', "hidden")
             ->with('recomendingPeople', $workingUsers)
             ->with('workingTreners', $workingTreners);
