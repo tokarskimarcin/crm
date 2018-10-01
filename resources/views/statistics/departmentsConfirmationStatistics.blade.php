@@ -528,7 +528,14 @@
                             });
                         })();
                         (function periodSelectForDepartmentsHandler() {
-
+                            VARIABLES.jQElements.periodSelectForDepartmentsjQ.change(function (e) {
+                                VARIABLES.DATA_TABLES.allDepartmentsConfirmation.ajaxReload();
+                            });
+                        })();
+                        (function monthDatetimepickerForDepartmentsHandler() {
+                            VARIABLES.jQElements.monthDatetimepickerForDepartments.change(function (e) {
+                                VARIABLES.DATA_TABLES.allDepartmentsConfirmation.ajaxReload();
+                            });
                         })();
                     }
                 },
@@ -569,6 +576,7 @@
                             headers: {'X-CSRF-TOKEN': '{{ csrf_token() }}'},
                             data: {
                                 selectedMonth: VARIABLES.jQElements.monthDatetimepickerForDepartments.find('input').val(),
+                                period: VARIABLES.jQElements.periodSelectForDepartmentsjQ.val()
                             },
                             success: function (response) {
                                 VARIABLES.DATA_TABLES.allDepartmentsConfirmation.data.allDepartmentsConfirmationStatistics = response.data;
