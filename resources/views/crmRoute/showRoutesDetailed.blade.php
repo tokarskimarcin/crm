@@ -58,7 +58,8 @@
                     które mogą być zbiorczo edytowane. Tabela z rekordami może być filtrowana dostępnymi polami wielokrotnego wyboru.
                     Aby edytować rekordy, należy je zaznaczyć i nacisnąć przycisk <span style="font-weight: bold;">Edytuj rekord(y)</span>.
                     Jeśli liczba <i>zaproszeń live</i> przekracza zakładane <i>limity</i>, w kolumnie <i>straty</i> wyswietli się 0. <br>
-                    Pokazy anulowane mają cały wiersz w kolorze <span style="background-color: #ffc0bd;">czerwonym</span>.
+                    Pokazy anulowane mają cały wiersz w kolorze <span style="background-color: #ffc0bd;">czerwonym</span>. <br>
+                    Legenda nagłówka tabeli: <b>T</b>: Tydzien, <b>Z</b>: Zaproszenia Live, <b>L</b>: Limit, <b>S</b>: Straty, <b>Spr</b>: Sprawdzenie
                 </div>
                 <div class="row">
                     <div class="col-md-2">
@@ -111,15 +112,15 @@
                     <table id="datatable" class="thead-inverse table table-striped table-bordered compact" style="max-width:100%;">
                         <thead>
                         <tr>
-                            <th>Tydz</th>
+                            <th>T</th>
                             <th>Data</th>
                             <th>Godz</th>
                             <th>Kampania</th>
                             <th>Podział bazy</th>
-                            <th>Sprawdzenie</th>
-                            <th>Zaproszenia <br>Live</th>
-                            <th>Limit</th>
-                            <th>Straty</th>
+                            <th>Spr.</th>
+                            <th>Z</th>
+                            <th>L</th>
+                            <th>S</th>
                             <th>Nazwa_klienta</th>
                             <th>Oddział</th>
                             <th>Uwagi</th>
