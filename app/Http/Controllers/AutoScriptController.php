@@ -13,6 +13,34 @@ use Illuminate\Support\Facades\DB;
 
 class AutoScriptController extends Controller
 {
+
+    public function pbx_update() {
+
+        $date = '2018-10-01';
+
+        $workHour = Work_Hour::where('date', '=', $date)->get();
+
+        $maxIds = DB::table('pbx_report_extension')
+            ->select(DB::raw('
+                    MAX(id) as id
+                '))
+            ->groupBy('user_id')
+            ->where('report_date', '=', $date)
+            ->get();
+
+        $pbx = Pbx_report_extension::where('report_date', '=', $date)->whereIn('id', $maxIds->pluck('id')->toArray())->get()->groupBy('user_id')->sortBy('id')->toArray();
+
+        foreach($workHour as $hourItem) {
+            if(array_key_exists($hourItem->id_user, $pbx)) {
+                $record = $pbx[$hourItem->id_user][0];
+                $success =  $record['success'];
+
+                Work_Hour::where('id', '=', $hourItem->id)->update(['success' => $success]);
+            }
+        }
+
+    }
+
     //Pobranie zgód dla miast
     public function setCityApprovalPart1(){
 
