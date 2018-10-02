@@ -4435,8 +4435,8 @@ class CrmRouteController extends Controller
      * This method return records for datatable
      */
     public function engraverForConfirmingDatatable(Request $request) {
-        $years = $request->years;
-        $weeks = $request->weeks;
+        $from = $request->from;
+        $to = $request->to;
         $departments = $request->departments;
         $typ = $request->typ;
 
@@ -4471,15 +4471,9 @@ class CrmRouteController extends Controller
             ->leftjoin('department_type', 'department_type.id', '=', 'department_info.id_dep_type')
             ->leftjoin('users', 'client_route_info.confirmingUser', '=', 'users.id')
             ->where('client_route_info.status', '=', 1) //now it's important
+            ->where('client_route_info.date', '>=', $from)
+            ->where('client_route_info.date', '<=', $to)
             ->whereIn('client_route.status',[1,2]);
-
-        if($years[0] != '0') {
-            $campaignsInfo = $campaignsInfo->whereIn(DB::raw('YEAR(client_route_info.date)'), $years);
-        }
-
-        if($weeks[0] != '0') {
-            $campaignsInfo = $campaignsInfo->whereIn('weekOfYear', $weeks);
-        }
 
         if($departments[0] != '0') {
             $campaignsInfo->where(function ($query) use ($departments){
