@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\DB;
 class AutoScriptController extends Controller
 {
 
+    //Temporary method for assigning successes for given date from pbx report
     public function pbx_update() {
 
         $date = '2018-10-01';
