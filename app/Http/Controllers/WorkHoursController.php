@@ -318,7 +318,7 @@ class WorkHoursController extends Controller
             $register_start = $request->register_start;
             $register_stop = $request->register_stop;
             $type_edit = $request->type_edit;
-            $succes = $request->succes;
+//            $succes = $request->succes;
             $id_manager = Auth::id();
             $checkWorkHours = Work_Hour::find($id);
             if ($checkWorkHours == null) {
@@ -339,14 +339,12 @@ class WorkHoursController extends Controller
                         'accept_start' => $register_start,
                         'accept_stop' => $register_stop,
                         'status' => 4,
-                        'updated_at' => date('Y-m-d H:i:s'),
-                        'success' => $succes]);}
+                        'updated_at' => date('Y-m-d H:i:s')]);}
 
             }else
             {
                 Work_Hour::where('id', $id)
                     ->update(['id_manager' => $id_manager,
-                        'success' => $succes,
                         'accept_start' => $register_start,
                         'accept_stop' => $register_stop,
                         'updated_at' => date('Y-m-d H:i:s'),
@@ -358,8 +356,7 @@ class WorkHoursController extends Controller
             'Id czasu pracy' => $request->id,
             'register_start' => $request->register_start,
             'register_stop' => $request->register_stop,
-            'type_edit' => $request->type_edit,
-            'succes' => $request->succes
+            'type_edit' => $request->type_edit
         ];
 
         new ActivityRecorder($data, 17,1);
