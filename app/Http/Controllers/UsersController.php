@@ -313,13 +313,12 @@ class UsersController extends Controller
     {
         $flag = $request->session()->get('flag');
         $request->session()->forget('flag');
-        $user = User::find($id);
 
         if (Auth::user()->user_type->all_departments == 1) {
 
             $user = User::find($id);
-            $promotionDateFloatYearhMonth = (float) date('Y.n', strtotime($user->promotion_date));
-            $nowDataeFloatYearhMonth = (float) date('Y.n');
+            $promotionDateFloatYearhMonth = (integer) date('Ym', strtotime($user->promotion_date));
+            $nowDataeFloatYearhMonth = (integer) date('Ym');
             if($user->promotion_date == null OR $promotionDateFloatYearhMonth < $nowDataeFloatYearhMonth){
                 $user->payment_type = 1;
             }else{
@@ -536,7 +535,12 @@ class UsersController extends Controller
                     }
 
                     $userEmployment3->user_id = $user->id;
-                    $userEmployment3->pbx_id_add_date = $request->start_date;
+                    if(\DateTime::createFromFormat('Y-m-d', date('Y-m-d'))->getTimestamp() <
+                        \DateTime::createFromFormat('Y-m-d', $request->start_date)->getTimestamp()){
+                        $userEmployment3->pbx_id_add_date = $request->start_date;
+                    }else{
+                        $userEmployment3->pbx_id_add_date = date('Y-m-d');
+                    }
                     $userEmployment3->pbx_id_remove_date = null;
                     $userEmployment3->save();
                 }
@@ -643,8 +647,8 @@ class UsersController extends Controller
                 ->update(['deleted' => 1, 'month_stop' => $month_to_end]);
         }
 
-        $promotionDateFloatYearhMonth = (float) date('Y.n', strtotime($user->promotion_date));
-        $nowDataeFloatYearhMonth = (float) date('Y.n');
+        $promotionDateFloatYearhMonth = (integer) date('Ym', strtotime($user->promotion_date));
+        $nowDataeFloatYearhMonth = (integer) date('Ym');
         if($request->payment_type == 0){
             if($promotionDateFloatYearhMonth < $nowDataeFloatYearhMonth)
                 $user->promotion_date = date('Y-m-d');

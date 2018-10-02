@@ -68,7 +68,7 @@
         </div>
         <div class="panel-body">
             <div class="row">
-                <div class="col-md-4">
+                <div class="col-md-2">
                     <label>Miesiąc:</label>
                     <div class="form-group">
                         <div class='input-group date' id='monthDatetimepicker'>
@@ -78,6 +78,13 @@
                             <input type='text' class="form-control" value="{{date('Y-m')}}" readonly/>
                         </div>
                     </div>
+                </div>
+                <div class="col-md-2">
+                    <label>Okres:</label>
+                    <select class="form-control selectpicker" id="periodSelect">
+                        <option value="1" selected>Tygodniowy</option>
+                        <option value="3">Miesięczny</option>
+                    </select>
                 </div>
                 <div class="col-md-4">
                     <label>Oddział:</label>
@@ -156,7 +163,7 @@
         </div>
         <div class="panel-body">
             <div class="row">
-                <div class="col-md-4">
+                <div class="col-md-2">
                     <label>Miesiąc:</label>
                     <div class="form-group">
                         <div class='input-group date' id='monthDatetimepickerForDepartments'>
@@ -166,6 +173,13 @@
                             <input type='text' class="form-control" value="{{date('Y-m')}}" readonly/>
                         </div>
                     </div>
+                </div>
+                <div class="col-md-2">
+                    <label>Okres:</label>
+                    <select class="form-control selectpicker" id="periodSelectForDepartments">
+                        <option value="1" selected>Tygodniowy</option>
+                        <option value="3">Miesięczny</option>
+                    </select>
                 </div>
             </div>
             <div class="row">
@@ -217,14 +231,16 @@
     <script src="{{ asset('/js/moment.js')}}"></script>
     <script>
         $(document).ready(function () {
-            const columnsNr = {'lp':0,'name':1,'shows':2,'provision':3,'dateGroup':19,'trainer':20};
-            let hiddenColumns = [columnsNr['dateGroup'], columnsNr['trainer']];
-            let groupColumns = [columnsNr['dateGroup'], columnsNr['trainer']];
+            const columnsNr = {'lp':0,'name':1,'shows':2,'provision':3,'avgTimeOnRecord': 15,'dateGroup':19,'secondGroup':20};
+            let hiddenColumns = [columnsNr['dateGroup'], columnsNr['secondGroup']];
+            let groupColumns = [columnsNr['dateGroup'], columnsNr['secondGroup']];
             let VARIABLES  = {
                 jQElements:{
                     trainersGroupingCheckboxjQ: $('#trainersGroupingCheckbox'),
                     departmentsSelectjQ: $('#departmentsSelect'),
                     trainersSelectjQ: $('#trainersSelect'),
+                    periodSelectjQ: $('#periodSelect'),
+                    periodSelectForDepartmentsjQ: $('#periodSelectForDepartments'),
                     monthDatetimepicker: $('#monthDatetimepicker').datetimepicker({
                         language: 'pl',
                         minView: 3,
@@ -246,7 +262,8 @@
                 trainers: <?php echo json_encode($trainers->toArray()) ?>,
                 departmentsConfirmationStatisticsLpCounter: 0,
                 allDepartmentsConfirmationStatisticsLpCounter: 0,
-                conditionDepartmentsConfirmationStatisticsLpCounterZeroing: null, //condition for pointing row that start a group
+                conditionDepartmentsConfirmationStatisticsLpCounterZeroing: null, //condition for pointing row that start a group,
+                dateGroupConditionDepartmentsConfirmationStatisticsLpCounterZeroing: null,
                 DATA_TABLES:{
                     departmentsConfirmation: {
                         data: {
@@ -291,17 +308,15 @@
                                 {data: 'avgFrequency'},
                                 {data: 'avgPairs'},
                                 {data: 'recordsCount'},
-                                {data: function () {
-                                        return 1;
+                                {data: 'avgTimeOnRecord'},
+                                {data: function (data) {
+                                        return data.agreementPct+'%';
                                     }},
-                                {data: function () {
-                                        return 1;
+                                {data: function (data) {
+                                        return data.uncertainPct+'%';
                                     }},
-                                {data: function () {
-                                        return 1;
-                                    }},
-                                {data: function () {
-                                        return 1;
+                                {data: function (data) {
+                                        return data.refusalPct+'%';
                                     }},
                                 {data: 'dateGroup'},
                                 {data: 'secondGroup'}
@@ -328,6 +343,19 @@
                                         $(row).css('background','#429137')
                                     }
                                 });
+                            },
+                            fnRowCallback: function (nRow, aData, iDisplayIndex) {
+                                let avgTimeOnRecord = aData.avgTimeOnRecord.split(':');
+                                let avgTimeOnRecordInSeconds = parseInt(avgTimeOnRecord[0])*3600 + parseInt(avgTimeOnRecord[1])*60 + parseInt(avgTimeOnRecord[2]);
+                                let redAvgTimeOnRecord = 120; // 00:02:00
+                                let yellowAvgTimeOnRecord = 150; // 00:02:30
+                                let color = '#00ff00';
+                                if(avgTimeOnRecordInSeconds < redAvgTimeOnRecord){
+                                    color = '#ff0000';
+                                }else if(avgTimeOnRecordInSeconds < yellowAvgTimeOnRecord){
+                                    color = '#ffff00';
+                                }
+                                $($(nRow).children()[columnsNr['avgTimeOnRecord']]).css({'background-color': color});
                             }
                         }),
                         getData: function () {
@@ -341,13 +369,14 @@
                             //data is grouped by weeks and trainers  (/week/: [ trainer1:[], trainer2:[]])
                             let dataTable = this.dataTable;
                             dataTable.clear();
+                            console.log(data);
                             $.each(data,function (dateGroup, week) {
                                 if(VARIABLES.jQElements.trainersGroupingCheckboxjQ.get(0).checked){
                                     $.each(week, function (trainer, data) {
-                                        FUNCTIONS.setTableDataWithdepartmentsConfirmationStatisticsLpCounterByGroup(data, 'trainer', dataTable);
+                                        FUNCTIONS.setTableDataWithDepartmentsConfirmationStatisticsLpCounterByGroup(data, 'secondGroup', dataTable);
                                     });
                                 }else{
-                                    FUNCTIONS.setTableDataWithdepartmentsConfirmationStatisticsLpCounterByGroup(week, 'dateGroup', dataTable);
+                                    FUNCTIONS.setTableDataWithDepartmentsConfirmationStatisticsLpCounterByGroup(week, 'dateGroup', dataTable);
                                 }
                             });
                             dataTable.draw();
@@ -400,17 +429,15 @@
                                 {data: 'avgFrequency'},
                                 {data: 'avgPairs'},
                                 {data: 'recordsCount'},
-                                {data: function () {
-                                        return 1;
+                                {data: 'avgTimeOnRecord'},
+                                {data: function (data) {
+                                        return data.agreementPct+'%';
                                     }},
-                                {data: function () {
-                                        return 1;
+                                {data: function (data) {
+                                        return data.uncertainPct+'%';
                                     }},
-                                {data: function () {
-                                        return 1;
-                                    }},
-                                {data: function () {
-                                        return 1;
+                                {data: function (data) {
+                                        return data.refusalPct+'%';
                                     }},
                                 {data: 'dateGroup'},
                                 {data: 'secondGroup'}
@@ -447,7 +474,7 @@
                                 $.each(week.secondGrouping, function (secondGroupingIndex, secondGrouping) {
                                     secondGrouping.dateGroup = week.dateGroup;
                                 });
-                                FUNCTIONS.setTableDataWithdepartmentsConfirmationStatisticsLpCounterByGroup(week.secondGrouping, 'dateGroup', dataTable);
+                                FUNCTIONS.setTableDataWithDepartmentsConfirmationStatisticsLpCounterByGroup(week.secondGrouping, 'dateGroup', dataTable);
                             });
                             dataTable.draw();
 
@@ -465,7 +492,7 @@
                         (function trainersGroupingCheckboxHandler() {
                             VARIABLES.jQElements.trainersGroupingCheckboxjQ.change(function (e) {
                                 if(e.target.checked){
-                                    groupColumns[1] = columnsNr['trainer'];
+                                    groupColumns[1] = columnsNr['secondGroup'];
                                 }
                                 VARIABLES.DATA_TABLES.departmentsConfirmation.ajaxReload();
                             });
@@ -484,6 +511,12 @@
                                 VARIABLES.DATA_TABLES.departmentsConfirmation.ajaxReload();
                             });
                         })();
+                        (function periodSelectHandler() {
+                            VARIABLES.jQElements.periodSelectjQ.change(function (e) {
+                                console.log($(e.target).val());
+                                VARIABLES.DATA_TABLES.departmentsConfirmation.ajaxReload();
+                            });
+                        })();
                         (function trainersSelectHandler() {
                             VARIABLES.jQElements.trainersSelectjQ.change(function (e) {
                                 VARIABLES.DATA_TABLES.departmentsConfirmation.ajaxReload();
@@ -492,6 +525,16 @@
                         (function monthDatetimepickerHandler() {
                             VARIABLES.jQElements.monthDatetimepicker.change(function (e) {
                                 VARIABLES.DATA_TABLES.departmentsConfirmation.ajaxReload();
+                            });
+                        })();
+                        (function periodSelectForDepartmentsHandler() {
+                            VARIABLES.jQElements.periodSelectForDepartmentsjQ.change(function (e) {
+                                VARIABLES.DATA_TABLES.allDepartmentsConfirmation.ajaxReload();
+                            });
+                        })();
+                        (function monthDatetimepickerForDepartmentsHandler() {
+                            VARIABLES.jQElements.monthDatetimepickerForDepartments.change(function (e) {
+                                VARIABLES.DATA_TABLES.allDepartmentsConfirmation.ajaxReload();
                             });
                         })();
                     }
@@ -506,7 +549,8 @@
                                 trainersGrouping: VARIABLES.jQElements.trainersGroupingCheckboxjQ.get(0).checked,
                                 departmentId: VARIABLES.jQElements.departmentsSelectjQ.val(),
                                 selectedMonth: VARIABLES.jQElements.monthDatetimepicker.find('input').val(),
-                                trainerId: VARIABLES.jQElements.trainersSelectjQ.val()
+                                trainerId: VARIABLES.jQElements.trainersSelectjQ.val(),
+                                period: VARIABLES.jQElements.periodSelectjQ.val()
                             },
                             success: function (response) {
                                 VARIABLES.DATA_TABLES.departmentsConfirmation.data.departmentsConfirmationStatistics = response.data;
@@ -532,6 +576,7 @@
                             headers: {'X-CSRF-TOKEN': '{{ csrf_token() }}'},
                             data: {
                                 selectedMonth: VARIABLES.jQElements.monthDatetimepickerForDepartments.find('input').val(),
+                                period: VARIABLES.jQElements.periodSelectForDepartmentsjQ.val()
                             },
                             success: function (response) {
                                 VARIABLES.DATA_TABLES.allDepartmentsConfirmation.data.allDepartmentsConfirmationStatistics = response.data;
@@ -575,40 +620,44 @@
                     let api = dataTable.api();
                     let rows = api.rows({page: 'current'}).nodes();
                     let last = null;
+                    let lastDateGroup = null;
                     api.column(column, {page: 'current'}).data().each(function (group, i) {
-                        if (last !== group) {
+                        let dateGroup = api.row(i).data().dateGroup;
+                        if (last !== group || lastDateGroup !== dateGroup) {
                             let elementToInsert = $('<tr>').addClass('group_'+column).append($('<td>').attr('colspan',colspan).text(group));
                             if(cssOptionsTr != null){
                                 elementToInsert.css(cssOptionsTr);
                             }
                             $($(rows).eq(i)[0]).before(elementToInsert);
                             last = group;
+                            lastDateGroup = dateGroup;
                         }
                     });
                 },
+
                 insertSumRowAfterGroup: function (insideGrouping, dataTable, sumsData, cssOptionsTr = null) {
                     let column = insideGrouping ? groupColumns[1] : groupColumns[0];
                     let api = dataTable.api();
                     let rows = api.rows({page: 'current'}).nodes();
                     api.column(column, {page: 'current'}).data().each(function (group, i) {
-                       if(group !== api.column(column, {page: 'current'}).data()[i+1]){
-                           let data = null;
-                           $.each(sumsData, function (weekNr, weekSums) {
+                        let dateGroup = api.column(columnsNr['dateGroup']).data()[i]; //variable need to exist only for inside grouping
+                        if(group !== api.column(column).data()[i+1] || dateGroup !== api.column(columnsNr['dateGroup']).data()[i+1]){
+                            let data = null;
+                            $.each(sumsData, function (weekNr, weekSums) {
                                if(weekSums.dateGroup === api.column(groupColumns[0], {page: 'current'}).data()[i]){
                                    data = weekSums;
                                    return false;
                                }
-                           });
-                           if(insideGrouping){
-                               $.each(data.secondGrouping, function (secondGroupingNr, secondGroupingSums) {
-                                   console.log(api.column(groupColumns[1], {page: 'current'}).data()[i]);
-                                   if(secondGroupingSums.secondGroup === api.column(groupColumns[1], {page: 'current'}).data()[i]){
-                                       data = secondGroupingSums;
-                                       return false;
-                                   }
-                               });
-                           }
-                           let elementToInsert = $('<tr>').addClass('groupSum_'+column).css('font-weight','bold')
+                            });
+                            if(insideGrouping){
+                                $.each(data.secondGrouping, function (secondGroupingNr, secondGroupingSums) {
+                                    if(secondGroupingSums.secondGroup === api.column(groupColumns[1], {page: 'current'}).data()[i]){
+                                        data = secondGroupingSums;
+                                        return false;
+                                    }
+                                });
+                            }
+                            let elementToInsert = $('<tr>').addClass('groupSum_'+column).css('font-weight','bold')
                                .append($('<td>'))
                                .append($('<td>').addClass('gray').text('Suma:'))
                                .append($('<td>').addClass('gray').text(data.shows))
@@ -623,9 +672,13 @@
                                .append($('<td>').addClass('strongRed').text(data.unsuccessfulBadlyPct+'%'))
                                .append($('<td>').addClass('gray').text(data.avgFrequency))
                                .append($('<td>').addClass('gray').text(data.avgPairs))
-                               .append($('<td>').addClass('gray').text(data.recordsCount));
-                           $($(rows).eq(i)[0]).after(elementToInsert);
-                       }
+                               .append($('<td>').addClass('gray').text(data.recordsCount))
+                               .append($('<td>').addClass('gray').text(data.avgTimeOnRecord))
+                               .append($('<td>').addClass('gray').text(data.agreementPct+'%'))
+                               .append($('<td>').addClass('gray').text(data.uncertainPct+'%'))
+                               .append($('<td>').addClass('gray').text(data.refusalPct+'%'));
+                            $($(rows).eq(i)[0]).after(elementToInsert);
+                        }
                     });
                 },
                 @php
@@ -678,12 +731,13 @@
                         });
                     });
                 },
-                setTableDataWithdepartmentsConfirmationStatisticsLpCounterByGroup: function(data, groupingData, dataTable){
+                setTableDataWithDepartmentsConfirmationStatisticsLpCounterByGroup: function(data, groupingData, dataTable){
                     if($.isArray(data)) {
                         $.each(data, function (index, row) {
-                            if(VARIABLES.conditionDepartmentsConfirmationStatisticsLpCounterZeroing !== row[groupingData]){  //if groupig data is diffrent than previous value, counter equals 0
+                            if(VARIABLES.conditionDepartmentsConfirmationStatisticsLpCounterZeroing !== row[groupingData] || VARIABLES.dateGroupConditionDepartmentsConfirmationStatisticsLpCounterZeroing !== row['dateGroup']){  //if groupig data is diffrent than previous value, counter equals 0
                                 VARIABLES.departmentsConfirmationStatisticsLpCounter = 0;                                    //counting from beginning
                                 VARIABLES.conditionDepartmentsConfirmationStatisticsLpCounterZeroing = row[groupingData];    //setting condition to grouping data of current row
+                                VARIABLES.dateGroupConditionDepartmentsConfirmationStatisticsLpCounterZeroing = row['dateGroup'];
                             }
                             VARIABLES.departmentsConfirmationStatisticsLpCounter++;
                             row.lp = VARIABLES.departmentsConfirmationStatisticsLpCounter;   //setting 'lp' row attribute
