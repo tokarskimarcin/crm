@@ -253,7 +253,7 @@
             var modify_stop = $(this).closest("tr").find("input[id='register_stop']").val();
             var register_start = $(this).closest("tr").find("[name='user_register_start']").text();
             var register_stop = $(this).closest("tr").find("[name='user_register_stop']").text();
-            var succes = 0;
+            // var succes = 0;
             var id = data.id;
             var type_edit = 0;
             var validate = 1;
@@ -289,8 +289,7 @@
                         "id": id,
                         "register_start": modify_start,
                         "register_stop": modify_stop,
-                        "type_edit":type_edit,
-                        "succes":succes
+                        "type_edit":type_edit
                     },
 
                     headers: {
