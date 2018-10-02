@@ -137,7 +137,7 @@
                                                                             if($item->success == 0)
                                                                                 $avg = number_format (0,2);
                                                                             else
-                                                                                $avg = number_format ( $item->success/($item->second/3600), 2 );
+                                                                                $avg = ($item->second/3600) != 0 ? number_format ( $item->success/($item->second/3600), 2 ) : 0;
 
                                                                             if($item->status == 3 && $item->id_manager == null)
                                                                                 $status = 'Oczekuje na akceptacje';
@@ -220,7 +220,7 @@
                                                                 @if($agreement == 1)
                                                                 <td><b>{{$total_success}}</b></td>
                                                                     @if($time_string > 0)
-                                                                        <td><b>{{round($total_success / $time_string, 2)}}</b></td>
+                                                                        <td><b>{{$time_string != 0 ? round($total_success / $time_string, 2) : 0}}</b></td>
                                                                     @else
                                                                         <td><b>0</b></td>
                                                                     @endif
