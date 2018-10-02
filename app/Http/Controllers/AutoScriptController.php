@@ -6,6 +6,7 @@ use App\Cities;
 use App\ClientRoute;
 use App\ClientRouteInfo;
 use App\Schedule;
+use App\Pbx_report_extension;
 use App\ClientRouteCampaigns;
 use App\Work_Hour;
 use Illuminate\Http\Request;
