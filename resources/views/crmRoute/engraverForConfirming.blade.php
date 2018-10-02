@@ -24,7 +24,7 @@
         }
 
         .page-info {
-            font-size: 1.3em;
+            font-size: 0.8em;
         }
 
         @keyframes example {
@@ -57,38 +57,47 @@
                     Pokazy <u>anulowane</u> mają cały wiersz w kolorze <span style="background-color: #fdff78;">żółtym</span>.
                 </div>
                 <div class="row">
-                    <div class="col-md-2">
-                        <div class="form-group">
-                            <label for="year">Rok</label>
-                            <select id="year" multiple="multiple" style="width: 100%;">
-                            </select>
+
+                    <div class="row">
+                        <div class="col-md-2">
+                            <div class="form-group">
+                                <label for="date" class="myLabel">Data początkowa:</label>
+                                <div class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">
+                                    <input class="form-control" name="date_start" id="date_start" type="text" value="{{date("Y-m-d")}}">
+                                    <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                    <div class="col-md-2">
-                        <div class="form-group">
-                            <label for="weeks">Tygodnie</label>
-                            <select id="weeks" multiple="multiple" style="width: 100%;">
-                            </select>
+
+                        <div class="col-md-2">
+                            <div class="form-group">
+                                <label for="date_stop" class="myLabel">Data końcowa:</label>
+                                <div class="input-group date form_date col-md-5" data-date="" data-date-format="yyyy-mm-dd" data-link-field="datak" style="width:100%;">
+                                    <input class="form-control" name="date_stop" id="date_stop" type="text" value="{{date("Y-m-d")}}">
+                                    <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="form-group">
-                            <label for="departments">Oddział</label>
-                            <select id="departments" multiple="multiple" style="width: 100%;">
-                                    <option value="dep_-1">Nieprzydzielone</option>
-                                @foreach($departmentInfo as $item)
-                                    <option value="dep_{{$item->id}}">{{$item->name2}} {{$item->name}}</option>
-                                @endforeach
-                            </select>
+
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="departments">Oddział</label>
+                                <select id="departments" multiple="multiple" style="width: 100%;">
+                                        <option value="dep_-1">Nieprzydzielone</option>
+                                    @foreach($departmentInfo as $item)
+                                        <option value="dep_{{$item->id}}">{{$item->name2}} {{$item->name}}</option>
+                                    @endforeach
+                                </select>
+                            </div>
                         </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="form-group">
-                            <label for="typ">Typ</label>
-                            <select id="typ" multiple="multiple" style="width: 100%;">
-                                <option value="2">Wysyłka</option>
-                                <option value="1">Badania</option>
-                            </select>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label for="typ">Typ</label>
+                                <select id="typ" multiple="multiple" style="width: 100%;">
+                                    <option value="2">Wysyłka</option>
+                                    <option value="1">Badania</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -140,8 +149,6 @@
 
            let APP = {
                arrays: {
-                   selectedYears: ["0"], //this array collect selected by user years
-                   selectedWeeks: ["0"], //this array collect selected by user weeks
                    selectedDepartments: ["0"], //this array collect selected by user departments
                    selectedTypes: ['0'], //array of selected by user types
                    changeArr: [] //This array collect changed rows
@@ -151,6 +158,8 @@
                    workHourData: @json($workHours)
                },
                DOMElements: {
+                   from: document.querySelector('#date_start'),
+                   to: document.querySelector('#date_stop'),
                    saveButton: document.querySelector('#save'),
                    badge: document.querySelector('.badge')
                },
@@ -161,8 +170,6 @@
                    loggedUserDepartment: {{Auth::user()->department_info_id}}
                }
            }
-
-           console.log(APP.JSONS.userData);
 
            /********* END OF GLOBAL VARIABLES*********/
 
@@ -338,7 +345,6 @@
                "rowCallback": function( row, data, index ) {
                    let frequencyCell = row.cells['9'];
                    let frequencyInput = frequencyCell.firstChild;
-                   console.log(frequencyInput.value);
                    if(frequencyInput.value != null && frequencyInput.value != '') {
                        if(frequencyInput.value < 15) {
                            frequencyCell.style.backgroundColor = 'red';
@@ -499,8 +505,8 @@
                    'url': "{{route('api.engraverForConfirmingDatatable')}}",
                    'type': 'POST',
                    'data': function (d) {
-                        d.years = APP.arrays.selectedYears;
-                        d.weeks = APP.arrays.selectedWeeks;
+                        d.from = APP.DOMElements.from.value;
+                        d.to = APP.DOMElements.to.value;
                         d.departments = APP.arrays.selectedDepartments;
                         d.typ = APP.arrays.selectedTypes;
                    },
@@ -634,99 +640,10 @@
                },
            });
 
-           /**
-            * This function appends week numbers to week select element and years to year select element
-            * IIFE function, execute after page is loaded automaticaly
-            */
-           (function appendWeeksAndYears() {
-               const maxWeekInYear = {{$lastWeek}}; //number of last week in current year
-               const weekSelect = document.querySelector('#weeks');
-               const yearSelect = document.querySelector('#year');
-               const baseYear = '2017';
-               const currentYear = {{$currentYear}};
-               const currentWeek = {{$currentWeek}};
-
-               for(let j = baseYear; j <= currentYear + 1; j++) {
-                   const opt = document.createElement('option');
-                   opt.value = j;
-                   opt.textContent = j;
-                   if(j == currentYear) {
-                       opt.setAttribute('selected', 'selected');
-                       APP.arrays.selectedYears = [j];
-                   }
-                   yearSelect.appendChild(opt);
-               }
-
-               for(let i = 1; i <= maxWeekInYear + 1; i++) {
-                   const opt = document.createElement('option');
-                   opt.value = i;
-                   opt.textContent = i;
-                   if(i == currentWeek) {
-                       opt.setAttribute('selected', 'selected');
-                       APP.arrays.selectedWeeks = [i];
-                   }
-                   weekSelect.appendChild(opt);
-               }
-           })();
 
            /*********************EVENT LISTENERS FUNCTIONS****************************/
            /*Functions from this section moslty update arrays which are going to be send by ajax for datatable.
            /**********************************************************/
-
-           /**
-            * This event listener change elements of array selected Years while user selects another year
-            */
-           $('#year').on('select2:select', function () {
-               let yearArr = $('#year').val();
-               if(yearArr.length > 0) { //no values, removed by user
-                   APP.arrays.selectedYears = yearArr;
-               }
-               else {
-                   APP.arrays.selectedYears = ["0"];
-               }
-               table.ajax.reload();
-           });
-
-           /**
-            * This event listener change elements of array selected Years while user unselects some year
-            */
-           $('#year').on('select2:unselect', function() {
-               if($('#year').val().length != 0) {
-                   APP.arrays.selectedYears = $('#year').val();
-               }
-               else {
-                   APP.arrays.selectedYears = ["0"];
-               }
-               table.ajax.reload();
-           });
-
-           /**
-            * This event listener change elements of array selecteWeeks while user selects another week
-            */
-           $('#weeks').on('select2:select', function() {
-               let weeksArr = $('#weeks').val();
-               // console.log('weeksArr', weeksArr);
-               if(weeksArr.length > 0) {
-                   APP.arrays.selectedWeeks = weeksArr;
-               }
-               else {
-                   APP.arrays.selectedWeeks = ["0"];
-               }
-               table.ajax.reload();
-           });
-
-           /**
-            * This event listener change elements of array selectedWeeks while user unselects any week.
-            */
-           $("#weeks").on('select2:unselect', function() {
-               if($('#weeks').val().length != 0) {
-                   APP.arrays.selectedWeeks = $('#weeks').val();
-               }
-               else {
-                   APP.arrays.selectedWeeks = ['0'];
-               }
-               table.ajax.reload();
-           });
 
            /**
             * This event listener change elements of array selectedDepartments while user selects a department
@@ -796,6 +713,13 @@
                table.ajax.reload();
            });
 
+           /**
+            * This event listener reloads table after changing start or stop date
+            */
+           $('#date_start, #date_stop').on('change', () => {
+               table.ajax.reload();
+           });
+
            function saveHandler(e) {
                const saveBtn = e.target;
                if(saveBtn.disabled == false) { //user clicked on active save button, it mean there are rows to change
@@ -834,12 +758,16 @@
 
            APP.DOMElements.saveButton.addEventListener('click', saveHandler);
 
-           /*Activation select2 framework*/
+           /*Activation select2 framework and datetimepicker*/
            (function initial() {
-               $('#weeks').select2();
-               $('#year').select2();
                $('#departments').select2();
                $('#typ').select2();
+               $('.form_date').datetimepicker({
+                   language:  'pl',
+                   autoclose: 1,
+                   minView : 2,
+                   pickTime: false,
+               });
            })();
 
        });
