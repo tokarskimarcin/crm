@@ -417,8 +417,10 @@ class WorkHoursController extends Controller
         $merge_array = $users->merge($users_fired_last_month);
         $merge_array = $merge_array->merge($users_fired_current_month);
 
+        $userTypesPermissionToEditSuccess = WorkHoursController::getUserTypesPermissionToEditSuccess();
         return view('workhours.viewHour')
-            ->with('users',$merge_array->sortBy('last_name'));
+            ->with('users',$merge_array->sortBy('last_name'))
+            ->with('userTypesPermissionToEditSuccess', $userTypesPermissionToEditSuccess);
     }
     public function viewHourGetCadre()
     {
@@ -558,12 +560,11 @@ class WorkHoursController extends Controller
         $myDepartment_info = Department_info::find(Auth::user()->department_info_id);
         $count_agreement = Department_types::find($myDepartment_info->id_dep_type);
         $count_agreement= $count_agreement->count_agreement;
-        if(!in_array(Auth::user()->user_type_id, WorkHoursController::getUserTypesPermissionToEditSuccess())) {
-            $count_agreement = 0;
-        }
         Session::put('count_agreement', $count_agreement);
         $user_info = $this->user_info($userid,$month);
         $department_id = Auth::user()->department_info_id;
+
+        $userTypesPermissionToEditSuccess = WorkHoursController::getUserTypesPermissionToEditSuccess();
 
         $users = User::where('status_work',1)->wherein('user_type_id',[1,2,9])
             ->where('department_info_id',$department_id)->orderBy('last_name')->get();
@@ -603,6 +604,7 @@ class WorkHoursController extends Controller
             ->with('response_userid',$userid)
             ->with('response_month',$month)
             ->with('agreement',$count_agreement)
+            ->with('userTypesPermissionToEditSuccess', $userTypesPermissionToEditSuccess)
             ->with('response_user_info',$user_info)
             ->with('user',$user)
             ->with('add_hour_success', $add_hour_success);
