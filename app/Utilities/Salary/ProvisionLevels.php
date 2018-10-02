@@ -353,5 +353,6 @@ class ProvisionLevels
                 break;
             }
         }
+        throw new \Exception('Wrong parameters in get() method');
     }
 }
