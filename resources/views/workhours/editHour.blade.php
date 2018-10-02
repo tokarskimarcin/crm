@@ -26,7 +26,7 @@
                     </div>
                     <input type="hidden" id="dtp_input3" value="" /><br/>
                 </div>
-                @if( Session::get('count_agreement')==1)
+                @if( Session::get('count_agreement')==1 && in_array(Auth::user()->user_type_id, $userTypesPermissionToEditSuccess))
                 <div class="form-group">
                     <label for="dtp_input3" class="col-md-5 control-label">Liczba Sukcesów: </label>
                     <div class="input-group date col-md-5">
