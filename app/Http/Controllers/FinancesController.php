@@ -1860,10 +1860,12 @@ class FinancesController extends Controller
             $bonusInfo = $request->bonusInfo;
 
             EmployeeOfTheWeek::where('id',$employeeOfTheWeekId)->update(['accepted' => 1, 'accepted_by_user_id' => Auth::user()->id]);
+
             if(is_array($bonusInfo) and count($bonusInfo)>0){
                 $employeeOfTheWeek = EmployeeOfTheWeek::where('id',$employeeOfTheWeekId)->first();
 
                 $userType = UserTypes::where('id',$employeeOfTheWeek->user_type_id)->first();
+                new ActivityRecorder(array_merge(['T'=>'Akceptacja '.$userType->name.' tygodnia'], ['employeeOfTheWeekId'=>$employeeOfTheWeekId, 'bonusInfo' => $bonusInfo]), 10, 1);
 
                 EmployeeOfTheWeekRanking::where('employee_of_the_week_id',$employeeOfTheWeekId)->update(['bonus' => 0]);
                 $employeesOfTheWeekRanking = EmployeeOfTheWeekRanking::where('employee_of_the_week_id',$employeeOfTheWeekId)->get();
