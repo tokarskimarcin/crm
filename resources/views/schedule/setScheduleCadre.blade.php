@@ -186,7 +186,7 @@ function getStartAndEndDate($week, $year) {
             table += '<th>Akcja</th></tr>'+
             '</thead>' +
             '<tbody> <tr id='+d.id_user+'>';
-            var time = moment('07'+':'+'45','HH:mm');
+            var time = moment('06'+':'+'45','HH:mm');
             for(var i=0;i<7;i++)
             {
                 table +='<td class='+d.id+'>';
