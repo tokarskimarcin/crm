@@ -653,13 +653,18 @@ class WorkHoursController extends Controller
             if ($checkWorkHour == null) {
                 return 0;
             }
-            Work_Hour::where('id', $id)
-                ->update(['id_manager' => $id_manager,
-                    'success' => $succes,
-                    'accept_start' => $accept_start,
-                    'accept_stop' => $accept_stop,
-                    'updated_at' => date('Y-m-d H:i:s'),
-                    'status' => 5]);
+
+            $work_hour = Work_Hour::where('id', $id)->first();
+            if(in_array(Auth::user()->user_type_id, WorkHoursController::getUserTypesPermissionToEditSuccess())){
+                $work_hour->success = $succes;
+            }
+            $work_hour->status = 5;
+            $work_hour->accept_start = $accept_start;
+            $work_hour->accept_stop = $accept_stop;
+            $work_hour->id_manager = $id_manager;
+            $work_hour->updated_at = date('Y-m-d H:i:s');
+            $work_hour->save();
+
             $data = [
                 'T' => 'Edycja godzin pracy',
                 'Id godzin pracy:' => $id,
@@ -689,7 +694,9 @@ class WorkHoursController extends Controller
                 $work_hour = new Work_Hour;
             $work_hour->status = 4;
             $work_hour->accept_sec = 100;
-            $work_hour->success = $succes;
+            if(in_array(Auth::user()->user_type_id, WorkHoursController::getUserTypesPermissionToEditSuccess())){
+                $work_hour->success = $succes;
+            }
             $work_hour->date = $date[1];
             $work_hour->accept_start = $accept_start;
             $work_hour->accept_stop = $accept_stop;
