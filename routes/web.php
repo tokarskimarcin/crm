@@ -1077,3 +1077,5 @@ Route::get('/setCityApprovalPart3','AutoScriptController@setCityApprovalPart3');
 Route::get('/setCityApprovalPart4','AutoScriptController@setCityApprovalPart4');
 Route::get('/setCityApprovalPart5','AutoScriptController@setCityApprovalPart5');
 Route::get('/setCityApprovalPart6','AutoScriptController@setCityApprovalPart6');
+
+Route::get('/refreshPbxReportExtension', 'AutoScriptController@pbx_update');
