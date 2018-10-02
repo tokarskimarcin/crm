@@ -24,7 +24,7 @@
         }
 
         .page-info {
-            font-size: 1.3em;
+            font-size: 0.8em;
         }
 
         @keyframes example {
