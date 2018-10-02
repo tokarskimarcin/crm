@@ -127,6 +127,7 @@
                             <th>Nr kampanii (PBX)</th>
                             <th>Nazwa_Hotelu</th>
                             <th>Adres_Hotelu</th>
+                            <th>Uwaga_Hotelu</th>
                         </tr>
                         </thead>
                     </table>
@@ -666,6 +667,7 @@
                serverSide: true,
                ordering: false,
                scrollY: APP.globalVariables.datatableHeight,
+               "iDisplayLength": 50,
                "drawCallback": function( settings ) {
 
                },
@@ -707,7 +709,6 @@
                                        campaignId: campaignId
                                    },
                                    success: function (response) {
-                                       console.log(response);
                                        if(response == 'success')
                                            table.ajax.reload();
                                    }
@@ -859,6 +860,10 @@
                    {"data":function (data, type, dataToSet) {
                            return data.hotelAdress;
                        },"name":"hotelAdress"
+                   },
+                   {"data":function (data, type, dataToSet) {
+                           return data.hotelComment;
+                       },"name":"hotelComment"
                    }
                ],
                order: [[1, 'asc'], [9, 'asc'],[3, 'desc'], [2, 'asc']],
@@ -900,7 +905,7 @@
                            .append('<td>' + sumAllSuccess + '</td>')
                            .append('<td>' + sumAllLimit + '</td>')
                            .append('<td>' + sumAllLose + '</td>')
-                           .append('<td colspan="5"></td>')
+                           .append('<td colspan="6"></td>')
                    },
                },
            });
