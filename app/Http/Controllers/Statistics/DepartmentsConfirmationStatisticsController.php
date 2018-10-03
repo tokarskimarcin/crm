@@ -165,7 +165,7 @@ class DepartmentsConfirmationStatisticsController extends Controller
                         $query->whereNull('pbx_id_remove_date');
                     })
                     ->orWhere(function ($query){
-                        $query->where('pbx_id_remove_date','0000-00-00');
+                        $query->where('pbx_id_remove_date','like','0000-00-00%');
                     });
 
             })->get();
