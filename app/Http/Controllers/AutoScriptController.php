@@ -8,6 +8,7 @@ use App\ClientRouteInfo;
 use App\Schedule;
 use App\Pbx_report_extension;
 use App\ClientRouteCampaigns;
+use App\User;
 use App\Work_Hour;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -389,6 +390,19 @@ class AutoScriptController extends Controller
 
             if($bestConsultant != null) {
                 ClientRouteInfo::where('id', '=', $singleShow->id)->update(['confirmingUser' => $bestConsultant->user_id]);
+            }
+        }
+    }
+
+    public function autoSalaryIncrease() {
+        $allActiveUsers = User::getActiveUsers();
+        $allActiveUsersGrouped = $allActiveUsers->groupBy('user_type_id');
+        foreach($allActiveUsersGrouped as $groupId => $groupMembers) {
+            switch($groupId) {
+                case 5: {
+
+                    break;
+                }
             }
         }
     }
