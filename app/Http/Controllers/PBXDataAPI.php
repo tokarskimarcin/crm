@@ -286,7 +286,7 @@ class PBXDataAPI extends Controller
                                     $data_to_insert[$temp_key]['actual_coach_id'] = $userWithThisPbxNumber->coach_id;
                                     $workHourSuccess = Work_Hour::where('id_user',$userWithThisPbxNumber->id)
                                                                 ->where('date',date('Y-m-d'))
-                                                                ->whereIn('status',[1,2,3])
+                                                                ->whereIn('status',[1,2,3,4])
                                                                 ->get()->first();
                                     if($workHourSuccess != null){
                                         $workHourSuccess->success = $data_to_insert[$temp_key]['success'];

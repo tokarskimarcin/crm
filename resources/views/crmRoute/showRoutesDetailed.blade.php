@@ -58,7 +58,8 @@
                     które mogą być zbiorczo edytowane. Tabela z rekordami może być filtrowana dostępnymi polami wielokrotnego wyboru.
                     Aby edytować rekordy, należy je zaznaczyć i nacisnąć przycisk <span style="font-weight: bold;">Edytuj rekord(y)</span>.
                     Jeśli liczba <i>zaproszeń live</i> przekracza zakładane <i>limity</i>, w kolumnie <i>straty</i> wyswietli się 0. <br>
-                    Pokazy anulowane mają cały wiersz w kolorze <span style="background-color: #ffc0bd;">czerwonym</span>.
+                    Pokazy anulowane mają cały wiersz w kolorze <span style="background-color: #ffc0bd;">czerwonym</span>. <br>
+                    Legenda nagłówka tabeli: <b>T</b>: Tydzien, <b>Z</b>: Zaproszenia Live, <b>L</b>: Limit, <b>S</b>: Straty, <b>Spr</b>: Sprawdzenie
                 </div>
                 <div class="row">
                     <div class="col-md-2">
@@ -111,21 +112,22 @@
                     <table id="datatable" class="thead-inverse table table-striped table-bordered compact" style="max-width:100%;">
                         <thead>
                         <tr>
-                            <th>Tydz</th>
+                            <th>T</th>
                             <th>Data</th>
                             <th>Godz</th>
                             <th>Kampania</th>
                             <th>Podział bazy</th>
-                            <th>Sprawdzenie</th>
-                            <th>Zaproszenia <br>Live</th>
-                            <th>Limit</th>
-                            <th>Straty</th>
+                            <th>Spr.</th>
+                            <th>Z</th>
+                            <th>L</th>
+                            <th>S</th>
                             <th>Nazwa_klienta</th>
                             <th>Oddział</th>
                             <th>Uwagi</th>
                             <th>Nr kampanii (PBX)</th>
                             <th>Nazwa_Hotelu</th>
                             <th>Adres_Hotelu</th>
+                            <th>Uwaga_Hotelu</th>
                         </tr>
                         </thead>
                     </table>
@@ -665,6 +667,7 @@
                serverSide: true,
                ordering: false,
                scrollY: APP.globalVariables.datatableHeight,
+               "iDisplayLength": 50,
                "drawCallback": function( settings ) {
 
                },
@@ -706,7 +709,6 @@
                                        campaignId: campaignId
                                    },
                                    success: function (response) {
-                                       console.log(response);
                                        if(response == 'success')
                                            table.ajax.reload();
                                    }
@@ -858,6 +860,10 @@
                    {"data":function (data, type, dataToSet) {
                            return data.hotelAdress;
                        },"name":"hotelAdress"
+                   },
+                   {"data":function (data, type, dataToSet) {
+                           return data.hotelComment;
+                       },"name":"hotelComment"
                    }
                ],
                order: [[1, 'asc'], [9, 'asc'],[3, 'desc'], [2, 'asc']],
@@ -899,7 +905,7 @@
                            .append('<td>' + sumAllSuccess + '</td>')
                            .append('<td>' + sumAllLimit + '</td>')
                            .append('<td>' + sumAllLose + '</td>')
-                           .append('<td colspan="5"></td>')
+                           .append('<td colspan="6"></td>')
                    },
                },
            });
