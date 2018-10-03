@@ -18,7 +18,7 @@ class AutoScriptController extends Controller
     //Temporary method for assigning successes for given date from pbx report
     public function pbx_update() {
 
-        $date = '2018-10-01';
+        $date = '2018-10-02';
 
         $workHour = Work_Hour::where('date', '=', $date)->get();
 
