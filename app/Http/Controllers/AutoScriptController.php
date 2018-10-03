@@ -399,12 +399,10 @@ class AutoScriptController extends Controller
         $allActiveUsers = User::getActiveUsers();
         $allActiveUsersGrouped = $allActiveUsers->groupBy('user_type_id');
         foreach($allActiveUsersGrouped as $groupId => $groupMembers) {
-            switch($groupId) {
-                case 5: {
-                    IncreaseSalary::set()
-                    break;
-                }
+            foreach($groupMembers as $groupMember) {
+                IncreaseSalary::set($groupMember);
             }
+
         }
     }
 
