@@ -4320,7 +4320,8 @@ class CrmRouteController extends Controller
         $departmentInfo = DB::table('department_info')->select(DB::raw('
         department_info.id as id, 
         department_type.name as name, 
-        departments.name as name2
+        departments.name as name2,
+        department_type.id as depId
         '))
             ->join('department_type', 'department_info.id_dep_type', '=', 'department_type.id')
             ->join('departments', 'department_info.id_dep', '=', 'departments.id')

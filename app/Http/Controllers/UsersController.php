@@ -1391,12 +1391,12 @@ class UsersController extends Controller
             ->get();
         //where('department_info_id','=',Auth::user()->department_info_id)
         $newCoaches = User::where([
-            ['user_type_id', '=', 4],
             ['status_work', '=', 1],
             ['department_info_id', '=', Auth::user()->department_info_id]
-        ])->get();
+        ])
+            ->whereIn('user_type_id', [4,20])
+            ->get();
 
-        //dd($newcoaches);
         return view('hr.coachChange')
             ->with('coaches', $coaches)
             ->with('newCoaches', $newCoaches);

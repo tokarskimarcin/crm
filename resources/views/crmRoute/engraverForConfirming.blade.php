@@ -81,11 +81,13 @@
 
                         <div class="col-md-4">
                             <div class="form-group">
-                                <label for="departments">Oddział</label>
+                                <label for="departments">Oddział dzwoniący</label>
                                 <select id="departments" multiple="multiple" style="width: 100%;">
                                         <option value="dep_-1">Nieprzydzielone</option>
                                     @foreach($departmentInfo as $item)
+                                        @if($item->depId == 2)
                                         <option value="dep_{{$item->id}}">{{$item->name2}} {{$item->name}}</option>
+                                        @endif
                                     @endforeach
                                 </select>
                             </div>
