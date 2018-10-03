@@ -339,6 +339,7 @@
                processing: true,
                serverSide: true,
                scrollY: APP.globalVariables.datatableHeight,
+               "iDisplayLength": 100,
                "drawCallback": function( settings ) {
 
                },
@@ -358,7 +359,6 @@
                    }
 
                    row.setAttribute('data-id', data.id); //clientRouteInfo Id
-                   row.setAttribute('data-depid', data.depId); //department info Id
 
                    const confirmDateInput = row.querySelector('.confirm-date');
                    const confirmDate = confirmDateInput.value;
@@ -413,7 +413,6 @@
                    $('#datatable tbody tr').on('change', function(e) {
                         const changedElement = e.target;
                         const elementRow = this;
-                        const depId = elementRow.dataset.depid
                         const id = elementRow.dataset.id;
 
                         let confDate = elementRow.querySelector('.confirm-date');
@@ -430,11 +429,12 @@
                             const newConfirmDate = e.target.value;
                             confirmingPeopleSelect.innerHTML = ''; //clearing list of current people
                             appendBasicOption(confirmingPeopleSelect);
+
                             APP.JSONS.userData.forEach(person => { //looping over all data about people
                                if(person.hasOwnProperty('date')) {
                                    person.date.forEach(day => {
                                        if(day == newConfirmDate) { //current person is available this day
-                                           if(person.depId == depId) {
+                                           if(person.depId == APP.globalVariables.loggedUserDepartment) {
                                                addPersonToConfirmationList(person, confirmingPeopleSelect);
                                            }
                                        }
