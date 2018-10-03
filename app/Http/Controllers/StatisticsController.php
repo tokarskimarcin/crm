@@ -4067,12 +4067,12 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
      * Raport dzienny trenerzy
      */
     public function pageDayReportCoachGet() {
-        $coaches = User::whereIn('user_type_id', [4, 12])
+        $coaches = User::whereIn('user_type_id', [4, 12, 20])
             ->orderBy('last_name')
             ->where('status_work', '=', 1)
             ->get();
 
-        if (Auth::user()->user_type_id == 4 || Auth::user()->user_type_id == 12)
+        if (Auth::user()->user_type_id == 4 || Auth::user()->user_type_id == 12 || Auth::user()->user_type_id == 20)
             $coaches = $coaches->where('department_info_id', '=', Auth::user()->department_info_id);
 
 
@@ -4102,12 +4102,12 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
      * Raport dzienny trenerzy (po wyborze)
      */
     public function pageDayReportCoachPost(Request $request) {
-        $coaches = User::whereIn('user_type_id', [4, 12])
+        $coaches = User::whereIn('user_type_id', [4, 12, 20])
             ->orderBy('last_name')
             ->where('status_work', '=', 1)
             ->get();
 
-        if (Auth::user()->user_type_id == 4 || Auth::user()->user_type_id == 12)
+        if (Auth::user()->user_type_id == 4 || Auth::user()->user_type_id == 12 || Auth::user()->user_type_id == 20)
             $coaches = $coaches->where('department_info_id', '=', Auth::user()->department_info_id);
 
         $year = date('Y');
@@ -4171,7 +4171,7 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
     public function pageSummaryDayReportCoachesGet() {
         $department_info = Department_info::where('id_dep_type', '=', 2)->get();
 
-        if (Auth::user()->user_type_id == 4 || Auth::user()->user_type_id == 12)
+        if (Auth::user()->user_type_id == 4 || Auth::user()->user_type_id == 12 || Auth::user()->user_type_id == 20)
             $department_info = $department_info->where('id', '=', Auth::user()->department_info_id);
 
         $month = date('m');
@@ -4197,7 +4197,7 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
     public function pageSummaryDayReportCoachesPost(Request $request) {
         $department_info = Department_info::where('id_dep_type', '=', 2)->get();
 
-        if (Auth::user()->user_type_id == 4 || Auth::user()->user_type_id == 12)
+        if (Auth::user()->user_type_id == 4 || Auth::user()->user_type_id == 12 || Auth::user()->user_type_id == 20)
             $department_info = $department_info->where('id', '=', Auth::user()->department_info_id);
 
         $month = $request->month_selected;
