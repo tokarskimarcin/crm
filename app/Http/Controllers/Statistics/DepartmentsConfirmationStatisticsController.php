@@ -194,6 +194,10 @@ class DepartmentsConfirmationStatisticsController extends Controller
 
             $consultantConfirmationReports = array_merge($consultantConfirmationReports, $confirmationReport->toArray());
         }
+        if($userId == 7594){
+            dd($consultantEmploymentStatus, $consultantConfirmationReports);
+
+        }
         return collect($consultantConfirmationReports);
     }
 }
