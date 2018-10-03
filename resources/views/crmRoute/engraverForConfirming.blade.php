@@ -339,6 +339,7 @@
                processing: true,
                serverSide: true,
                scrollY: APP.globalVariables.datatableHeight,
+               "iDisplayLength": 100,
                "drawCallback": function( settings ) {
 
                },
