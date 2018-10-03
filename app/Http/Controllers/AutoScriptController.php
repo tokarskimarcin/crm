@@ -9,6 +9,7 @@ use App\Schedule;
 use App\Pbx_report_extension;
 use App\ClientRouteCampaigns;
 use App\User;
+use App\Utilities\Salary\IncreaseSalary;
 use App\Work_Hour;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -400,7 +401,7 @@ class AutoScriptController extends Controller
         foreach($allActiveUsersGrouped as $groupId => $groupMembers) {
             switch($groupId) {
                 case 5: {
-
+                    IncreaseSalary::set()
                     break;
                 }
             }
