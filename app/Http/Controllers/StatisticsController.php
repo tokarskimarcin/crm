@@ -4233,7 +4233,7 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
 
     private function getDayCoachStatistics($dep_id, $report_date) {
         $department_info = Department_info::find($dep_id);
-        $coaches = User::whereIn('user_type_id', [4,12])
+        $coaches = User::whereIn('user_type_id', [4,12, 20])
             ->where('status_work', '=', 1)
             ->where('department_info_id', '=', $department_info->id)
             ->get();
