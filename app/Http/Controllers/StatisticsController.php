@@ -3928,7 +3928,7 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
         $departments = Department_info::where('id_dep_type', '=', 2)->get();
 
         $coaches = User::where('department_info_id', '=', $departments->first()->id)
-            ->whereIn('user_type_id', [4, 12])
+            ->whereIn('user_type_id', [4, 12, 20])
             ->where('status_work', '=', 1)
             ->get();
 
@@ -3957,7 +3957,7 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
         $departments = Department_info::where('id_dep_type', '=', 2)->get();
 
         $coaches = User::where('department_info_id', '=', $request->dep_selected)
-            ->whereIn('user_type_id', [4, 12])
+            ->whereIn('user_type_id', [4, 12, 20])
             ->where('status_work', '=', 1)
             ->get();
         $data = [];
