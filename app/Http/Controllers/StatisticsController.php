@@ -4917,33 +4917,32 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
      * Wysłanie maili godzinnych raport trenerzy
      */
     public function test() {
-        $departments = Department_info::where('id_dep_type', '=', 2)
-            ->get();
+        $data = [];
 
-        foreach ($departments as $department){
-            $report_hour = date('H') . ':00:00';
-            $data_raw = $this->getDayCoachStatistics($department->id, date('Y-m-d'));
+        $prev_month = date('m', strtotime('-1 month', time()));
+        $year = (intval($prev_month) == 12) ? intval(date('Y')) - 1 : date('Y') ;
 
-            $data = [
-                'department'   => $department,
-                'coaches'   => $data_raw['coaches'],
-                'data'      => $data_raw['data'],
-                'report_date' => $data_raw['report_date'],
-                'report_hour' => $report_hour
-            ];
+        $first_day = $year . '-' . $prev_month . '-01';
+        $days_in_month = date('t', strtotime($year . '-' . $prev_month));
+        $last_day = date('Y-m-') . date('t', strtotime($year . '-' . $prev_month));
+        $month = $prev_month;
 
-            /**
-             * Maile wysyłane są do dyrektorow, kierownikow, trenerów + paweł
-             */
-            $coaches = User::whereIn('user_type_id', [4, 12, 20])
-                ->where('status_work', '=', 1)
-                ->where('department_info_id', '=', $department->id)
-                ->get();
+        $departments = Department_info::where('id_dep_type', '=', 2)->get();
 
-            $menager = $coaches->pluck('id')->merge(collect([$department->menager_id, $department->director_id, 4796, 1364, 11]))->toArray();
-
-            $this->sendMailByVerona('hourReportCoach', $data, 'Raport trenerzy', User::where('id', '=', 4646)->get());
+        foreach ($departments as $dep) {
+            $data[] = $this->getDepartmentsData($first_day, $last_day, $month, $year, $dep->id, $days_in_month);
         }
+
+        $data = [
+            'data' => $data,
+            'send_month' => $month,
+            'total_days' => intval($days_in_month),
+            'departments'=> $departments
+        ];
+
+
+        $title = 'Miesięczny Raport Oddziały';
+        $this->sendMailByVerona('summaryReportDepartment', $data, $title, USER::where('id', '=', 4646)->get());
     }
 
     /******** Główna funkcja do wysyłania emaili*************/
