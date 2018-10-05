@@ -984,12 +984,12 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
 
     /** KONIEC CRM **/
 
-    /** AUTO SCRIPT **/
-    Route::get('/autoSalaryIncrease', 'AutoScriptController@autoSalaryIncrease');
-    /** KONIEC AUTO SCRIPT */
-
 });
 /**OUT OF FIREWALL **/
+
+/** AUTO SCRIPT **/
+Route::get('/autoSalaryIncrease', 'AutoScriptController@autoSalaryIncrease');
+/** KONIEC AUTO SCRIPT */
 
 //CHARTS
 Route::get('/charts', 'ScreensController@showScreensGet');
