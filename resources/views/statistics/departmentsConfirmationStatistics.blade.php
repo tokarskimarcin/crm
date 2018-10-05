@@ -369,7 +369,6 @@
                             //data is grouped by weeks and trainers  (/week/: [ trainer1:[], trainer2:[]])
                             let dataTable = this.dataTable;
                             dataTable.clear();
-                            console.log(data);
                             $.each(data,function (dateGroup, week) {
                                 if(VARIABLES.jQElements.trainersGroupingCheckboxjQ.get(0).checked){
                                     $.each(week, function (trainer, data) {
