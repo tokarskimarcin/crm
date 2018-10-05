@@ -23,7 +23,11 @@
           @endif
           <td nowrap="nowrap"><span style="background-color: #d9edf7; padding: 4px 10px;border-radius: 5px;border:1px solid #bce8f1; color:#31708f;">{{$penalty->manager->first_name . ' ' . $penalty->manager->last_name}}</span></td>
           <td>{{$penalty->comment}}</td>
-          <td><button class="btn btn-danger btn-sm action delete" id="{{$penalty->id}}">Usuń</button></td>
+          <td>
+              @if(in_array(Auth::user()->user_type_id, $userTypesPermissionToGivePenaltyBonus) || in_array(Auth::user()->id, $userIdsPermisionToGivePenaltyBonus))
+                <button class="btn btn-danger btn-sm action delete" id="{{$penalty->id}}">Usuń</button>
+              @endif
+          </td>
         </tr>
     @endforeach
     @if (Session::has('message'))
