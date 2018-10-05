@@ -3,6 +3,7 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 class Department_info extends Model
 {
@@ -66,6 +67,59 @@ class Department_info extends Model
             return $item;
         });
         return $departments;
+    }
+
+    /**
+     * @param User $user
+     * @param $type {string} - name of proffesion
+     * @return null/int
+     * This methdo returns number of departments for given user on his occupation
+     */
+    public static function numberOfDepartments(User $user, $type) {
+        $query = Department_info::select(DB::raw('COUNT(*) as amount'));
+        switch($type) {
+            case 'menager_id': {
+                $query = $query->where('menager_id', '=', $user->id)
+                    ->first();
+                break;
+            }
+            case 'regionalManager_id': {
+                $query = $query->where('regionalManager_id', '=', $user->id)
+                    ->first();
+                break;
+            }
+            case 'director_id': {
+                $query = $query->where('director_id', '=', $user->id)
+                    ->first();
+                break;
+            }
+            case 'hr_id': {
+                $query = $query->where('hr_id', '=', $user->id)
+                    ->first();
+                break;
+            }
+            case 'hr_id_second': {
+                $query = $query->where('hr_id_second', '=', $user->id)
+                    ->first();
+                break;
+            }
+            case 'director_hr_id': {
+                $query = $query->where('director_hr_id', '=', $user->id)
+                    ->first();
+                break;
+            }
+            case 'instructor_regional_id': {
+                $query = $query->where('instructor_regional_id', '=', $user->id)
+                    ->first();
+                break;
+            }
+            default: {
+                $query = null;
+                break;
+            }
+        }
+
+        return $query->amount ? $query->amount : null;
     }
 
 
