@@ -86,7 +86,7 @@
 
         let fromDate = $('#from_date');
         let toDate = $('#to_date');
-        fromDate.val(firstDayOfThisMonth);
+        fromDate.val(today);
         toDate.val(today);
 
         let linkGroups = $('#link_group');
