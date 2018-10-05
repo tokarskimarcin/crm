@@ -16,6 +16,7 @@ use App\PBXDKJTeam;
 use App\RecruitmentStory;
 use App\ReportCampaign;
 use App\UserEmploymentStatus;
+use App\Utilities\Dates\MonthFourWeeksDivision;
 use App\Work_Hour;
 use DateTime;
 use Illuminate\Http\Request;
@@ -24,6 +25,7 @@ use Illuminate\Support\Facades\DB;
 use Mail;
 use App\Department_info;
 use App\User;
+
 
 class StatisticsController extends Controller
 {
@@ -1722,8 +1724,22 @@ class StatisticsController extends Controller
      * Wyświetlanie przeprowadzonych szkoleń Tygodniowy
      */
     public function pageWeekReportTrainingGroup(){
-        $date_start = date("Y-m-d",strtotime('-7 Days'));
-        $date_stop = date("Y-m-d",strtotime('-1 Day'));
+        $today = date('Y-m-d');
+        $companyWeeks = MonthFourWeeksDivision::get(date('Y'), date('m'));
+        $weekIndex = null;
+
+        foreach($companyWeeks as $weekNumber => $value) { //counting index number of company week.
+            $todayDateTime = new DateTime($today);
+            $firstDayDateTime = new DateTime($value->firstDay);
+            $lastDayDateTime = new DateTime($value->lastDay);
+
+            if($todayDateTime >= $firstDayDateTime && $todayDateTime <= $lastDayDateTime) {
+                $weekIndex = $weekNumber;
+            }
+        }
+
+        $date_start = $companyWeeks[$weekIndex]->firstDay;
+        $date_stop = $companyWeeks[$weekIndex]->lastDay;
         $dataTrainingGroup = RecruitmentStory::getReportTrainingData($date_start,$date_stop);
         $dateHireCandidate = RecruitmentStory::getReportTrainingDataAndHire($date_start,$date_stop);
         $dataTrainingGroup = $this::mapTrainingGroupInfoAndHireCandidate($dataTrainingGroup,$dateHireCandidate);
@@ -4897,6 +4913,38 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
     }
 
 
+    /**
+     * Wysłanie maili godzinnych raport trenerzy
+     */
+    public function test() {
+        $departments = Department_info::where('id_dep_type', '=', 2)
+            ->get();
+
+        foreach ($departments as $department){
+            $report_hour = date('H') . ':00:00';
+            $data_raw = $this->getDayCoachStatistics($department->id, date('Y-m-d'));
+
+            $data = [
+                'department'   => $department,
+                'coaches'   => $data_raw['coaches'],
+                'data'      => $data_raw['data'],
+                'report_date' => $data_raw['report_date'],
+                'report_hour' => $report_hour
+            ];
+
+            /**
+             * Maile wysyłane są do dyrektorow, kierownikow, trenerów + paweł
+             */
+            $coaches = User::whereIn('user_type_id', [4, 12, 20])
+                ->where('status_work', '=', 1)
+                ->where('department_info_id', '=', $department->id)
+                ->get();
+
+            $menager = $coaches->pluck('id')->merge(collect([$department->menager_id, $department->director_id, 4796, 1364, 11]))->toArray();
+
+            $this->sendMailByVerona('hourReportCoach', $data, 'Raport trenerzy', User::where('id', '=', 4646)->get());
+        }
+    }
 
     /******** Główna funkcja do wysyłania emaili*************/
     /*
