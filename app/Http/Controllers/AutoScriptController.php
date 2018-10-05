@@ -402,17 +402,20 @@ class AutoScriptController extends Controller
     public function autoSalaryIncrease() {
         $allActiveUsers = User::getActiveUsers();
         $allActiveUsersGrouped = $allActiveUsers->groupBy('user_type_id');
-        $log = ['T:' => 'Podwyżka pensji'];
+        $log = ['T' => 'Podwyżka pensji'];
         $count = 0;
         foreach($allActiveUsersGrouped as $groupId => $groupMembers) {
             foreach($groupMembers as $groupMember) {
-                //dodac try catch
-                $result = IncreaseSalary::set($groupMember);
-                if($result) { //There was change.
-                    $log[$count] = $result;
-                    $count++;
+                try {
+                    $result = IncreaseSalary::set($groupMember);
+                    if($result) { //There was change.
+                        $log[$count] = $result;
+                        $count++;
+                    }
                 }
-
+                catch (\Exception $exception) {
+                    new ActivityRecorder($exception->getMessage(), 245, 6);
+                }
             }
 
         }
