@@ -3315,12 +3315,12 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
      * Wyśwetlanie raportu miesięczengo trenerzy
      */
     public function pageMonthReportCoachGet () {
-        $coaches = User::whereIn('user_type_id', [4,12])
+        $coaches = User::whereIn('user_type_id', [4,12, 20])
             ->where('status_work', '=', 1)
             ->orderBy('last_name')
             ->get();
 
-        if (Auth::user()->user_type_id == 4 || Auth::user()->user_type_id == 12)
+        if (Auth::user()->user_type_id == 4 || Auth::user()->user_type_id == 12 || Auth::user()->user_type_id == 20)
             $coaches = $coaches->where('department_info_id', '=', Auth::user()->department_info_id);
 
         return view('reportpage.MonthReportCoach')
@@ -3341,10 +3341,10 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
         //Ustalenie coach_id
         $leader = User::find($request->coach_id);
         $monthData = self::getWeekMonthCoachData($date_start, $date_stop, $request->coach_id);
-        $coaches = User::whereIn('user_type_id', [4,12])
+        $coaches = User::whereIn('user_type_id', [4,12, 20])
             ->where('status_work', '=', 1)
             ->get();
-        if (Auth::user()->user_type_id == 4 || Auth::user()->user_type_id == 12)
+        if (Auth::user()->user_type_id == 4 || Auth::user()->user_type_id == 12 || Auth::user()->user_type_id == 20)
             $coaches = $coaches->where('department_info_id', '=', Auth::user()->department_info_id);
         $onlyUserID = [];
         if($request->onlyNewUser == 1){
@@ -3849,7 +3849,7 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
     public function pageMonthReportCoachRankingGet() {
         $departments = Department_info::where('id_dep_type', '=', 2)->get();
 
-        $coaches = User::whereIn('user_type_id', [4, 12])
+        $coaches = User::whereIn('user_type_id', [4, 12, 20])
             ->where('status_work', '=', 1)
             ->get();
 
@@ -3875,16 +3875,16 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
 
         if($request->dep_selected > 0){
             $coaches = User::where('department_info_id', '=', $request->dep_selected)
-                ->whereIn('user_type_id', [4, 12])
+                ->whereIn('user_type_id', [4, 12, 20])
                 ->where('status_work', '=', 1)
                 ->get();
         }else if($request->dep_selected == 0){ // Wszyscy
-            $coaches = User::whereIn('user_type_id', [4, 12])
+            $coaches = User::whereIn('user_type_id', [4, 12, 20])
                 ->where('status_work', '=', 1)
                 ->get();
         }else if($request->dep_selected == -1){ // -1 Badania
             $coaches = User::select(DB::Raw('users.*'))
-                ->whereIn('user_type_id', [4, 12])
+                ->whereIn('user_type_id', [4, 12, 20])
                 ->join('department_info','department_info.id','users.department_info_id')
                 ->where('status_work', '=', 1)
                 ->where('department_info.type', 'like', "Badania")
@@ -3892,7 +3892,7 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
         }else if($request->dep_selected == -2){ // -2 Wysyłka
             $coaches = User::select(DB::Raw('users.*'))
                 ->join('department_info','department_info.id','users.department_info_id')
-                ->whereIn('user_type_id', [4, 12])
+                ->whereIn('user_type_id', [4, 12, 20])
                 ->where('status_work', '=', 1)
                 ->where('department_info.type', 'like', "Wysyłka")
                 ->get();
