@@ -43,7 +43,7 @@ class UsersController extends Controller
             ->where('department_info_id', '=', Auth::user()->department_info_id)// wybiera dział aktualnie zalogowanego użytkownika
             ->get();
 
-        $workingTreners = User::whereIn('user_type_id', [4, 12])
+        $workingTreners = User::whereIn('user_type_id', [4, 12, 20])
             ->where('status_work', '=', 1)
             ->where('department_info_id', '=', Auth::user()->department_info_id)
             ->get();
