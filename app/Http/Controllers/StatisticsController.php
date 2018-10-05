@@ -4008,7 +4008,7 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
             ->with('user_type_ids_for_trainers_report', StatisticsController::getUserTypeIdsForTrainersReportOfUnusedAccounts())
             ->with('user_type_ids_for_managers_report', StatisticsController::getUserTypeIdsForManagersReportOfUnusedAccounts())
             ->with('user_type_ids_for_departments_report', StatisticsController::getUserTypeIdsForDepartmentsReportOfUnusedAccounts())
-            ->with('user_to_show', User::where('id', 5323)->first());//$user);
+            ->with('user_to_show', $user);
     }
 
     /*public function MailReportUnusedAccount($data){
