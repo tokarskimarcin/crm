@@ -423,19 +423,5 @@ class AutoScriptController extends Controller
         new ActivityRecorder($log, 245, 2);
     }
 
-    public function setAllLinks() {
-        $from = 3;
-        $to = 23;
-
-        $privilages = PrivilageRelation::where('user_type_id', '=', $from)->pluck('link_id')->toArray();
-
-        foreach($privilages as $privilage) {
-            $priv = new PrivilageRelation();
-            $priv->user_type_id = $to;
-            $priv->link_id = $privilage;
-            $priv->save();
-        }
-    }
-
 
 }
