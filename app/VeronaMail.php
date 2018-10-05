@@ -189,13 +189,12 @@ class VeronaMail
      */
     public function sendMail() : bool {
         //route mail
-        $mail_type_pom = $this->getMailPath();
+        $mail_type = $this->getMailPath();
         //route to page with mail (privilages);
         $mail_type2 = $this->generateLinkToView();
         //get users to send mail
         $accepted_users = $this->getUserToSendMail($mail_type2);
 
-        $mail_type = $mail_type_pom;
         $mail_title = $this->getMailTitle();
         try{
             /* UWAGA !!! ODKOMENTOWANIE TEGO POWINNO ZACZĄC WYSYŁAĆ MAILE*/

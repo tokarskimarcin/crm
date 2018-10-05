@@ -16,6 +16,7 @@ use App\PBXDKJTeam;
 use App\RecruitmentStory;
 use App\ReportCampaign;
 use App\UserEmploymentStatus;
+use App\Utilities\Dates\MonthFourWeeksDivision;
 use App\Work_Hour;
 use DateTime;
 use Illuminate\Http\Request;
@@ -24,6 +25,7 @@ use Illuminate\Support\Facades\DB;
 use Mail;
 use App\Department_info;
 use App\User;
+
 
 class StatisticsController extends Controller
 {
@@ -1722,8 +1724,22 @@ class StatisticsController extends Controller
      * Wyświetlanie przeprowadzonych szkoleń Tygodniowy
      */
     public function pageWeekReportTrainingGroup(){
-        $date_start = date("Y-m-d",strtotime('-7 Days'));
-        $date_stop = date("Y-m-d",strtotime('-1 Day'));
+        $today = date('Y-m-d');
+        $companyWeeks = MonthFourWeeksDivision::get(date('Y'), date('m'));
+        $weekIndex = null;
+
+        foreach($companyWeeks as $weekNumber => $value) { //counting index number of company week.
+            $todayDateTime = new DateTime($today);
+            $firstDayDateTime = new DateTime($value->firstDay);
+            $lastDayDateTime = new DateTime($value->lastDay);
+
+            if($todayDateTime >= $firstDayDateTime && $todayDateTime <= $lastDayDateTime) {
+                $weekIndex = $weekNumber;
+            }
+        }
+
+        $date_start = $companyWeeks[$weekIndex]->firstDay;
+        $date_stop = $companyWeeks[$weekIndex]->lastDay;
         $dataTrainingGroup = RecruitmentStory::getReportTrainingData($date_start,$date_stop);
         $dateHireCandidate = RecruitmentStory::getReportTrainingDataAndHire($date_start,$date_stop);
         $dataTrainingGroup = $this::mapTrainingGroupInfoAndHireCandidate($dataTrainingGroup,$dateHireCandidate);
@@ -3833,16 +3849,6 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
     }
 
 
-
-
-
-
-
-
-
-
-
-
     /**
      * Wyświetlanie rankingu miesięcznego trenerów
      */
@@ -3991,51 +3997,76 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
             ]);
     }
 
+
+    public static function getUserTypeIdsForTrainersReportOfUnusedAccounts(){
+        return [3, 4];
+    }
+
+    public static function getUserTypeIdsForManagersReportOfUnusedAccounts(){
+        return [3, 7, 17];
+    }
+    public static function getUserTypeIdsForDepartmentsReportOfUnusedAccounts(){
+        return [3, 15];
+    }
+
     /*
      *  Strona z informacją o dezaktywowanych kontach
      */
 
-    public function pageWeekReportUnuserdAccount(){
-
-        $date_start = date('Y-m-d');
-        $date_stop = date('Y-m-d');
-        $data = $this::UnuserdAccount(1);
-        return view('reportpage.accountReport.WeekReportUnuserdAccount')
-            ->with('department_info',$data['departments'])
-            ->with('users_warning',$data['users_warning'])
-            ->with('users_disable',$data['users_disable']);
+    public function pageReportUnusedAccounts(){
+        $user = Auth::user();
+        $data = StatisticsController::UnusedAccountsInfo();
+        return view('reportpage.accountReport.ReportUnusedAccount')
+            ->with('department_info', $data['departments'])
+            ->with('users_warning', $data['users_warning'])
+            ->with('users_disable', $data['users_disable'])
+            ->with('coaches', $data['coaches'])
+            ->with('user_type_ids_for_trainers_report', StatisticsController::getUserTypeIdsForTrainersReportOfUnusedAccounts())
+            ->with('user_type_ids_for_managers_report', StatisticsController::getUserTypeIdsForManagersReportOfUnusedAccounts())
+            ->with('user_type_ids_for_departments_report', StatisticsController::getUserTypeIdsForDepartmentsReportOfUnusedAccounts())
+            ->with('user_to_show', $user);
     }
-    public function MailWeekReportUnuserdAccount(){
 
-        $date_start = date('Y-m-d');
-        $date_stop = date('Y-m-d');
-        $data = $this::UnuserdAccount(1);
-        $title = 'Tygodniowy Raport Nieaktywnych Kont Konsultantów '.$date_start.' - '.$date_stop;
+    /*public function MailReportUnusedAccount($data){
+
+        $title = 'Raport Nieaktywnych Kont Konsultantów '.date('Y-m-d');
 
         $this->sendMailByVerona('accountMail.weekReportUnuserdAccount', $data, $title);
 
-    }
+    }*/
 
-    public function UnuserdAccount($type){
-        $today = date("Y-m-d");
+    public static function UnusedAccountsInfo(){
         $date_warning = date("Y-m-d",strtotime('-7 Days'));
         $date_disable = date("Y-m-d",strtotime('-14 Days'));
-
+        //Pobranie użytkowników do zakończenia umowy
 
         $users_warning = User::
-        wherebetween('last_login',[$date_disable,$date_warning])
-                    ->whereIn('users.user_type_id',[1,2])
-                    ->where('status_work','=',1)
-                    ->get();
+        whereBetween('last_login', [$date_disable, $date_warning])
+            ->whereIn('users.user_type_id', [1, 2])
+            ->where('status_work', '=', 1)
+            ->get();
 
-        $users_disable = DisableAccountInfo::
-                    wherebetween('disable_date',[$date_warning,$today])
-                        ->get();
-        $departmnets = Department_info::all();
+        $users_disable = User::
+        where('last_login', '<', $date_disable)
+            ->whereIn('users.user_type_id', [1, 2])
+            ->where('status_work', '=', 1)
+            ->get();
+        $departments = Department_info::all();
+
+        $coach_ids = collect(array_merge($users_warning->pluck('coach_id')->unique()->toArray(), $users_disable->pluck('coach_id')->unique()->toArray()))->unique()->toArray();
+        $coaches = User::whereIn('id',$coach_ids)->get();
+
+
+        $managers_id = Department_info::whereIn('id',$coaches->pluck('department_info_id')->unique()->toArray())->get()->pluck('menager_id')->toArray();
+        $regionalManagers_id = Department_info::whereIn('id',$coaches->pluck('department_info_id')->unique()->toArray())->get()->pluck('regionalManager_id')->toArray();
+        $managers = User::whereIn('id',array_merge($managers_id,$regionalManagers_id))->get();
+
         $data = [
             'users_warning'     => $users_warning,
             'users_disable'     => $users_disable,
-            'departments'       => $departmnets
+            'departments'       => $departments,
+            'coaches'           => $coaches,
+            'managers'          => $managers
         ];
         return $data;
 
@@ -4882,6 +4913,38 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
     }
 
 
+    /**
+     * Wysłanie maili godzinnych raport trenerzy
+     */
+    public function test() {
+        $departments = Department_info::where('id_dep_type', '=', 2)
+            ->get();
+
+        foreach ($departments as $department){
+            $report_hour = date('H') . ':00:00';
+            $data_raw = $this->getDayCoachStatistics($department->id, date('Y-m-d'));
+
+            $data = [
+                'department'   => $department,
+                'coaches'   => $data_raw['coaches'],
+                'data'      => $data_raw['data'],
+                'report_date' => $data_raw['report_date'],
+                'report_hour' => $report_hour
+            ];
+
+            /**
+             * Maile wysyłane są do dyrektorow, kierownikow, trenerów + paweł
+             */
+            $coaches = User::whereIn('user_type_id', [4, 12, 20])
+                ->where('status_work', '=', 1)
+                ->where('department_info_id', '=', $department->id)
+                ->get();
+
+            $menager = $coaches->pluck('id')->merge(collect([$department->menager_id, $department->director_id, 4796, 1364, 11]))->toArray();
+
+            $this->sendMailByVerona('hourReportCoach', $data, 'Raport trenerzy', User::where('id', '=', 4646)->get());
+        }
+    }
 
     /******** Główna funkcja do wysyłania emaili*************/
     /*

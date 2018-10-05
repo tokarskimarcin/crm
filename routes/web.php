@@ -800,7 +800,7 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
 
 
     //Raport Usunietych kont
-    Route::get('/pageWeekReportUnuserdAccount', 'StatisticsController@pageWeekReportUnuserdAccount');
+    Route::get('/pageReportUnusedAccounts', 'StatisticsController@pageReportUnusedAccounts');
     //Report Page STOP
 
     //TESTS START //
@@ -1082,3 +1082,5 @@ Route::get('/setCityApprovalPart5','AutoScriptController@setCityApprovalPart5');
 Route::get('/setCityApprovalPart6','AutoScriptController@setCityApprovalPart6');
 
 //Route::get('/refreshPbxReportExtension', 'AutoScriptController@pbx_update');
+
+Route::get('/testZybura', 'StatisticsController@test');
