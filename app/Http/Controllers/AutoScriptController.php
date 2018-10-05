@@ -6,6 +6,7 @@ use App\ActivityRecorder;
 use App\Cities;
 use App\ClientRoute;
 use App\ClientRouteInfo;
+use App\PrivilageRelation;
 use App\Schedule;
 use App\Pbx_report_extension;
 use App\ClientRouteCampaigns;
