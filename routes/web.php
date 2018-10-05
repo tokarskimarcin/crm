@@ -800,7 +800,7 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
 
 
     //Raport Usunietych kont
-    Route::get('/pageWeekReportUnuserdAccount', 'StatisticsController@pageWeekReportUnuserdAccount');
+    Route::get('/pageReportUnusedAccounts', 'StatisticsController@pageReportUnusedAccounts');
     //Report Page STOP
 
     //TESTS START //

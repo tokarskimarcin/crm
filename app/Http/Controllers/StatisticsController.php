@@ -3833,16 +3833,6 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
     }
 
 
-
-
-
-
-
-
-
-
-
-
     /**
      * Wyświetlanie rankingu miesięcznego trenerów
      */
@@ -3991,51 +3981,76 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
             ]);
     }
 
+
+    public static function getUserTypeIdsForTrainersReportOfUnusedAccounts(){
+        return [3, 4];
+    }
+
+    public static function getUserTypeIdsForManagersReportOfUnusedAccounts(){
+        return [3, 7, 17];
+    }
+    public static function getUserTypeIdsForDepartmentsReportOfUnusedAccounts(){
+        return [3, 15];
+    }
+
     /*
      *  Strona z informacją o dezaktywowanych kontach
      */
 
-    public function pageWeekReportUnuserdAccount(){
-
-        $date_start = date('Y-m-d');
-        $date_stop = date('Y-m-d');
-        $data = $this::UnuserdAccount(1);
-        return view('reportpage.accountReport.WeekReportUnuserdAccount')
-            ->with('department_info',$data['departments'])
-            ->with('users_warning',$data['users_warning'])
-            ->with('users_disable',$data['users_disable']);
+    public function pageReportUnusedAccounts(){
+        $user = Auth::user();
+        $data = StatisticsController::UnusedAccountsInfo();
+        return view('reportpage.accountReport.ReportUnusedAccount')
+            ->with('department_info', $data['departments'])
+            ->with('users_warning', $data['users_warning'])
+            ->with('users_disable', $data['users_disable'])
+            ->with('coaches', $data['coaches'])
+            ->with('user_type_ids_for_trainers_report', StatisticsController::getUserTypeIdsForTrainersReportOfUnusedAccounts())
+            ->with('user_type_ids_for_managers_report', StatisticsController::getUserTypeIdsForManagersReportOfUnusedAccounts())
+            ->with('user_type_ids_for_departments_report', StatisticsController::getUserTypeIdsForDepartmentsReportOfUnusedAccounts())
+            ->with('user_to_show', User::where('id', 5323)->first());//$user);
     }
-    public function MailWeekReportUnuserdAccount(){
 
-        $date_start = date('Y-m-d');
-        $date_stop = date('Y-m-d');
-        $data = $this::UnuserdAccount(1);
-        $title = 'Tygodniowy Raport Nieaktywnych Kont Konsultantów '.$date_start.' - '.$date_stop;
+    /*public function MailReportUnusedAccount($data){
+
+        $title = 'Raport Nieaktywnych Kont Konsultantów '.date('Y-m-d');
 
         $this->sendMailByVerona('accountMail.weekReportUnuserdAccount', $data, $title);
 
-    }
+    }*/
 
-    public function UnuserdAccount($type){
-        $today = date("Y-m-d");
+    public static function UnusedAccountsInfo(){
         $date_warning = date("Y-m-d",strtotime('-7 Days'));
         $date_disable = date("Y-m-d",strtotime('-14 Days'));
-
+        //Pobranie użytkowników do zakończenia umowy
 
         $users_warning = User::
-        wherebetween('last_login',[$date_disable,$date_warning])
-                    ->whereIn('users.user_type_id',[1,2])
-                    ->where('status_work','=',1)
-                    ->get();
+        whereBetween('last_login', [$date_disable, $date_warning])
+            ->whereIn('users.user_type_id', [1, 2])
+            ->where('status_work', '=', 1)
+            ->get();
 
-        $users_disable = DisableAccountInfo::
-                    wherebetween('disable_date',[$date_warning,$today])
-                        ->get();
-        $departmnets = Department_info::all();
+        $users_disable = User::
+        where('last_login', '<', $date_disable)
+            ->whereIn('users.user_type_id', [1, 2])
+            ->where('status_work', '=', 1)
+            ->get();
+        $departments = Department_info::all();
+
+        $coach_ids = collect(array_merge($users_warning->pluck('coach_id')->unique()->toArray(), $users_disable->pluck('coach_id')->unique()->toArray()))->unique()->toArray();
+        $coaches = User::whereIn('id',$coach_ids)->get();
+
+
+        $managers_id = Department_info::whereIn('id',$coaches->pluck('department_info_id')->unique()->toArray())->get()->pluck('menager_id')->toArray();
+        $regionalManagers_id = Department_info::whereIn('id',$coaches->pluck('department_info_id')->unique()->toArray())->get()->pluck('regionalManager_id')->toArray();
+        $managers = User::whereIn('id',array_merge($managers_id,$regionalManagers_id))->get();
+
         $data = [
             'users_warning'     => $users_warning,
             'users_disable'     => $users_disable,
-            'departments'       => $departmnets
+            'departments'       => $departments,
+            'coaches'           => $coaches,
+            'managers'          => $managers
         ];
         return $data;
 

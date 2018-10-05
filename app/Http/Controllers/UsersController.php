@@ -9,6 +9,7 @@ use App\Department_info;
 use App\DisableAccountInfo;
 use App\Pbx_report_extension;
 use App\SuccessorHistory;
+use App\VeronaMail;
 use Exception;
 use App\PrivilageRelation;
 use App\User;
@@ -492,13 +493,12 @@ class UsersController extends Controller
         $user->student = $request->student;
         $user->salary_to_account = $request->salary_to_account;
         $user->agency_id = $request->agency_id;
+
+        // if the edited user is a consultant
         if ($user->user_type_id == 1 || $user->user_type_id == 2) {
             if ($user->status_work != "0") {
                 $user->login_phone = ($request->login_phone != null) ? $request->login_phone : 0;
             }
-        }
-
-        if ($user->user_type_id == 1 || $user->user_type_id == 2) {
             if ($request->status_work == 0) { //firing employee
                 if ($user->status_work == 1) {
                     if ($userEmployment) { //user has history in user_employment_status
@@ -519,11 +519,7 @@ class UsersController extends Controller
                         $userEmployment2->save();
                     }
                 }
-            }
-        }
-
-        if ($user->user_type_id == 1 || $user->user_type_id == 2) {
-            if ($request->status_work == 1) { //re-hiring employee
+            }else { //re-hiring employee
                 if ($user->status_work == 0) {
                     $userEmployment3 = new UserEmploymentStatus(); //adding new insertion
                     if ($request->login_phone == 0) {
@@ -629,6 +625,7 @@ class UsersController extends Controller
         }
         if ($request->status_work == "1") {
             $user->end_work = null;
+            $user->disabled_by_system = 0;
         } else {
             $user->end_work = $request->stop_date;
         }
@@ -1352,20 +1349,13 @@ class UsersController extends Controller
     //Wyłączenie użytkowników którzy nie logowali się od 14 dni
     public function DisableUnusedAccount()
     {
-        $today = date("Y-m-d");
-        $date_disable = date("Y-m-d", mktime(0, 0, 0, date("m"), date("d") - 14, date("Y")));
-        //Pobranie użytkowników do zakończenia umowy
-        $users_disable = User::
-        where('last_login', '<', $date_disable)
-            ->whereIn('users.user_type_id', [1, 2])
-            ->where('status_work', '=', 1)
-            ->get();
-
-        foreach ($users_disable as $iteam) {
+        $today = date('Y-m-d');
+        $data = StatisticsController::UnusedAccountsInfo();
+        // disabling accounts
+        foreach ($data['users_disable'] as $user) {
             /**
              * automatyczne rozwiązanie pakietu medycznego w przypadku zakończenia pracy
              */
-            $user = $iteam;
             $month_to_end = date('Y-m-t', strtotime($today));
             MedicalPackage::where('user_id', '=', $user->id)
                 ->where('deleted', '=', 0)
@@ -1373,13 +1363,54 @@ class UsersController extends Controller
                 ->update(['deleted' => 1, 'month_stop' => $month_to_end]);
             $user->end_work = $today;
             $user->status_work = 0;
-            $user->save();
+            $user->disabled_by_system = 1;
+            /*$user->save()*/;
+            /*
             $disable_account_info = new DisableAccountInfo();
             $disable_account_info->user_id = $user->id;
             $disable_account_info->department_info_id = $user->department_info_id;
             $disable_account_info->disable_date = $today;
-            $disable_account_info->save();
+            $disable_account_info->save();*/
         }
+
+        //check if should send mails
+        if(count($data['users_warning']) > 0 || count($data['users_disable']) > 0){
+            $data_to_send = array_merge($data, [
+                'department_info' => Department_info::all(),
+                'user_type_ids_for_trainers_report' => StatisticsController::getUserTypeIdsForTrainersReportOfUnusedAccounts(),
+                'user_type_ids_for_managers_report' => StatisticsController::getUserTypeIdsForManagersReportOfUnusedAccounts(),
+                'user_type_ids_for_departments_report' => StatisticsController::getUserTypeIdsForDepartmentsReportOfUnusedAccounts()]);
+            $title = 'Raport Nieaktywnych Kont Konsultantów '.date('Y-m-d');
+
+
+            foreach ($data_to_send['coaches'] as $coach) {
+                $data_to_send = array_merge($data_to_send, [
+                    'user_to_show' => $coach]);
+                $mail = new VeronaMail('accountMail.weekReportUnusedAccount',$data_to_send,$title, User::where('id',$coach->id)->get());
+                try {
+                    //$mail->sendMail();
+                    dd('Mails with disabled accounts sent');
+                } catch (Exception $e) {
+                    dd('Could not send mail with disabled accounts',$e);
+                }
+            }
+
+
+            foreach($data_to_send['managers'] as $manager){
+                $data_to_send = array_merge($data_to_send, [
+                    'user_to_show' => $manager]);
+
+                $mail = new VeronaMail('accountMail.weekReportUnusedAccount',$data_to_send,$title, $manager);
+                try {
+                    dd($data_to_send);
+                    //$mail->sendMail();
+                    dd('Mails with disabled accounts sent');
+                } catch (Exception $e) {
+                    dd('Could not send mail with disabled accounts',$e);
+                }
+            }
+        }
+
     }
 
     public function coachChangeGet()
