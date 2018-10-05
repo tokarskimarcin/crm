@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\ActivityRecorder;
 use App\Cities;
 use App\ClientRoute;
 use App\ClientRouteInfo;
@@ -395,15 +396,27 @@ class AutoScriptController extends Controller
         }
     }
 
+    /**
+     * This method periodicaly checks whether users has correct salary on their occupation.
+     */
     public function autoSalaryIncrease() {
         $allActiveUsers = User::getActiveUsers();
         $allActiveUsersGrouped = $allActiveUsers->groupBy('user_type_id');
+        $log = ['T:' => 'Podwyżka pensji'];
+        $count = 0;
         foreach($allActiveUsersGrouped as $groupId => $groupMembers) {
             foreach($groupMembers as $groupMember) {
-                IncreaseSalary::set($groupMember);
+                //dodac try catch
+                $result = IncreaseSalary::set($groupMember);
+                if($result) { //There was change.
+                    $log[$count] = $result;
+                    $count++;
+                }
+
             }
 
         }
+        new ActivityRecorder($log, 245, 2);
     }
 
 }
