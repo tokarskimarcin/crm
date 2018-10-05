@@ -657,86 +657,86 @@
                             /**
                              * Usunięcie coachingu
                              */
-                            $('.button-delete-coaching').on('click', function () {
-                                coaching_id = $(this).data('id');
-                                swal({
-                                    title: 'Jesteś pewien?',
-                                    text: "Nie będziesz w stanie cofnąć zmian!",
-                                    type: 'warning',
-                                    showCancelButton: true,
-                                    confirmButtonColor: '#3085d6',
-                                    cancelButtonColor: '#d33',
-                                    confirmButtonText: 'Tak, usuń coaching!'
-                                }).then((result) => {
-                                    if (result.value) {
+                            {{--$('.button-delete-coaching').on('click', function () {--}}
+                                {{--coaching_id = $(this).data('id');--}}
+                                {{--swal({--}}
+                                    {{--title: 'Jesteś pewien?',--}}
+                                    {{--text: "Nie będziesz w stanie cofnąć zmian!",--}}
+                                    {{--type: 'warning',--}}
+                                    {{--showCancelButton: true,--}}
+                                    {{--confirmButtonColor: '#3085d6',--}}
+                                    {{--cancelButtonColor: '#d33',--}}
+                                    {{--confirmButtonText: 'Tak, usuń coaching!'--}}
+                                {{--}).then((result) => {--}}
+                                    {{--if (result.value) {--}}
 
-                                        $.ajax({
-                                            type: "POST",
-                                            url: "{{ route('api.deleteCoachingTableDirector') }}", // do zamiany
-                                            headers: {
-                                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                                            },
-                                            data: {
-                                                'coaching_id': coaching_id
-                                            },
-                                            success: function (response) {
-                                                in_progress_table.ajax.reload();
-                                            }
-                                        });
-                                    }
-                                })
-                            });
+                                        {{--$.ajax({--}}
+                                            {{--type: "POST",--}}
+                                            {{--url: "{{ route('api.deleteCoachingTableDirector') }}", // do zamiany--}}
+                                            {{--headers: {--}}
+                                                {{--'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')--}}
+                                            {{--},--}}
+                                            {{--data: {--}}
+                                                {{--'coaching_id': coaching_id--}}
+                                            {{--},--}}
+                                            {{--success: function (response) {--}}
+                                                {{--in_progress_table.ajax.reload();--}}
+                                            {{--}--}}
+                                        {{--});--}}
+                                    {{--}--}}
+                                {{--})--}}
+                            {{--});--}}
 
                             /**
                              * Educja coachingu
                              */
-                            $('.button-edit-coaching').on('click', function () {
-                                clear_moda();
-                                coaching_id = $(this).data('id');
-                                $.ajax({
-                                    type: "POST",
-                                    url: "{{ route('api.getCoachingDirector') }}", // do zamiany
-                                    headers: {
-                                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                                    },
-                                    data: {
-                                        'coaching_id': coaching_id
-                                    },
-                                    success: function (response) {
+                            {{--$('.button-edit-coaching').on('click', function () {--}}
+                                {{--clear_moda();--}}
+                                {{--coaching_id = $(this).data('id');--}}
+                                {{--$.ajax({--}}
+                                    {{--type: "POST",--}}
+                                    {{--url: "{{ route('api.getCoachingDirector') }}", // do zamiany--}}
+                                    {{--headers: {--}}
+                                        {{--'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')--}}
+                                    {{--},--}}
+                                    {{--data: {--}}
+                                        {{--'coaching_id': coaching_id--}}
+                                    {{--},--}}
+                                    {{--success: function (response) {--}}
 
-                                        $('#couaching_manager_id').val(response.user_id);
-                                        $('#coaching_subject').val(response.subject);
-                                        $('#couaching_manager_type').val(response.coaching_type);
-                                        $('#manager_actual_avg').val(response.average_start);
-                                        $('#manager_actual_janky').val(response.janky_start);
-                                        $('#manager_actual_rbh').val(response.rbh_start);
-                                        $('#coaching_manager_avg_goal').val(response.average_goal);
-                                        $('#coaching_manager_avg_janky').val(response.janky_goal);
-                                        $('#coaching_manager_avg_rbh').val(response.rbh_goal);
-                                        $('#coaching_actual_avg').val(response.coaching_actual_avg);
-                                        $('#coaching_goal').val(response.average_goal);
-                                        $('#date_start_new_coaching').val(response.coaching_date);
-                                        $('#save_coaching_modal').text('Edytuj Coaching');
-                                        $('#status_coauching').val(response.id);
-                                        $('#Modal_Coaching').modal('show');
+                                        {{--$('#couaching_manager_id').val(response.user_id);--}}
+                                        {{--$('#coaching_subject').val(response.subject);--}}
+                                        {{--$('#couaching_manager_type').val(response.coaching_type);--}}
+                                        {{--$('#manager_actual_avg').val(response.average_start);--}}
+                                        {{--$('#manager_actual_janky').val(response.janky_start);--}}
+                                        {{--$('#manager_actual_rbh').val(response.rbh_start);--}}
+                                        {{--$('#coaching_manager_avg_goal').val(response.average_goal);--}}
+                                        {{--$('#coaching_manager_avg_janky').val(response.janky_goal);--}}
+                                        {{--$('#coaching_manager_avg_rbh').val(response.rbh_goal);--}}
+                                        {{--$('#coaching_actual_avg').val(response.coaching_actual_avg);--}}
+                                        {{--$('#coaching_goal').val(response.average_goal);--}}
+                                        {{--$('#date_start_new_coaching').val(response.coaching_date);--}}
+                                        {{--$('#save_coaching_modal').text('Edytuj Coaching');--}}
+                                        {{--$('#status_coauching').val(response.id);--}}
+                                        {{--$('#Modal_Coaching').modal('show');--}}
 
-                                        let select_value = response.coaching_type;
-                                        var input = document.getElementsByClassName('goal_manager');
-                                        for (var i = 0; i < input.length; i++) {
-                                            if (select_value != 'Wybierz') {
-                                                if (select_value == i + 1) {
-                                                    input[i].disabled = false;
-                                                } else {
-                                                    input[i].disabled = true;
-                                                }
-                                            } else {
-                                                input[i].disabled = true;
-                                            }
-                                        }
-                                        in_progress_table.ajax.reload();
-                                    }
-                                });
-                            });
+                                        {{--let select_value = response.coaching_type;--}}
+                                        {{--var input = document.getElementsByClassName('goal_manager');--}}
+                                        {{--for (var i = 0; i < input.length; i++) {--}}
+                                            {{--if (select_value != 'Wybierz') {--}}
+                                                {{--if (select_value == i + 1) {--}}
+                                                    {{--input[i].disabled = false;--}}
+                                                {{--} else {--}}
+                                                    {{--input[i].disabled = true;--}}
+                                                {{--}--}}
+                                            {{--} else {--}}
+                                                {{--input[i].disabled = true;--}}
+                                            {{--}--}}
+                                        {{--}--}}
+                                        {{--in_progress_table.ajax.reload();--}}
+                                    {{--}--}}
+                                {{--});--}}
+                            {{--});--}}
                         },
                         "columns": [
                             {
@@ -824,8 +824,9 @@
                             },
                             {
                                 "data": function (data, type, dataToSet) {
-                                    return "<button class='button-edit-coaching btn btn-warning btn-block' data-id=" + data.id + ">Edycja</button>" +
-                                        "<button class='button-delete-coaching btn btn-danger btn-block' data-id=" + data.id + ">Usuń</button>";
+                                    return null;
+                                    // return "<button class='button-edit-coaching btn btn-warning btn-block' data-id=" + data.id + ">Edycja</button>";
+                                        // "<button class='button-delete-coaching btn btn-danger btn-block' data-id=" + data.id + ">Usuń</button>";
                                 }, "orderable": false, "searchable": false
                             },
                         ],
