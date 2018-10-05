@@ -2,12 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\ActivityRecorder;
 use App\Cities;
 use App\ClientRoute;
 use App\ClientRouteInfo;
 use App\Schedule;
 use App\Pbx_report_extension;
 use App\ClientRouteCampaigns;
+use App\User;
+use App\Utilities\Salary\IncreaseSalary;
 use App\Work_Hour;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -391,6 +394,29 @@ class AutoScriptController extends Controller
                 ClientRouteInfo::where('id', '=', $singleShow->id)->update(['confirmingUser' => $bestConsultant->user_id]);
             }
         }
+    }
+
+    /**
+     * This method periodicaly checks whether users has correct salary on their occupation.
+     */
+    public function autoSalaryIncrease() {
+        $allActiveUsers = User::getActiveUsers();
+        $allActiveUsersGrouped = $allActiveUsers->groupBy('user_type_id');
+        $log = ['T:' => 'Podwyżka pensji'];
+        $count = 0;
+        foreach($allActiveUsersGrouped as $groupId => $groupMembers) {
+            foreach($groupMembers as $groupMember) {
+                //dodac try catch
+                $result = IncreaseSalary::set($groupMember);
+                if($result) { //There was change.
+                    $log[$count] = $result;
+                    $count++;
+                }
+
+            }
+
+        }
+        new ActivityRecorder($log, 245, 2);
     }
 
 }

@@ -127,6 +127,14 @@ class User extends Authenticatable
         return $this->hasMany('App\Pbx_report_extension', 'pbx_id', 'login_phone');
     }
 
+    public function trainerConsultants() {
+        return $this->hasMany('App\User', 'coach_id');
+    }
+
+    public function trainer() {
+        return $this->belongsTo('App\User','coach_id');
+    }
+
     /**
      *  Wyłączenie starych kont użytkowników (konta do wyłączenia, konta do wysłania informacji)
      */
@@ -146,11 +154,70 @@ class User extends Authenticatable
             ->get();
     }
 
-    public function trainerConsultants() {
-        return $this->hasMany('App\User', 'coach_id');
+    /**
+     * @param null $user_type
+     * @return null/Collection of users
+     */
+    public static function getActiveUsers($user_type = null) {
+        $all_user_types_arr = UserTypes::select('id')->pluck('id')->toArray(); //List of all present user types
+        $users = null;
+        if(in_array($user_type, $all_user_types_arr)) { //case when user passed as argument existing user type
+            $users = User::select(
+                'users.id as id',
+                'first_name',
+                'last_name',
+                'last_login',
+                'user_type_id',
+                'department_info_id',
+                'department_info.id_dep as id_dep',
+                'department_info.id_dep_type as id_dep_type',
+                'start_work',
+                'end_work',
+                'phone',
+                'login_phone as pbx_id',
+                'rate',
+                'id_manager',
+                'salary',
+                'additional_salary',
+                'main_department_id',
+                'coach_id',
+                'promotion_date',
+                'degradation_date'
+            )
+                ->join('department_info', 'department_info.id', '=', 'users.department_info_id')
+                ->where('status_work', '=', 1)
+                ->where('user_type_id', '=', $user_type)
+                ->get();
+        }
+        else { //case when user didn't passed any argument or it was out of accepted range
+            $users = User::select(
+                'users.id as id',
+                'first_name',
+                'last_name',
+                'last_login',
+                'user_type_id',
+                'department_info_id',
+                'department_info.id_dep as id_dep',
+                'department_info.id_dep_type as id_dep_type',
+                'start_work',
+                'end_work',
+                'phone',
+                'login_phone as pbx_id',
+                'rate',
+                'id_manager',
+                'salary',
+                'additional_salary',
+                'main_department_id',
+                'coach_id',
+                'promotion_date',
+                'degradation_date'
+            )
+                ->join('department_info', 'department_info.id', '=', 'users.department_info_id')
+                ->where('status_work', '=', 1)
+                ->get();
+        }
+
+        return $users;
     }
 
-    public function trainer() {
-        return $this->belongsTo('App\User','coach_id');
-    }
 }
