@@ -165,7 +165,7 @@ class DepartmentsConfirmationStatisticsController extends Controller
                         $query->whereNull('pbx_id_remove_date');
                     })
                     ->orWhere(function ($query){
-                        $query->where('pbx_id_remove_date','0000-00-00');
+                        $query->where('pbx_id_remove_date','like','0000-00-00%');
                     });
 
             })->get();
@@ -180,7 +180,7 @@ class DepartmentsConfirmationStatisticsController extends Controller
         $consultantConfirmationReports = [];
         foreach ($consultantEmploymentStatus as $employmentStatus){
             $firstDayOfPeriod = is_null($employmentStatus->pbx_id_add_date) ? $dateGroupSum->firstDay : $employmentStatus->pbx_id_add_date;
-            $lastDayOfPeriod = is_null($employmentStatus->pbx_id_remove_date) ? $dateGroupSum->lastDay : $employmentStatus->pbx_id_remove_date;
+            $lastDayOfPeriod = is_null($employmentStatus->pbx_id_remove_date) || $employmentStatus->pbx_id_remove_date == '0000-00-00' ? $dateGroupSum->lastDay : $employmentStatus->pbx_id_remove_date;
             if(\DateTime::createFromFormat('Y-m-d', $firstDayOfPeriod) < \DateTime::createFromFormat('Y-m-d', $dateGroupSum->firstDay)){
                 $firstDayOfPeriod = $dateGroupSum->firstDay;
             }
