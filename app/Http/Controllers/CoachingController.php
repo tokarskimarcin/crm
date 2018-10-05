@@ -36,7 +36,7 @@ class CoachingController extends Controller
         $dep_id = Auth::user()->department_info_id;
         $coach = User::where('status_work', '=', '1')
             ->where('department_info_id', '=', $dep_id)
-            ->whereIn('user_type_id', [4, 12])
+            ->whereIn('user_type_id', [4, 12, 20])
             ->get();
         return view('coaching.progress_manager_table')->with([
             'departments' => $departments,
@@ -65,12 +65,12 @@ class CoachingController extends Controller
 
 
         $coach = User::where('department_info_id', '=', $dep_info_id)
-            ->whereIn('user_type_id', [4, 12])
+            ->whereIn('user_type_id', [4, 12, 20])
             ->get();
 
 //        $coach = User::where('status_work', '=', '1')
 //            ->where('department_info_id', '=', $dep_id)
-//            ->whereIn('user_type_id', [4, 12])
+//            ->whereIn('user_type_id', [4, 12, 20])
 //            ->get();
 
         return view('coaching.progress_manager_table_for_all')->with([
@@ -101,7 +101,7 @@ class CoachingController extends Controller
         $dep_id = Auth::user()->department_info_id;
         $coach = User::where('status_work', '=', '1')
             ->where('department_info_id', '=', $dep_id)
-            ->whereIn('user_type_id', [4, 12])
+            ->whereIn('user_type_id', [4, 12, 20])
             ->get();
         return view('coaching.progress_table_admin')->with([
             'directorsHR' => $directorsHR,
@@ -123,7 +123,7 @@ class CoachingController extends Controller
                 if ($request->department_info_id < 100) {
                     $coach = User::where('status_work', '=', '1')
                         ->where('department_info_id', '=', $request->department_info_id)
-                        ->whereIn('user_type_id', [4, 12])
+                        ->whereIn('user_type_id', [4, 12, 20])
                         ->get();
                 } else {
                     $dirId = substr($request->department_info_id, 2);
@@ -1019,7 +1019,7 @@ class CoachingController extends Controller
         $all_coach_list = User::
         whereIn('main_department_id', $manager_departments->pluck('id')->toarray())
             ->where('status_work', '=', 1)
-            ->whereIn('user_type_id', [4, 12, 5, 19])
+            ->whereIn('user_type_id', [4, 12, 5, 19, 20])
             ->get();
 
 //        dd($all_coach_list);
