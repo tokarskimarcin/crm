@@ -26,6 +26,7 @@ use Mail;
 use App\Department_info;
 use App\User;
 
+
 class StatisticsController extends Controller
 {
     private $firstJune = '2018-06-01';
@@ -4912,6 +4913,38 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
     }
 
 
+    /**
+     * Wysłanie maili godzinnych raport trenerzy
+     */
+    public function test() {
+        $departments = Department_info::where('id_dep_type', '=', 2)
+            ->get();
+
+        foreach ($departments as $department){
+            $report_hour = date('H') . ':00:00';
+            $data_raw = $this->getDayCoachStatistics($department->id, date('Y-m-d'));
+
+            $data = [
+                'department'   => $department,
+                'coaches'   => $data_raw['coaches'],
+                'data'      => $data_raw['data'],
+                'report_date' => $data_raw['report_date'],
+                'report_hour' => $report_hour
+            ];
+
+            /**
+             * Maile wysyłane są do dyrektorow, kierownikow, trenerów + paweł
+             */
+            $coaches = User::whereIn('user_type_id', [4, 12, 20])
+                ->where('status_work', '=', 1)
+                ->where('department_info_id', '=', $department->id)
+                ->get();
+
+            $menager = $coaches->pluck('id')->merge(collect([$department->menager_id, $department->director_id, 4796, 1364, 11]))->toArray();
+
+            $this->sendMailByVerona('hourReportCoach', $data, 'Raport trenerzy', User::where('id', '=', 4646)->get());
+        }
+    }
 
     /******** Główna funkcja do wysyłania emaili*************/
     /*
