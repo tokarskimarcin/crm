@@ -16,6 +16,7 @@ use App\PBXDKJTeam;
 use App\RecruitmentStory;
 use App\ReportCampaign;
 use App\UserEmploymentStatus;
+use App\Utilities\Dates\MonthFourWeeksDivision;
 use App\Work_Hour;
 use DateTime;
 use Illuminate\Http\Request;
@@ -1722,8 +1723,22 @@ class StatisticsController extends Controller
      * Wyświetlanie przeprowadzonych szkoleń Tygodniowy
      */
     public function pageWeekReportTrainingGroup(){
-        $date_start = date("Y-m-d",strtotime('-7 Days'));
-        $date_stop = date("Y-m-d",strtotime('-1 Day'));
+        $today = date('Y-m-d');
+        $companyWeeks = MonthFourWeeksDivision::get(date('Y'), date('m'));
+        $weekIndex = null;
+
+        foreach($companyWeeks as $weekNumber => $value) { //counting index number of company week.
+            $todayDateTime = new DateTime($today);
+            $firstDayDateTime = new DateTime($value->firstDay);
+            $lastDayDateTime = new DateTime($value->lastDay);
+
+            if($todayDateTime >= $firstDayDateTime && $todayDateTime <= $lastDayDateTime) {
+                $weekIndex = $weekNumber;
+            }
+        }
+
+        $date_start = $companyWeeks[$weekIndex]->firstDay;
+        $date_stop = $companyWeeks[$weekIndex]->lastDay;
         $dataTrainingGroup = RecruitmentStory::getReportTrainingData($date_start,$date_stop);
         $dateHireCandidate = RecruitmentStory::getReportTrainingDataAndHire($date_start,$date_stop);
         $dataTrainingGroup = $this::mapTrainingGroupInfoAndHireCandidate($dataTrainingGroup,$dateHireCandidate);
