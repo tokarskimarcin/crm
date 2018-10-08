@@ -5662,4 +5662,12 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
         $title = 'Raport miesięczny niezapłaconych faktur';
         $this->sendMailByVerona('monthReportUnpaidInvoices', $data, $title,null,[2]);
     }
+
+    private function recruitmentRotationVariables($view){
+        $departments = Department_info::with('departments')->with('department_type')->get();
+        return $view->with('departments',$departments);
+    }
+    public function pageReportRecruitmentRotation(){
+        return $this->recruitmentRotationVariables(view('reportpage.recruitmentReport.ReportRecruitmentRotation'));
+    }
 }
