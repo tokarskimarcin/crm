@@ -30,7 +30,8 @@ use App\MedicalPackage;
 class UsersController extends Controller
 {
     public static function getUserTypesPermissionToGivePenaltyBonus(){
-        return [3, 10, 23];
+        $userTypesPermissionToGivePenaltyBonus = PrivilageRelation::join('links','links.id','link_id')->where('link', 'view_penalty_bonus')->get()->pluck('user_type_id')->toArray();
+        return $userTypesPermissionToGivePenaltyBonus;
     }
     /**
      * Wyświetlanie widou dla telemarketera
