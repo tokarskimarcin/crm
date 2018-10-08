@@ -26,7 +26,7 @@
     <tbody>
     @foreach($data as  $item)
         @php
-            $stat1 = $item->sum_choise_stageOne > 0 ? 100 *  $item->countHireUserFromFirstTrainingGroup / $item->sum_choise_stageOne : 0;
+            $stat1 = $item->sum_choise_stageOne > 0 ? round(100 * $item->countHireUserFromFirstTrainingGroup / $item->sum_choise_stageOne, 2) : 0;
             $stat2 = $item->sum_choise_stageTwo > 0 ? 100 * $item->sum_choise_stageOne / $item->sum_choise_stageTwo : 0;
             $stat3 = $item->sum_choise_stageOne > 0 ? 100 * ($item->sum_choise_stageOne+$item->sum_absent_stageOne) / $item->sum_choise_stageOne : 0;
         @endphp
