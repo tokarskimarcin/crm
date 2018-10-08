@@ -5664,7 +5664,24 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
     }
 
     private function recruitmentRotationVariables($view){
+        $date_start = '2018-09-01';
+        $date_stop = '2018-10-30';
         $departments = Department_info::with('departments')->with('department_type')->get();
+        $departmentStats = User::select('department_info_id',
+            DB::raw('SUM(CASE WHEN created_at BETWEEN "'.$date_start.'" AND "'.$date_stop.'" THEN 1 ELSE 0 END)  as new_accounts_sum' ),
+            DB::raw('SUM(CASE WHEN end_work BETWEEN "'.$date_start.'" AND "'.$date_stop.'" and disabled_by_system = 1 THEN 1 ELSE 0 END)  as disabled_by_system_sum' ),
+            DB::raw('SUM(CASE WHEN end_work BETWEEN "'.$date_start.'" AND "'.$date_stop.'" THEN 1 ELSE 0 END) as end_work_sum'))
+            ->groupBy('department_info_id')->get();
+        $departmentStats2 = User::select('department_info_id', DB::raw('count(*) as working_user'))
+            ->whereIn('id',Work_Hour::select('id_user')->whereBetween('created_at',[$date_start,$date_stop])->distinct()->get()->toArray())
+            ->groupBy('department_info_id')
+            ->whereIn('user_type_id',[1,2])->get();
+        $data = $departmentStats->map(function ($item, $key) use ($departmentStats2) {
+            $single_agent = $departmentStats2->where('department_info_id', $item->department_info_id);
+            dd($item, $single_agent);
+            return collect($item)->merge($single_agent);
+        });
+        dd($data);
         return $view->with('departments',$departments);
     }
     public function pageReportRecruitmentRotation(){
