@@ -5663,28 +5663,50 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
         $this->sendMailByVerona('monthReportUnpaidInvoices', $data, $title,null,[2]);
     }
 
-    private function recruitmentRotationVariables($view){
-        $date_start = '2018-09-01';
-        $date_stop = '2018-10-30';
+    private function recruitmentRotationVariables($view, $date_start, $date_stop, $department){
+        $rbh = 30 * 60 * 60;
+
         $departments = Department_info::with('departments')->with('department_type')->get();
-        $departmentStats = User::select('department_info_id',
-            DB::raw('SUM(CASE WHEN created_at BETWEEN "'.$date_start.'" AND "'.$date_stop.'" THEN 1 ELSE 0 END)  as new_accounts_sum' ),
-            DB::raw('SUM(CASE WHEN end_work BETWEEN "'.$date_start.'" AND "'.$date_stop.'" and disabled_by_system = 1 THEN 1 ELSE 0 END)  as disabled_by_system_sum' ),
-            DB::raw('SUM(CASE WHEN end_work BETWEEN "'.$date_start.'" AND "'.$date_stop.'" THEN 1 ELSE 0 END) as end_work_sum'))
-            ->groupBy('department_info_id')->get();
-        $departmentStats2 = User::select('department_info_id', DB::raw('count(*) as working_user'))
-            ->whereIn('id',Work_Hour::select('id_user')->whereBetween('created_at',[$date_start,$date_stop])->distinct()->get()->toArray())
-            ->groupBy('department_info_id')
-            ->whereIn('user_type_id',[1,2])->get();
+        $departmentStats = Department_info::leftJoin('users','department_info.id','users.department_info_id')
+            ->select('department_info.id',
+            DB::raw('COUNT(CASE WHEN created_at BETWEEN "'.$date_start.'" AND "'.$date_stop.'" THEN 1 ELSE null END)  as new_accounts_sum' ),
+            DB::raw('COUNT(CASE WHEN end_work BETWEEN "'.$date_start.'" AND "'.$date_stop.'" and disabled_by_system = 1 THEN 1 ELSE null END)  as disabled_by_system_sum' ),
+            DB::raw('COUNT(CASE WHEN end_work BETWEEN "'.$date_start.'" AND "'.$date_stop.'" THEN 1 ELSE null END) as end_work_sum'))
+            ->groupBy('department_info.id');
+        if($department>0){
+            $departmentStats->where('department_info.id', $department);
+        }
+        $departmentStats = $departmentStats->get();
+
+
+        $departmentStats2 =  Department_info::leftJoin('users','department_info.id','users.department_info_id')
+            ->select('department_info.id', DB::raw('COUNT(CASE WHEN users.user_type_id IN (1,2) AND users.id IN ('.
+                implode(",",Work_Hour::select('id_user')->whereBetween('created_at',[$date_start,$date_stop])->distinct()->get()->pluck('id_user')->toArray())
+                .') THEN 1 ELSE NULL END) as working_users_sum'))
+            ->groupBy('department_info.id');
+        if($department>0){
+            $departmentStats2->where('department_info.id', $department);
+        }
+        $departmentStats2 = $departmentStats2->get();
+
+        $departmentStats3 = Work_Hour::select(DB::raw('IFNULL(SUM(TIME_TO_SEC(TIMEDIFF(accept_stop, accept_start))), 0)'),'id_user')
+            ->whereIn('id_user',User::whereBetween('end_work',[$date_start,$date_stop])->get()->toArray())
+            ->groupBy('id_user')
+            //->having(DB::raw('IFNULL(SUM(TIME_TO_SEC(TIMEDIFF(accept_stop, accept_start))), 0)'), '<', $rbh)
+            ->get();
+
+        dd($departmentStats3);
+
         $data = $departmentStats->map(function ($item, $key) use ($departmentStats2) {
-            $single_agent = $departmentStats2->where('department_info_id', $item->department_info_id);
-            dd($item, $single_agent);
-            return collect($item)->merge($single_agent);
+            $single_agent = $departmentStats2->where('id', $item->id)->first();
+            return (object)array_merge($item->toArray(),$single_agent->toArray());
         });
-        dd($data);
-        return $view->with('departments',$departments);
+
+        return $view->with('departments',$departments)->with('data',$data);
     }
     public function pageReportRecruitmentRotation(){
-        return $this->recruitmentRotationVariables(view('reportpage.recruitmentReport.ReportRecruitmentRotation'));
+        $date_start = '2018-09-01';
+        $date_stop = '2018-10-30';
+        return $this->recruitmentRotationVariables(view('reportpage.recruitmentReport.ReportRecruitmentRotation'),$date_start, $date_stop, 0);
     }
 }
