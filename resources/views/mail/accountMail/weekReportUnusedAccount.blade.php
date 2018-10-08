@@ -1,4 +1,6 @@
-
+@if($user_to_show->user_type_id == 3)
+    <div class="alert alert-info"><strong>ADMIN info</strong> Raport dla dyrektorów</div>
+@endif
 {{-- table for directors--}}
 @if(in_array($user_to_show->user_type_id, $user_type_ids_for_departments_report) > 0)
     <table style="width:100%;border:1px solid #231f20;border-collapse:collapse;padding:3px">
@@ -44,6 +46,9 @@
     </table>
 @endif
 
+@if($user_to_show->user_type_id == 3)
+    <div class="alert alert-info" style="margin-top: 1em"><strong>ADMIN info</strong>  Raport dla kierowników i kierowników regionalnych</div>
+@endif
 {{-- table for managers--}}
 @if(in_array($user_to_show->user_type_id, $user_type_ids_for_managers_report) > 0)
     <table style="width:100%;border:1px solid #231f20;border-collapse:collapse;padding:3px">
@@ -117,6 +122,9 @@
     </table>
 @endif
 
+@if($user_to_show->user_type_id == 3)
+    <div class="alert alert-info" style="margin-top: 1em"><strong>ADMIN info</strong>  Raporty dla trenerów</div>
+@endif
 {{-- table for trainers--}}
 @if(in_array($user_to_show->user_type_id, $user_type_ids_for_trainers_report) > 0)
     <table style="width:100%;border:1px solid #231f20;border-collapse:collapse;padding:3px">

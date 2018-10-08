@@ -377,6 +377,7 @@ class UsersController extends Controller
                 ->with('department_info', $department_info)
                 ->with('allActiveUser', $allActiveUser)
                 ->with('userTypesPermissionToGivePenaltyBonus', UsersController::getUserTypesPermissionToGivePenaltyBonus())
+                ->with('userIdsPermisionToGivePenaltyBonus', [])
                 ->with('succesorVisableStatus', $succesorVisableStatus)
                 ->with('type', 2);
         } else if ($flag == "true") {
