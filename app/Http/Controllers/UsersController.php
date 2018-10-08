@@ -30,7 +30,7 @@ use App\MedicalPackage;
 class UsersController extends Controller
 {
     public static function getUserTypesPermissionToGivePenaltyBonus(){
-        return [3,23];
+        return [3, 10, 23];
     }
     /**
      * Wyświetlanie widou dla telemarketera
