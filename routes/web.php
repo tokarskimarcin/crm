@@ -935,6 +935,8 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
     Route::get('/userPrivilages', 'AdminPanel\LinksController@userPrivilagesGET');
     Route::post('/userPrivilages', 'AdminPanel\LinksController@userPrivilagesPOST');
 
+    Route::get('/notificationSystemGet', 'AdminPanel\NotificationSystemController@notificationSystemGet');
+
     /** CRM **/
     Route::get('/specificRoute/{id}', 'CrmRouteController@specificRouteGet');
     Route::get('/showClientRoutes', 'CrmRouteController@showClientRoutesGet');
