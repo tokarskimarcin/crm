@@ -46,7 +46,7 @@
     @endforeach
     @php
         $stat_total_1 = $data->sum('sum_choise_stageOne') > 0 ? round(100 * $data->sum('countHireUserFromFirstTrainingGroup') / $data->sum('sum_choise_stageOne'), 2) : 0;
-        $stat_total_2 = $data->sum('sum_choise_stageTwo') > 0 ? round(100 * $data->sum('sum_choise_stageTwo') / $data->sum('sum_choise_stageOne'), 2) : 0;
+        $stat_total_2 = $data->sum('sum_choise_stageOne') > 0 ? round(100 * $data->sum('sum_choise_stageTwo') / $data->sum('sum_choise_stageOne'), 2) : 0;
         $stat_total_3 = ($data->sum('sum_choise_stageOne') + $data->sum('sum_absent_stageOne')) > 0 ? round(100 * $data->sum('sum_choise_stageOne') / ($data->sum('sum_choise_stageOne') + $data->sum('sum_absent_stageOne')), 2) : 0;
     @endphp
     <tr>

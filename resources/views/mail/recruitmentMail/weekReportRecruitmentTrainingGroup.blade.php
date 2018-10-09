@@ -27,8 +27,8 @@
     @foreach($data as  $item)
         @php
             $stat1 = $item->sum_choise_stageOne > 0 ? round(100 * $item->countHireUserFromFirstTrainingGroup / $item->sum_choise_stageOne, 2) : 0;
-            $stat2 = $item->sum_choise_stageOne > 0 ? round(100 * $item->sum_choise_stageTwo /  $item->sum_choise_stageOne,2) : 0;
-            $stat3 = $item->sum_choise_stageOne+$item->sum_absent_stageOne > 0 ? round(100 * $item->sum_choise_stageOne / ($item->sum_choise_stageOne+$item->sum_absent_stageOne),2) : 0;
+            $stat2 = $item->sum_choise_stageOne > 0 ? round(100 * $item->sum_choise_stageTwo / $item->sum_choise_stageOne, 2) : 0;
+            $stat3 = $item->sum_choise_stageOne+$item->sum_absent_stageOne > 0 ? round(100 * $item->sum_choise_stageOne / ($item->sum_choise_stageOne + $item->sum_absent_stageOne),2) : 0;
         @endphp
         <tr>
             <td  style="border:1px solid #231f20;text-align:center;padding:3px">{{$item->dep_name.' '.$item->dep_name_type}}</td>
@@ -47,7 +47,7 @@
     <tr>
         @php
             $stat_total_1 = $data->sum('sum_choise_stageOne') > 0 ? round(100 * $data->sum('countHireUserFromFirstTrainingGroup') / $data->sum('sum_choise_stageOne'), 2) : 0;
-            $stat_total_2 = $data->sum('sum_choise_stageTwo') > 0 ? round(100 * $data->sum('sum_choise_stageTwo') / $data->sum('sum_choise_stageOne'), 2) : 0;
+            $stat_total_2 = $data->sum('sum_choise_stageOne') > 0 ? round(100 * $data->sum('sum_choise_stageTwo') / $data->sum('sum_choise_stageOne'), 2) : 0;
             $stat_total_3 = ($data->sum('sum_choise_stageOne') + $data->sum('sum_absent_stageOne')) > 0 ? round(100 * $data->sum('sum_choise_stageOne') / ($data->sum('sum_choise_stageOne') + $data->sum('sum_absent_stageOne')), 2) : 0;
         @endphp
         <td colspan="1" style="border:1px solid #231f20;text-align:center;padding:3px"><b>TOTAL</b></td>
