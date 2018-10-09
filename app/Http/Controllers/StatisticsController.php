@@ -5711,11 +5711,17 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
             return (object)array_merge($item->toArray(),$working_user_sum->toArray(), $users_less_30rbh_sum->toArray());
         });
 
-        return $view->with('departments',$departments)->with('data',$data);
+        return $view->with('departments',$departments)->with('data',$data)->with('period',(object)['date_start' => $date_start, 'date_stop' => $date_stop]);
     }
-    public function pageReportRecruitmentRotation(){
-        $date_start = '2018-09-01';
-        $date_stop = '2018-10-30';
+    public function pageReportRecruitmentRotationGet(){
+        $date_start = date('Y-m-').'01';
+        $date_stop = date('Y-m-').date('t');
+        return $this->recruitmentRotationVariables(view('reportpage.recruitmentReport.ReportRecruitmentRotation'),$date_start, $date_stop, 0);
+    }
+
+    public function pageReportRecruitmentRotationPost(Request $request){
+        $date_start = $request->date_start;
+        $date_stop = $request->date_stop;
         return $this->recruitmentRotationVariables(view('reportpage.recruitmentReport.ReportRecruitmentRotation'),$date_start, $date_stop, 0);
     }
 }
