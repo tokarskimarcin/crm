@@ -24,7 +24,7 @@
             <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$department->new_accounts_sum}}</td>
             <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$department->end_work_sum}} ({{$department->disabled_by_system_sum}})</td>
             <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$department->working_users_sum > 0 ? round($department->end_work_sum*100/$department->working_users_sum,2) : 0}}%</td>
-            <td style="border:1px solid #231f20;text-align:center;padding:3px">1</td>
+            <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$department->users_less_30rbh_sum}}</td>
         </tr>
     @endforeach
     </tbody>
