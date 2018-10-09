@@ -93,7 +93,8 @@
                             <option value="{{$dep->id}}" >{{$dep->departments->name}} {{$dep->department_type->name}}</option>
                         @endforeach
                     </select>
-                </div><div class="col-md-4">
+                </div>
+                <div class="col-md-4">
                     <label>Trener:</label>
                     <select class="form-control selectpicker" id="trainersSelect">
                         <option value="-1" selected>Wszyscy</option>
