@@ -15,9 +15,21 @@
         </tr>
     </thead>
     <tbody>
+    @php
+        $new_accounts_total = 0;
+        $end_work_total = 0;
+        $disabled_by_system_total = 0;
+        $working_users_total = 0;
+        $users_less_30rbh_total = 0;
+    @endphp
     @foreach($data as $department)
         @php
-            $dep = $departments->where('id', $department->id)->first()
+            $dep = $departments->where('id', $department->id)->first();
+            $new_accounts_total += $department->new_accounts_sum;
+            $end_work_total += $department->end_work_sum;
+            $disabled_by_system_total += $department->disabled_by_system_sum;
+            $working_users_total += $department->working_users_sum;
+            $users_less_30rbh_total += $department->users_less_30rbh_sum;
         @endphp
         <tr>
             <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$dep->departments->name}} {{$dep->department_type->name}}</td>
@@ -27,5 +39,12 @@
             <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$department->users_less_30rbh_sum}}</td>
         </tr>
     @endforeach
+    <tr>
+        <td style="background: #444444;border:1px solid #231f20;text-align:center;padding:3px; color:#efd88f"><b>Total</b></td>
+        <td style="background: #444444;border:1px solid #231f20;text-align:center;padding:3px; color:#efd88f"><b>{{$new_accounts_total}}</b></td>
+        <td style="background: #444444;border:1px solid #231f20;text-align:center;padding:3px; color:#efd88f"><b>{{$end_work_total}} ({{$disabled_by_system_total}})</b></td>
+        <td style="background: #444444;border:1px solid #231f20;text-align:center;padding:3px; color:#efd88f"><b>{{$working_users_total > 0 ? round($end_work_total*100/$working_users_total,2) : 0}}%</b></td>
+        <td style="background: #444444;border:1px solid #231f20;text-align:center;padding:3px; color:#efd88f"><b>{{$users_less_30rbh_total}}</b></td>
+    </tr>
     </tbody>
 </table>

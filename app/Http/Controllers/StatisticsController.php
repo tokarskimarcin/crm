@@ -5693,11 +5693,11 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
             Department_info::leftJoin('users','department_info.id','users.department_info_id')
                 ->select('department_info.id', DB::raw('COUNT(CASE WHEN users.id IN ('.
                     implode(",",Work_Hour::select(DB::raw('IFNULL(SUM(TIME_TO_SEC(TIMEDIFF(accept_stop, accept_start))), 0)'),'id_user')
-                        ->whereIn('id_user',User::whereBetween('end_work',[$date_start,$date_stop])->get()->toArray())
-                        //->having(DB::raw('IFNULL(SUM(TIME_TO_SEC(TIMEDIFF(accept_stop, accept_start))), 0)'), '<', $rbh)
+                        ->whereIn('id_user',User::whereBetween('end_work',[$date_start,$date_stop])->get()->pluck('id')->toArray())
+                        ->having(DB::raw('IFNULL(SUM(TIME_TO_SEC(TIMEDIFF(accept_stop, accept_start))), 0)'), '<', $rbh)
                         ->groupBy('id_user')
                         ->get()->pluck('id_user')->toArray())
-                    .',1) THEN 1 ELSE NULL END) as users_less_30rbh_sum'))
+                    .') THEN 1 ELSE NULL END) as users_less_30rbh_sum'))
                 ->groupBy('department_info.id');
         if($department>0){
             $departmentStats3->where('department_info.id', $department);
