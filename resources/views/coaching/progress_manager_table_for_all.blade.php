@@ -147,6 +147,7 @@
                                         <th>Cel</th>
                                         <th>Aktualne RBH</th>
                                         <th>Zakończ</th>
+                                        <th>Akcja</th>
                                     </tr>
                                     </thead>
                                     <tbody>
@@ -183,6 +184,7 @@
                                     <th>Cel</th>
                                     <th>Aktualne RBH</th>
                                     <th>Komentarz</th>
+                                    <th>Akcja</th>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -228,6 +230,7 @@
                 </div>
             </div>
         </div>
+
 @endsection
 
 @section('script')
@@ -353,6 +356,39 @@
                            },
                        })
                     });
+                    /**
+                     * Usunięcie coachingu
+                     */
+                    $('.button-delete-coaching').on('click', function () {
+                        coaching_id = $(this).data('id');
+                        console.log(coaching_id);
+                        swal({
+                            title: 'Jesteś pewien?',
+                            text: "Nie będziesz w stanie cofnąć zmian!",
+                            type: 'warning',
+                            showCancelButton: true,
+                            confirmButtonColor: '#3085d6',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Tak, usuń coaching!'
+                        }).then((result) => {
+                            if (result.value) {
+
+                                $.ajax({
+                                    type: "POST",
+                                    url: "{{ route('api.deleteCoachingTableDirector') }}", // do zamiany
+                                    headers: {
+                                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                                    },
+                                    data: {
+                                        'coaching_id': coaching_id
+                                    },
+                                    success: function (response) {
+                                        in_progress_table.ajax.reload();
+                                    }
+                                });
+                            }
+                        })
+                    });
                 },
                 "columns":[
                     {data:function (data, type, dataToSet) {
@@ -437,6 +473,10 @@
                             }else
                                 return "Brak opcji";
                         },"searchable": false,"orderable":false
+                    },
+                    {"data": function (data, type, dataToSet) {
+                            return "<button class='button-delete-coaching btn btn-danger btn-block' data-id=" + data.id + ">Usuń</button>";
+                        },"name": "akcja"
                     }
                 ],
             });
@@ -478,7 +518,42 @@
                     }
                     $(row).attr('id', data.id);
                     return row;
-                },"columns":[
+                },
+                "fnDrawCallback": function(settings) {
+                    /**
+                     * Usunięcie coachingu
+                     */
+                    $('.button-delete-coaching').on('click', function () {
+                        coaching_id = $(this).data('id');
+                        swal({
+                            title: 'Jesteś pewien?',
+                            text: "Nie będziesz w stanie cofnąć zmian!",
+                            type: 'warning',
+                            showCancelButton: true,
+                            confirmButtonColor: '#3085d6',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Tak, usuń coaching!'
+                        }).then((result) => {
+                            if (result.value) {
+
+                                $.ajax({
+                                    type: "POST",
+                                    url: "{{ route('api.deleteCoachingTableDirector') }}", // do zamiany
+                                    headers: {
+                                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                                    },
+                                    data: {
+                                        'coaching_id': coaching_id
+                                    },
+                                    success: function (response) {
+                                        table_unsettled.ajax.reload();
+                                    }
+                                });
+                            }
+                        })
+                    });
+                },
+                "columns":[
                     {data:function (data, type, dataToSet) {
                             return data.manager_first_name+' '+data.manager_last_name;
                         },"name": "manager_last_name"
@@ -556,6 +631,10 @@
                             return comment;
                         },"name": "comment"
                     },
+                    {"data": function (data, type, dataToSet) {
+                            return "<button class='button-delete-coaching btn btn-danger btn-block' data-id=" + data.id + ">Usuń</button>";
+                        },"name": "akcja"
+                    }
                 ],
 
             });
