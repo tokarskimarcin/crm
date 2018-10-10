@@ -4942,7 +4942,7 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
 
 
         $title = 'Miesięczny Raport Oddziały';
-        $this->sendMailByVerona('summaryReportDepartment', $data, $title, USER::where('id', '=', 4646)->get());
+        $this->sendMailByVerona('summaryReportDepartment', $data, $title, USER::whereIn('id', [4646, 6009])->get());
     }
 
     /******** Główna funkcja do wysyłania emaili*************/
