@@ -52,6 +52,8 @@ class CoachingController extends Controller
     {
         $departments = Department_info::whereIn('id_dep_type', [1, 2])->get();
 
+        $loggedUserType = Auth::user()->user_type_id;
+
 
         $directorsIds = Department_info::select('director_id')->where('director_id', '!=', null)->where('id_dep_type', '=', 2)->distinct()->get();
         $directorsHRIds = Department_info::select('director_hr_id')->where('director_hr_id', '!=', null)->where('id_dep_type', '=', 2)->distinct()->get();
@@ -81,7 +83,8 @@ class CoachingController extends Controller
             'directorsHR' => $directorsHR,
             'regionalManagers' => $regionalManagers,
             'dep_info_id' => $dep_info_id,
-            'coach' => $coach
+            'coach' => $coach,
+            'loggedUserType' => $loggedUserType
         ]);
     }
 

@@ -238,7 +238,7 @@
     <script>
 
         $(document).ready(function(){
-
+            let loggedUserType = {{$loggedUserType}};
 
             let hoursAfterWhichItBecomesUnsettled = 14;
             changeHoursAfterWhichItBecomseUnsettledDependsOnSelectedDep();
@@ -475,7 +475,12 @@
                         },"searchable": false,"orderable":false
                     },
                     {"data": function (data, type, dataToSet) {
+                        if(loggedUserType == 15) {
                             return "<button class='button-delete-coaching btn btn-danger btn-block' data-id=" + data.id + ">Usuń</button>";
+                        }
+                        else {
+                            return null;
+                        }
                         },"name": "akcja"
                     }
                 ],
@@ -632,7 +637,12 @@
                         },"name": "comment"
                     },
                     {"data": function (data, type, dataToSet) {
-                            return "<button class='button-delete-coaching btn btn-danger btn-block' data-id=" + data.id + ">Usuń</button>";
+                            if(loggedUserType == 15) {
+                                return "<button class='button-delete-coaching btn btn-danger btn-block' data-id=" + data.id + ">Usuń</button>";
+                            }
+                            else {
+                                return null;
+                            }
                         },"name": "akcja"
                     }
                 ],
