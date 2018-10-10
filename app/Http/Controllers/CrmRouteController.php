@@ -3989,7 +3989,7 @@ class CrmRouteController extends Controller
         Mail::send('mail.' . $mail_type, $data, function($message) use ($accepted_users, $mail_title,$storageURL,$mailFrom)
         {
             if($mailFrom == null)
-                $message->from('noreply@veronconsulting.pl', 'Verona Consulting');
+                $message->from('noreply@veronaconsulting.pl', 'Verona Consulting');
             else{
                 $message->from($mailFrom, 'Verona Consulting');
                 $message->cc($mailFrom, 'Verona Consulting');
