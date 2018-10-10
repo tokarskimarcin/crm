@@ -200,7 +200,7 @@ class VeronaMail
             /* UWAGA !!! ODKOMENTOWANIE TEGO POWINNO ZACZĄC WYSYŁAĆ MAILE*/
             Mail::send('mail.' . $mail_type, $this->getData(), function($message) use ($accepted_users, $mail_title)
             {
-                $message->from('noreply@veronconsulting.pl', 'Verona Consulting');
+                $message->from('noreply@veronaconsulting.pl', 'Verona Consulting');
                 foreach($accepted_users as $user) {
                     if (filter_var($user->username, FILTER_VALIDATE_EMAIL)) {
                         $message->to($user->username, $user->first_name . ' ' . $user->last_name)->subject($mail_title);
