@@ -1505,7 +1505,7 @@ class TestsController extends Controller
         Mail::send('tests.' . $mail_type, $data, function($message) use ($user_mail, $user_name, $mail_title)
         {
 
-            $message->from('noreply@veronaconsulting.pl', 'Verona Consulting');
+            $message->from('noreply.verona@gmail.com', 'Verona Consulting');
             $message->to($user_mail, $mail_title)->subject($mail_title);
 
         });
