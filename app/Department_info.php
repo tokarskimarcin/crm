@@ -123,6 +123,31 @@ class Department_info extends Model
     }
 
 
+    /**
+     * @param null $deparmentTypesArray
+     * @return mixed
+     * This method returns list of departments.
+     */
+    public static function getDepartmentsWithNames($deparmentTypesArray = null) {
+        $depTypes = $deparmentTypesArray === null ? Department_types::select('id')->pluck('id')->toArray() : $deparmentTypesArray;
+
+        return Department_info::select('department_info.id as id',
+            'departments.name as department_name',
+            'department_type.name as department_type',
+            'department_info.menager_id',
+            'department_info.regionalManager_id',
+            'department_info.director_id',
+            'department_info.hr_id',
+            'department_info.hr_id_second',
+            'department_info.director_hr_id',
+            'department_info.instructor_regional_id'
+        )
+            ->join('department_type', 'department_info.id_dep_type', '=', 'department_type.id')
+            ->join('departments', 'department_info.id_dep', '=', 'departments.id')
+            ->whereIn('department_info.id_dep_type', $depTypes)
+            ->get();
+    }
+
     /** Edit or modify department
      * @param $request
      * @return Department_info|\Illuminate\Support\Collection

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\ActivityRecorder;
 use App\Department_info;
+use App\MultipleDepartments;
 use App\Schedule;
 use App\ScheduleRelation;
 use App\UserTypes;
@@ -41,13 +42,64 @@ class ScheduleController extends Controller
     }
     public function viewScheduleGet()
     {
-        return view('schedule.viewSchedule');
+        $departments = Department_info::whereIn('id_dep_type',[1,2])->get();
+        $departmentInfo = Department_info::getDepartmentsWithNames([1,2]);
+        $multipleDepartments = MultipleDepartments::select('department_info_id')->where('user_id', '=', Auth::user()->id)->pluck('department_info_id')->toArray();
+        $excludedUserTypes = [1,2];
+        $extendedUserTypes = UserTypes::select('id')->whereNotIn('id', $excludedUserTypes)->pluck('id')->toArray();
+
+        $authUserType = Auth::user()->user_type_id;
+
+        //check whether user has permission to see extended department list in view
+        if(in_array($authUserType, $extendedUserTypes)) {
+            $directorsIds = Department_info::select('director_id')->where('director_id', '!=', null)->where('id_dep_type', '=', 2)->distinct()->get();
+            $directorsHRIds = Department_info::select('director_hr_id')->where('director_hr_id', '!=', null)->where('id_dep_type', '=', 2)->distinct()->get();
+            $regionalManagersIds = Department_info::select('regionalManager_id')->where('regionalManager_id', '!=', null)->where('id_dep_type', '=', 2)->distinct()->get();
+            $regionalManagersInstructorsIds = Department_info::select('instructor_regional_id')->where('instructor_regional_id', '!=', null)->where('id_dep_type', '=', 2)->distinct()->get();
+            $directors = User::whereIn('id', $directorsIds)->get();
+            $directorsHR = User::whereIn('id', $directorsHRIds)->get();
+            $regionalManagers = User::whereIn('id', $regionalManagersIds)->get();
+            $regionalManagersInstructors = User::whereIn('id',$regionalManagersInstructorsIds)->get();
+        }
+
+        return view('schedule.viewSchedule')
+            ->with('department_info', $departmentInfo)
+            ->with('departments', $departments)
+            ->with('multiple_departments', $multipleDepartments)
+            ->with('directors', $directors)
+            ->with('directorsHR', $directorsHR)
+            ->with('regionalManagers', $regionalManagers)
+            ->with('regionalManagersInstructors', $regionalManagersInstructors);
+
     }
     public function viewSchedulePost(Request $request)
     {
+        $allDepartments = Department_info::whereIn('id_dep_type',[1,2])->get();
+        $departmentInfo = Department_info::getDepartmentsWithNames([1,2]);
+        $multipleDepartments = MultipleDepartments::select('department_info_id')->where('user_id', '=', Auth::user()->id)->pluck('department_info_id')->toArray();
+        $excludedUserTypes = [1,2];
+        $extendedUserTypes = UserTypes::select('id')->whereNotIn('id', $excludedUserTypes)->pluck('id')->toArray();
+
+        $authUserType = Auth::user()->user_type_id;
+
+        //check whether user has permission to see extended department list in view
+        if(in_array($authUserType, $extendedUserTypes)) {
+            $directorsIds = Department_info::select('director_id')->where('director_id', '!=', null)->where('id_dep_type', '=', 2)->distinct()->get();
+            $directorsHRIds = Department_info::select('director_hr_id')->where('director_hr_id', '!=', null)->where('id_dep_type', '=', 2)->distinct()->get();
+            $regionalManagersIds = Department_info::select('regionalManager_id')->where('regionalManager_id', '!=', null)->where('id_dep_type', '=', 2)->distinct()->get();
+            $regionalManagersInstructorsIds = Department_info::select('instructor_regional_id')->where('instructor_regional_id', '!=', null)->where('id_dep_type', '=', 2)->distinct()->get();
+            $directors = User::whereIn('id', $directorsIds)->get();
+            $directorsHR = User::whereIn('id', $directorsHRIds)->get();
+            $regionalManagers = User::whereIn('id', $regionalManagersIds)->get();
+            $regionalManagersInstructors = User::whereIn('id',$regionalManagersInstructorsIds)->get();
+        }
+
+
         if ($request->show_schedule == "Wybierz") {
             return view('schedule.viewSchedule');
         }
+
+        $selected_department = explode('_',$request->department); //['name', 'value']
         $number_of_week = $request->show_schedule;
         $year = $request->year;
         $year = explode('.',$year);
@@ -71,16 +123,111 @@ class ScheduleController extends Controller
                 users.id as id_user,
                 users.first_name as user_first_name,
                 users.last_name as user_last_name
-                '))
-            ->where('users.department_info_id',Auth::user()->department_info_id)
+                '));
+
+        $resultArr = []; //collection on departments and their corresponding data
+
+        switch($selected_department[0]) {
+            case 'department': {
+                $query = $query
+                    ->where('users.department_info_id',$selected_department[1])
+                    ->where('users.status_work', '=', 1)
+                    ->wherein('users.user_type_id',[1,2])
+                    ->orderBy('users.last_name')
+                    ->get();
+
+                array_push($resultArr, ['data' => $query, 'name' => $departmentInfo->where('id', '=', $selected_department[1])->first()->department_name . ' ' . $departmentInfo->where('id', '=', $selected_department[1])->first()->department_type]);
+                break;
+            }
+            case 'regionalDirector': {
+                $departments = $departmentInfo->where('director_id', '=', $selected_department[1])->pluck('id')->toArray();
+
+                foreach($departments as $department) {
+                    $query = $this->view_shedule_query($number_of_week, $year, $department);
+                    array_push($resultArr, ['data' => $query, 'name' => $departmentInfo->where('id', '=', $department)->first()->department_name . ' ' . $departmentInfo->where('id', '=', $department)->first()->department_type]);
+                }
+                break;
+            }
+            case 'regionalMenager': {
+                $departments = $departmentInfo->where('regionalManager_id', '=', $selected_department[1])->pluck('id')->toArray();
+
+                foreach($departments as $department) {
+                    $query = $this->view_shedule_query($number_of_week, $year, $department);
+                    array_push($resultArr, ['data' => $query, 'name' => $departmentInfo->where('id', '=', $department)->first()->department_name . ' ' . $departmentInfo->where('id', '=', $department)->first()->department_type]);
+                }
+                break;
+            }
+            case 'regionalDirectorInstructor': {
+                $departments = $departmentInfo->where('instructor_regional_id', '=', $selected_department[1])->pluck('id')->toArray();
+
+                foreach($departments as $department) {
+                    $query = $this->view_shedule_query($number_of_week, $year, $department);
+                    array_push($resultArr, ['data' => $query, 'name' => $departmentInfo->where('id', '=', $department)->first()->department_name . ' ' . $departmentInfo->where('id', '=', $department)->first()->department_type]);
+                }
+
+                break;
+            }
+            case 'regionalDirectorHr': {
+                $departments = $departmentInfo->where('director_hr_id', '=', $selected_department[1])->pluck('id')->toArray();
+
+                foreach($departments as $department) {
+                    $query = $this->view_shedule_query($number_of_week, $year, $department);
+                    array_push($resultArr, ['data' => $query, 'name' => $departmentInfo->where('id', '=', $department)->first()->department_name . ' ' . $departmentInfo->where('id', '=', $department)->first()->department_type]);
+                }
+
+                break;
+            }
+            default: {
+                $query = $query
+                    ->where('users.department_info_id', Auth::user()->department_info_id)
+                    ->where('users.status_work', '=', 1)
+                    ->wherein('users.user_type_id',[1,2])
+                    ->orderBy('users.last_name')
+                    ->get();
+
+                array_push($resultArr, ['data' => $query, 'name' => $departmentInfo->where('id', '=', Auth::user()->department_info_id)->first()->department_name . ' ' . $departmentInfo->where('id', '=', Auth::user()->department_info_id)->first()->department_type]);
+                break;
+            }
+        }
+
+        return view('schedule.viewSchedule')
+            ->with('departments', $allDepartments)
+            ->with('number_of_week',$number_of_week)
+            ->with('schedule_users',$resultArr)
+            ->with('department_info', $departmentInfo)
+            ->with('multiple_departments', $multipleDepartments)
+            ->with('directors', $directors)
+            ->with('directorsHR', $directorsHR)
+            ->with('regionalManagers', $regionalManagers)
+            ->with('regionalManagersInstructors', $regionalManagersInstructors);
+    }
+
+    private function view_shedule_query($number_of_week, $year, $department) {
+        return $query = DB::table('users')
+            ->leftjoin("schedule", function ($join) use ($number_of_week,$year) {
+                $join->on("schedule.id_user", "=", "users.id")
+                    ->where("schedule.week_num", "=", $number_of_week)
+                    ->orderBy('users.last_name')
+                    ->where("schedule.year", "=", $year);
+            })
+            ->select(DB::raw(
+                'schedule.*,
+                            time_to_sec(`monday_stop`)-time_to_sec(`monday_start`) as sec_monday,
+                            time_to_sec(`tuesday_stop`)-time_to_sec(`tuesday_start`) as sec_tuesday,
+                            time_to_sec(`wednesday_stop`)-time_to_sec(`wednesday_start`) as sec_wednesday,
+                            time_to_sec(`thursday_stop`)-time_to_sec(`thursday_start`) as sec_thursday,
+                            time_to_sec(`friday_stop`)-time_to_sec(`friday_start`) as sec_friday,
+                            time_to_sec(`saturday_stop`)-time_to_sec(`saturday_start`) as sec_saturday,
+                            time_to_sec(`sunday_stop`)-time_to_sec(`sunday_start`) as sec_sunday,
+                            users.id as id_user,
+                            users.first_name as user_first_name,
+                            users.last_name as user_last_name
+                            '))
+            ->where('users.department_info_id','=',$department)
             ->where('users.status_work', '=', 1)
             ->wherein('users.user_type_id',[1,2])
             ->orderBy('users.last_name')
             ->get();
-
-        return view('schedule.viewSchedule')
-            ->with('number_of_week',$number_of_week)
-            ->with('schedule_user',$query);
     }
 
     public function datatableShowUserSchedule(Request $request)
