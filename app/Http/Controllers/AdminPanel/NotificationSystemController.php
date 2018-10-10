@@ -23,7 +23,7 @@ class NotificationSystemController
 
     public function ratingCriterionDataAjax(Request $request){
         if($request->ajax()){
-            return NotificationRatingCriterion::all();
+            return NotificationRatingCriterion::with('rating_system')->get();
         }
         return false;
     }
@@ -37,10 +37,22 @@ class NotificationSystemController
 
     public function newRatingCriterionDataAjax(Request $request){
         if($request->ajax()){
+            $notificationRatingCriterion = new NotificationRatingCriterion();
+            $notificationRatingCriterion->criterion = $request->criterion;
+            $notificationRatingCriterion->notification_rating_system_id = $request->ratingSystemId;
+            $notificationRatingCriterion->save();
+            return 'success';
         }
         return false;
     }
 
+    public function ratingCriterionStatusChangeAjax(Request $request){
+        if($request->ajax()){
+            NotificationRatingCriterion::where('id',$request->ratingCriterionId)->update(['status'=>$request->status]);
+            return 'success';
+        }
+        return false;
+    }
     public function newRatingSystemDataAjax(Request $request){
         if($request->ajax()){
             $notificationRatingSystem = new NotificationRatingSystem();

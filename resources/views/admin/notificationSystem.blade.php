@@ -26,6 +26,9 @@
         .leftPanel{
             border-right: 1px #b9b9b9 solid;
         }
+        .bootstrap-select > .dropdown-menu {
+            left: 0 !important;
+        }
     </style>
 @endsection
 @section('content')
@@ -132,12 +135,45 @@
                             columns:[
                                 {data: 'lp'},
                                 {data: 'criterion'},
-                                {data: 'notification_rating_system_id'},
-                                {data: 'action'}
+                                {data: function (data) {
+                                        return $('<textarea>').css({'width':'20em','height':'3em', 'resize':'none'})
+                                            .append(data.rating_system.rating_start+' - '+data.rating_system.rating_stop
+                                                +' : '+data.rating_system.description).prop('outerHTML')
+                                    }},
+                                {data: function (data) {
+                                    let actionButton = $('<button>')
+                                        .addClass('onoff btn btn-block').append($('<span>')
+                                            .addClass('glyphicon glyphicon-off'));
+                                    if(data.status == 0){
+                                        actionButton.addClass('btn-success');
+                                    }else if(data.status == 1){
+                                        actionButton.addClass('btn-danger');
+                                    }
+
+                                    return actionButton.prop('outerHTML');
+                                    }, name: 'action'}
                             ],
                             fnDrawCallback: function () {
                             },
                             fnRowCallback: function (nRow, aData, iDisplayIndex) {
+                                if(aData.status == 0){
+                                    $(nRow).css({'background': '#ffa8a3'});
+                                }
+                                $(nRow).find('.onoff').click(function (e) {
+                                    let onoffText = 'wyłączyć';
+                                    if(aData.status == 0){
+                                        onoffText = 'włączyć';
+                                    }
+                                    swal({
+                                        showCancelButton: true,
+                                        title: 'Czy na pewno?',
+                                        text: 'Czy na pewno chcesz '+onoffText+' kryterium?',
+                                        type: 'warning'}).then(function (result) {
+                                        if(result.value){
+                                            FUNCTIONS.AJAXs.ratingCriterionStatusChangeAjax(aData.id, aData.status == 1 ? 0 : 1);
+                                        }
+                                    })
+                                });
                             }
                         }),
                         getData: function () {
@@ -226,8 +262,43 @@
                                         .append($('<h2>')
                                             .addClass('modal-title')
                                             .append('Formularz nowego kryterium oceniania'));
-                                    VARIABLES.jQElements.myModal.find('.modal-body').append();
-                                    VARIABLES.jQElements.myModal.find('.modal-footer').append();
+                                    let criterionTextArea = $('<textarea>').css({'width':'100%','resize':'vertical','min-height':'10vh','max-height':'30vh'});
+                                    let selectRatingSystems = $('<select>').addClass('form-control selectpicker').attr('data-live-search',true);
+                                    selectRatingSystems.append($('<option>').val(0).text('Wybierz')).prop('selected',true);
+                                    $.each(VARIABLES.DATA_TABLES.ratingSystem.data.systems, function(index, system){
+                                        selectRatingSystems.append($('<option>').val(system.id).text(system.rating_start+' - '+system.rating_stop+' : '+system.description.substring(0,80))
+                                            .attr('data-subtext','ID: '+system.id));
+                                    });
+                                    VARIABLES.jQElements.myModal.find('.modal-body')
+                                        .append($('<label>')
+                                            .append('Kryterium'))
+                                        .append(criterionTextArea)
+                                        .append($('<hr>'))
+                                        .append($('<label>')
+                                            .append('System oceny'))
+                                        .append(selectRatingSystems);
+                                    selectRatingSystems.selectpicker('refresh');
+                                    VARIABLES.jQElements.myModal.find('.modal-footer')
+                                        .append($('<button>')
+                                            .addClass('btn btn-success')
+                                            .append($('<span>')
+                                                .addClass('glyphicon glyphicon-save'))
+                                            .append(' Zapisz')
+                                            .click(function (e) {
+                                                let validation = true;
+                                                if(parseInt(selectRatingSystems.selectpicker('val')) <= 0){
+                                                    validation = false;
+                                                }
+                                                if(!criterionTextArea.val()){
+                                                    validation = false;
+                                                }
+                                                if(validation){
+                                                    FUNCTIONS.AJAXs.newRatingCriterionDataAjax(criterionTextArea.val(), selectRatingSystems.selectpicker('val'))
+                                                }else{
+                                                    swal('Wypełnij wszystkie pola');
+                                                }
+                                            }));
+
                                 });
                             }
                         )();
@@ -349,17 +420,76 @@
                             }
                         });
                     },
-                    newRatingCriterionDataAjax: function(ratingStart, ratingStop, description) {
+                    newRatingCriterionDataAjax: function(criterion, ratingSystemId) {
                         return $.ajax({
                             url: "{{ route('api.newRatingCriterionDataAjax') }}",
                             type: 'POST',
                             headers: {'X-CSRF-TOKEN': '{{ csrf_token() }}'},
                             data: {
-                                ratingStart: ratingStart,
-                                ratingStop: ratingStop,
-                                description: description
+                                criterion: criterion,
+                                ratingSystemId: ratingSystemId
                             },
                             success: function (response) {
+                                VARIABLES.jQElements.myModal.modal('hide');
+                                if(response === 'success'){
+                                    $.notify({
+                                        // options
+                                        message: 'Dodano nowe kryterium oceniania'
+                                    },{
+                                        // settings
+                                        type: 'success'
+                                    });
+                                    VARIABLES.DATA_TABLES.ratingCriterion.ajaxReload();
+                                }else{
+                                    $.notify({
+                                        // options
+                                        message: 'Coś poszło nie tak'
+                                    },{
+                                        // settings
+                                        type: 'danger'
+                                    });
+                                }
+                            },
+                            error: function (jqXHR, textStatus, thrownError) {
+                                console.log(jqXHR);
+                                console.log('textStatus: ' + textStatus);
+                                console.log('thrownError: ' + thrownError);
+                                swal({
+                                    type: 'error',
+                                    title: 'Błąd ' + jqXHR.status,
+                                    text: 'Wystąpił błąd: ' + thrownError+' "'+jqXHR.responseJSON.message+'"',
+                                });
+                            }
+                        });
+                    },
+                    ratingCriterionStatusChangeAjax: function(ratingCriterionId, status) {
+                        return $.ajax({
+                            url: "{{ route('api.ratingCriterionStatusChangeAjax') }}",
+                            type: 'POST',
+                            headers: {'X-CSRF-TOKEN': '{{ csrf_token() }}'},
+                            data: {
+                                ratingCriterionId: ratingCriterionId,
+                                status: status
+                            },
+                            success: function (response) {
+                                if(response === 'success'){
+                                    $.notify({
+                                        // options
+                                        message: 'Zmieniono status kryterium oceniania'
+                                    },{
+                                        // settings
+                                        type: 'success'
+                                    });
+                                    VARIABLES.DATA_TABLES.ratingCriterion.ajaxReload();
+                                }else{
+                                    $.notify({
+                                        // options
+                                        message: 'Coś poszło nie tak'
+                                    },{
+                                        // settings
+                                        type: 'danger'
+                                    });
+                                }
                             },
                             error: function (jqXHR, textStatus, thrownError) {
                                 console.log(jqXHR);
@@ -430,7 +560,6 @@
                     if($.isArray(data)) {
                         $.each(data, function (index, row) {
                             row.lp = lp;
-                            console.log(row);
                             dataTable.row.add(row);
                             lp++;
                         });

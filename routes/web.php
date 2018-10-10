@@ -227,6 +227,7 @@ Route::POST('/datatableLogInfoAjax', 'AdminPanel\LogsController@datatableLogInfo
 Route::POST('/ratingCriterionDataAjax', 'AdminPanel\NotificationSystemController@ratingCriterionDataAjax')->name('api.ratingCriterionDataAjax');
 Route::POST('/ratingSystemDataAjax', 'AdminPanel\NotificationSystemController@ratingSystemDataAjax')->name('api.ratingSystemDataAjax');
 Route::POST('/newRatingCriterionDataAjax', 'AdminPanel\NotificationSystemController@newRatingCriterionDataAjax')->name('api.newRatingCriterionDataAjax');
+Route::POST('/ratingCriterionStatusChangeAjax', 'AdminPanel\NotificationSystemController@ratingCriterionStatusChangeAjax')->name('api.ratingCriterionStatusChangeAjax');
 Route::POST('/newRatingSystemDataAjax', 'AdminPanel\NotificationSystemController@newRatingSystemDataAjax')->name('api.newRatingSystemDataAjax');
 
 
