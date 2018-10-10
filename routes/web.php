@@ -224,6 +224,11 @@ Route::POST('/getMedicalPackagesAdminData', 'AdminController@getMedicalPackagesA
 Route::POST('/getMedicalPackageData', 'AdminController@getMedicalPackageData')->name('api.getMedicalPackageData');
 Route::POST('/saveMedicalPackageData', 'AdminController@saveMedicalPackageData')->name('api.saveMedicalPackageData');
 Route::POST('/datatableLogInfoAjax', 'AdminPanel\LogsController@datatableLogInfoAjax')->name('api.datatableLogInfo');
+Route::POST('/ratingCriterionDataAjax', 'AdminPanel\NotificationSystemController@ratingCriterionDataAjax')->name('api.ratingCriterionDataAjax');
+Route::POST('/ratingSystemDataAjax', 'AdminPanel\NotificationSystemController@ratingSystemDataAjax')->name('api.ratingSystemDataAjax');
+Route::POST('/newRatingCriterionDataAjax', 'AdminPanel\NotificationSystemController@newRatingCriterionDataAjax')->name('api.newRatingCriterionDataAjax');
+Route::POST('/newRatingSystemDataAjax', 'AdminPanel\NotificationSystemController@newRatingSystemDataAjax')->name('api.newRatingSystemDataAjax');
+
 
 
 Route::POST('/getDaysInMonth', 'StatisticsController@getDaysInMonth')->name('api.getDaysInMonth');
