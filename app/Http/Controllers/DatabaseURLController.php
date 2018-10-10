@@ -227,7 +227,7 @@ class DatabaseURLController extends Controller
 
      Mail::send('mail.' . $mail_type, $data, function($message) use ($accepted_users, $mail_title)
      {
-        $message->from('noreply.verona@gmail.com', 'Verona Consulting');
+        $message->from('noreply@veronconsulting.pl', 'Verona Consulting');
         foreach ($accepted_users as $key => $user) {
           if (filter_var($user, FILTER_VALIDATE_EMAIL)) {
               $message->to($user)->subject($mail_title);
@@ -272,7 +272,7 @@ class DatabaseURLController extends Controller
         /* UWAGA !!! ODKOMENTOWANIE TEGO POWINNO ZACZĄC WYSYŁAĆ MAILE*/
         Mail::send('mail.' . $mail_type, $data, function($message) use ($accepted_users, $mail_title)
         {
-            $message->from('noreply.verona@gmail.com', 'Verona Consulting');
+            $message->from('noreply@veronconsulting.pl', 'Verona Consulting');
             foreach($accepted_users as $user) {
                 if (filter_var($user->username, FILTER_VALIDATE_EMAIL)) {
                     $message->to($user->username, $user->first_name . ' ' . $user->last_name)->subject($mail_title);
