@@ -5034,7 +5034,7 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
 //      dd($mail_type);
        Mail::send('mail.' . $mail_type, $data, function($message) use ($accepted_users, $mail_title)
        {
-           $message->from('noreply@veronaconsulting.pl', 'Verona Consulting');
+           $message->from('noreply.verona@gmail.com', 'Verona Consulting');
            foreach($accepted_users as $user) {
 //               dd($user); -> zwraca ID tylko
             if (filter_var($user->username, FILTER_VALIDATE_EMAIL)) {
