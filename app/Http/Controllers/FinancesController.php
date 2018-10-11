@@ -628,8 +628,10 @@ class FinancesController extends Controller
     }
 
     private function provisionSystemForInstructors(&$user, $dividedMonth,$arrayOfDepartmentStatistics = null){
+//        dd('1');
         $weekNumber = 0;
         $user->provision = 0;
+
         if($user->department_type_id == 1){             //szkoleniowiec potwierdzeń
             $clientRouteInfo = ClientRouteInfo::select(
                 DB::raw('concat(users.first_name," ",users.last_name) as confirmingUserName'),
@@ -662,12 +664,32 @@ class FinancesController extends Controller
                 }
                 $weekNumber++;
             }
-        }else if($user->department_type_id == 2){       //szkoleniowiec telemarketing
+        }
+        else if($user->department_type_id == 2){       //szkoleniowiec telemarketing
+
+            $firstStatisticArr = [];
+            foreach($dividedMonth as $companyWeek) {
+                $date_start = $companyWeek->firstDay;
+                $date_stop = $companyWeek->lastDay;
+                $dataTrainingGroup = RecruitmentStory::getReportTrainingData($date_start,$date_stop);
+                $dateHireCandidate = RecruitmentStory::getReportTrainingDataAndHire($date_start,$date_stop);
+                $dataTrainingGroup = $this::mapTrainingGroupInfoAndHireCandidate($dataTrainingGroup,$dateHireCandidate);
+
+                foreach($dataTrainingGroup as $recruitmentInfo) { //we are filling firstStatistcArr with parameter: recruited to stage 1.
+                    if($recruitmentInfo->dep_id == $user->department_info_id) { //data from user's department
+                        $recruitedToStage1 = $recruitmentInfo->sum_choise_stageOne > 0 ? round(100 * $recruitmentInfo->countHireUserFromFirstTrainingGroup / $recruitmentInfo->sum_choise_stageOne, 2) : 0;
+                        array_push($firstStatisticArr, $recruitedToStage1);
+                    }
+                }
+            }
+
+
             foreach ($arrayOfDepartmentStatistics as $item){
                 $commissionAvg = Department_info::find($user->department_info_id)->commission_avg;
                 $total_week_avg_proc = round((100*$item->total_week_avg)/$commissionAvg,2);
                 $user->bonus +=  ProvisionLevels::get('instructor', $item->janky_proc,3,$total_week_avg_proc, 'avg'); // Średnia
                 $user->bonus += ProvisionLevels::get('instructor', $item->janky_proc,3,$item->total_week_goal_proc, 'ammount'); // Cel zgód
+
                 if($this->getToSave() == 1){
                     $this->saveBonus($user->id,ProvisionLevels::get('instructor', $item->janky_proc,3,$total_week_avg_proc, 'avg'),$dividedMonth[$weekNumber]->lastDay,"Premia tygodniowa (".$dividedMonth[$weekNumber]->firstDay." -- ".$dividedMonth[$weekNumber]->lastDay.") za osiągnięcie:  Średniej na projekcie");
                     $this->saveBonus($user->id,ProvisionLevels::get('instructor', $item->janky_proc,3,$item->total_week_goal_proc, 'ammount'),$dividedMonth[$weekNumber]->lastDay,"Premia tygodniowa (".$dividedMonth[$weekNumber]->firstDay." -- ".$dividedMonth[$weekNumber]->lastDay.") za osiągnięcie: Celu na projekcie");
@@ -675,6 +697,18 @@ class FinancesController extends Controller
                 $weekNumber++;
             }
         }
+    }
+
+    public function mapTrainingGroupInfoAndHireCandidate($trainingGroupCollect,$dateHireCandidate){
+        return $trainingGroupCollect->map(function ($item) use ($dateHireCandidate){
+            $dateHireCandidateDepartment = $dateHireCandidate->where('departmentInfoId',$item->dep_id);
+
+            if(!$dateHireCandidateDepartment->isEmpty()){
+                $item->countHireUserFromFirstTrainingGroup = $dateHireCandidateDepartment->count();
+            }
+            $item->procScore = $item->sum_choise_stageOne != 0 ? round(($item->countHireUserFromFirstTrainingGroup/$item->sum_choise_stageOne)*100,2) : 0;
+            return $item;
+        });
     }
 
     private function getDepartmentStatistics($weekDateArr, $month, $year, $departments) {
