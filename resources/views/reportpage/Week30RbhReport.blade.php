@@ -6,7 +6,7 @@
     <div class="row">
         <div class="col-lg-12">
             <div class="page-header">
-                <div class="alert gray-nav">Raport Tygodniowy 30 Rbh</div>
+                <div class="alert gray-nav">Raport Tygodniowy 30 Rbh(zbiorczy)</div>
             </div>
         </div>
     </div>
@@ -47,11 +47,20 @@
 @section('script')
 
     <script>
-        // $('.form_date').datetimepicker({
-        //     language:  'pl',
-        //     autoclose: 1,
-        //     minView : 2,
-        //     pickTime: false,
-        // });
+        $('.form_date').datetimepicker({
+            language:  'pl',
+            autoclose: 1,
+            minView : 2,
+            pickTime: false,
+        });
+
+        let date_start = `<?php echo $date_start; ?>`;
+        let date_stop = `<?php echo $date_stop; ?>`;
+
+        let date_start_input = document.querySelector('#date');
+        $(date_start_input).val(date_start);
+
+        let date_stop_input = document.querySelector('#date_stop');
+        $(date_stop_input).val(date_stop);
     </script>
 @endsection
