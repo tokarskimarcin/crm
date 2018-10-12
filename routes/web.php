@@ -353,6 +353,7 @@ Route::post('/allDepartmentsConfirmationStatisticsAjax', 'Statistics\Departments
 //Emails
 
 Route::get('/hourReportTelemarketing', 'StatisticsController@MailhourReportTelemarketing'); // ok
+Route::get('/hourReportTelemarketing2', 'StatisticsController@MailhourReportTelemarketing2'); // ok
 Route::get('/weekReportTelemarketing', 'StatisticsController@MailweekReportTelemarketing'); // ok
 Route::get('/monthReportTelemarketing', 'StatisticsController@MailmonthReportTelemarketing'); // ok
 Route::get('/dayReportTelemarketing', 'StatisticsController@MailDayReportTelemarketing'); // tutaj dodac
