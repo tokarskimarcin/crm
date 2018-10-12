@@ -4952,7 +4952,7 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
     *
     */
 
-    private function sendMailByVerona($mail_type, $data, $mail_title, $default_users = null,$depTypeId = [1,2]) {
+    private function sendMailByVerona($mail_type, $data, $mail_title, $default_users = null,$depTypeId = [1,2,6]) {
 //            dd($data);
         if ($default_users !== null) {
             $email = [];
