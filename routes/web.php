@@ -1091,4 +1091,4 @@ Route::get('/pageWeek30RbhReport', 'StatisticsController@pageWeek30RbhReport');
 Route::post('/pageWeek30RbhReport', 'StatisticsController@pageWeek30RbhReportPost');
 
 Route::get('/pageMonth30RbhReport', 'StatisticsController@pageMonth30RbhReport');
-Route::post('/pageMonth30RbhReport', 'StatisticsController@pageMonth30RbhReport');
+Route::post('/pageMonth30RbhReport', 'StatisticsController@pageMonth30RbhReportPost');

@@ -12,15 +12,7 @@
     </div>
     <div class="row">
         <div class="col-lg-12">
-            <div class="alert alert-info">
-                Wiersze, które mają kolor jasno czerwony wskazują osoby, których liczba zgód jest niższa niż średnia w ich oddziale <br>
-                Wiersze, które mają kolor jasno zielony wskazują osoby, których liczba zgód jest wyższa niż średnia w ich oddziale.
-            </div>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-lg-12">
-            <form action="{{URL::to('/pageWeek30RbhReport')}}" method="post">
+            <form action="{{URL::to('/pageMonth30RbhReport')}}" method="post">
                 <input type="hidden" name="_token" value="{{ csrf_token() }}">
                 <div class="form-group">
                     <label for="date" class="myLabel">Data początkowa:</label>
@@ -44,7 +36,7 @@
         <div class="col-lg-12">
             <div class="row">
                 <div class="panel-body" style="font-size: 12px;">
-                    @include('mail.week30RbhReport')
+                    @include('mail.month30RbhReport')
                 </div>
             </div>
         </div>

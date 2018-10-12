@@ -5760,6 +5760,42 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
         ]);
     }
 
+    public function pageMonth30RbhReport() {
+        $today = date('Y-m-d');
+        $companyWeeks = MonthFourWeeksDivision::get(date('Y'), date('m'));
+        $weekIndex = null;
+
+        $date_start = $companyWeeks[0]->firstDay;
+        $date_stop = $companyWeeks[count($companyWeeks) - 1]->lastDay;
+
+        $data = $this->get30RBHData($date_start, $date_stop);
+
+        $infoAboutDepartments = Department_info::getDepartmentsWithNames()->groupBy('id');
+
+        return view('reportpage.Month30RbhReport')->with([
+            'date_start' => $date_start,
+            'date_stop' => $date_stop,
+            'data' => $data,
+            'infoAboutDepartments' => $infoAboutDepartments
+        ]);
+    }
+
+    public function pageMonth30RbhReportPost(Request $request) {
+        $date_start = $request->date_start;
+        $date_stop = $request->date_stop;
+
+        $data = $this->get30RBHData($date_start, $date_stop);
+
+        $infoAboutDepartments = Department_info::getDepartmentsWithNames()->groupBy('id');
+
+        return view('reportpage.Month30RbhReport')->with([
+            'date_start' => $date_start,
+            'date_stop' => $date_stop,
+            'data' => $data,
+            'infoAboutDepartments' => $infoAboutDepartments
+        ]);
+    }
+
     /**
      * @param $date_start
      * @param $date_stop
