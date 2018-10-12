@@ -5041,7 +5041,6 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
 //        }
 //     });
 
-        dd($accepted_users->pluck('last_name')->toArray());
         $mail_type = $mail_type_pom;
       /* UWAGA !!! ODKOMENTOWANIE TEGO POWINNO ZACZĄC WYSYŁAĆ MAILE*/
 //      dd($mail_type);
