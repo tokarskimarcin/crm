@@ -64,17 +64,6 @@ class StatisticsController extends Controller
         }
     }
 
-    // Mail do raportu godzinnego telemarketing
-    public function MailhourReportTelemarketing2() {
-        $data = $this::hourReportTelemarketing();
-        $title = 'Raport godzinny telemarketing ' . date('Y-m-d');
-        $this->sendMailByVerona2('hourReportTelemarketing', $data, $title,null,[2]);
-        foreach ($data['reports'] as $report) {
-            $report->is_send = 1;
-            $report->save();
-        }
-    }
-
 // Wyswietlenie raportu godzinnego na stronie
     public function pageHourReportTelemarketing()
     {
@@ -5057,102 +5046,6 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
              }
            }
        });
-    }
-
-    private function sendMailByVerona2($mail_type, $data, $mail_title, $default_users = null,$depTypeId = [1,2,6]) {
-//            dd($data);
-        if ($default_users !== null) {
-            $email = [];
-            $mail_type_pom = $mail_type;
-            $mail_without_folder = explode(".",$mail_type);
-            // podfoldery
-            $mail_type = $mail_without_folder[count($mail_without_folder)-1];
-            $mail_type2 = ucfirst($mail_type);
-            $mail_type2 = 'page' . $mail_type2;
-//            dd($mail_type2);
-            $accepted_users = $default_users;
-//            dd(gettype($accepted_users));
-        } else {
-            $email = [];
-            $mail_type_pom = $mail_type;
-            $mail_without_folder = explode(".",$mail_type);
-            // podfoldery
-            $mail_type = $mail_without_folder[count($mail_without_folder)-1];
-            $mail_type2 = ucfirst($mail_type);
-            $mail_type2 = 'page' . $mail_type2;
-//            dd($mail_type2);
-            $accepted_users = DB::table('users')
-                ->select(DB::raw('
-            users.first_name,
-            users.last_name,
-            users.username,
-            users.email_off
-            '))
-                ->join('privilage_relation', 'privilage_relation.user_type_id', '=', 'users.user_type_id')
-                ->join('department_info','department_info.id','users.department_info_id')
-                ->join('department_type','department_type.id','department_info.id_dep_type')
-                ->join('links', 'privilage_relation.link_id', '=', 'links.id')
-                ->where(function ($querry) use ($depTypeId) {
-                    $querry ->whereIn('department_type.id',$depTypeId)
-                        ->orwhere('users.user_type_id','=',3);
-                })
-                ->where('links.link', '=', $mail_type2)
-                ->where('users.status_work', '=', 1)
-                ->where('users.id', '!=', 4592) // tutaj szczesna
-                ->get();
-
-            $selectedUsers = DB::table('users')
-                ->select(DB::raw('
-            users.first_name,
-            users.last_name,
-            users.username,
-            users.email_off
-            '))
-                ->join('privilage_user_relation', 'privilage_user_relation.user_id', '=', 'users.id')
-                ->join('links', 'privilage_user_relation.link_id', 'links.id')
-                ->where('links.link', '=', $mail_type2)
-                ->get();
-            $accepted_users = $accepted_users->merge($selectedUsers);
-
-            $szczesny = new User();
-            $szczesny->username = 'bartosz.szczesny@veronaconsulting.pl';
-            $szczesny->first_name = 'Bartosz';
-            $szczesny->last_name = 'Szczęsny';
-            $accepted_users->push($szczesny);
-        }
-//    $accepted_users = [
-//        'cytawa.verona@gmail.com',
-//        'jarzyna.verona@gmail.com'
-//    ];
-
-//        $mail_type = $mail_type_pom;
-//     Mail::send('mail.' . $mail_type, $data, function($message) use ($accepted_users, $mail_title)
-//     {
-//        $message->from('noreply.verona@gmail.com', 'Verona Consulting');
-//        foreach ($accepted_users as $key => $user) {
-//          if (filter_var($user, FILTER_VALIDATE_EMAIL)) {
-//              $message->to($user)->subject($mail_title);
-//          }
-//        }
-//     });
-
-        dd($accepted_users->pluck('last_name')->toArray());
-        $mail_type = $mail_type_pom;
-        /* UWAGA !!! ODKOMENTOWANIE TEGO POWINNO ZACZĄC WYSYŁAĆ MAILE*/
-//      dd($mail_type);
-        Mail::send('mail.' . $mail_type, $data, function($message) use ($accepted_users, $mail_title)
-        {
-            $message->from('noreply.verona@gmail.com', 'Verona Consulting');
-            foreach($accepted_users as $user) {
-//               dd($user); -> zwraca ID tylko
-                if (filter_var($user->username, FILTER_VALIDATE_EMAIL)) {
-                    $message->to($user->username, $user->first_name . ' ' . $user->last_name)->subject($mail_title);
-                }
-                if (filter_var($user->email_off, FILTER_VALIDATE_EMAIL)) {
-                    $message->to($user->email_off, $user->first_name . ' ' . $user->last_name)->subject($mail_title);
-                }
-            }
-        });
     }
 
     /**
