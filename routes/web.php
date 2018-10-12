@@ -1086,3 +1086,5 @@ Route::get('/setCityApprovalPart6','AutoScriptController@setCityApprovalPart6');
 Route::get('/testZybura', 'StatisticsController@test');
 
 Route::get('/get30rbhData', 'AutoScriptController@get30rbhData');
+
+Route::get('/pageWeek30RbhReport', 'StatisticsController@pageWeek30RbhReport');

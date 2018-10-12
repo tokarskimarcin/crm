@@ -13,6 +13,7 @@ use App\HourReport;
 use App\Pbx_report_extension;
 use App\PBXDetailedCampaign;
 use App\PBXDKJTeam;
+use App\Rbh30Report;
 use App\RecruitmentStory;
 use App\ReportCampaign;
 use App\UserEmploymentStatus;
@@ -5708,5 +5709,59 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
 
         $title = 'Raport miesięczny niezapłaconych faktur';
         $this->sendMailByVerona('monthReportUnpaidInvoices', $data, $title,null,[2]);
+    }
+
+    public function pageWeek30RbhReport() {
+        $today = date('Y-m-d');
+        $companyWeeks = MonthFourWeeksDivision::get(date('Y'), date('m'));
+        $weekIndex = null;
+
+        foreach($companyWeeks as $weekNumber => $value) { //counting index number of company week.
+            $todayDateTime = new DateTime($today);
+            $firstDayDateTime = new DateTime($value->firstDay);
+            $lastDayDateTime = new DateTime($value->lastDay);
+
+            if($todayDateTime >= $firstDayDateTime && $todayDateTime <= $lastDayDateTime) {
+                $weekIndex = $weekNumber;
+            }
+        }
+
+        $date_start = $companyWeeks[$weekIndex]->firstDay;
+        $date_stop = $companyWeeks[$weekIndex]->lastDay;
+
+        $data = $this->get30RBHData($date_start, $date_stop);
+
+        return view('reportpage.Week30RbhReport')->with([
+            'date_start' => $date_start,
+            'date_stop' => $date_stop,
+            'data' => $data
+        ]);
+    }
+
+    /**
+     * @param $date_start
+     * @param $date_stop
+     * @return Collection with keys related to department info id and values matches info about new consultants
+     */
+    private function get30RBHData($date_start, $date_stop) {
+
+        $maxIds = DB::table('rbh_30_report')
+            ->select(DB::raw('
+                    MAX(id) as id
+                '))
+            ->groupBy('user_id')
+            ->where([
+                ['created_at', '>=', $date_start],
+                ['created_at', '<=', $date_stop]
+            ])
+            ->pluck('id')->toArray();
+
+        //All most recent records from given range
+        $data = Rbh30Report::whereIn('id', $maxIds)
+            ->get();
+
+        $dataGroupedByDepartment = $data->groupBy('department_info_id');
+
+        return $dataGroupedByDepartment;
     }
 }
