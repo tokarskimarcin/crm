@@ -67,7 +67,7 @@
         $lp = 1;
     @endphp
     @foreach($reports->sortby('time_on_record') as $report)
-        @if($report->team_name == 'LUBLIN_Wysylka')
+        @if($report->team_name == 'Lublin_Potwierdzanie')
             @if($report->time_on_record < '00:02:30')
                 <tr style="background-color: #e25454a3;">
             @else
@@ -113,7 +113,7 @@
         $lp = 1;
     @endphp
     @foreach($reports->sortby('time_on_record') as $report)
-        @if($report->team_name == 'Potwierdzenia_Wysylka')
+        @if($report->team_name == 'Radom_Potwierdzanie')
             @if($report->time_on_record < '00:02:30')
                 <tr style="background-color: #e25454a3;">
              @else
