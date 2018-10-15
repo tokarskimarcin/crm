@@ -669,13 +669,14 @@ class FinancesController extends Controller
         else if($user->department_type_id == 2){       //szkoleniowiec telemarketing
 
             $firstStatisticArr = [];
+            $secondStatisticsArr = [];
             foreach($dividedMonth as $companyWeek) {
                 $date_start = $companyWeek->firstDay;
                 $date_stop = $companyWeek->lastDay;
                 $dataTrainingGroup = RecruitmentStory::getReportTrainingData($date_start,$date_stop);
                 $dateHireCandidate = RecruitmentStory::getReportTrainingDataAndHire($date_start,$date_stop);
                 $dataTrainingGroup = $this::mapTrainingGroupInfoAndHireCandidate($dataTrainingGroup,$dateHireCandidate);
-                $RBH30Data = Data30RBHreport::get($date_start, $date_stop);
+                $RBH30Data = Data30RBHreport::get($date_start, $date_stop, 1);
 
                 foreach($dataTrainingGroup as $recruitmentInfo) { //we are filling firstStatistcArr with parameter: recruited to stage 1.
                     if($recruitmentInfo->dep_id == $user->department_info_id) { //data from user's department
@@ -684,9 +685,21 @@ class FinancesController extends Controller
                     }
                 }
 
-                foreach($RBH30Data[$user->dep_name . ' ' . $user->dep_type] as )
 
+                $sumConsultants = 0;
+                if(isset($RBH30Data[$user->department_info_id])) {
+                    $sumConsultants = count($RBH30Data[$user->department_info_id]);
+                }
 
+                $sum_success = 0;
+                if(isset($RBH30Data[$user->department_info_id])) {
+                    foreach($RBH30Data[$user->department_info_id] as $rbhInfo) {
+                        $sum_success += $rbhInfo->success;
+                    }
+                }
+                $avg = $sumConsultants > 0 ? round($sum_success / $sumConsultants, 2) : 0; //new consultants avg
+
+                array_push($secondStatisticsArr, $avg);
             }
 
 
@@ -1019,19 +1032,19 @@ class FinancesController extends Controller
             }
             foreach($salary as $user) {
                 if($user->user_type_id == 4) {
-                    $this->provisionSystemForTrainers($user,  MonthFourWeeksDivision::get($year, $month),$arrayOfDepartmentStatistics[$user->department_info_id]);
+//                    $this->provisionSystemForTrainers($user,  MonthFourWeeksDivision::get($year, $month),$arrayOfDepartmentStatistics[$user->department_info_id]);
                 }
                 else if($user->user_type_id == 5) {
-                    $this->provisionSystemForHR($user, $month, $year,$arrayOfDepartmentStatistics[$user->department_info_id]);
+//                    $this->provisionSystemForHR($user, $month, $year,$arrayOfDepartmentStatistics[$user->department_info_id]);
                 }
                 else if($user->user_type_id == 19) {
                     $this->provisionSystemForInstructors($user,  MonthFourWeeksDivision::get($year, $month),$arrayOfDepartmentStatistics[$user->department_info_id]);
                 }
                 else if($user->user_type_id == 8 || $user->user_type_id == 22) { //koordynator + menager of coordinators
-                    $this->provisionSystemForCoordinators($user, $month, $year);
+//                    $this->provisionSystemForCoordinators($user, $month, $year);
                 }
                 else if($user->user_type_id == 17 ||  $user->user_type_id == 7 || $user->user_type_id == 14 || $user->user_type_id == 21) { // Kierownik + Kierownik Regionaly + kierownik HR + Kierownik Szkoleniowcow
-                    $this->provisionSystemForManagers($user,MonthFourWeeksDivision::get($year, $month),$arrayOfDepartmentStatistics);
+//                    $this->provisionSystemForManagers($user,MonthFourWeeksDivision::get($year, $month),$arrayOfDepartmentStatistics);
                 }
             }
         }

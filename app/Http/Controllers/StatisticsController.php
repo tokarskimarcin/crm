@@ -5819,6 +5819,7 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
         $date_stop = $request->date_stop;
 
         $data = Data30RBHreport::get($date_start, $date_stop);
+//        dd($data);
 
         $infoAboutDepartments = Department_info::getDepartmentsWithNames()->groupBy('id');
 
@@ -5839,7 +5840,7 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
         $date_stop = $companyWeeks[count($companyWeeks) - 1]->lastDay;
 
         $data = Data30RBHreport::get($date_start, $date_stop);
-        dd($data['Lublin Telemarketing']);
+//        dd($data['Lublin Telemarketing']);
 
         $infoAboutDepartments = Department_info::getDepartmentsWithNames()->groupBy('id');
 

@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\DB;
 
 class Data30RBHreport
 {
-    public static function get($date_start, $date_stop) {
+    public static function get($date_start, $date_stop, $groupByType = 0) {
         $maxIds = DB::table('rbh_30_report')
             ->select(DB::raw('
                     MAX(id) as id
@@ -29,6 +29,7 @@ class Data30RBHreport
         //All most recent records from given range
         $data = Rbh30Report::select(
             DB::raw('CONCAT(departments.name, " ", department_type.name) as department_info_id'),
+            'department_info.id as id',
             'first_name',
             'last_name',
             'success',
@@ -43,7 +44,13 @@ class Data30RBHreport
             ->orderBy('success', 'DESC')
             ->get();
 
-        $dataGroupedByDepartment = $data->groupBy('department_info_id');
+        $dataGroupedByDepartment = null;
+        if($groupByType == 0) {
+            $dataGroupedByDepartment = $data->groupBy('department_info_id');
+        }
+        else if($groupByType == 1) {
+            $dataGroupedByDepartment = $data->groupBy('id');
+        }
 
         return $dataGroupedByDepartment;
     }

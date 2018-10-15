@@ -112,6 +112,12 @@ class ProvisionLevels
                         return $provision;
                         break;
                     }
+                    case '4': {
+
+
+                        return $provision;
+                        break;
+                    }
                 }
                 break;
             }
