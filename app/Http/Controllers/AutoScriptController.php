@@ -7,6 +7,7 @@ use App\Cities;
 use App\ClientRoute;
 use App\ClientRouteInfo;
 use App\PrivilageRelation;
+use App\Rbh30Report;
 use App\Schedule;
 use App\Pbx_report_extension;
 use App\ClientRouteCampaigns;
@@ -18,6 +19,31 @@ use Illuminate\Support\Facades\DB;
 
 class AutoScriptController extends Controller
 {
+
+    /**
+     * This method saves once a day records to rbh30report table
+     */
+    public function get30rbhData() {
+        $today = date('Y-m-d');
+
+        //array of users working less than 30 rbh this day with their data
+        $usersWorkingLessThan30Rbh = Work_Hour::usersWorkingRBHSelector(30, '<');
+
+        //collection of records from rbh30report from this day
+        $actual30RbhRecords = Rbh30Report::where('created_at', '=', $today)->get();
+
+        foreach($usersWorkingLessThan30Rbh as $user) {
+            if($actual30RbhRecords->where('user_id', '=', $user->id_user)->where('created_at', '=', $today)->isEmpty()) { //there is no duplicates
+                $rbh30Report = new Rbh30Report();
+                $rbh30Report->user_id = $user->id_user;
+                $rbh30Report->department_info_id = $user->dep_id;
+                $rbh30Report->success = $user->success;
+                $rbh30Report->sec_sum = $user->sec_sum;
+                $rbh30Report->created_at = $today;
+                $rbh30Report->save();
+            }
+        }
+    }
 
     //Temporary method for assigning successes for given date from pbx report
     public function pbx_update() {
