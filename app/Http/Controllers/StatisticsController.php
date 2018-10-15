@@ -3988,7 +3988,7 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
         $newUserID = [];
         if($request->onlyNewUser == 1){
             $newUserID = $this::getUser30RBH('<')->pluck('id_user')->toArray();
-        }else if($request->onlyNewUser == 1){
+        }else if($request->onlyNewUser == 2){
             $newUserID = $this::getUser30RBH('>=')->pluck('id_user')->toArray();
         }
 
