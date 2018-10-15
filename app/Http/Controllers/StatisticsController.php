@@ -18,6 +18,7 @@ use App\RecruitmentStory;
 use App\ReportCampaign;
 use App\UserEmploymentStatus;
 use App\Utilities\Dates\MonthFourWeeksDivision;
+use App\Utilities\Reports\Report_data_methods\Data30RBHreport;
 use App\Work_Hour;
 use DateTime;
 use Illuminate\Http\Request;
@@ -5801,7 +5802,7 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
         $date_start = $companyWeeks[$weekIndex]->firstDay;
         $date_stop = $companyWeeks[$weekIndex]->lastDay;
 
-        $data = $this->get30RBHData($date_start, $date_stop);
+        $data = Data30RBHreport::get($date_start, $date_stop);
 
         $infoAboutDepartments = Department_info::getDepartmentsWithNames()->groupBy('id');
 
@@ -5817,7 +5818,7 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
         $date_start = $request->date_start;
         $date_stop = $request->date_stop;
 
-        $data = $this->get30RBHData($date_start, $date_stop);
+        $data = Data30RBHreport::get($date_start, $date_stop);
 
         $infoAboutDepartments = Department_info::getDepartmentsWithNames()->groupBy('id');
 
@@ -5837,7 +5838,8 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
         $date_start = $companyWeeks[0]->firstDay;
         $date_stop = $companyWeeks[count($companyWeeks) - 1]->lastDay;
 
-        $data = $this->get30RBHData($date_start, $date_stop);
+        $data = Data30RBHreport::get($date_start, $date_stop);
+        dd($data['Lublin Telemarketing']);
 
         $infoAboutDepartments = Department_info::getDepartmentsWithNames()->groupBy('id');
 
@@ -5853,7 +5855,7 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
         $date_start = $request->date_start;
         $date_stop = $request->date_stop;
 
-        $data = $this->get30RBHData($date_start, $date_stop);
+        $data = Data30RBHreport::get($date_start, $date_stop);
 
         $infoAboutDepartments = Department_info::getDepartmentsWithNames()->groupBy('id');
 
@@ -5865,43 +5867,4 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
         ]);
     }
 
-    /**
-     * @param $date_start
-     * @param $date_stop
-     * @return Collection with keys related to department info id and values matches info about new consultants
-     */
-    private function get30RBHData($date_start, $date_stop) {
-
-        $maxIds = DB::table('rbh_30_report')
-            ->select(DB::raw('
-                    MAX(id) as id
-                '))
-            ->groupBy('user_id')
-            ->where([
-                ['created_at', '>=', $date_start],
-                ['created_at', '<=', $date_stop]
-            ])
-            ->pluck('id')->toArray();
-
-        //All most recent records from given range
-        $data = Rbh30Report::select(
-            DB::raw('CONCAT(departments.name, " ", department_type.name) as department_info_id'),
-            'first_name',
-            'last_name',
-            'success',
-            'sec_sum'
-        )
-            ->join('users', 'rbh_30_report.user_id', '=', 'users.id')
-            ->join('department_info', 'rbh_30_report.department_info_id', '=', 'department_info.id')
-            ->join('departments', 'department_info.id_dep', '=', 'departments.id')
-            ->join('department_type', 'department_info.id_dep_type', '=', 'department_type.id')
-            ->whereIn('rbh_30_report.id', $maxIds)
-            ->orderBy('department_info_id')
-            ->orderBy('success', 'DESC')
-            ->get();
-
-        $dataGroupedByDepartment = $data->groupBy('department_info_id');
-
-        return $dataGroupedByDepartment;
-    }
 }

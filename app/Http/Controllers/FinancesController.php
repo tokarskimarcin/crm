@@ -26,6 +26,7 @@ use App\Utilities\Dates\MonthFourWeeksDivision;
 use App\Utilities\DataProcessing\ConfirmationStatistics;
 use App\Utilities\Dates\MonthIntoCompanyWeeksDivision;
 use App\Utilities\Dates\MonthPerWeekDivision;
+use App\Utilities\Reports\Report_data_methods\Data30RBHreport;
 use App\Utilities\Salary\ProvisionLevels;
 use App\Work_Hour;
 use DateTime;
@@ -674,6 +675,7 @@ class FinancesController extends Controller
                 $dataTrainingGroup = RecruitmentStory::getReportTrainingData($date_start,$date_stop);
                 $dateHireCandidate = RecruitmentStory::getReportTrainingDataAndHire($date_start,$date_stop);
                 $dataTrainingGroup = $this::mapTrainingGroupInfoAndHireCandidate($dataTrainingGroup,$dateHireCandidate);
+                $RBH30Data = Data30RBHreport::get($date_start, $date_stop);
 
                 foreach($dataTrainingGroup as $recruitmentInfo) { //we are filling firstStatistcArr with parameter: recruited to stage 1.
                     if($recruitmentInfo->dep_id == $user->department_info_id) { //data from user's department
@@ -681,6 +683,10 @@ class FinancesController extends Controller
                         array_push($firstStatisticArr, $recruitedToStage1);
                     }
                 }
+
+                foreach($RBH30Data[$user->dep_name . ' ' . $user->dep_type] as )
+
+
             }
 
 
