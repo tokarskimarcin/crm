@@ -57,7 +57,14 @@ class Work_Hour extends Model
             ->join('department_type', 'department_info.id_dep_type', '=', 'department_type.id')
             ->where(function ($querry) use ($SactualMonth, $comparator){
                 if($comparator == '<' || $comparator == '<=' ){
-                    $querry->orwhere('users.status_work',1)
+                    $querry->where(function ($querry) use ($SactualMonth, $comparator){
+                        if($comparator == '<' || $comparator == '<=' ){
+                                $querry->where(function ($query) use ($SactualMonth) {
+                                $query->where('users.status_work', '=', 1)->where('users.start_work','like',$SactualMonth.'%');
+                                })
+                                ->orwhere('users.end_work','like',$SactualMonth.'%');
+                            }
+                        })
                         ->orwhere('users.end_work','like',$SactualMonth.'%');
                 }
             })
@@ -159,9 +166,7 @@ class Work_Hour extends Model
      * @return Collection
      */
     public static function mergeCollection($allUsersThisMonth,$iTimeInSeconds) : Collection{
-
-
-       return $allUsersThisMonth->map(function($item) use($iTimeInSeconds) {
+       return $allUsersThisMonth->map(function($item) use($iTimeInSeconds, $allUsersThisMonth) {
             if($item->sec_sum >= $iTimeInSeconds) { // case when user works over 30 hours
                 //Teraz chce uzyskać daty od kiedy zaczą pracować do kiedy liczyć mu wyniki.
 

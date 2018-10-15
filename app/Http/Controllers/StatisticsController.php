@@ -5711,6 +5711,68 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
         $this->sendMailByVerona('monthReportUnpaidInvoices', $data, $title,null,[2]);
     }
 
+    private function recruitmentRotationVariables($view, $date_start, $date_stop, $department){
+        $rbh = 30 * 60 * 60; //30RBH
+
+        $departments = Department_info::with('departments')->with('department_type')->get();
+        $departmentStats = Department_info::leftJoin('users','department_info.id','users.department_info_id')
+            ->select('department_info.id',
+            DB::raw('COUNT(CASE WHEN created_at BETWEEN "'.$date_start.'" AND "'.$date_stop.'" THEN 1 ELSE null END)  as new_accounts_sum' ),
+            DB::raw('COUNT(CASE WHEN end_work BETWEEN "'.$date_start.'" AND "'.$date_stop.'" and disabled_by_system = 1 THEN 1 ELSE null END)  as disabled_by_system_sum' ),
+            DB::raw('COUNT(CASE WHEN end_work BETWEEN "'.$date_start.'" AND "'.$date_stop.'" THEN 1 ELSE null END) as end_work_sum'))
+            ->groupBy('department_info.id');
+        if($department>0){
+            $departmentStats->where('department_info.id', $department);
+        }
+        $departmentStats = $departmentStats->get();
+
+
+        $departmentStats2 =  Department_info::leftJoin('users','department_info.id','users.department_info_id')
+            ->select('department_info.id', DB::raw('COUNT(CASE WHEN users.user_type_id IN (1,2) AND users.id IN ('.
+                implode(",",Work_Hour::select('id_user')->whereBetween('created_at',[$date_start,$date_stop])->distinct()->get()->pluck('id_user')->toArray())
+                .') THEN 1 ELSE NULL END) as working_users_sum'))
+            ->groupBy('department_info.id');
+        if($department>0){
+            $departmentStats2->where('department_info.id', $department);
+        }
+        $departmentStats2 = $departmentStats2->get();
+
+        $departmentStats3 =
+            Department_info::leftJoin('users','department_info.id','users.department_info_id')
+                ->select('department_info.id', DB::raw('COUNT(CASE WHEN users.id IN ('.
+                    implode(",",Work_Hour::select(DB::raw('IFNULL(SUM(TIME_TO_SEC(TIMEDIFF(accept_stop, accept_start))), 0)'),'id_user')
+                        ->whereIn('id_user',User::whereBetween('end_work',[$date_start,$date_stop])->get()->pluck('id')->toArray())
+                        ->having(DB::raw('IFNULL(SUM(TIME_TO_SEC(TIMEDIFF(accept_stop, accept_start))), 0)'), '<', $rbh)
+                        ->groupBy('id_user')
+                        ->get()->pluck('id_user')->toArray())
+                    .') THEN 1 ELSE NULL END) as users_less_30rbh_sum'))
+                ->groupBy('department_info.id');
+        if($department>0){
+            $departmentStats3->where('department_info.id', $department);
+        }
+        $departmentStats3 = $departmentStats3->get();
+
+
+        $data = $departmentStats->map(function ($item, $key) use ($departmentStats2, $departmentStats3) {
+            $working_user_sum = $departmentStats2->where('id', $item->id)->first();
+            $users_less_30rbh_sum = $departmentStats3->where('id', $item->id)->first();
+            return (object)array_merge($item->toArray(),$working_user_sum->toArray(), $users_less_30rbh_sum->toArray());
+        });
+
+        return $view->with('departments',$departments)->with('data',$data)->with('period',(object)['date_start' => $date_start, 'date_stop' => $date_stop]);
+    }
+    public function pageReportRecruitmentRotationGet(){
+        $date_start = date('Y-m-').'01';
+        $date_stop = date('Y-m-').date('t');
+        return $this->recruitmentRotationVariables(view('reportpage.recruitmentReport.ReportRecruitmentRotation'),$date_start, $date_stop, 0);
+    }
+
+    public function pageReportRecruitmentRotationPost(Request $request){
+        $date_start = $request->date_start;
+        $date_stop = $request->date_stop;
+        return $this->recruitmentRotationVariables(view('reportpage.recruitmentReport.ReportRecruitmentRotation'),$date_start, $date_stop, 0);
+    }
+
     /**
      * This is get method for week30RbhReport.
      */

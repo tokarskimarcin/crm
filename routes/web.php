@@ -650,6 +650,9 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
     Route::get('/pageReportDepartments', 'StatisticsController@pageReportDepartmentsGet');
     Route::post('/pageReportDepartments', 'StatisticsController@pageReportDepartmentsPost');
 
+    Route::get('/pageReportRecruitmentRotationGet', 'StatisticsController@pageReportRecruitmentRotationGet');
+    Route::post('/pageReportRecruitmentRotationPost', 'StatisticsController@pageReportRecruitmentRotationPost');
+
 
     Route::get('/departmentsConfirmationGet', 'Statistics\DepartmentsConfirmationStatisticsController@departmentsConfirmationGet');
     //Statistics Stop

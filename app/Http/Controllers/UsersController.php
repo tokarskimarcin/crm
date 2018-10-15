@@ -30,7 +30,8 @@ use App\MedicalPackage;
 class UsersController extends Controller
 {
     public static function getUserTypesPermissionToGivePenaltyBonus(){
-        return [3,23];
+        $userTypesPermissionToGivePenaltyBonus = PrivilageRelation::join('links','links.id','link_id')->where('link', 'view_penalty_bonus')->get()->pluck('user_type_id')->toArray();
+        return $userTypesPermissionToGivePenaltyBonus;
     }
     /**
      * Wyświetlanie widou dla telemarketera
@@ -377,6 +378,7 @@ class UsersController extends Controller
                 ->with('department_info', $department_info)
                 ->with('allActiveUser', $allActiveUser)
                 ->with('userTypesPermissionToGivePenaltyBonus', UsersController::getUserTypesPermissionToGivePenaltyBonus())
+                ->with('userIdsPermisionToGivePenaltyBonus', [])
                 ->with('succesorVisableStatus', $succesorVisableStatus)
                 ->with('type', 2);
         } else if ($flag == "true") {
