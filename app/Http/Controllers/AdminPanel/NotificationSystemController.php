@@ -8,9 +8,6 @@
 
 namespace App\Http\Controllers\AdminPanel;
 
-
-
-use App\NotificationRating;
 use App\NotificationRatingCriterion;
 use App\NotificationRatingSystem;
 use Illuminate\Http\Request;
@@ -46,13 +43,6 @@ class NotificationSystemController
         return false;
     }
 
-    public function ratingCriterionStatusChangeAjax(Request $request){
-        if($request->ajax()){
-            NotificationRatingCriterion::where('id',$request->ratingCriterionId)->update(['status'=>$request->status]);
-            return 'success';
-        }
-        return false;
-    }
     public function newRatingSystemDataAjax(Request $request){
         if($request->ajax()){
             $notificationRatingSystem = new NotificationRatingSystem();
@@ -60,6 +50,14 @@ class NotificationSystemController
             $notificationRatingSystem->rating_stop = $request->ratingStop;
             $notificationRatingSystem->description = $request->description;
             $notificationRatingSystem->save();
+            return 'success';
+        }
+        return false;
+    }
+
+    public function ratingCriterionStatusChangeAjax(Request $request){
+        if($request->ajax()){
+            NotificationRatingCriterion::where('id',$request->ratingCriterionId)->update(['status'=>$request->status]);
             return 'success';
         }
         return false;
