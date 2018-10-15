@@ -13,6 +13,7 @@ use App\HourReport;
 use App\Pbx_report_extension;
 use App\PBXDetailedCampaign;
 use App\PBXDKJTeam;
+use App\Rbh30Report;
 use App\RecruitmentStory;
 use App\ReportCampaign;
 use App\UserEmploymentStatus;
@@ -5715,5 +5716,192 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
 
         $title = 'Raport miesięczny niezapłaconych faktur';
         $this->sendMailByVerona('monthReportUnpaidInvoices', $data, $title,null,[2]);
+    }
+
+    private function recruitmentRotationVariables($view, $date_start, $date_stop, $department){
+        $rbh = 30 * 60 * 60; //30RBH
+
+        $departments = Department_info::with('departments')->with('department_type')->get();
+        $departmentStats = Department_info::leftJoin('users','department_info.id','users.department_info_id')
+            ->select('department_info.id',
+            DB::raw('COUNT(CASE WHEN created_at BETWEEN "'.$date_start.'" AND "'.$date_stop.'" THEN 1 ELSE null END)  as new_accounts_sum' ),
+            DB::raw('COUNT(CASE WHEN end_work BETWEEN "'.$date_start.'" AND "'.$date_stop.'" and disabled_by_system = 1 THEN 1 ELSE null END)  as disabled_by_system_sum' ),
+            DB::raw('COUNT(CASE WHEN end_work BETWEEN "'.$date_start.'" AND "'.$date_stop.'" THEN 1 ELSE null END) as end_work_sum'))
+            ->groupBy('department_info.id');
+        if($department>0){
+            $departmentStats->where('department_info.id', $department);
+        }
+        $departmentStats = $departmentStats->get();
+
+
+        $departmentStats2 =  Department_info::leftJoin('users','department_info.id','users.department_info_id')
+            ->select('department_info.id', DB::raw('COUNT(CASE WHEN users.user_type_id IN (1,2) AND users.id IN ('.
+                implode(",",Work_Hour::select('id_user')->whereBetween('created_at',[$date_start,$date_stop])->distinct()->get()->pluck('id_user')->toArray())
+                .') THEN 1 ELSE NULL END) as working_users_sum'))
+            ->groupBy('department_info.id');
+        if($department>0){
+            $departmentStats2->where('department_info.id', $department);
+        }
+        $departmentStats2 = $departmentStats2->get();
+
+        $departmentStats3 =
+            Department_info::leftJoin('users','department_info.id','users.department_info_id')
+                ->select('department_info.id', DB::raw('COUNT(CASE WHEN users.id IN ('.
+                    implode(",",Work_Hour::select(DB::raw('IFNULL(SUM(TIME_TO_SEC(TIMEDIFF(accept_stop, accept_start))), 0)'),'id_user')
+                        ->whereIn('id_user',User::whereBetween('end_work',[$date_start,$date_stop])->get()->pluck('id')->toArray())
+                        ->having(DB::raw('IFNULL(SUM(TIME_TO_SEC(TIMEDIFF(accept_stop, accept_start))), 0)'), '<', $rbh)
+                        ->groupBy('id_user')
+                        ->get()->pluck('id_user')->toArray())
+                    .') THEN 1 ELSE NULL END) as users_less_30rbh_sum'))
+                ->groupBy('department_info.id');
+        if($department>0){
+            $departmentStats3->where('department_info.id', $department);
+        }
+        $departmentStats3 = $departmentStats3->get();
+
+
+        $data = $departmentStats->map(function ($item, $key) use ($departmentStats2, $departmentStats3) {
+            $working_user_sum = $departmentStats2->where('id', $item->id)->first();
+            $users_less_30rbh_sum = $departmentStats3->where('id', $item->id)->first();
+            return (object)array_merge($item->toArray(),$working_user_sum->toArray(), $users_less_30rbh_sum->toArray());
+        });
+
+        return $view->with('departments',$departments)->with('data',$data)->with('period',(object)['date_start' => $date_start, 'date_stop' => $date_stop]);
+    }
+    public function pageReportRecruitmentRotationGet(){
+        $date_start = date('Y-m-').'01';
+        $date_stop = date('Y-m-').date('t');
+        return $this->recruitmentRotationVariables(view('reportpage.recruitmentReport.ReportRecruitmentRotation'),$date_start, $date_stop, 0);
+    }
+
+    public function pageReportRecruitmentRotationPost(Request $request){
+        $date_start = $request->date_start;
+        $date_stop = $request->date_stop;
+        return $this->recruitmentRotationVariables(view('reportpage.recruitmentReport.ReportRecruitmentRotation'),$date_start, $date_stop, 0);
+    }
+
+    /**
+     * This is get method for week30RbhReport.
+     */
+    public function pageWeek30RbhReport() {
+        $today = date('Y-m-d');
+        $companyWeeks = MonthFourWeeksDivision::get(date('Y'), date('m'));
+        $weekIndex = null;
+
+        foreach($companyWeeks as $weekNumber => $value) { //counting index number of company week.
+            $todayDateTime = new DateTime($today);
+            $firstDayDateTime = new DateTime($value->firstDay);
+            $lastDayDateTime = new DateTime($value->lastDay);
+
+            if($todayDateTime >= $firstDayDateTime && $todayDateTime <= $lastDayDateTime) {
+                $weekIndex = $weekNumber;
+            }
+        }
+
+        $date_start = $companyWeeks[$weekIndex]->firstDay;
+        $date_stop = $companyWeeks[$weekIndex]->lastDay;
+
+        $data = $this->get30RBHData($date_start, $date_stop);
+
+        $infoAboutDepartments = Department_info::getDepartmentsWithNames()->groupBy('id');
+
+        return view('reportpage.Week30RbhReport')->with([
+            'date_start' => $date_start,
+            'date_stop' => $date_stop,
+            'data' => $data,
+            'infoAboutDepartments' => $infoAboutDepartments
+        ]);
+    }
+
+    public function pageWeek30RbhReportPost(Request $request) {
+        $date_start = $request->date_start;
+        $date_stop = $request->date_stop;
+
+        $data = $this->get30RBHData($date_start, $date_stop);
+
+        $infoAboutDepartments = Department_info::getDepartmentsWithNames()->groupBy('id');
+
+        return view('reportpage.Week30RbhReport')->with([
+            'date_start' => $date_start,
+            'date_stop' => $date_stop,
+            'data' => $data,
+            'infoAboutDepartments' => $infoAboutDepartments
+        ]);
+    }
+
+    public function pageMonth30RbhReport() {
+        $today = date('Y-m-d');
+        $companyWeeks = MonthFourWeeksDivision::get(date('Y'), date('m'));
+        $weekIndex = null;
+
+        $date_start = $companyWeeks[0]->firstDay;
+        $date_stop = $companyWeeks[count($companyWeeks) - 1]->lastDay;
+
+        $data = $this->get30RBHData($date_start, $date_stop);
+
+        $infoAboutDepartments = Department_info::getDepartmentsWithNames()->groupBy('id');
+
+        return view('reportpage.Month30RbhReport')->with([
+            'date_start' => $date_start,
+            'date_stop' => $date_stop,
+            'data' => $data,
+            'infoAboutDepartments' => $infoAboutDepartments
+        ]);
+    }
+
+    public function pageMonth30RbhReportPost(Request $request) {
+        $date_start = $request->date_start;
+        $date_stop = $request->date_stop;
+
+        $data = $this->get30RBHData($date_start, $date_stop);
+
+        $infoAboutDepartments = Department_info::getDepartmentsWithNames()->groupBy('id');
+
+        return view('reportpage.Month30RbhReport')->with([
+            'date_start' => $date_start,
+            'date_stop' => $date_stop,
+            'data' => $data,
+            'infoAboutDepartments' => $infoAboutDepartments
+        ]);
+    }
+
+    /**
+     * @param $date_start
+     * @param $date_stop
+     * @return Collection with keys related to department info id and values matches info about new consultants
+     */
+    private function get30RBHData($date_start, $date_stop) {
+
+        $maxIds = DB::table('rbh_30_report')
+            ->select(DB::raw('
+                    MAX(id) as id
+                '))
+            ->groupBy('user_id')
+            ->where([
+                ['created_at', '>=', $date_start],
+                ['created_at', '<=', $date_stop]
+            ])
+            ->pluck('id')->toArray();
+
+        //All most recent records from given range
+        $data = Rbh30Report::select(
+            DB::raw('CONCAT(departments.name, " ", department_type.name) as department_info_id'),
+            'first_name',
+            'last_name',
+            'success',
+            'sec_sum'
+        )
+            ->join('users', 'rbh_30_report.user_id', '=', 'users.id')
+            ->join('department_info', 'rbh_30_report.department_info_id', '=', 'department_info.id')
+            ->join('departments', 'department_info.id_dep', '=', 'departments.id')
+            ->join('department_type', 'department_info.id_dep_type', '=', 'department_type.id')
+            ->whereIn('rbh_30_report.id', $maxIds)
+            ->orderBy('department_info_id')
+            ->orderBy('success', 'DESC')
+            ->get();
+
+        $dataGroupedByDepartment = $data->groupBy('department_info_id');
+
+        return $dataGroupedByDepartment;
     }
 }

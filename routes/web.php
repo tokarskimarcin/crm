@@ -650,6 +650,9 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
     Route::get('/pageReportDepartments', 'StatisticsController@pageReportDepartmentsGet');
     Route::post('/pageReportDepartments', 'StatisticsController@pageReportDepartmentsPost');
 
+    Route::get('/pageReportRecruitmentRotationGet', 'StatisticsController@pageReportRecruitmentRotationGet');
+    Route::post('/pageReportRecruitmentRotationPost', 'StatisticsController@pageReportRecruitmentRotationPost');
+
 
     Route::get('/departmentsConfirmationGet', 'Statistics\DepartmentsConfirmationStatisticsController@departmentsConfirmationGet');
     //Statistics Stop
@@ -763,6 +766,12 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
     Route::post('/pageMonthReportCoachRankingOrderable', 'StatisticsController@pageMonthReportCoachRankingOrderablePost');
 
     //Raporty Rekrutacji
+
+    Route::get('/pageWeek30RbhReport', 'StatisticsController@pageWeek30RbhReport');
+    Route::post('/pageWeek30RbhReport', 'StatisticsController@pageWeek30RbhReportPost');
+
+    Route::get('/pageMonth30RbhReport', 'StatisticsController@pageMonth30RbhReport');
+    Route::post('/pageMonth30RbhReport', 'StatisticsController@pageMonth30RbhReportPost');
 
     //Dzienny
     Route::get('/pageDayReportRecruitmentFlow', 'StatisticsController@pageDayReportRecruitmentFlow');
@@ -989,6 +998,8 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
 
 /** AUTO SCRIPT **/
 Route::get('/autoSalaryIncrease', 'AutoScriptController@autoSalaryIncrease');
+
+Route::get('/get30rbhData', 'AutoScriptController@get30rbhData');
 /** KONIEC AUTO SCRIPT */
 
 //CHARTS

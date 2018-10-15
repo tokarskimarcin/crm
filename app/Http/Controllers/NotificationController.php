@@ -192,7 +192,14 @@ class NotificationController extends Controller
             return view('errors.404');
         }
 
+
         $authUserId = Auth::user()->id;
+
+        $comment->user_id = Auth::user()->id;
+        $comment->content = $request->content;
+        $comment->notification_id = $id;
+        $comment->save();
+
         $notificationsChangesDisplayedFlags = NotificationChangesDisplayedFlags::where('notification_id',$checkNotification->id)->first();
         if(!empty($notificationsChangesDisplayedFlags)){
             if($authUserId == $checkNotification->user_id){
@@ -201,15 +208,10 @@ class NotificationController extends Controller
                 || ($authUserId != $checkNotification->user_id && $authUserId != $checkNotification->displayed_by)){
                 $notificationsChangesDisplayedFlags->comment_added_by_realizator_displayed = false;
             }else{
-                Session::flash('message_orror', "AA");
+                Session::flash('message_error', "Coś poszło nie tak");
             }
             $notificationsChangesDisplayedFlags->save();
         }
-
-        $comment->user_id = Auth::user()->id;
-        $comment->content = $request->content;
-        $comment->notification_id = $id;
-        $comment->save();
 
         Session::flash('message_ok', "Komentarz dodany pomyślnie!");
         return Redirect::back();
