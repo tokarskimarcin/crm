@@ -8,8 +8,12 @@
 
 namespace App\Http\Controllers\AdminPanel;
 
+use App\JudgeResult;
+use App\NotificationRating;
+use App\NotificationRatingComponents;
 use App\NotificationRatingCriterion;
 use App\NotificationRatingSystem;
+use App\Utilities\NumbersProcessing\Normalizer;
 use Illuminate\Http\Request;
 
 class NotificationSystemController
@@ -61,5 +65,59 @@ class NotificationSystemController
             return 'success';
         }
         return false;
+    }
+
+    public function convertJRtoNewSystem(){
+        $judgeResults = JudgeResult::all();
+        foreach($judgeResults->sortBy('id') as $judgeResult){
+            $notificationRating = new NotificationRating();
+            $notificationRating->notification_id = $judgeResult->notification_id;
+            $notificationRating->comment = $judgeResult->comment;
+            $notificationRating->created_at = $judgeResult->created_at;
+            $notificationRating->updated_at = $judgeResult->updated_at;
+            $notificationRating->save();
+
+            $average_rating = 0;
+
+            $notificationRatingComponent = new NotificationRatingComponents();
+            $notificationRatingComponent->notification_rating_id = $notificationRating->id;
+            $notificationRatingComponent->notification_rating_criterion_id = 1; // "Czy problem został naprawiony?"
+            $notificationRatingComponent->rating = $judgeResult->repaired == 1 ? 2 : 1;
+            $average_rating+= Normalizer::normalize($notificationRatingComponent->rating, [1,2]);
+            $notificationRatingComponent->save();
+
+
+            $notificationRatingComponent = new NotificationRatingComponents();
+            $notificationRatingComponent->notification_rating_id = $notificationRating->id;
+            $notificationRatingComponent->notification_rating_criterion_id = 2; // "Oceń jakość wykonania zgłoszenia:"
+            $notificationRatingComponent->rating = $judgeResult->judge_quality;
+            $average_rating+= Normalizer::normalize($notificationRatingComponent->rating, [1,6]);
+            $notificationRatingComponent->save();
+
+            $notificationRatingComponent = new NotificationRatingComponents();
+            $notificationRatingComponent->notification_rating_id = $notificationRating->id;
+            $notificationRatingComponent->notification_rating_criterion_id = 3; // "Oceń kontakt serwisantem:"
+            $notificationRatingComponent->rating = $judgeResult->judge_contact;
+            $average_rating+= Normalizer::normalize($notificationRatingComponent->rating, [1,6]);
+            $notificationRatingComponent->save();
+
+            $notificationRatingComponent = new NotificationRatingComponents();
+            $notificationRatingComponent->notification_rating_id = $notificationRating->id;
+            $notificationRatingComponent->notification_rating_criterion_id = 4; // "Oceń czas wykonywania zgłoszenia:"
+            $notificationRatingComponent->rating = $judgeResult->judge_time;
+            $average_rating+= Normalizer::normalize($notificationRatingComponent->rating, [1,6]);
+            $notificationRatingComponent->save();
+
+            $notificationRatingComponent = new NotificationRatingComponents();
+            $notificationRatingComponent->notification_rating_id = $notificationRating->id;
+            $notificationRatingComponent->notification_rating_criterion_id = 5; // "Czy technik kontaktował się po zakończeniu zgłoszenia?"
+            $notificationRatingComponent->rating = $judgeResult->response_after == 1 ? 2 : 1;
+            $average_rating+= Normalizer::normalize($notificationRatingComponent->rating, [1,2]);
+            $notificationRatingComponent->save();
+
+            $notificationRating->average_rating = round($average_rating/5,2);
+            $notificationRating->save();
+        }
+        dd("Done");
     }
 }
