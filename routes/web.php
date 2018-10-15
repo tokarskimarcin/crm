@@ -767,6 +767,12 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
 
     //Raporty Rekrutacji
 
+    Route::get('/pageWeek30RbhReport', 'StatisticsController@pageWeek30RbhReport');
+    Route::post('/pageWeek30RbhReport', 'StatisticsController@pageWeek30RbhReportPost');
+
+    Route::get('/pageMonth30RbhReport', 'StatisticsController@pageMonth30RbhReport');
+    Route::post('/pageMonth30RbhReport', 'StatisticsController@pageMonth30RbhReportPost');
+
     //Dzienny
     Route::get('/pageDayReportRecruitmentFlow', 'StatisticsController@pageDayReportRecruitmentFlow');
     Route::post('/pageDayReportRecruitmentFlow', 'StatisticsController@pageDayReportRecruitmentFlowPost');
@@ -992,6 +998,8 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
 
 /** AUTO SCRIPT **/
 Route::get('/autoSalaryIncrease', 'AutoScriptController@autoSalaryIncrease');
+
+Route::get('/get30rbhData', 'AutoScriptController@get30rbhData');
 /** KONIEC AUTO SCRIPT */
 
 //CHARTS
