@@ -668,8 +668,8 @@ class FinancesController extends Controller
         }
         else if($user->department_type_id == 2){       //szkoleniowiec telemarketing
 
-            $firstStatisticArr = [];
-            $secondStatisticsArr = [];
+            $firstStatisticArr = []; //array of recruited to stage 1 statistics
+            $secondStatisticsArr = []; //array of averages
             foreach($dividedMonth as $companyWeek) {
                 $date_start = $companyWeek->firstDay;
                 $date_stop = $companyWeek->lastDay;
@@ -685,13 +685,12 @@ class FinancesController extends Controller
                     }
                 }
 
-
-                $sumConsultants = 0;
+                $sumConsultants = 0; // number of consultants = denumerator for average
                 if(isset($RBH30Data[$user->department_info_id])) {
                     $sumConsultants = count($RBH30Data[$user->department_info_id]);
                 }
 
-                $sum_success = 0;
+                $sum_success = 0; // number of successes = numerator for average
                 if(isset($RBH30Data[$user->department_info_id])) {
                     foreach($RBH30Data[$user->department_info_id] as $rbhInfo) {
                         $sum_success += $rbhInfo->success;
@@ -702,16 +701,12 @@ class FinancesController extends Controller
                 array_push($secondStatisticsArr, $avg);
             }
 
-
-            foreach ($arrayOfDepartmentStatistics as $item){
-                $commissionAvg = Department_info::find($user->department_info_id)->commission_avg;
-                $total_week_avg_proc = round((100*$item->total_week_avg)/$commissionAvg,2);
-                $user->bonus +=  ProvisionLevels::get('instructor', $item->janky_proc,3,$total_week_avg_proc, 'avg'); // Średnia
-                $user->bonus += ProvisionLevels::get('instructor', $item->janky_proc,3,$item->total_week_goal_proc, 'ammount'); // Cel zgód
-
-                if($this->getToSave() == 1){
-                    $this->saveBonus($user->id,ProvisionLevels::get('instructor', $item->janky_proc,3,$total_week_avg_proc, 'avg'),$dividedMonth[$weekNumber]->lastDay,"Premia tygodniowa (".$dividedMonth[$weekNumber]->firstDay." -- ".$dividedMonth[$weekNumber]->lastDay.") za osiągnięcie:  Średniej na projekcie");
-                    $this->saveBonus($user->id,ProvisionLevels::get('instructor', $item->janky_proc,3,$item->total_week_goal_proc, 'ammount'),$dividedMonth[$weekNumber]->lastDay,"Premia tygodniowa (".$dividedMonth[$weekNumber]->firstDay." -- ".$dividedMonth[$weekNumber]->lastDay.") za osiągnięcie: Celu na projekcie");
+            foreach ($arrayOfDepartmentStatistics as $item) {
+                $user->bonus += ProvisionLevels::get('instructor', $item->janky_proc,3 ,$secondStatisticsArr[$weekNumber], 'avg');
+                $user->bonus += ProvisionLevels::get('instructor', $item->janky_proc,3 ,$firstStatisticArr[$weekNumber], 'employment');
+                if($this->getToSave() == 1) {
+                    $this->saveBonus($user->id,ProvisionLevels::get('instructor', $item->janky_proc,3 ,$secondStatisticsArr[$weekNumber], 'avg'),$dividedMonth[$weekNumber]->lastDay,"Premia tygodniowa (".$dividedMonth[$weekNumber]->firstDay." -- ".$dividedMonth[$weekNumber]->lastDay.") za osiągnięcie:  Średniej na projekcie");
+                    $this->saveBonus($user->id,ProvisionLevels::get('instructor', $item->janky_proc,3 ,$firstStatisticArr[$weekNumber], 'employment'),$dividedMonth[$weekNumber]->lastDay,"Premia tygodniowa (".$dividedMonth[$weekNumber]->firstDay." -- ".$dividedMonth[$weekNumber]->lastDay.") za osiągnięcie: Celu na projekcie");
                 }
                 $weekNumber++;
             }
