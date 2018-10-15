@@ -699,6 +699,12 @@ class StatisticsController extends Controller
 
         $date_stop = $date_stop === null ? $date_start: $date_stop;
 
+        $dayOfWeek = date('w', strtotime($date_stop));
+
+        //changing from sunday to saturday because in sunday there are only 0 in scores.
+        if($dayOfWeek == 0) {
+            $date_stop = date('Y-m-d', strtotime($date_stop . ' - 1 day'));
+        }
         $dkj = DB::table('pbx_dkj_team')
             ->select(DB::raw(
                 '
