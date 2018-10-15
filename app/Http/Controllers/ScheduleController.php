@@ -42,8 +42,8 @@ class ScheduleController extends Controller
     }
     public function viewScheduleGet()
     {
-        $departments = Department_info::whereIn('id_dep_type',[1,2])->get();
-        $departmentInfo = Department_info::getDepartmentsWithNames([1,2]);
+        $departments = Department_info::whereIn('id_dep_type',[1,2, 6])->get();
+        $departmentInfo = Department_info::getDepartmentsWithNames([1,2, 6]);
         $multipleDepartments = MultipleDepartments::select('department_info_id')->where('user_id', '=', Auth::user()->id)->pluck('department_info_id')->toArray();
         $excludedUserTypes = [1,2];
         $extendedUserTypes = UserTypes::select('id')->whereNotIn('id', $excludedUserTypes)->pluck('id')->toArray();
@@ -74,8 +74,8 @@ class ScheduleController extends Controller
     }
     public function viewSchedulePost(Request $request)
     {
-        $allDepartments = Department_info::whereIn('id_dep_type',[1,2])->get();
-        $departmentInfo = Department_info::getDepartmentsWithNames([1,2]);
+        $allDepartments = Department_info::whereIn('id_dep_type',[1,2, 6])->get();
+        $departmentInfo = Department_info::getDepartmentsWithNames([1,2, 6]);
         $multipleDepartments = MultipleDepartments::select('department_info_id')->where('user_id', '=', Auth::user()->id)->pluck('department_info_id')->toArray();
         $excludedUserTypes = [1,2];
         $extendedUserTypes = UserTypes::select('id')->whereNotIn('id', $excludedUserTypes)->pluck('id')->toArray();
