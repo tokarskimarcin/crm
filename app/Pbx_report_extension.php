@@ -34,8 +34,6 @@ class Pbx_report_extension extends Model
                     ->where('report_date','<=',$item['dateStop']);
                     $item['avg']  = $item['secondStop'] != 0 ? round($item['success']/($item['secondStop']/3600),2) : 0;
                 }else{
-                    if(!isset($item['success']))
-                        dd($item);
                     $item['avg']  = $item['sec_sum'] != 0 ? round($item['success']/($item['sec_sum']/3600),2) : 0;
                 }
                 $item['jankyProc']          = $userInfo->sum('all_checked_talks') != 0 ? round($userInfo->sum('all_bad_talks')/($userInfo->sum('all_checked_talks')) * 100,2) : 0;
