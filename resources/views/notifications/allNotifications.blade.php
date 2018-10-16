@@ -28,7 +28,7 @@
         <br />
         <div class="col-md-12">
           <div class="table-responsive" id="div_new_notifications">
-              <table id="new_notifications" class="table table-striped table-bordered thead-inverse" cellspacing="0" width="100%" >
+              <table id="new_notifications" class="table compact table-striped table-bordered thead-inverse" cellspacing="0" width="100%" >
                 <thead>
                   <tr>
                       <td>ID zgłoszenia</td>
@@ -45,7 +45,7 @@
               </table>
           </div>
           <div class="table-responsive" style="display: none" id="div_in_progress">
-              <table id="in_progress" class="table table-striped table-bordered thead-inverse" cellspacing="0" width="100%" >
+              <table id="in_progress" class="table compact table-striped table-bordered thead-inverse" cellspacing="0" width="100%" >
                 <thead>
                   <tr>
                       <td>ID zgłoszenia</td>
@@ -64,7 +64,7 @@
               </table>
           </div>
           <div class="table-responsive" style="display: none" id="div_finished">
-              <table id="finished" class="table table-striped table-bordered thead-inverse" cellspacing="0" width="100%" >
+              <table id="finished" class="table compact table-striped table-bordered thead-inverse" cellspacing="0" width="100%" >
                 <thead>
                   <tr>
                       <td>ID zgłoszenia</td>
@@ -94,7 +94,7 @@
 <script src="{{ asset('/js/buttons.bootstrap.min.js')}}"></script>
 <script src="{{ asset('/js/dataTables.select.min.js')}}"></script>
 <script>
-
+let authUser = <?php echo json_encode(Auth::user()->toArray())?>;
 
 $('.menu_item').on('click', function(){
     var id = this.id;
@@ -135,6 +135,9 @@ table = $('#new_notifications').DataTable({
         "url": "//cdn.datatables.net/plug-ins/1.10.16/i18n/Polish.json"
     },
     "drawCallback": function (settings) {
+        $('.removeNotification').click(function (e) {
+            removeNotificationButtonHandler(e);
+        });
     },
     "ajax": {
         'url': "{{ route('api.datatableShowNewNotifications') }}",
@@ -155,14 +158,18 @@ table = $('#new_notifications').DataTable({
               return data.first_name + " " + data.last_name;
         }, "name": "last_name"},
         {"data": function (data, type, dataToSet) {
-            return "<a class='btn btn-default' href={{URL::to('/show_notification/')}}/" + data.notification_id + ">Pokaż</a>";
+            let div = $('<div>').append("<a class='btn btn-default btn-block' href={{URL::to('/show_notification/')}}/" + data.notification_id + ">Pokaż</a>");
+            if(authUser.user_type_id === 3){
+                div.append($('<button>').addClass('removeNotification btn btn-danger btn-block').attr('data-notification-id',data.notification_id).append('Usuń'));
+            }
+            return div.prop('outerHTML');
         }, "name": "id_user", orderable: false},
 
     ],
 
 });
 
-table = $('#in_progress').DataTable({
+table2 = $('#in_progress').DataTable({
     "autoWidth": false,
     "processing": true,
     "serverSide": true,
@@ -170,6 +177,9 @@ table = $('#in_progress').DataTable({
         "url": "//cdn.datatables.net/plug-ins/1.10.16/i18n/Polish.json"
     },
     "drawCallback": function (settings) {
+        $('.removeNotificationInProgress').click(function (e) {
+            removeNotificationButtonHandler(e);
+        });
     },
     "ajax": {
         'url': "{{ route('api.datatableShowInProgressNotifications') }}",
@@ -192,14 +202,18 @@ table = $('#in_progress').DataTable({
         {"data": 'data_start'},
         {"data": 'displayedBy'},
         {"data": function (data, type, dataToSet) {
-            return "<a class='btn btn-default' href={{URL::to('/show_notification/')}}/" + data.notification_id + ">Pokaż</a>";
+                let div = $('<div>').append("<a class='btn btn-default btn-block' href={{URL::to('/show_notification/')}}/" + data.notification_id + ">Pokaż</a>");
+                if(authUser.user_type_id === 3){
+                    div.append($('<button>').addClass('removeNotificationInProgress btn btn-danger btn-block').attr('data-notification-id',data.notification_id).append('Usuń'));
+                }
+                return div.prop('outerHTML');
         }, "name": "id_user", orderable: false},
 
     ],
 
 });
 
-table = $('#finished').DataTable({
+table3 = $('#finished').DataTable({
     "autoWidth": false,
     "processing": true,
     "serverSide": true,
@@ -207,6 +221,9 @@ table = $('#finished').DataTable({
         "url": "//cdn.datatables.net/plug-ins/1.10.16/i18n/Polish.json"
     },
     "drawCallback": function (settings) {
+        $('.removeNotificationExecuted').click(function (e) {
+            removeNotificationButtonHandler(e);
+        });
     },
     "ajax": {
         'url': "{{ route('api.datatableShowFinishedNotifications') }}",
@@ -229,11 +246,67 @@ table = $('#finished').DataTable({
         {"data": 'data_stop'},
         {"data": 'displayedBy'},
         {"data": function (data, type, dataToSet) {
-            return "<a class='btn btn-default' href={{URL::to('/show_notification/')}}/" + data.notification_id + ">Pokaż</a>";
+                let div = $('<div>').append("<a class='btn btn-default btn-block' href={{URL::to('/show_notification/')}}/" + data.notification_id + ">Pokaż</a>");
+                if(authUser.user_type_id === 3){
+                    div.append($('<button>').addClass('removeNotificationExecuted btn btn-danger btn-block').attr('data-notification-id',data.notification_id).append('Usuń'));
+                }
+                return div.prop('outerHTML');
         }, "name": "id_user", orderable: false},
 
     ],
 
 });
+
+function removeNotificationButtonHandler(e) {
+    let notification_id = $(e.target).data('notification-id');
+    swal({
+        title: 'Jesteś pewien?',
+        text: "Spowoduje to usunięcie zgłoszenia!",
+        type: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Tak, usuń zgłoszenie'
+    }).then((result) => {
+        if(result.value)
+        {
+            $.ajax({
+                type: "POST",
+                url: '{{ route('api.delete_notification') }}',
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                data: {
+                    'notification_id': notification_id
+                },
+                success: function (response) {
+                    if (response == 1) {
+                        swal(
+                            'Zgłoszenie zostało usunięte',
+                            'Zgłoszenie zostało usunięte',
+                            'success'
+                        );
+                        table.ajax.reload();
+                        table2.ajax.reload();
+                        table3.ajax.reload();
+                    }
+                    else if(response == 0){
+                        swal(
+                            'Zgłoszenia nie można usunąć, ponieważ jest już w trakcie realizacji oraz jesteś osobą zgłaszającą.',
+                            'Zgłoszenia nie można usunąć.',
+                            'error'
+                        );
+                    }else{
+                        swal(
+                            'Problem skontaktuj się z admininstratorem.',
+                            'Problem skontaktuj się z admininstratorem.',
+                            'error'
+                        );
+                    }
+                }
+            });
+        }
+    });
+}
 </script>
 @endsection

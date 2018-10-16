@@ -1,6 +1,7 @@
 <style>
     .OneToSix:hover div{
         border-color: rgba(0, 0, 0, 0.51);
+        cursor: pointer;
     }
 </style>
 

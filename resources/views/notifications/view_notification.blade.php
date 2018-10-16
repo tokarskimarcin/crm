@@ -70,7 +70,7 @@
                         @if($notification->status == 3)
 
                             <div class="col-md-4">
-                                <form method="get" action="{{URL::to('/judge_notification/'.$notification->id)}}">
+                                <form method="get" action="{{URL::to('/rateNotification/'.$notification->id)}}">
                                     <button class="btn btn-default btn-block">Oceń</button>
                                 </form>
                             </div>

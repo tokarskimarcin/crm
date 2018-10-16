@@ -329,7 +329,7 @@ function createNotificationRatingModalBody(response){
             tr.append($('<td>').append(component.rating))
         } else if (notificationRatingCriterion.rating_system.id === 3) {
             tr.append($('<td>').append(component.rating === 1 ? 'NIE' : component.rating === 2 ? 'ŚREDNIO' : 'TAK')
-                .css({'background-color': component.rating === 1 ? 'rgba(255,0,0,0.75)' : component.rating === 2 ? 'rgba(255,255,0,0.75)' : 'rgba(0,175,0,0.75)'}))
+                .css({'background-color': component.rating === 1 ? 'rgba(255,0,0,0.75)' : component.rating === 2 ? 'rgba(0,0,255,0.75)' : 'rgba(0,175,0,0.75)'}))
         } else {
         }
         tbody1.append(tr);

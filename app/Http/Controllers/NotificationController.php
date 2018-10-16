@@ -243,11 +243,11 @@ class NotificationController extends Controller
 
     public function myNotifications() {
         $notifications = Notifications::where('displayed_by', '=', Auth::user()->id)->count();
-        $unratedNotifications = Notifications::select('status','jr.id')
-            ->leftJoin('judge_results as jr','jr.notification_id','=','notifications.id')
+        $unratedNotifications = Notifications::select('status','nr.id')
+            ->leftJoin('notification_rating as nr','nr.notification_id','=','notifications.id')
             ->where('notifications.user_id','=',Auth::user()->id)
             ->where('status','=',3)
-            ->whereNull('jr.id')
+            ->whereNull('nr.id')
             ->count();
         $notRepairedNotifications = Notifications::where('status','=',2)->where('displayed_by',Auth::user()->id)->count();
         return view('admin.myNotifications')
@@ -525,15 +525,25 @@ class NotificationController extends Controller
 
             if($notification->user_id == Auth::user()->id)
             {
-                if($notification->status == 1)
+                if($notification->status == 1 || Auth::user()->user_type_id === 3)
                 {
                     $notification->status = 0;
+                    $notification->updated_at = date('Y-m-d H:i:s');
+                    $notification->remove_date = date('Y-m-d H:i:s');
                     $notification->save();
                     new ActivityRecorder(array_merge(['T'=>'Usunięcie zgłoszonego problemu'], $notification->toArray()),35,3);
                     return 1;
                 }else
                     return 0;
             }else{
+                if(Auth::user()->user_type_id === 3){
+                    $notification->status = 0;
+                    $notification->updated_at = date('Y-m-d H:i:s');
+                    $notification->remove_date = date('Y-m-d H:i:s');
+                    $notification->save();
+                    new ActivityRecorder(array_merge(['T'=>'Usunięcie zgłoszonego problemu'], $notification->toArray()),35,3);
+                    return 1;
+                }
                 return 2;
             }
         }
