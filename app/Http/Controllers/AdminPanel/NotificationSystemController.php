@@ -96,7 +96,7 @@ class NotificationSystemController
 
             $notificationRatingComponent = new NotificationRatingComponents();
             $notificationRatingComponent->notification_rating_id = $notificationRating->id;
-            $notificationRatingComponent->notification_rating_criterion_id = 3; // "Oceń kontakt serwisantem:"
+            $notificationRatingComponent->notification_rating_criterion_id = 3; // "Oceń kontakt z serwisantem:"
             $notificationRatingComponent->rating = $judgeResult->judge_contact;
             $average_rating+= Normalizer::normalize($notificationRatingComponent->rating, [1,6]);
             $notificationRatingComponent->save();

@@ -219,6 +219,7 @@ Route::POST('/recruiterTrainingsData', 'RecruitmentAttemptController@recruiterTr
 Route::POST('/datatableTrainingData', 'RecruitmentStoryController@datatableTrainingData')->name('api.datatableTrainingData');
 
 Route::POST('/delete_notification', 'NotificationController@delete_notification')->name('api.delete_notification');
+Route::Post('/rateNotificationAjax', 'NotificationController@rateNotificationAjax')->name('api.rateNotificationAjax');
 
 Route::POST('/getMedicalPackagesAdminData', 'AdminController@getMedicalPackagesAdminData')->name('api.getMedicalPackagesAdminData');
 Route::POST('/getMedicalPackageData', 'AdminController@getMedicalPackageData')->name('api.getMedicalPackageData');
@@ -636,8 +637,8 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
 
     Route::get('/my_notifications', 'NotificationController@myNotifications');
 
-    Route::get('/judge_notification/{id}', 'NotificationController@judgeNotificationGet');
-    Route::Post('/judge_notification', 'NotificationController@judgeNotificationPost');
+    Route::get('/judge_notification/{id}', 'NotificationController@rateNotificationGet');
+    Route::get('/rateNotificationPost', 'NotificationController@rateNotificationPost');
 
     Route::get('/it_cadre', 'NotificationController@ITCadreGet');
 

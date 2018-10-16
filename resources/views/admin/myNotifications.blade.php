@@ -9,9 +9,9 @@
     </div>
 </div>
 
-@if(isset($message_ok))
+@if(Session::has('message_ok'))
     <div class="alert alert-success">
-        {{$message_ok}}
+        {{Session::get('message_ok')}}
     </div>
 @endif
 <div class="panel panel-info">
