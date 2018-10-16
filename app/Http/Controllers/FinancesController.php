@@ -621,12 +621,12 @@ class FinancesController extends Controller
 
     }
 
-    private function provisionSystemForInstructors(&$user, $dividedMonth,$arrayOfDepartmentStatistics = null){
-//        dd('1');
+    private function provisionSystemForInstructors(&$user, $dividedMonth, $dep_info,$deps2, $arrayOfDepartmentStatistics = null){
         $weekNumber = 0;
         $user->provision = 0;
         
             if($user->department_type_id == 1){             //szkoleniowiec potwierdzeń
+//                dd('1');
                 $clientRouteInfo = ClientRouteInfo::select(
                     DB::raw('concat(users.first_name," ",users.last_name) as confirmingUserName'),
                     DB::raw('concat(trainer.first_name," ",trainer.last_name) as confirmingUserTrainerName'),
@@ -644,7 +644,7 @@ class FinancesController extends Controller
                     ->join('users as trainer','users.coach_id','=','trainer.id')
                     ->where('confirmDate', '>=', $dividedMonth[0]->firstDay)
                     ->where('confirmDate', '<=', $dividedMonth[count($dividedMonth)-1]->lastDay)
-                    ->where('users.department_info_id', $user->department_info_id)
+                    ->where('users.department_info_id', $dep_info)
                     ->where('di.id_dep_type',1)
                     ->whereNotNull('confirmingUser')
                     ->whereNotNull('users.coach_id')->get(); //client route info poszczególnych konsultantów w calym oddziale w miesiacu
@@ -666,26 +666,26 @@ class FinancesController extends Controller
                 foreach($dividedMonth as $companyWeek) {
                     $date_start = $companyWeek->firstDay;
                     $date_stop = $companyWeek->lastDay;
-                    $dataTrainingGroup = RecruitmentStory::getReportTrainingData($date_start,$date_stop);
-                    $dateHireCandidate = RecruitmentStory::getReportTrainingDataAndHire($date_start,$date_stop);
+                    $dataTrainingGroup = RecruitmentStory::getReportTrainingDataShort($date_start,$date_stop, $deps2);
+                    $dateHireCandidate = RecruitmentStory::getReportTrainingDataAndHireShort($date_start,$date_stop);
                     $dataTrainingGroup = $this::mapTrainingGroupInfoAndHireCandidate($dataTrainingGroup,$dateHireCandidate);
                     $RBH30Data = Data30RBHreport::get($date_start, $date_stop, 1);
 
                     foreach($dataTrainingGroup as $recruitmentInfo) { //we are filling firstStatistcArr with parameter: recruited to stage 1.
-                        if($recruitmentInfo->dep_id == $user->department_info_id) { //data from user's department
+                        if($recruitmentInfo->dep_id == $dep_info) { //data from user's department
                             $recruitedToStage1 = $recruitmentInfo->sum_choise_stageOne > 0 ? round(100 * $recruitmentInfo->countHireUserFromFirstTrainingGroup / $recruitmentInfo->sum_choise_stageOne, 2) : 0;
                             array_push($firstStatisticArr, $recruitedToStage1);
                         }
                     }
 
                     $sumConsultants = 0; // number of consultants = denumerator for average
-                    if(isset($RBH30Data[$user->department_info_id])) {
-                        $sumConsultants = count($RBH30Data[$user->department_info_id]);
+                    if(isset($RBH30Data[$dep_info])) {
+                        $sumConsultants = count($RBH30Data[$dep_info]);
                     }
 
                     $sum_success = 0; // number of successes = numerator for average
-                    if(isset($RBH30Data[$user->department_info_id])) {
-                        foreach($RBH30Data[$user->department_info_id] as $rbhInfo) {
+                    if(isset($RBH30Data[$dep_info])) {
+                        foreach($RBH30Data[$dep_info] as $rbhInfo) {
                             $sum_success += $rbhInfo->success;
                         }
                     }
@@ -695,11 +695,19 @@ class FinancesController extends Controller
                 }
 
                 foreach ($arrayOfDepartmentStatistics as $item) {
-                    $user->bonus += ProvisionLevels::get('instructor', $item->janky_proc,3 ,$secondStatisticsArr[$weekNumber], 'avg');
-                    $user->bonus += ProvisionLevels::get('instructor', $item->janky_proc,3 ,$firstStatisticArr[$weekNumber], 'employment');
+                    if(isset($secondStatisticsArr[$weekNumber])) {
+                        $user->bonus += ProvisionLevels::get('instructor', $item->janky_proc,3 ,$secondStatisticsArr[$weekNumber], 'avg');
+                    }
+                    if(isset($firstStatisticArr[$weekNumber])) {
+                        $user->bonus += ProvisionLevels::get('instructor', $item->janky_proc,3 ,$firstStatisticArr[$weekNumber], 'employment');
+                    }
                     if($this->getToSave() == 1) {
-                        $this->saveBonus($user->id,ProvisionLevels::get('instructor', $item->janky_proc,3 ,$secondStatisticsArr[$weekNumber], 'avg'),$dividedMonth[$weekNumber]->lastDay,"Premia tygodniowa (".$dividedMonth[$weekNumber]->firstDay." -- ".$dividedMonth[$weekNumber]->lastDay.") za osiągnięcie:  Średniej na projekcie");
-                        $this->saveBonus($user->id,ProvisionLevels::get('instructor', $item->janky_proc,3 ,$firstStatisticArr[$weekNumber], 'employment'),$dividedMonth[$weekNumber]->lastDay,"Premia tygodniowa (".$dividedMonth[$weekNumber]->firstDay." -- ".$dividedMonth[$weekNumber]->lastDay.") za osiągnięcie: Celu na projekcie");
+                        if(isset($secondStatisticsArr[$weekNumber])) {
+                            $this->saveBonus($user->id,ProvisionLevels::get('instructor', $item->janky_proc,3 ,$secondStatisticsArr[$weekNumber], 'avg'),$dividedMonth[$weekNumber]->lastDay,"Premia tygodniowa (".$dividedMonth[$weekNumber]->firstDay." -- ".$dividedMonth[$weekNumber]->lastDay.") za osiągnięcie:  Średniej na projekcie");
+                        }
+                        if(isset($firstStatisticArr[$weekNumber])) {
+                            $this->saveBonus($user->id,ProvisionLevels::get('instructor', $item->janky_proc,3 ,$firstStatisticArr[$weekNumber], 'employment'),$dividedMonth[$weekNumber]->lastDay,"Premia tygodniowa (".$dividedMonth[$weekNumber]->firstDay." -- ".$dividedMonth[$weekNumber]->lastDay.") za osiągnięcie: Celu na projekcie");
+                        }
                     }
                     $weekNumber++;
                 }
@@ -937,6 +945,8 @@ class FinancesController extends Controller
 
     public function viewPaymentCadrePost(Request $request)
     {
+        ini_set('max_execution_time', '500');
+//        dd($request);
         $this->setToSave($request->toSave);
         //Zapisanie infromacji o zaakceptowaniu wypłat
         $savePayment = 1;
@@ -1014,6 +1024,7 @@ class FinancesController extends Controller
         $allDepartments = Department_info::all();
         $arrayOfDepartmentStatistics = [];
         $dividedMonthForDepartmentStatistics = MonthFourWeeksDivision::get($year, $month);
+        $deps2 = Department_info::where('commission_avg','!=',0)->get();
 
         if($savePayment == 1){
             foreach ($allDepartments as $item){
@@ -1021,29 +1032,25 @@ class FinancesController extends Controller
             }
             foreach($salary as $user) {
                 if($user->user_type_id == 4) {
-//                    $this->provisionSystemForTrainers($user,  $dividedMonthForDepartmentStatistics ,$arrayOfDepartmentStatistics[$user->department_info_id]);
+                    $this->provisionSystemForTrainers($user,  $dividedMonthForDepartmentStatistics ,$arrayOfDepartmentStatistics[$user->department_info_id]);
                 }
                 else if($user->user_type_id == 5) {
-//                    $this->provisionSystemForHR($user, $month, $year,$arrayOfDepartmentStatistics[$user->department_info_id]);
+                    $this->provisionSystemForHR($user, $month, $year,$arrayOfDepartmentStatistics[$user->department_info_id]);
                 }
-                else if($user->user_type_id == 19 || $user->user_type_id == 21) {
-                    if($user->user_type_id == 19) {
-                        $this->provisionSystemForInstructors($user,  $dividedMonthForDepartmentStatistics,$arrayOfDepartmentStatistics[$user->department_info_id]);
+                else if($user->user_type_id == 19) {
+                        $this->provisionSystemForInstructors($user,  $dividedMonthForDepartmentStatistics, $user->department_info_id,$deps2,$arrayOfDepartmentStatistics[$user->department_info_id]);
+                }
+                else if($user->user_type_id == 21) {
+                    $instructorDepartments = Department_info::where('instructor_regional_id', '=', $user->id)->pluck('id')->toArray(); //array of department_info.id of instructor's departments
+                    foreach($instructorDepartments as $singleDepartment) {
+                        $this->provisionSystemForInstructors($user,  $dividedMonthForDepartmentStatistics,$singleDepartment,$deps2, $arrayOfDepartmentStatistics[$singleDepartment]);
                     }
-                    else {
-                        $instructorDepartments = Department_info::where('instructor_regional_id', '=', $user->id)->pluck('id')->toArray(); //array of department_info.id of instructor's departments
-                        foreach($instructorDepartments as $singleDepartment) {
-                            $this->provisionSystemForInstructors($user,  $dividedMonthForDepartmentStatistics,$arrayOfDepartmentStatistics[$singleDepartment]);
-                        }
-
-                    }
-
                 }
                 else if($user->user_type_id == 8 || $user->user_type_id == 22) { //koordynator + menager of coordinators
-//                    $this->provisionSystemForCoordinators($user, $month, $year);
+                    $this->provisionSystemForCoordinators($user, $month, $year);
                 }
                 else if($user->user_type_id == 17 ||  $user->user_type_id == 7 || $user->user_type_id == 14) { // Kierownik + Kierownik Regionaly + kierownik HR + Kierownik Szkoleniowcow
-//                    $this->provisionSystemForManagers($user, $dividedMonthForDepartmentStatistics, $arrayOfDepartmentStatistics);
+                    $this->provisionSystemForManagers($user, $dividedMonthForDepartmentStatistics, $arrayOfDepartmentStatistics);
                 }
             }
         }

@@ -1094,4 +1094,6 @@ Route::get('/setCityApprovalPart6','AutoScriptController@setCityApprovalPart6');
 
 //Route::get('/refreshPbxReportExtension', 'AutoScriptController@pbx_update');
 
-Route::get('/testZybura', 'StatisticsController@test');
+Route::get('/t', 'TestController@t');
+
+Route::post('/savePaymentsAjax', 'FinancesController@viewPaymentCadrePOST');
