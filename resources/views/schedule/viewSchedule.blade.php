@@ -73,7 +73,7 @@
                                                 </select>
                                                 <h1 style ="font-family: 'bebas_neueregular',sans-serif; margin-top:0px;text-shadow: 2px 2px 2px rgba(150, 150, 150, 0.8); font-size:25px;">Wybierz oddział:</h1>
                                                 <select name="department" id="department" class="form-control">
-                                                    <option value="0">Wybierz</option>
+                                                    <option value="0">Twój oddział</option>
                                                     <optgroup label="Departamenty">
                                                     @foreach($department_info as $dep_info)
                                                         @if($dep_info->id)
@@ -81,6 +81,7 @@
                                                         @endif
                                                     </optgroup>
                                                     @endforeach
+                                                    @isset($directorsHR)
                                                     <optgroup label="Kierownik Regionalny HR">
                                                         @foreach($directorsHR as $director)
                                                             @php
@@ -90,6 +91,8 @@
                                                                     value="regionalDirectorHr_{{ $director->id }}">{{ $director->last_name . ' ' . $director->first_name }}</option>
                                                         @endforeach
                                                     </optgroup>
+                                                    @endisset
+                                                    @isset($regionalManagersInstructors)
                                                     <optgroup label="Szkoleniowiec Regionalny">
                                                         @foreach($regionalManagersInstructors as $regionalManagersInstructor)
                                                             @php
@@ -99,6 +102,8 @@
                                                                     value="regionalDirectorInstructor_{{ $regionalManagersInstructor->id }}">{{ $regionalManagersInstructor->last_name . ' ' . $regionalManagersInstructor->first_name }}</option data-toggle="tooltip" data-placement="right" title="@foreach($allDepartments as $dep){{$dep->departments->name}} {{$dep->department_type->name}}, @endforeach">
                                                         @endforeach
                                                     </optgroup>
+                                                    @endisset
+                                                    @isset($regionalManagers)
                                                     <optgroup label="Kierownik Regionalny">
                                                         @foreach($regionalManagers as $director)
                                                             @php
@@ -108,6 +113,8 @@
                                                                     value="regionalMenager_{{ $director->id }}">{{ $director->last_name . ' ' . $director->first_name }}</option>
                                                         @endforeach
                                                     </optgroup>
+                                                    @endisset
+                                                    @isset($directors)
                                                     <optgroup label="Dyrektorzy">
                                                         @foreach($directors as $director)
                                                             @php
@@ -121,6 +128,7 @@
                                                                 "></span></option>
                                                         @endforeach
                                                     </optgroup>
+                                                    @endisset
 
                                                 </select>
                                                 <input id="year" type = "hidden" name = "year" value = "" />
