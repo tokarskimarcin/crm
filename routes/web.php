@@ -767,11 +767,11 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
 
     //Raporty Rekrutacji
 
-    Route::get('/pageWeek30RbhReport', 'StatisticsController@pageWeek30RbhReport');
-    Route::post('/pageWeek30RbhReport', 'StatisticsController@pageWeek30RbhReportPost');
+    Route::get('/pageWeek30RbhReport', 'StatisticsRBHController@pageWeek30RbhReport');
+    Route::post('/pageWeek30RbhReport', 'StatisticsRBHController@pageWeek30RbhReportPost');
 
-    Route::get('/pageMonth30RbhReport', 'StatisticsController@pageMonth30RbhReport');
-    Route::post('/pageMonth30RbhReport', 'StatisticsController@pageMonth30RbhReportPost');
+    Route::get('/pageMonth30RbhReport', 'StatisticsRBHController@pageMonth30RbhReport');
+    Route::post('/pageMonth30RbhReport', 'StatisticsRBHController@pageMonth30RbhReportPost');
 
     //Dzienny
     Route::get('/pageDayReportRecruitmentFlow', 'StatisticsController@pageDayReportRecruitmentFlow');
@@ -1093,5 +1093,3 @@ Route::get('/setCityApprovalPart5','AutoScriptController@setCityApprovalPart5');
 Route::get('/setCityApprovalPart6','AutoScriptController@setCityApprovalPart6');
 
 //Route::get('/refreshPbxReportExtension', 'AutoScriptController@pbx_update');
-
-Route::get('/testZybura', 'StatisticsController@test');
