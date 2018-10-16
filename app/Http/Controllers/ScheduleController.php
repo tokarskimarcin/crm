@@ -82,6 +82,10 @@ class ScheduleController extends Controller
 
         $authUserType = Auth::user()->user_type_id;
 
+        $directors = null;
+        $directorsHR = null;
+        $regionalManagers = null;
+        $regionalManagersInstructors = null;
         //check whether user has permission to see extended department list in view
         if(in_array($authUserType, $extendedUserTypes)) {
             $directorsIds = Department_info::select('director_id')->where('director_id', '!=', null)->where('id_dep_type', '=', 2)->distinct()->get();
