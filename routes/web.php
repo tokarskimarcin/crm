@@ -55,7 +55,7 @@ Route::POST('/datatableDkjShowEmployee', 'DkjController@datatableDkjShowEmployee
 Route::POST('/datatableCadreHR', 'UsersController@datatableCadreHR')->name('api.datatableCadreHR');
 Route::POST('/datatableMyNotifications', 'NotificationController@datatableMyNotifications')->name('api.datatableMyNotifications');
 Route::POST('/datatableMyHandledNotifications', 'NotificationController@datatableMyHandledNotifications')->name('api.datatableMyHandledNotifications');
-Route::POST('/notificationJudgeResult','NotificationController@notificationJudgeResult')->name('api.notificationJudgeResult');
+Route::POST('/notificationRating','NotificationController@notificationRating')->name('api.notificationRating');
 /* Equipment start */
 Route::POST('/datatableShowLaptop', 'EquipmentsController@datatableShowLaptop')->name('api.datatableShowLaptop');
 Route::POST('/datatableShowTablet', 'EquipmentsController@datatableShowTablet')->name('api.datatableShowTablet');
@@ -637,7 +637,7 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
 
     Route::get('/my_notifications', 'NotificationController@myNotifications');
 
-    Route::get('/judge_notification/{id}', 'NotificationController@rateNotificationGet');
+    Route::get('/rateNotification/{id}', 'NotificationController@rateNotificationGet');
     Route::get('/rateNotificationPost', 'NotificationController@rateNotificationPost');
 
     Route::get('/it_cadre', 'NotificationController@ITCadreGet');

@@ -106,7 +106,7 @@
         @if($notificationRating == null)
             <div class="row">
                 <div class="col-md-12">
-                    <label>
+                    <label style="width: 100%">
                         Komentarz (opcjonalnie):
                     <textarea id="comment" style="width: 100%; min-height: 5em; max-height: 100%; resize: vertical" ></textarea>
                     </label>
@@ -129,7 +129,7 @@
         @else
         <div class="row">
             <div class="col-md-12">
-                <label>
+                <label style="width: 100%">
                     Komentarz:
                 <textarea id="comment" style="width: 100%; min-height: 5em; max-height: 100%; resize: vertical" readonly>{{$notificationRating->comment}}</textarea>
                 </label>

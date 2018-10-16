@@ -365,10 +365,10 @@ class NotificationController extends Controller
                 notifications.*,
                 users.first_name as first_name,
                 users.last_name as last_name,
-                jr.id as judge_result
+                nr.id as notification_rating
             '))
             ->leftJoin('users', 'users.id', '=', 'notifications.displayed_by')
-            ->leftJoin('judge_results as jr','jr.notification_id','=','notifications.id')
+            ->leftJoin('notification_rating as nr','nr.notification_id','=','notifications.id')
             ->where('status','!=',0)
             ->where('notifications.user_id', '=', Auth::user()->id)
             ->get();
@@ -381,12 +381,12 @@ class NotificationController extends Controller
             ->select(DB::raw('
                 notifications.*,
                 concat(users.first_name," ",users.last_name ) as user_name,
-                jr.id as jr_id,
-                jr.comment,
-                jr.judge_sum
+                nr.id as nr_id,
+                nr.comment,
+                nr.average_rating
             '))
             ->leftJoin('users', 'users.id', '=', 'notifications.user_id')
-            ->leftJoin('judge_results as jr', 'jr.notification_id', '=', 'notifications.id')
+            ->leftJoin('notification_rating as nr', 'nr.notification_id', '=', 'notifications.id')
             ->where('status','!=',0)
             ->where('displayed_by', '=', Auth::user()->id)
             ->get();
@@ -539,9 +539,17 @@ class NotificationController extends Controller
         }
     }
 
-    public function notificationJudgeResult(Request $request){
+    public function notificationRating(Request $request){
         if($request->ajax()) {
-            return ['judgeResult' => JudgeResult::find($request->judgeResultId)];
+            $notificationRating = NotificationRating::find($request->notificationRatingId);
+            $notificationRatingComponents = NotificationRatingComponents::where('notification_rating_id',$request->notificationRatingId)->get();
+            $notificationRatingCriterion = NotificationRatingCriterion::whereIn('id',$notificationRatingComponents->pluck('notification_rating_criterion_id')->toArray())
+                ->with('rating_system')->get();
+            return [
+                'notificationRating' => $notificationRating,
+                'notificationRatingComponents' => $notificationRatingComponents,
+                'notificationRatingCriterion' => $notificationRatingCriterion
+            ];
         }
     }
 }
