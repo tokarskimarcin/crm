@@ -424,6 +424,7 @@ class WorkHoursController extends Controller
     }
     public function viewHourGetCadre()
     {
+        $userTypesPermissionToEditSuccess = WorkHoursController::getUserTypesPermissionToEditSuccess();
         $users = User::wherenotin('user_type_id', [1,2,9])
             ->where('status_work',1)
             ->orderBy('last_name')
@@ -448,7 +449,8 @@ class WorkHoursController extends Controller
         $merge_array = $merge_array->merge($users_fired_current_month);
 
         return view('workhourscadre.viewHourCadre')
-            ->with('users',$merge_array->sortBy('last_name'));
+            ->with('users',$merge_array->sortBy('last_name'))
+            ->with('userTypesPermissionToEditSuccess', $userTypesPermissionToEditSuccess);
     }
     public function viewHourPostCadre(Request $request)
     {
@@ -514,13 +516,16 @@ class WorkHoursController extends Controller
             ->get();
         $merge_array = $users->merge($users_fired_last_month);
         $merge_array = $merge_array->merge($users_fired_current_month);
+
+        $userTypesPermissionToEditSuccess = WorkHoursController::getUserTypesPermissionToEditSuccess();
         return view('workhourscadre.viewHourCadre')
             ->with('users',$merge_array->sortBy('last_name'))
             ->with('response_userid',$userid)
             ->with('response_month',$month)
             ->with('agreement',$count_agreement)
             ->with('response_user_info',$user_info)
-            ->with('action_status',$what_show);
+            ->with('action_status',$what_show)
+            ->with('userTypesPermissionToEditSuccess', $userTypesPermissionToEditSuccess);
     }
     public function viewHourPost(Request $request)
     {

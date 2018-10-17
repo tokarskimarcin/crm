@@ -34,7 +34,7 @@ class StatisticsRBHController extends Controller
 
         $CallUsersThisMonthExtended = Work_Hour::mergeCollection($CallUsersThisMonth,$iTimeInSeconds);
 
-        $CallUsersForReport = collect(array_merge($CusersWorkingLessThan30RBH->toArray(), $CallUsersThisMonthExtended->toArray()))->unique('id_user');
+        $CallUsersForReport = collect(array_merge($CusersWorkingLessThan30RBH->toArray(), $CallUsersThisMonthExtended->where('sec_sum','>=',$iTimeInSeconds)->toArray()))->unique('id_user');
 
         $CallUsersForReport = Pbx_report_extension::getPbxUserStatistics($CallUsersForReport);
         $aCllUsersForReport = $CallUsersForReport->groupBy('dep_id')->sortBy('dep_id');
@@ -91,7 +91,7 @@ class StatisticsRBHController extends Controller
 
         $CallUsersThisMonthExtended = Work_Hour::mergeCollection($CallUsersThisMonth,$iTimeInSeconds);
 
-        $CallUsersForReport = collect(array_merge($CusersWorkingLessThan30RBH->toArray(), $CallUsersThisMonthExtended->toArray()))->unique('id_user');
+        $CallUsersForReport = collect(array_merge($CusersWorkingLessThan30RBH->toArray(), $CallUsersThisMonthExtended->where('sec_sum','>=',$iTimeInSeconds)->toArray()))->unique('id_user');
         $CallUsersForReport = Pbx_report_extension::getPbxUserStatistics($CallUsersForReport);
         $aCllUsersForReport = $CallUsersForReport->groupBy('dep_id')->sortBy('dep_id');
         $sMonths = Work_Hour::getMonthsNames();
