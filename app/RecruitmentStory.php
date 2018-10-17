@@ -142,7 +142,7 @@ class RecruitmentStory extends Model
     }
 
     public static function getReportTrainingDataAndHireShort($data_start,$data_stop){
-        $users = User::select('id', 'department_info_id', 'candidate_id')->get();
+//        $users = User::select('id', 'department_info_id', 'candidate_id')->get();
 
         $records = DB::table('group_training')
             ->select(DB::raw('
@@ -167,16 +167,45 @@ class RecruitmentStory extends Model
             ->get();
 
         $ids = $records->pluck('recruitment_attempt_id')->toArray();
-        $maxIds = RecruitmentStory::select(DB::raw('MAX(id) as id'))->whereIn('recruitment_attempt_id', $ids)->groupBy('recruitment_attempt_id')->pluck('id')->toArray();
-        $recruitment = RecruitmentStory::select('id','attempt_status_id', 'recruitment_attempt_id')->whereIn('id', $maxIds)->get();
 
-        $records = $records->map(function ($item) use($users, $recruitment) {
-            $lookingData = $recruitment->where('recruitment_attempt_id',$item->recruitment_attempt_id)->first();
-            $item->last_recruitment_story_id = $lookingData->id;
-            $item->attempt_status_id = $lookingData->attempt_status_id;
+        $halfOfArr = (int)floor(count($ids) / 2);
+        $firstIdsArr = [];
+        $secondIdsArr = [];
+        $allIds = count($ids);
+
+        for($i = 0; $i < $halfOfArr; $i++) {
+            array_push($firstIdsArr, $ids[$i]);
+        }
+
+        for($i = $halfOfArr; $i < $allIds; $i++) {
+            array_push($secondIdsArr, $ids[$i]);
+        }
+
+        $maxIds1 = RecruitmentStory::select(DB::raw('MAX(id) as id'))->whereIn('recruitment_attempt_id', $firstIdsArr)->groupBy('recruitment_attempt_id')->pluck('id')->toArray();
+        $maxIds2 = RecruitmentStory::select(DB::raw('MAX(id) as id'))->whereIn('recruitment_attempt_id', $secondIdsArr)->groupBy('recruitment_attempt_id')->pluck('id')->toArray();
+
+        $recruitment1 = RecruitmentStory::select('id','attempt_status_id', 'recruitment_attempt_id')->whereIn('id', $maxIds1)->get();
+        $recruitment2 = RecruitmentStory::select('id','attempt_status_id', 'recruitment_attempt_id')->whereIn('id', $maxIds2)->get();
+
+        $records = $records->map(function ($item) use($recruitment1, $recruitment2) {
+            $lookingData1 = $recruitment1->where('recruitment_attempt_id',$item->recruitment_attempt_id)->first();
+            $lookingData2 = null;
+            if(!isset($lookingData1)) {
+                $lookingData2 = $recruitment2->where('recruitment_attempt_id',$item->recruitment_attempt_id)->first();
+            }
+
+            if(isset($lookingData1)) {
+                $item->last_recruitment_story_id = $lookingData1->id;
+                $item->attempt_status_id = $lookingData1->attempt_status_id;
+            }
+            else {
+                $item->last_recruitment_story_id = $lookingData2->id;
+                $item->attempt_status_id = $lookingData2->attempt_status_id;
+            }
+
             if($item->attempt_status_id == 10){
-                $findCandidateInUser = $users->where('candidate_id',$item->candidateID)->first();
-                if(!empty($findCandidateInUser)){
+                $findCandidateInUser = User::where('candidate_id',$item->candidateID)->first();
+                if(isset($findCandidateInUser)){
                     $item->userID = $findCandidateInUser->id;
                     $item->departmentInfoId = $findCandidateInUser->department_info_id;
                 }
@@ -184,7 +213,6 @@ class RecruitmentStory extends Model
             return  $item;
         })->where('attempt_status_id',10)->where('userID','!=',0);
 
-//        dd($records);
         return $records;
     }
 
