@@ -530,6 +530,7 @@ class NotificationController extends Controller
                     $notification->status = 0;
                     $notification->updated_at = date('Y-m-d H:i:s');
                     $notification->remove_date = date('Y-m-d H:i:s');
+                    $notification->removed_by_user_id = Auth::user()->id;
                     $notification->save();
                     new ActivityRecorder(array_merge(['T'=>'Usunięcie zgłoszonego problemu'], $notification->toArray()),35,3);
                     return 1;
@@ -540,6 +541,7 @@ class NotificationController extends Controller
                     $notification->status = 0;
                     $notification->updated_at = date('Y-m-d H:i:s');
                     $notification->remove_date = date('Y-m-d H:i:s');
+                    $notification->removed_by_user_id = Auth::user()->id;
                     $notification->save();
                     new ActivityRecorder(array_merge(['T'=>'Usunięcie zgłoszonego problemu'], $notification->toArray()),35,3);
                     return 1;

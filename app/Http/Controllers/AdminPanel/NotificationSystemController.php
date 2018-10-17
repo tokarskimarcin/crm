@@ -13,8 +13,10 @@ use App\NotificationRating;
 use App\NotificationRatingComponents;
 use App\NotificationRatingCriterion;
 use App\NotificationRatingSystem;
+use App\Notifications;
 use App\Utilities\NumbersProcessing\Normalizer;
 use Illuminate\Http\Request;
+use PragmaRX\Firewall\Notifications\Notification;
 
 class NotificationSystemController
 {
@@ -119,5 +121,19 @@ class NotificationSystemController
             $notificationRating->save();
         }
         dd("Done");
+    }
+
+    public function notificationsPushedWithRemovedBy(){
+        $notifications = Notifications::where('status',  0)->get();
+        foreach ($notifications as $notification){
+            if($notification->removed_by_user_id == null){
+                $notification->removed_by_user_id = $notification->user_id;
+            }
+            if($notification->remove_date == null){
+                $notification->remove_date = $notification->updated_at;
+            }
+            $notification->save();
+        }
+        dd('Done');
     }
 }

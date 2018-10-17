@@ -353,6 +353,9 @@ Route::post('/getDepartmentsAveragesForEveryHourAjax', 'StatisticsController@get
 Route::post('/getDepartmentsAveragesForEveryDayAjax', 'StatisticsController@getDepartmentsAveragesForEveryDayAjax')->name('api.getDepartmentsAveragesForEveryDayAjax');
 Route::post('/departmentsConfirmationStatisticsAjax', 'Statistics\DepartmentsConfirmationStatisticsController@departmentsConfirmationStatisticsAjax')->name('api.departmentsConfirmationStatisticsAjax');
 Route::post('/allDepartmentsConfirmationStatisticsAjax', 'Statistics\DepartmentsConfirmationStatisticsController@allDepartmentsConfirmationStatisticsAjax')->name('api.allDepartmentsConfirmationStatisticsAjax');
+
+Route::post('/removedNotificationsCountStatisticsAjax', 'Statistics\RemovedNotificationStatisticsController@removedNotificationsCountStatisticsAjax')->name('api.removedNotificationsCountStatisticsAjax');
+Route::post('/removedNotificationsAjax', 'Statistics\RemovedNotificationStatisticsController@removedNotificationsAjax')->name('api.removedNotificationsAjax');
 /* END STATISTICS ROUTES AJAX */
 
 //********************END AJAX*********************** */
@@ -662,6 +665,7 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
 
 
     Route::get('/departmentsConfirmationGet', 'Statistics\DepartmentsConfirmationStatisticsController@departmentsConfirmationGet');
+    Route::get('/removedNotificationGet', 'Statistics\RemovedNotificationStatisticsController@removedNotificationGet');
     //Statistics Stop
 
     //Report Page Start
@@ -1098,3 +1102,4 @@ Route::get('/setCityApprovalPart6','AutoScriptController@setCityApprovalPart6');
 Route::get('/testZybura', 'StatisticsController@test');
 
 Route::get('/convertJRtoNewSystem','AdminPanel\NotificationSystemController@convertJRtoNewSystem');
+Route::get('/notificationsPushedWithRemovedBy','AdminPanel\NotificationSystemController@notificationsPushedWithRemovedBy');
