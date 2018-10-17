@@ -25,7 +25,7 @@ class WorkHoursController extends Controller
 
 
     public static function getUserTypesPermissionToEditSuccess(){
-        return [3,23];
+        return [3,23, 10];
     }
     //******************acceptHour****************** START
     public function acceptHour()
