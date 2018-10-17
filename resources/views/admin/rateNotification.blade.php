@@ -69,12 +69,11 @@
                     <h3>{{$ratingCriterion->criterion}}</h3>
                     @if($ratingCriterion->rating_system->id == 3)
                         @include('admin.ratingSystems.NoAverageYes',['radioName'=> 'NoAverageYes'.$ratingCriterion->id])
-                    @endif
-                    @if($ratingCriterion->rating_system->id == 2)
-                        @include('admin.ratingSystems.OneToSix', ['radioName'=> 'OneToSix'.$ratingCriterion->id])
-                    @endif
-                    @if($ratingCriterion->rating_system->id == 1)
+                    @elseif($ratingCriterion->rating_system->id == 1)
                         @include('admin.ratingSystems.NoYes', ['radioName'=> 'NoYes'.$ratingCriterion->id])
+                    @else
+                        @include('admin.ratingSystems.RangeStopToRangeStart', ['radioName'=> 'OneToSix'.$ratingCriterion->id,
+                            'ratingRange' => [$ratingCriterion->rating_system->rating_start, $ratingCriterion->rating_system->rating_stop]])
                     @endif
                 </div>
             </div>
@@ -91,12 +90,13 @@
                         <h3>{{$ratingCriterion->criterion}}</h3>
                         @if($ratingCriterion->rating_system->id == 3)
                             @include('admin.ratingSystems.NoAverageYes',['radioName'=> 'NoAverageYes'.$ratingCriterion->id , 'rating' => $rating_component->rating])
-                        @endif
-                        @if($ratingCriterion->rating_system->id == 2)
-                            @include('admin.ratingSystems.OneToSix', ['radioName'=> 'OneToSix'.$ratingCriterion->id , 'rating' => $rating_component->rating])
-                        @endif
-                        @if($ratingCriterion->rating_system->id == 1)
+                        @elseif($ratingCriterion->rating_system->id == 1)
                             @include('admin.ratingSystems.NoYes', ['radioName'=> 'NoYes'.$ratingCriterion->id , 'rating' => $rating_component->rating])
+                        @else
+                            @include('admin.ratingSystems.RangeStopToRangeStart',
+                            ['radioName'=> 'OneToSix'.$ratingCriterion->id ,
+                            'rating' => $rating_component->rating,
+                            'ratingRange' => [$ratingCriterion->rating_system->rating_start, $ratingCriterion->rating_system->rating_stop]])
                         @endif
                     </div>
                 </div>

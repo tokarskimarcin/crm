@@ -6,7 +6,7 @@
 </style>
 
 @if(isset($rating))
-    @for($i = 6 ; $i >= 1 ; $i --)
+    @for($i = $ratingRange[1] ; $i >= $ratingRange[0] ; $i --)
         @if($rating == $i)
         <label class="OneToSix">
             <div class="well well-sm" style="border-radius: 50%; padding: 1em">
@@ -16,7 +16,7 @@
         @endif
     @endfor
 @else
-    @for($i = 6 ; $i >= 1 ; $i --)
+    @for($i = $ratingRange[1] ; $i >= $ratingRange[0] ; $i --)
         <label class="OneToSix">
             <div class="well well-sm" style="border-radius: 50%; padding: 1em">
                 <input type="radio" name="{{$radioName}}" value="{{$i}}" > {{$i}}
