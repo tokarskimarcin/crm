@@ -74,13 +74,15 @@
                                                 <h1 style ="font-family: 'bebas_neueregular',sans-serif; margin-top:0px;text-shadow: 2px 2px 2px rgba(150, 150, 150, 0.8); font-size:25px;">Wybierz oddział:</h1>
                                                 <select name="department" id="department" class="form-control">
                                                     <option value="0">Twój oddział</option>
-                                                    <optgroup label="Departamenty">
-                                                    @foreach($department_info as $dep_info)
-                                                        @if($dep_info->id)
-                                                        <option value="department_{{$dep_info->id}}">{{$dep_info->department_name}} {{$dep_info->department_type}}</option>
-                                                        @endif
-                                                    </optgroup>
-                                                    @endforeach
+                                                    @if(count($multiple_departments) > 0)
+                                                        <optgroup label="Departamenty">
+                                                        @foreach($department_info as $dep_info)
+                                                            @if($dep_info->id && in_array($dep_info->id, $multiple_departments))
+                                                            <option value="department_{{$dep_info->id}}">{{$dep_info->department_name}} {{$dep_info->department_type}}</option>
+                                                            @endif
+                                                        </optgroup>
+                                                        @endforeach
+                                                    @endif
                                                     @isset($directorsHR)
                                                     <optgroup label="Kierownik Regionalny HR">
                                                         @foreach($directorsHR as $director)
@@ -88,7 +90,7 @@
                                                                 $allDepartments = $departments->where('director_hr_id', '=', $director->id);
                                                             @endphp
                                                             <option data-toggle="tooltip" data-placement="right" title="@foreach($allDepartments as $dep){{$dep->departments->name}} {{$dep->department_type->name}}, @endforeach"
-                                                                    value="regionalDirectorHr_{{ $director->id }}">{{ $director->last_name . ' ' . $director->first_name }}</option>
+                                                                    value="regionalDirectorHr_{{ $director->id }}">{{$director->last_name . ' ' . $director->first_name }}</option>
                                                         @endforeach
                                                     </optgroup>
                                                     @endisset
@@ -99,7 +101,7 @@
                                                                 $allDepartments = $departments->where('instructor_regional_id', '=', $regionalManagersInstructor->id);
                                                             @endphp
                                                             <option data-toggle="tooltip" data-placement="right" title="@foreach($allDepartments as $dep){{$dep->departments->name}} {{$dep->department_type->name}}, @endforeach"
-                                                                    value="regionalDirectorInstructor_{{ $regionalManagersInstructor->id }}">{{ $regionalManagersInstructor->last_name . ' ' . $regionalManagersInstructor->first_name }}</option data-toggle="tooltip" data-placement="right" title="@foreach($allDepartments as $dep){{$dep->departments->name}} {{$dep->department_type->name}}, @endforeach">
+                                                                    value="regionalDirectorInstructor_{{$regionalManagersInstructor->id }}">{{ $regionalManagersInstructor->last_name . ' ' . $regionalManagersInstructor->first_name }}</option data-toggle="tooltip" data-placement="right" title="@foreach($allDepartments as $dep){{$dep->departments->name}} {{$dep->department_type->name}}, @endforeach">
                                                         @endforeach
                                                     </optgroup>
                                                     @endisset
@@ -110,7 +112,7 @@
                                                                 $allDepartments = $departments->where('regionalManager_id', '=', $director->id);
                                                             @endphp
                                                             <option data-toggle="tooltip" data-placement="right" title="@foreach($allDepartments as $dep){{$dep->departments->name}} {{$dep->department_type->name}}, @endforeach"
-                                                                    value="regionalMenager_{{ $director->id }}">{{ $director->last_name . ' ' . $director->first_name }}</option>
+                                                                    value="regionalMenager_{{ $director->id }}">{{$director->last_name . ' ' . $director->first_name }}</option>
                                                         @endforeach
                                                     </optgroup>
                                                     @endisset
@@ -121,7 +123,7 @@
                                                                 $allDepartments = $departments->where('director_id', '=', $director->id);
                                                             @endphp
                                                             <option data-toggle="tooltip" data-placement="right" title="@foreach($allDepartments as $dep){{$dep->departments->name}} {{$dep->department_type->name}}, @endforeach"
-                                                                    value="regionalDirector_{{ $director->id }}">{{ $director->last_name . ' ' . $director->first_name }} <span class="glyphicon glyphicon-info-sign" data-toggle="tooltip" data-placement="right" title="
+                                                                    value="regionalDirector_{{ $director->id }}">{{$director->last_name . ' ' . $director->first_name }} <span class="glyphicon glyphicon-info-sign" data-toggle="tooltip" data-placement="right" title="
                                                             @foreach($allDepartments as $dep)
                                                                     {{$dep->departments->name}} {{$dep->department_type->name}},
                                                             @endforeach
@@ -165,7 +167,7 @@
                                             <table class="table table-bordered table-condensed">
                                                 <div class="panel-heading gray-nav" style="border:1px solid #d3d3d3;"><h4><b>Analiza Grafik Plan</b></h4></div>
                                                 <tr>
-                                                    <td align="center"><b>Osoba</b></td>
+                                                    <td align="center"><b>Osoba(Imie Nazwisko)</b></td>
                                                     <?php $week_array = ['Pon','Wt','Śr','Czw','Pt','Sob','Nie'];
                                                     $rbg_monday =0;
                                                     $rbg_tuesday =0;
@@ -181,7 +183,7 @@
                                                 </tr>
                                                 @foreach($schedule_user['data'] as $item =>$key)
                                                  <tr>
-                                                     <td align="center" class="active"><b>{{$key->user_first_name.' - '.$key->user_last_name}}</b></td>
+                                                     <td align="center" class="active"><b>{{$key->user_first_name.' '.$key->user_last_name}}</b></td>
                                                      <td align="center">{{$key->monday_start !== null ?  substr($key->monday_start,0,5).' - '.substr($key->monday_stop,0,5) : ($key->monday_comment !== null ? $key->monday_comment : null) }}</td>
                                                      <td align="center">{{$key->tuesday_start !== null ?  substr($key->tuesday_start,0,5).' - '.substr($key->tuesday_stop,0,5) : ($key->tuesday_comment !== null ? $key->tuesday_comment : null) }}</td>
                                                      <td align="center">{{$key->wednesday_start !== null ?  substr($key->wednesday_start,0,5).' - '.substr($key->wednesday_stop,0,5) : ($key->wednesday_comment !== null ? $key->wednesday_comment : null) }}</td>
