@@ -6,7 +6,7 @@
     <div class="row">
         <div class="col-lg-12">
             <div class="page-header">
-                <div class="alert gray-nav">Raport Tygodniowy 30 Rbh(zbiorczy)</div>
+                <div class="alert gray-nav">Raport Miesięczny 30 Rbh(zbiorczy)</div>
             </div>
         </div>
     </div>
