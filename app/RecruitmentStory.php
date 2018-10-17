@@ -122,6 +122,7 @@ class RecruitmentStory extends Model
             ->where('recruitment_story.attempt_status_id',8)
             ->where('group_training.training_stage',1)
             ->get();
+
         $records = $records->map(function ($item){
             $lookingData = RecruitmentStory::where('recruitment_attempt_id',$item->recruitment_attempt_id)->orderby('id','desc')->first();
             $item->last_recruitment_story_id = $lookingData->id;
@@ -139,6 +140,83 @@ class RecruitmentStory extends Model
 
         return $records;
     }
+
+    public static function getReportTrainingDataAndHireShort($data_start,$data_stop){
+//        $users = User::select('id', 'department_info_id', 'candidate_id')->get();
+
+        $records = DB::table('group_training')
+            ->select(DB::raw('
+                group_training.id as groupTrainingID,
+                candidate.id as candidateID,
+                group_training.training_date,
+                recruitment_story.recruitment_attempt_id,
+                0 as last_recruitment_story_id,
+                0 as attempt_status_id,
+                0 as userID,
+                0 as departmentInfoId
+            '))
+            ->join('candidate_training','candidate_training.training_id','group_training.id')
+            ->join('recruitment_story','recruitment_story.id','candidate_training.completed_training')
+            ->join('recruitment_attempt','recruitment_attempt.id','recruitment_story.recruitment_attempt_id')
+            ->join('candidate','candidate.id','recruitment_story.candidate_id')
+            ->whereBetween('group_training.training_date', [$data_start, $data_stop])
+            ->where('recruitment_attempt.training_date','=',null)
+            ->where('recruitment_attempt.status',1)
+            ->where('recruitment_story.attempt_status_id',8)
+            ->where('group_training.training_stage',1)
+            ->get();
+
+        $ids = $records->pluck('recruitment_attempt_id')->toArray();
+
+        $halfOfArr = (int)floor(count($ids) / 2);
+        $firstIdsArr = [];
+        $secondIdsArr = [];
+        $allIds = count($ids);
+
+        for($i = 0; $i < $halfOfArr; $i++) {
+            array_push($firstIdsArr, $ids[$i]);
+        }
+
+        for($i = $halfOfArr; $i < $allIds; $i++) {
+            array_push($secondIdsArr, $ids[$i]);
+        }
+
+        $maxIds1 = RecruitmentStory::select(DB::raw('MAX(id) as id'))->whereIn('recruitment_attempt_id', $firstIdsArr)->groupBy('recruitment_attempt_id')->pluck('id')->toArray();
+        $maxIds2 = RecruitmentStory::select(DB::raw('MAX(id) as id'))->whereIn('recruitment_attempt_id', $secondIdsArr)->groupBy('recruitment_attempt_id')->pluck('id')->toArray();
+
+        $recruitment1 = RecruitmentStory::select('id','attempt_status_id', 'recruitment_attempt_id')->whereIn('id', $maxIds1)->get();
+        $recruitment2 = RecruitmentStory::select('id','attempt_status_id', 'recruitment_attempt_id')->whereIn('id', $maxIds2)->get();
+
+        $records = $records->map(function ($item) use($recruitment1, $recruitment2) {
+            $lookingData1 = $recruitment1->where('recruitment_attempt_id',$item->recruitment_attempt_id)->first();
+            $lookingData2 = null;
+            if(!isset($lookingData1)) {
+                $lookingData2 = $recruitment2->where('recruitment_attempt_id',$item->recruitment_attempt_id)->first();
+            }
+
+            if(isset($lookingData1)) {
+                $item->last_recruitment_story_id = $lookingData1->id;
+                $item->attempt_status_id = $lookingData1->attempt_status_id;
+            }
+            else {
+                $item->last_recruitment_story_id = $lookingData2->id;
+                $item->attempt_status_id = $lookingData2->attempt_status_id;
+            }
+
+            if($item->attempt_status_id == 10){
+                $findCandidateInUser = User::where('candidate_id',$item->candidateID)->first();
+                if(isset($findCandidateInUser)){
+                    $item->userID = $findCandidateInUser->id;
+                    $item->departmentInfoId = $findCandidateInUser->department_info_id;
+                }
+            }
+            return  $item;
+        })->where('attempt_status_id',10)->where('userID','!=',0);
+
+        return $records;
+    }
+
+
     public static function getReportTrainingData($data_start,$data_stop){
         $records = DB::table('group_training')
             ->select(DB::raw('
@@ -180,6 +258,43 @@ class RecruitmentStory extends Model
                         }else{
                             $dep_data->sum_choise_stageTwo = $item->sum_choise;
                             $dep_data->sum_absent_stageTwo = $item->sum_absent;
+                        }
+                    }
+                }
+                $data[] = $dep_data;
+                array_push($departmentUserArray,$dep->id);
+            }
+        }
+        return collect($data)->sortByDesc('sum_choise');
+    }
+
+    public static function getReportTrainingDataShort($data_start,$data_stop, $deps){
+        $records = DB::table('group_training')
+            ->select(DB::raw('
+                sum(candidate_choise_count) as sum_choise,
+                group_training.training_stage,
+                department_info.id as dep_id
+            '))
+            ->join('department_info', 'group_training.department_info_id', 'department_info.id')
+            ->whereBetween('training_date', [$data_start, $data_stop])
+            ->groupBy('department_info.id','training_stage')
+            ->get();
+
+
+        $data=[];
+        $departmentUserArray = [];
+        foreach ($deps as $dep) {
+            if(!in_array($dep->id,$departmentUserArray))
+            {
+                $dep_data = new \stdClass();
+                $dep_data->dep_id = $dep->id;
+                $dep_data->countHireUserFromFirstTrainingGroup = 0;
+                $dep_data->sum_choise_stageOne = 0;
+                $dep_data->procScore = 0;
+                foreach($records as $item) {
+                    if ($item->dep_id == $dep->id) {
+                        if($item->training_stage == 1){
+                            $dep_data->sum_choise_stageOne = $item->sum_choise;
                         }
                     }
                 }

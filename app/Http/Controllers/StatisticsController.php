@@ -18,6 +18,7 @@ use App\RecruitmentStory;
 use App\ReportCampaign;
 use App\UserEmploymentStatus;
 use App\Utilities\Dates\MonthFourWeeksDivision;
+use App\Utilities\Reports\Report_data_methods\Data30RBHreport;
 use App\Work_Hour;
 use DateTime;
 use Illuminate\Http\Request;
