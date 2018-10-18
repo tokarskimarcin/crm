@@ -8,7 +8,7 @@ body {
 .wrapper {
     min-height: 100vh;
     display: grid;
-    grid-template-rows: 1fr 7fr 1fr;
+    grid-template-rows: 2fr 8fr 1fr;
 }
 
 /***HEADER PART****/
@@ -60,7 +60,6 @@ footer {
 @media only screen and (max-width: 600px) {
     /*Telefony komorkowe*/
     main {
-        border: 1px solid black;
 
         display: grid;
         grid-template-columns: 1fr;
@@ -79,8 +78,6 @@ footer {
 @media only screen and (min-width: 600px) {
 /*Tablety*/
     main {
-        border: 1px solid black;
-
         display: grid;
         grid-template-columns: 1fr 1fr;
         grid-gap: 2em;
@@ -99,8 +96,9 @@ footer {
 /*Komputery*/
 
     main {
-        border: 1px solid black;
 
+        padding-left: 2em;
+        padding-right: 2em;
         display: grid;
         grid-template-columns: 1fr 1fr 1fr;
         grid-gap: 2em;

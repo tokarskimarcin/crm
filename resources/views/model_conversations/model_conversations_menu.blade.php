@@ -35,7 +35,9 @@
             {{--<div class="category category_3"> Kategoria 7</div>--}}
         </main>
         <footer class="main_part">
-
+            <p>Posted by: Paweł Chmielewski</p>
+            <p>Contact information: <a href="mailto:someone@example.com">
+                    someone@example.com</a>.</p>
         </footer>
     </div>
 </body>
