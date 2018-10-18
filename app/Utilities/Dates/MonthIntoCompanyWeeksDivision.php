@@ -46,7 +46,7 @@ class MonthIntoCompanyWeeksDivision
             if($i == count($dividedMonth) - 1) {
                 $dateObj->weekNumber = $dividedMonth[$i]->weekNumber;
                 $dateObj->firstDay = $tempFirstDate;
-                $dateObj->lastDay = $tempLastDate;
+                $dateObj->lastDay = $dividedMonth[$i]->date == 'Suma' ? $tempLastDate : $dividedMonth[$i]->date;
                 array_push($weekDateArr, $dateObj);
             }
         }
