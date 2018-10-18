@@ -666,6 +666,7 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
 
     Route::get('/departmentsConfirmationGet', 'Statistics\DepartmentsConfirmationStatisticsController@departmentsConfirmationGet');
     Route::get('/removedNotificationGet', 'Statistics\RemovedNotificationStatisticsController@removedNotificationGet');
+    Route::get('/iTNotificationStatisticsGet', 'Statistics\ITNotificationStatisticsController@iTNotificationStatisticsGet');
     //Statistics Stop
 
     //Report Page Start

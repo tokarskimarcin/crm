@@ -321,22 +321,21 @@ function createNotificationRatingModalBody(response){
         let notificationRatingCriterion = response.notificationRatingCriterion.find(x => x.id === component.notification_rating_criterion_id);
         let tr = $('<tr>')
             .append($('<td>').append(notificationRatingCriterion.criterion))
-            .append($('<td>').append(normalize(component.rating,
-                [notificationRatingCriterion.rating_system.rating_start, notificationRatingCriterion.rating_system.rating_stop])*100).append('%'));
+            .append($('<td>').append(Math.round(normalize(component.rating,
+                [notificationRatingCriterion.rating_system.rating_start, notificationRatingCriterion.rating_system.rating_stop])*10000)/100).append('%'));
         if (notificationRatingCriterion.rating_system.id === 1) {
             tr.append($('<td>').append(component.rating === 1 ? 'NIE' : 'TAK').css({'background-color': component.rating === 1 ? 'rgba(255,0,0,0.75)' : 'rgba(0,175,0,0.75)'}))
-        } else if (notificationRatingCriterion.rating_system.id === 2) {
-            tr.append($('<td>').append(component.rating))
         } else if (notificationRatingCriterion.rating_system.id === 3) {
             tr.append($('<td>').append(component.rating === 1 ? 'NIE' : component.rating === 2 ? 'ŚREDNIO' : 'TAK')
                 .css({'background-color': component.rating === 1 ? 'rgba(255,0,0,0.75)' : component.rating === 2 ? 'rgba(0,0,255,0.75)' : 'rgba(0,175,0,0.75)'}))
         } else {
+            tr.append($('<td>').append(component.rating));
         }
         tbody1.append(tr);
     });
     tbody1.append( $('<tr>').css({'font-weight':'bold','color':'white','background-color':'#696969'})
         .append($('<td>').append('Suma:'))
-        .append($('<td>').append(Math.round(response.notificationRating.average_rating*100)).append('%')));
+        .append($('<td>').append(Math.round(response.notificationRating.average_rating*10000)/100).append('%')));
     let table1 = $(document.createElement('table')).addClass('table table-striped table-bordered thead-inverse')
         .append(thead1).append(tbody1);
     let tablesCol1 = $(document.createElement('div')).addClass('col-md-12').append(table1);

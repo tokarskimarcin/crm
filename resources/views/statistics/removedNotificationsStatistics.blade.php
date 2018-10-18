@@ -36,26 +36,23 @@
         <div class="panel-body">
             <div class="row">
                 <div class="col-md-2">
-                    <label>Od:</label>
+                    <label>Od:
                     <div class='input-group date' id='startDatetimepicker' >
                             <span class="input-group-addon">
                                 <span class="glyphicon glyphicon-calendar"></span>
                             </span>
-                        <label>
                             <input type='text' class="form-control" name="date_start" value="{{date('Y-m-')}}01" readonly/>
-                        </label>
-                    </div>
+                    </div></label>
+
                 </div>
                 <div class="col-md-2">
-                    <label>Do:</label>
+                    <label>Do:
                     <div class='input-group date' id='stopDatetimepicker' >
                             <span class="input-group-addon">
                                 <span class="glyphicon glyphicon-calendar"></span>
                             </span>
-                        <label>
                             <input type='text' class="form-control" name="date_stop" value="{{date('Y-m-').date('t')}}" readonly/>
-                        </label>
-                    </div>
+                    </div></label>
                 </div>
                 <div class="col-md-4">
                     @if(0)
