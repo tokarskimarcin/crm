@@ -13,11 +13,11 @@ body {
 
 /***HEADER PART****/
 header {
-    background-color: black;
+    background-color: #231f20;
     color: white;
 
-    box-shadow: 10px 10px 15px lightgray;
-    margin-bottom: 1em;
+    box-shadow: 10px 10px 15px black;
+    margin-bottom: 2em;
 
     display: flex;
     flex-direction: row;

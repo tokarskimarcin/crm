@@ -12,7 +12,7 @@
     <div class="wrapper">
         <header class="main_part">
             <div class="logo">
-                Tutaj jest logo verona
+                <img src="http://teambox.pl/image/logovc.png" class="CToWUd">
             </div>
             <div class="links">
                 <div class="link link1">
