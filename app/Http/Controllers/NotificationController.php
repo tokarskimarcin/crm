@@ -3,6 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\NotificationChangesDisplayedFlags;
+use App\NotificationRating;
+use App\NotificationRatingComponents;
+use App\NotificationRatingCriterion;
+use App\Utilities\NumbersProcessing\Normalizer;
 use Illuminate\Http\Request;
 use App\NotificationTypes;
 use App\Department_info;
@@ -236,13 +240,14 @@ class NotificationController extends Controller
             return $data;
         }
     }
+
     public function myNotifications() {
         $notifications = Notifications::where('displayed_by', '=', Auth::user()->id)->count();
-        $unratedNotifications = Notifications::select('status','jr.id')
-            ->leftJoin('judge_results as jr','jr.notification_id','=','notifications.id')
+        $unratedNotifications = Notifications::select('status','nr.id')
+            ->leftJoin('notification_rating as nr','nr.notification_id','=','notifications.id')
             ->where('notifications.user_id','=',Auth::user()->id)
             ->where('status','=',3)
-            ->whereNull('jr.id')
+            ->whereNull('nr.id')
             ->count();
         $notRepairedNotifications = Notifications::where('status','=',2)->where('displayed_by',Auth::user()->id)->count();
         return view('admin.myNotifications')
@@ -251,86 +256,107 @@ class NotificationController extends Controller
             ->with('notRepairedNotifications', $notRepairedNotifications);
     }
 
-    public function judgeNotificationGet($id){
+    public function rateNotificationGet($id){
         $notification = Notifications::find($id);
 
-        if($notification == null || $notification->user_id != Auth::user()->id || $notification->displayed_by == null) {
+        $notificationRating = NotificationRating::where('notification_id', $id)->with('rating_component')->first();
+        /*if($notification == null || $notification->user_id != Auth::user()->id || $notification->displayed_by == null) {
             return view('errors.404');
+        }*/
+
+        $notificationRatingCriterion = NotificationRatingCriterion::with('rating_system');
+        if ($notificationRating == null) {
+            $notificationRatingCriterion->where('status',1);
         }
+        $notificationRatingCriterion = $notificationRatingCriterion->get();
 
-        $judgeResult = JudgeResult::where('notification_id', $id)->get();
+        return view('admin.rateNotification')
+            ->with('notificationRatingCriterion', $notificationRatingCriterion)
+            ->with('notificationRating', $notificationRating)
+            ->with('notification', $notification);
 
-        if ($judgeResult == null || $judgeResult->count() == 0) {
-            return view('admin.judgeNotification')
-                ->with('notification', $notification);
-        } else {
-            return view('admin.judgeNotification')
-                ->with('judgeResult', $judgeResult)
-                ->with('notification', $notification);
+    }
+
+    public function rateNotificationPost(Request $request){
+        if($request->response == 'success'){
+            Session::flash('message_ok','Twoja opinia została przesłana');
+            return Redirect::to('my_notifications');
+        }else{
+            return view('errors.404');
         }
     }
 
-    public function judgeNotificationPost(Request $request){
+    public function rateNotificationAjax(Request $request){
         /**
          * Sprawdzenie czy powiadomienie nie zostało już ocenione
          */
-        $checkNotification = JudgeResult::where('notification_id', $request->notification_id)->count();
-        if ($checkNotification > 0) {
-            return view('errors.404');
+        $notificationRating = NotificationRating::where('notification_id', $request->notificationId)->count();
+        if ($notificationRating > 0) {
+            return 'error.404';
         }
 
         /**
          * Sprawdzenie czy ID powiadomienia jest zgodne z formularzem
          */
-        $id = $request->notification_id;
+        $id = $request->notificationId;
         $url_array = explode('/',URL::previous());
         $urlValidation = end($url_array);
         $checkNotification = Notifications::find($id);
         if ($checkNotification == null || ($urlValidation != $id)) {
-            return view('errors.404');
+            return 'error.404';
         }
+
+        $notificationRatingCriterion = NotificationRatingCriterion::whereIn('id',collect($request->ratingsArray)->pluck('criterionId')->toArray())
+            ->with('rating_system')->get();
 
         /**
          * Sprawdzenie czy przekazane wartości z formularza są prawidłowe
          */
-        if ($request->q1 != 1 && $request->q1 != 2) {
-            return view('errors.404');
-        }
-        if ($request->q5 != 1 && $request->q5 != 2) {
-            return view('errors.404');
-        }
-        $default_array = [1,2,3,4,5,6];
-        $check_array = [$request->q2, $request->q3, $request->q4];
-        foreach ($check_array as $key) {
-            if (!in_array($key, $default_array)) {
-                return view('errors.404');
+
+        $validation = true;
+        foreach ($request->ratingsArray as $ratingItem) {
+            $itemNotificationRatingCriterion = $notificationRatingCriterion->where('id',$ratingItem['criterionId'])->first();
+            if($itemNotificationRatingCriterion->rating_system->rating_start > intval($ratingItem['rating'])
+                || $itemNotificationRatingCriterion->rating_system->rating_stop < intval($ratingItem['rating'])){
+                $validation = false;
             }
+        }
+        if (!$validation) {
+            return 'error.404';
         }
 
         /**
          * Sprawdzenie czy powiadomienie istnieje, jest danego uzytkowinika oraz czy zostało zakończone
          */
-        $result = new JudgeResult();
-        $notification = Notifications::find($request->notification_id);
+        $notification = Notifications::find($request->notificationId);
         if ($notification == null || $notification->user_id != Auth::user()->id || $notification->displayed_by == null) {
-            return view('errors.404');
+            return 'error.404';
         }
 
-        $result->user_id = Auth::user()->id;
-        $result->it_id = $notification->displayed_by;
-        $result->notification_id = $notification->id;
-        $result->repaired = $request->q1;
-        $result->judge_quality = $request->q2;
-        $result->judge_contact = $request->q3;
-        $result->judge_time = $request->q4;
-        $result->response_after = $request->q5;
-        $result->comment = ($request->judge_comment != null) ? $request->judge_comment : "Brak komentarza";
-        $result->judge_sum = round(($request->q2 + $request->q3 + $request->q4) / 3, 2);
-        $result->save();
+        $notificationRating = new NotificationRating();
+        $notificationRating->notification_id = $notification->id;
+        $notificationRating->comment = $request->comment;;
+        $notificationRating->created_at = date("Y-m-d H:i:s");
+        $notificationRating->updated_at = date("Y-m-d H:i:s");
+        $notificationRating->save();
 
-        new ActivityRecorder(array_merge(['T'=>'Dodanie oceny zgłoszenia'],$result->toArray()),76,1);
-        return $this->myNotifications()
-            ->with('message_ok', 'Twoja opinia została przesłana!');
+
+        $average_rating = 0;
+        foreach ($request->ratingsArray as $ratingItem) {
+            $itemNotificationRatingCriterion = $notificationRatingCriterion->where('id',$ratingItem['criterionId'])->first();
+            $notificationRatingComponent = new NotificationRatingComponents();
+            $notificationRatingComponent->notification_rating_id = $notificationRating->id;
+            $notificationRatingComponent->notification_rating_criterion_id = intval($ratingItem['criterionId']);
+            $notificationRatingComponent->rating = intval($ratingItem['rating']);
+            $average_rating += Normalizer::normalize($notificationRatingComponent->rating,
+                [$itemNotificationRatingCriterion->rating_system->rating_start, $itemNotificationRatingCriterion->rating_system->rating_stop]);
+            $notificationRatingComponent->save();
+        }
+        $notificationRating->average_rating = round($average_rating/count($request->ratingsArray),2);
+        $notificationRating->save();
+
+        new ActivityRecorder(array_merge(['T'=>'Dodanie oceny zgłoszenia'],$notificationRating->toArray()),76,1);
+        return 'success';
     }
 
     public function datatableMyNotifications(Request $request) {
@@ -339,10 +365,10 @@ class NotificationController extends Controller
                 notifications.*,
                 users.first_name as first_name,
                 users.last_name as last_name,
-                jr.id as judge_result
+                nr.id as notification_rating
             '))
             ->leftJoin('users', 'users.id', '=', 'notifications.displayed_by')
-            ->leftJoin('judge_results as jr','jr.notification_id','=','notifications.id')
+            ->leftJoin('notification_rating as nr','nr.notification_id','=','notifications.id')
             ->where('status','!=',0)
             ->where('notifications.user_id', '=', Auth::user()->id)
             ->get();
@@ -355,12 +381,12 @@ class NotificationController extends Controller
             ->select(DB::raw('
                 notifications.*,
                 concat(users.first_name," ",users.last_name ) as user_name,
-                jr.id as jr_id,
-                jr.comment,
-                jr.judge_sum
+                nr.id as nr_id,
+                nr.comment,
+                nr.average_rating
             '))
             ->leftJoin('users', 'users.id', '=', 'notifications.user_id')
-            ->leftJoin('judge_results as jr', 'jr.notification_id', '=', 'notifications.id')
+            ->leftJoin('notification_rating as nr', 'nr.notification_id', '=', 'notifications.id')
             ->where('status','!=',0)
             ->where('displayed_by', '=', Auth::user()->id)
             ->get();
@@ -499,23 +525,43 @@ class NotificationController extends Controller
 
             if($notification->user_id == Auth::user()->id)
             {
-                if($notification->status == 1)
+                if($notification->status == 1 || Auth::user()->user_type_id === 3)
                 {
                     $notification->status = 0;
+                    $notification->updated_at = date('Y-m-d H:i:s');
+                    $notification->remove_date = date('Y-m-d H:i:s');
+                    $notification->removed_by_user_id = Auth::user()->id;
                     $notification->save();
                     new ActivityRecorder(array_merge(['T'=>'Usunięcie zgłoszonego problemu'], $notification->toArray()),35,3);
                     return 1;
                 }else
                     return 0;
             }else{
+                if(Auth::user()->user_type_id === 3){
+                    $notification->status = 0;
+                    $notification->updated_at = date('Y-m-d H:i:s');
+                    $notification->remove_date = date('Y-m-d H:i:s');
+                    $notification->removed_by_user_id = Auth::user()->id;
+                    $notification->save();
+                    new ActivityRecorder(array_merge(['T'=>'Usunięcie zgłoszonego problemu'], $notification->toArray()),35,3);
+                    return 1;
+                }
                 return 2;
             }
         }
     }
 
-    public function notificationJudgeResult(Request $request){
+    public function notificationRating(Request $request){
         if($request->ajax()) {
-            return ['judgeResult' => JudgeResult::find($request->judgeResultId)];
+            $notificationRating = NotificationRating::find($request->notificationRatingId);
+            $notificationRatingComponents = NotificationRatingComponents::where('notification_rating_id',$request->notificationRatingId)->get();
+            $notificationRatingCriterion = NotificationRatingCriterion::whereIn('id',$notificationRatingComponents->pluck('notification_rating_criterion_id')->toArray())
+                ->with('rating_system')->get();
+            return [
+                'notificationRating' => $notificationRating,
+                'notificationRatingComponents' => $notificationRatingComponents,
+                'notificationRatingCriterion' => $notificationRatingCriterion
+            ];
         }
     }
 }

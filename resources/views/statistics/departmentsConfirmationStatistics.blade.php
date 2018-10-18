@@ -513,7 +513,6 @@
                         })();
                         (function periodSelectHandler() {
                             VARIABLES.jQElements.periodSelectjQ.change(function (e) {
-                                console.log($(e.target).val());
                                 VARIABLES.DATA_TABLES.departmentsConfirmation.ajaxReload();
                             });
                         })();

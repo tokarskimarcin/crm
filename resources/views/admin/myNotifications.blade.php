@@ -9,9 +9,9 @@
     </div>
 </div>
 
-@if(isset($message_ok))
+@if(Session::has('message_ok'))
     <div class="alert alert-success">
-        {{$message_ok}}
+        {{Session::get('message_ok')}}
     </div>
 @endif
 <div class="panel panel-info">
@@ -74,7 +74,7 @@
             </div>
         </div>
 
-        <div id="modalJudgeResult" class="modal fade" tabindex="-1" role="dialog">
+        <div id="modalNotificationRating" class="modal fade" tabindex="-1" role="dialog">
             <div class="modal-dialog modal-lg" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -132,10 +132,10 @@ let table = $('#datatable').DataTable({
             if (status != 3) {
                 return '<a class="btn btn-default btn-block" href="#" data-toggle="tooltip" title="Ocenić wykonanie możesz po zakończonej realizacji!" data-placement="left" disabled>Oceń</a>';
             } else {
-                if(data.judge_result == null){
-                    return '<a class="btn btn-default btn-block" href="judge_notification/'+data.id+'" >Oceń</a>';
+                if(data.notification_rating == null){
+                    return '<a class="btn btn-default btn-block" href="rateNotification/'+data.id+'" >Oceń</a>';
                 }else{
-                    return '<a class="btn btn-info btn-block" href="judge_notification/'+data.id+'" >Ocena</a>';
+                    return '<a class="btn btn-info btn-block" href="rateNotification/'+data.id+'" >Ocena</a>';
                 }
             }
 
@@ -236,18 +236,18 @@ let table2 = $('#datatable2').DataTable({
             }
         },
         {"data": function (data, type, dataToSet) {
-            let button = $(document.createElement('button')).addClass('judgeResultButton btn btn-block btn-primary');
-            if(data.jr_id == null){
+            let button = $(document.createElement('button')).addClass('notificationRatingButton btn btn-block btn-primary');
+            if(data.nr_id == null){
                 button.append('Brak').attr('disabled',true);
             }else{
                 let span = $(document.createElement('span'));
-                if(data.comment !== 'Brak komentarza'){
+                if(data.comment !== null){
                     span.addClass('glyphicon glyphicon-comment');
                 }
-                button.append(span).append(' '+data.judge_sum).attr('data-jrid',data.jr_id);
+                button.append(span).append(' '+parseInt(data.average_rating*100)+'%').attr('data-nrid',data.nr_id);
             }
             return button.prop('outerHTML');
-            }, name: 'judgeResult',"orderable": false, "searchable": false},
+            }, name: 'notificationRating',"orderable": false, "searchable": false},
         {"data": function (data, type, dataToSet) {
                 return '<a class="btn btn-default  btn-block" href="show_notification/'+data.id+'" ><span class="glyphicon glyphicon-search"></span></a>';
             },"orderable": false, "searchable": false },
@@ -255,12 +255,12 @@ let table2 = $('#datatable2').DataTable({
 });
 
 $('.panel-body').click(function (e) {
-   if($(e.target).hasClass('judgeResultButton')){
-       judgeResultButtonHandler(e);
+   if($(e.target).hasClass('notificationRatingButton')){
+       notificationRatingButtonHandler(e);
    }
 
 });
-function judgeResultButtonHandler(e) {
+function notificationRatingButtonHandler(e) {
     swal({
         title: 'Ładowawnie...',
         text: 'To może chwilę zająć',
@@ -271,18 +271,18 @@ function judgeResultButtonHandler(e) {
         onOpen: () => {
             swal.showLoading();
             $.ajax({
-                url: "{{ route('api.notificationJudgeResult') }}",
+                url: "{{ route('api.notificationRating') }}",
                 type: 'POST',
                 headers: {'X-CSRF-TOKEN': '{{ csrf_token() }}'},
                 data: {
-                    'judgeResultId': $(e.target).data('jrid')
+                    'notificationRatingId': $(e.target).data('nrid')
                 },
                 success: function (response) {
-                    if(response){
-                        let modalBody = $('#modalJudgeResult .modal-body');
+                    if(response.hasOwnProperty('notificationRating') && response.hasOwnProperty('notificationRatingComponents') && response.hasOwnProperty('notificationRatingCriterion')){
+                        let modalBody = $('#modalNotificationRating .modal-body');
                         modalBody.text('');
-                        modalBody.append(createJudgeResultModalBody(response.judgeResult));
-                        $('#modalJudgeResult').modal('show');
+                        modalBody.append(createNotificationRatingModalBody(response));
+                        $('#modalNotificationRating').modal('show');
                     }
                 },
                 error: function (jqXHR, textStatus, thrownError) {
@@ -303,65 +303,56 @@ function judgeResultButtonHandler(e) {
 
 
 }
+function normalize(score, scoreRange, normalizeRange = [0,1]){
+    return ((score-scoreRange[0])/(scoreRange[1] - scoreRange[0]))*(normalizeRange[1]-normalizeRange[0])+normalizeRange[0];
+}
 
-function createJudgeResultModalBody(judgeResult){
-    console.log(judgeResult);
-
+function createNotificationRatingModalBody(response){
     let thead1 = $(document.createElement('thead'))
         .append($(document.createElement('tr'))
             .append($(document.createElement('th')).append('Kryterium'))
+            .append($('<th>').append('Wynik'))
             .append($(document.createElement('th')).append('Ocena')));
 
 
-    let tbody1 = $(document.createElement('tbody'))
-        .append($(document.createElement('tr'))
-            .append($(document.createElement('td')).append('Jakość wykonania'))
-            .append($(document.createElement('td')).append(judgeResult.judge_quality)))
+    let tbody1 = $(document.createElement('tbody'));
 
-        .append($(document.createElement('tr'))
-            .append($(document.createElement('td')).append('Kontakt z serwisantem'))
-            .append($(document.createElement('td')).append(judgeResult.judge_contact)))
-
-        .append($(document.createElement('tr'))
-            .append($(document.createElement('td')).append('Czas wykonywania'))
-            .append($(document.createElement('td')).append(judgeResult.judge_time)))
-
-        .append($(document.createElement('tr'))
-            .append($(document.createElement('th')).append('Ocena ogólna'))
-            .append($(document.createElement('th')).append(judgeResult.judge_sum+'/6')));
-
+    $.each(response.notificationRatingComponents, function (componentIndex, component) {
+        let notificationRatingCriterion = response.notificationRatingCriterion.find(x => x.id === component.notification_rating_criterion_id);
+        let tr = $('<tr>')
+            .append($('<td>').append(notificationRatingCriterion.criterion))
+            .append($('<td>').append(Math.round(normalize(component.rating,
+                [notificationRatingCriterion.rating_system.rating_start, notificationRatingCriterion.rating_system.rating_stop])*10000)/100).append('%'));
+        if (notificationRatingCriterion.rating_system.id === 1) {
+            tr.append($('<td>').append(component.rating === 1 ? 'NIE' : 'TAK').css({'background-color': component.rating === 1 ? 'rgba(255,0,0,0.75)' : 'rgba(0,175,0,0.75)'}))
+        } else if (notificationRatingCriterion.rating_system.id === 3) {
+            tr.append($('<td>').append(component.rating === 1 ? 'NIE' : component.rating === 2 ? 'ŚREDNIO' : 'TAK')
+                .css({'background-color': component.rating === 1 ? 'rgba(255,0,0,0.75)' : component.rating === 2 ? 'rgba(0,0,255,0.75)' : 'rgba(0,175,0,0.75)'}))
+        } else {
+            tr.append($('<td>').append(component.rating));
+        }
+        tbody1.append(tr);
+    });
+    tbody1.append( $('<tr>').css({'font-weight':'bold','color':'white','background-color':'#696969'})
+        .append($('<td>').append('Suma:'))
+        .append($('<td>').append(Math.round(response.notificationRating.average_rating*10000)/100).append('%')));
     let table1 = $(document.createElement('table')).addClass('table table-striped table-bordered thead-inverse')
         .append(thead1).append(tbody1);
-    let tablesCol1 = $(document.createElement('div')).addClass('col-md-6').append(table1);
-
-    let thead2 = $(document.createElement('thead'))
-        .append($(document.createElement('tr'))
-            .append($(document.createElement('th')).append('Kryterium'))
-            .append($(document.createElement('th')).append('Ocena')));
+    let tablesCol1 = $(document.createElement('div')).addClass('col-md-12').append(table1);
 
 
-    let tbody2 = $(document.createElement('tbody'))
-        .append($(document.createElement('tr'))
-            .append($(document.createElement('td')).append('Problem naprawiony'))
-            .append($(document.createElement('td')).css('background',judgeResult.repaired === 1 ? '#78ff80' : '#ff7878')
-                .append(judgeResult.repaired === 1 ? 'TAK' : 'NIE')))
-
-        .append($(document.createElement('tr'))
-            .append($(document.createElement('td')).append('Kontakt technika po zakończeniu'))
-            .append($(document.createElement('td')).css('background',judgeResult.response_after === 1 ? '#78ff80' : '#ff7878')
-                .append(judgeResult.response_after === 1 ? 'TAK' : 'NIE')));
-
-    let table2 = $(document.createElement('table')).addClass('table table-striped table-bordered thead-inverse')
-        .append(thead2).append(tbody2);
-    let tablesCol2 = $(document.createElement('div')).addClass('col-md-6').append(table2);
-
-    let tablesRow = $(document.createElement('div')).addClass('row').append(tablesCol1).append(tablesCol2);
+    let tablesRow = $(document.createElement('div')).addClass('row').append(tablesCol1);
 
     let commentCol = $(document.createElement('div')).addClass('col-md-12')
         .append($(document.createElement('label')).append('Komentarz:'))
-        .append($(document.createElement('div')).addClass('well well-sm').append(judgeResult.comment));
+        .append($(document.createElement('div')).addClass('well well-sm').append(response.notificationRating.comment));
     let commentRow = $(document.createElement('div')).addClass('row').append(commentCol);
-    return  $(document.createElement('div')).append(tablesRow).append($(document.createElement('hr'))).append(commentRow);
+
+    let append = $(document.createElement('div')).append(tablesRow);
+    if(response.notificationRating.comment !== null){
+        append.append($(document.createElement('hr'))).append(commentRow);
+    }
+    return append;
 
 }
 </script>
