@@ -13,7 +13,7 @@
     </label>
     @endif
     @if($rating == 2) <label class="NoAverageYes">
-        <div class="well well-sm" style="background-color: rgba(0,0,255,0.75); border-radius: 25%; padding: 2em">
+        <div class="well well-sm" style="background-color: rgba(0,0,255,0.50); border-radius: 25%; padding: 2em">
             <input type="radio" name="{{$radioName}}"  checked="checked" disabled="disabled" value="2"> ŚREDNIO
         </div>
     </label>
@@ -32,7 +32,7 @@
         </div>
     </label>
     <label class="NoAverageYes">
-        <div class="well well-sm" style="background-color: rgba(255,255,0,0.75); border-radius: 25%; padding: 2em">
+        <div class="well well-sm" style="background-color: rgba(0,0,255,0.50); border-radius: 25%; padding: 2em">
             <input type="radio" name="{{$radioName}}" value="2"> ŚREDNIO
         </div>
     </label>

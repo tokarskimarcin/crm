@@ -356,6 +356,8 @@ Route::post('/allDepartmentsConfirmationStatisticsAjax', 'Statistics\Departments
 
 Route::post('/removedNotificationsCountStatisticsAjax', 'Statistics\RemovedNotificationStatisticsController@removedNotificationsCountStatisticsAjax')->name('api.removedNotificationsCountStatisticsAjax');
 Route::post('/removedNotificationsAjax', 'Statistics\RemovedNotificationStatisticsController@removedNotificationsAjax')->name('api.removedNotificationsAjax');
+
+Route::post('/iTNotificationsStatisticsAjax', 'Statistics\ITNotificationStatisticsController@iTNotificationsStatisticsAjax')->name('api.iTNotificationsStatisticsAjax');
 /* END STATISTICS ROUTES AJAX */
 
 //********************END AJAX*********************** */

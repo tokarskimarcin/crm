@@ -22,6 +22,7 @@
     <style>
         .VCtooltip .well:hover {
             background-color: rgba(185,185,185,0.75) !important;
+            cursor: help;
         }
     </style>
 @endsection
