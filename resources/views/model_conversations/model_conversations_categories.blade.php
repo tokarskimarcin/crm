@@ -20,6 +20,6 @@
         };
     </script>
 
-    <script src="{{ asset('js/model_conversations/category.blade.js') }}"></script>
-    <script src="{{ asset('js/model_conversations/script.blade.js') }}"></script>
+    <script src="{{ asset('js/model_conversations/category.js') }}"></script>
+    <script src="{{ asset('js/model_conversations/menu.js') }}"></script>
 @endsection

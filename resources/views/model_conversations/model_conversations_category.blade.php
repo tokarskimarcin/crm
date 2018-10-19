@@ -7,6 +7,18 @@
 
 
 @section('script')
-    <script src="{{ asset('js/model_conversations/category.blade.js') }}"></script>
-    <script src="{{ asset('js/model_conversations/script.js') }}"></script>
+    <script>
+        //In this script we define global variables and php variables
+        let APP = {
+            DOMElements: {
+                main: document.querySelector('main')
+            },
+            globalVariables: {
+                categories: @json($categories),
+                url: `{{asset('storage/')}}`
+            }
+        };
+    </script>
+    <script src="{{ asset('js/model_conversations/category.js') }}"></script>
+    <script src="{{ asset('js/model_conversations/categories.js') }}"></script>
 @endsection

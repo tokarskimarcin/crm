@@ -13,16 +13,17 @@ class ModelConversationsController extends Controller
     public function modelConversationMenuGet() {
 
         //Mockup of categories
-        $categories = ModelConvCategories::OnlyActive()->get();
+        $categories = ModelConvCategories::OnlyActive()->where('subcategory_id', '=', 0)->get();
 
         return view('model_conversations.model_conversations_categories')
             ->with('categories', $categories);
     }
 
     public function categoryGet($id) {
+        $categories = ModelConvCategories::OnlyActive()->where('subcategory_id', '=', $id)->get();
 
-
-        return view('model_conversations.model_conversations_category');
+        return view('model_conversations.model_conversations_category')
+            ->with('categories', $categories);
     }
 
     public function modelConversationsManagementGet() {
