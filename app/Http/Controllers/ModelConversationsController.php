@@ -71,8 +71,9 @@ class ModelConversationsController extends Controller
             $picture = $request->file('picture');
 //            $picture_ext = $picture->getClientOriginalExtension();
             $picture_name = $picture->getClientOriginalName();
-//            dd($picture_name);
+
             $picture->storeAs('public',$picture_name);
+
         }
         else { //case when we are adding new category
 

@@ -15,8 +15,7 @@
             },
             globalVariables: {
                 categories: @json($categories),
-                url: `{{Storage::url('app/public')}}`,
-                url2: `{{asset('image/')}}`
+                url: `{{asset('storage/')}}`
             }
         };
     </script>

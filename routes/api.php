@@ -36,6 +36,12 @@ Route::get('getAuditScan/{name}', function($name){
     return response()->download($path);
 });
 
+Route::get('getCategoryPicture/{name}', function($name){
+    //return 1;
+    $path = storage_path('app/model_conversations/' . $name);
+    return response()->download($path);
+});
+
 Route::get('getInvoice/{name}', function($name){
     $path = storage_path('app/campaign_invoice_files/' . $name);
     return response()->file($path);

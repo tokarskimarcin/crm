@@ -28,6 +28,7 @@
                             <th>Nazwa</th>
                             <th>Zdjęcie</th>
                             <th>Status</th>
+                            <th>Podkategoria</th>
                             <th>Akcja</th>
                         </tr>
                     </thead>
@@ -38,6 +39,7 @@
                             <td>{{$category->name}}</td>
                             <td>{{$category->img}} <a href="{{asset('image/')}}/{{$category->img}}"><span class="glyphicon glyphicon-picture"></span></a></td>
                             <td>@if($category->status == 1) <div class="alert alert-success">Aktywna</div> @else <div class="alert alert-danger">Nieaktywna</div> @endif</td>
+                            <td>Główna</td>
                             <td>@if($category->status == 1) <button class=" btn btn-warning" data-type="category" data-action="1">Wyłącz</button> @else <button class="btn btn-success" data-type="category" data-action="2">Włącz </button> @endif <button class="btn btn-danger" data-type="category" data-action="0">Usuń</button> <button class="btn btn-info" id="changePicture" data-type="category" data-action="4" data-toggle="modal" data-target="#myModal">Zmien zdjęcie</button> </td>
                         </tr>
                         @endforeach

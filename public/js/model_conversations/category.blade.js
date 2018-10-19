@@ -17,6 +17,6 @@ Category.prototype.createDOMElement = function() {
 
     main_div.appendChild(name_div);
 
-    main_div.style.backgroundImage = 'url(' + APP.globalVariables.url2 + '/' + this.image + ')';
+    main_div.style.backgroundImage = 'url(' + APP.globalVariables.url + '/' + this.image + ')';
     return main_div;
 }
