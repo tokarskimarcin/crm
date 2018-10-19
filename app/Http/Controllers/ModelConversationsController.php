@@ -6,6 +6,7 @@ use App\ActivityRecorder;
 use App\ModelConvCategories;
 use App\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Storage;
 
 class ModelConversationsController extends Controller
@@ -64,10 +65,17 @@ class ModelConversationsController extends Controller
 
     }
 
+    /**
+     * @param Request $request
+     * @return mixed
+     * This method changes picture of category or adds new category
+     */
     public function categoryPost(Request $request) {
         $toAdd = $request->toAdd;
 
         if($toAdd == 0) { //case when we are only adding new picture
+
+            //przy zmianie zdiecia, trzeba usunać stare - trzeba dodać to
             $id = $request->id;
             $picture = $request->file('picture');
 //            $picture_ext = $picture->getClientOriginalExtension();
@@ -78,6 +86,28 @@ class ModelConversationsController extends Controller
         }
         else { //case when we are adding new category
 
+            //trzeba dodać ograniczenie na wielkosc zdiecia i rozszerzenie.
+            $name = $request->name;
+            $picture = $request->file('picture');
+            $picture_name = null;
+            if($picture) {
+                $picture_name = $picture->getClientOriginalName();
+                $picture->storeAs('public',$picture_name);
+            }
+            else {
+                $picture_name = 'chmury1.jpeg';
+            }
+
+            $status = $request->status;
+            $subcategory = $request->subcategory;
+
+            $category = new ModelConvCategories();
+            $category->subcategory_id = $subcategory;
+            $category->name = $name;
+            $category->img = $picture_name;
+            $category->status = $status;
+            $category->save();
         }
+        return Redirect::back();
     }
 }

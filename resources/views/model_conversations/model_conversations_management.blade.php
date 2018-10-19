@@ -21,7 +21,7 @@
             <div id="menu1" class="tab-pane fade">
                 <h3>Kategorie</h3>
 
-                <table class="table table-stripped">
+                <table class="table table-stripped table-condensed">
                     <thead>
                         <tr>
                             <th>ID</th>
@@ -39,10 +39,32 @@
                             <td>{{$category->name}}</td>
                             <td>{{$category->img}} <a href="{{asset('image/')}}/{{$category->img}}"><span class="glyphicon glyphicon-picture"></span></a></td>
                             <td>@if($category->status == 1) <div class="alert alert-success">Aktywna</div> @else <div class="alert alert-danger">Nieaktywna</div> @endif</td>
-                            <td> {{$category->subcategory_id}}</td>
+                            <td>@if($category->subcategory_id == 0) Głowne kategorie @else {{$category->subcategory_id}} @endif</td>
                             <td>@if($category->status == 1) <button class=" btn btn-warning" data-type="category" data-action="1">Wyłącz</button> @else <button class="btn btn-success" data-type="category" data-action="2">Włącz </button> @endif <button class="btn btn-danger" data-type="category" data-action="0">Usuń</button> <button class="btn btn-info" id="changePicture" data-type="category" data-action="4" data-toggle="modal" data-target="#myModal">Zmien zdjęcie</button> </td>
                         </tr>
                         @endforeach
+                        <form  method="post" action="/modelConversationCategory" enctype="multipart/form-data">
+                            <input type="hidden" name="toAdd" value="1">
+                            <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                            <tr style="background-color: gray;">
+                                <td>Nowa kategoria</td>
+                                <td><input class="form-control" type="text" placeholder="Nazwa kategorii" name="name"></td>
+                                <td><input type="file" name="picture"></td>
+                                <td><select name="status"></select></td>
+                                <td>
+                                    <select name="subcategory" class="form-control">
+                                        <option value="0">Główna kategoria</option>
+                                        @foreach($categories as $category)
+                                            @if($category->status == 1)
+                                            <option value="{{$category->id}}">{{$category->name}}</option>
+                                            @endif
+                                        @endforeach
+                                    </select>
+                                </td>
+                                <td><input type="submit" class="btn btn-success" value="Dodaj nową kategorię"></td>
+                            </tr>
+                        </form>
+
                     </tbody>
                 </table>
             </div>
