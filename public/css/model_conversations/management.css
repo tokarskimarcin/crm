@@ -1,0 +1,12 @@
+.box {
+    width: 95%;
+    margin: 0 auto;
+}
+
+.active-category {
+    background-color: lightgreen;
+}
+
+.inactive-category {
+    background-color: lightcoral;
+}

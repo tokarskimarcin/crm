@@ -60,6 +60,7 @@ footer {
 
 .category {
     box-shadow: 0 0 10px 10px white inset;
+    border-radius: 4%;
 
     display: flex;
     align-items: center;
@@ -68,11 +69,12 @@ footer {
 
 .category:hover {
     cursor: pointer;
+    opacity: 0.8;
 }
 
 @keyframes largeText {
     from {font-size: 2em;}
-    to {font-size: 2.2em;}
+    to {font-size: 2.5em;}
 }
 
 .center {
@@ -83,7 +85,7 @@ footer {
 
 .center:hover {
     animation-name: largeText;
-    animation-duration: 1s;
+    animation-duration: 1.3s;
     animation-fill-mode: forwards;
 }
 

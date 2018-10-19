@@ -1,11 +1,9 @@
 @extends('model_conversations.model_conversations_menu')
+@section('styles')
+    <link rel="stylesheet" href="{{asset('css/model_conversations/management.css')}}">
+@endsection
+
 @section('section')
-    <style>
-        .box {
-            width: 95%;
-            margin: 0 auto;
-        }
-    </style>
 
     <div class="box">
         <ul class="nav nav-tabs">
@@ -38,8 +36,8 @@
                             <td>{{$category->id}}</td>
                             <td>{{$category->name}}</td>
                             <td>{{$category->img}} <a href="{{asset('image/')}}/{{$category->img}}"><span class="glyphicon glyphicon-picture"></span></a></td>
-                            <td>@if($category->status == 1) <div class="alert alert-success">Aktywna</div> @else <div class="alert alert-danger">Nieaktywna</div> @endif</td>
-                            <td>@if($category->subcategory_id == 0) Głowne kategorie @else {{$category->subcategory_id}} @endif</td>
+                            <td>@if($category->status == 1) <span class="active-category">Aktywna</span> @else <div class="inactive-category">Nieaktywna</div> @endif</td>
+                            <td>@if($category->subcategory_id == 0) Głowne kategorie @else {{$categories->where('id', '=', $category->subcategory_id)->first()->name}} @endif</td>
                             <td>@if($category->status == 1) <button class=" btn btn-warning" data-type="category" data-action="1">Wyłącz</button> @else <button class="btn btn-success" data-type="category" data-action="2">Włącz </button> @endif <button class="btn btn-danger" data-type="category" data-action="0">Usuń</button> <button class="btn btn-info" id="changePicture" data-type="category" data-action="4" data-toggle="modal" data-target="#myModal">Zmien zdjęcie</button> </td>
                         </tr>
                         @endforeach
