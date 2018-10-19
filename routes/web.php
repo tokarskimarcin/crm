@@ -358,6 +358,8 @@ Route::post('/removedNotificationsCountStatisticsAjax', 'Statistics\RemovedNotif
 Route::post('/removedNotificationsAjax', 'Statistics\RemovedNotificationStatisticsController@removedNotificationsAjax')->name('api.removedNotificationsAjax');
 
 Route::post('/iTNotificationsStatisticsAjax', 'Statistics\ITNotificationStatisticsController@iTNotificationsStatisticsAjax')->name('api.iTNotificationsStatisticsAjax');
+
+Route::post('/iTCadreNotificationsRatingsStatisticsAjax', 'Statistics\ITNotificationsRatingsStatisticsController@iTCadreNotificationsRatingsStatisticsAjax')->name('api.iTCadreNotificationsRatingsStatisticsAjax');
 /* END STATISTICS ROUTES AJAX */
 
 //********************END AJAX*********************** */
@@ -645,7 +647,7 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
     Route::get('/rateNotification/{id}', 'NotificationController@rateNotificationGet');
     Route::get('/rateNotificationPost', 'NotificationController@rateNotificationPost');
 
-    Route::get('/it_cadre', 'NotificationController@ITCadreGet');
+    Route::get('/iTNotificationsRatingsStatisticsGet', 'Statistics\ITNotificationsRatingsStatisticsController@iTNotificationsRatingsStatisticsGet');
 
     Route::get('/it_worker/{id}', 'NotificationController@ITWorkerGet');
 

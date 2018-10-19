@@ -164,7 +164,7 @@ function drawStuff() {
 
 var chart = new google.charts.Bar(document.getElementById('dual_x_div'));
 chart.draw(data, options);
-};
+}
 
 </script>
 @endsection
