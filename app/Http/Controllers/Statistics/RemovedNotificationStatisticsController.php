@@ -9,6 +9,7 @@
 namespace App\Http\Controllers\Statistics;
 
 
+use App\Department_info;
 use App\Notifications;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -17,10 +18,14 @@ class RemovedNotificationStatisticsController
 {
 
     public function removedNotificationGet(){
-        return view('statistics.removedNotificationsStatistics');
+        $departments = Department_info::with('departments')->with('department_type')->get();
+        return view('statistics.removedNotificationsStatistics')
+            ->with('departments',$departments);
     }
 
     public function removedNotificationsCountStatisticsAjax(Request $request){
+        $departmentsSelected = $request->departmentsSelect;
+        $notificationsTypeSelected = $request->notificationsTypeSelect;
         $removedNotificationsStatistics = Notifications::
         select(DB::raw('concat(u.last_name," ", u.first_name) as person'),
             DB::raw('concat(dep.name," ", dep_type.name) as department'),
@@ -32,12 +37,22 @@ class RemovedNotificationStatisticsController
             ->join('departments as dep','dep_info.id_dep','dep.id')
             ->whereBetween('remove_date',[$request->dateStart, $request->dateStop])
             ->where('status', 0 )
-            ->groupBy('user_id')
-            ->get();
-        return $removedNotificationsStatistics;
+            ->groupBy('user_id');
+        if($departmentsSelected != 0){
+            $removedNotificationsStatistics->where('u.main_department_id', $departmentsSelected);
+        }
+        if($notificationsTypeSelected == 1){            //removed by user who create notification
+            $removedNotificationsStatistics->whereRaw('user_id = removed_by_user_id');
+        }else if($notificationsTypeSelected ==2){       //removed by user who didn't create notification
+            $removedNotificationsStatistics->whereRaw('user_id <> removed_by_user_id');
+        }
+
+        return $removedNotificationsStatistics->get();
     }
+
     public function removedNotificationsAjax(Request $request){
 
+        $notificationsTypeSelected = $request->notificationsTypeSelect;
         $removedNotificationsStatistics = Notifications::select('remove_date',
             DB::raw('concat(remover.last_name," ", remover.first_name) as removedBy'),
             DB::raw('concat(notifier.last_name," ", notifier.first_name) as notifiedBy'),
@@ -46,9 +61,13 @@ class RemovedNotificationStatisticsController
             ->join('users as remover', 'removed_by_user_id','remover.id')
             ->whereBetween('remove_date',[$request->dateStart, $request->dateStop])
             ->where('status',0)
-            ->where('user_id', $request->selectedUser)
-            ->get();
+            ->where('user_id', $request->selectedUser);
 
-        return $removedNotificationsStatistics;
+        if($notificationsTypeSelected == 1){            //removed by user who create notification
+            $removedNotificationsStatistics->whereRaw('user_id = removed_by_user_id');
+        }else if($notificationsTypeSelected ==2){       //removed by user who didn't create notification
+            $removedNotificationsStatistics->whereRaw('user_id <> removed_by_user_id');
+        }
+        return $removedNotificationsStatistics->get();
     }
 }

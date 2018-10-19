@@ -24,6 +24,9 @@
             background-color: rgba(185,185,185,0.75) !important;
             cursor: help;
         }
+        .bootstrap-select > .dropdown-menu{
+            left: 0 !important;
+        }
     </style>
 @endsection
 @section('content')
@@ -55,17 +58,27 @@
                             <input type='text' class="form-control" name="date_stop" value="{{date('Y-m-').date('t')}}" readonly/>
                     </div></label>
                 </div>
-                <div class="col-md-4">
-                    @if(0)
-                        <label for="departmentsSelect">Oddział:</label>
-                        <select class="form-control selectpicker" id="departmentsSelect" name="department">
+                <div class="col-md-3">
+                    @if(isset($departments))
+                        <label for="departmentsSelect">Oddział:
+                        <select class="form-control selectpicker" id="departmentsSelect" name="departmentsSelect">
+                            <option value="0">Wszystkie</option>
                             @foreach($departments as $dep)
                                 <option value="{{$dep->id}}" >{{$dep->departments->name}} {{$dep->department_type->name}}</option>
                             @endforeach
                         </select>
+                        </label>
                     @endif
                 </div>
-                <div class="col-md-2"></div>
+                <div class="col-md-3">
+                    <label for="notificationsTypeSelect">Zgłoszenia:
+                        <select class="form-control selectpicker" id="notificationsTypeSelect" name="notificationsTypeSelect">
+                            <option value="0">Wszystkie</option>
+                            <option value="1">Usunięte przez zgłaszającego</option>
+                            <option value="2">Usunięte nie przez zgłaszającego</option>
+                        </select>
+                    </label>
+                </div>
                 <div class="col-md-2">
                     <div class="VCtooltip VCtooltip-left">
                         <div class="well well-sm" style="border-radius: 10%; background-color: #5bc0de; color: white; margin-bottom: 0;">Legenda <span class="glyphicon glyphicon-info-sign"></span></div>
@@ -122,6 +135,8 @@
             let VARIABLES = {
                 selectedUser: null,
                 jQElements: {
+                    departmentsSelect: $('#departmentsSelect'),
+                    notificationsTypeSelect: $('#notificationsTypeSelect'),
                     startDatetimepicker: $('#startDatetimepicker').datetimepicker({
                         language: 'pl',
                         minView: 2,
@@ -243,19 +258,24 @@
                     callEvents: function () {
                         (function startDatetimepickerHandler() {
                             VARIABLES.jQElements.startDatetimepicker.datetimepicker().on('changeDate',function () {
-                                VARIABLES.DATA_TABLES.removedNotificationsCount.ajaxReload();
-                                if(VARIABLES.selectedUser !== null){
-                                    VARIABLES.DATA_TABLES.removedNotifications.ajaxReload()
-                                }
+                               FUNCTIONS.reloadTables();
                             });
                         })();
 
                         (function stopDatetimepickerHandler() {
                             VARIABLES.jQElements.stopDatetimepicker.datetimepicker().on('changeDate',function () {
-                                VARIABLES.DATA_TABLES.removedNotificationsCount.ajaxReload();
-                                if(VARIABLES.selectedUser !== null){
-                                    VARIABLES.DATA_TABLES.removedNotifications.ajaxReload()
-                                }
+                                FUNCTIONS.reloadTables();
+                            });
+                        })();
+
+                        (function departmentsSelectHandler() {
+                            VARIABLES.jQElements.departmentsSelect.on('changed.bs.select',function () {
+                                FUNCTIONS.reloadTables();
+                            });
+                        })();
+                        (function notificationsTypeSelectHandler() {
+                            VARIABLES.jQElements.notificationsTypeSelect.on('changed.bs.select',function () {
+                                FUNCTIONS.reloadTables();
                             });
                         })();
                     }
@@ -268,7 +288,9 @@
                             headers: {'X-CSRF-TOKEN': '{{ csrf_token() }}'},
                             data: {
                                 dateStart: VARIABLES.jQElements.startDatetimepicker.find('input').val(),
-                                dateStop: VARIABLES.jQElements.stopDatetimepicker.find('input').val()
+                                dateStop: VARIABLES.jQElements.stopDatetimepicker.find('input').val(),
+                                departmentsSelect: VARIABLES.jQElements.departmentsSelect.val(),
+                                notificationsTypeSelect: VARIABLES.jQElements.notificationsTypeSelect.val()
                             },
                             success: function (response) {
                                 VARIABLES.DATA_TABLES.removedNotificationsCount.data.removedNotificationsCountStatistics = response;
@@ -294,7 +316,8 @@
                             data: {
                                 dateStart: VARIABLES.jQElements.startDatetimepicker.find('input').val(),
                                 dateStop: VARIABLES.jQElements.stopDatetimepicker.find('input').val(),
-                                selectedUser: VARIABLES.selectedUser
+                                notificationsTypeSelect: VARIABLES.jQElements.notificationsTypeSelect.val(),
+                                selectedUser: VARIABLES.selectedUser,
                             },
                             success: function (response) {
                                 VARIABLES.DATA_TABLES.removedNotifications.data.removedNotifications = response;
@@ -312,6 +335,11 @@
                             }
                         });
                     }},
+                reloadTables(){
+                    VARIABLES.DATA_TABLES.removedNotificationsCount.ajaxReload();
+                    VARIABLES.DATA_TABLES.removedNotifications.dataTable.clear();
+                    VARIABLES.DATA_TABLES.removedNotifications.dataTable.draw();
+                },
                 @php
                     /*universal function for datatables that reload data in given datatable
                     * @DATA_TABLES dataTable
