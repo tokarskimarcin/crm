@@ -16,7 +16,7 @@ header {
     background-color: #231f20;
     color: white;
 
-    box-shadow: 10px 10px 15px black;
+    box-shadow: 0 0 10px 15px #231f20;
     margin-bottom: 2em;
 
     display: flex;
@@ -40,6 +40,11 @@ header {
     align-items: center;
     justify-content: flex-end;
 
+    font-size: 1.2em;
+    color: white;
+    font-weight: bold;
+    font-family: verdana;
+
 }
 
 .link {
@@ -54,7 +59,32 @@ footer {
 }
 
 .category {
-    background-color: lightgray;
+    box-shadow: 0 0 10px 10px white inset;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.category:hover {
+    cursor: pointer;
+}
+
+@keyframes largeText {
+    from {font-size: 2em;}
+    to {font-size: 2.2em;}
+}
+
+.center {
+    font-size: 2em;
+    color: white;
+    font-family: Comic Sans MS;
+}
+
+.center:hover {
+    animation-name: largeText;
+    animation-duration: 1s;
+    animation-fill-mode: forwards;
 }
 
 @media only screen and (max-width: 600px) {

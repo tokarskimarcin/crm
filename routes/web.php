@@ -1095,3 +1095,13 @@ Route::get('/setCityApprovalPart6','AutoScriptController@setCityApprovalPart6');
 //Route::get('/refreshPbxReportExtension', 'AutoScriptController@pbx_update');
 
 Route::get('/modelConversationMenu', 'ModelConversationsController@modelConversationMenuGet');
+
+Route::get('/modelConversationCategory/{id}', 'ModelConversationsController@categoryGet');
+Route::put('/modelConversationCategory/{id}', 'ModelConversationsController@categoryPut');
+Route::delete('/modelConversationCategory/{id}', 'ModelConversationsController@categoryDelete');
+Route::post('/modelConversationCategory', 'ModelConversationsController@categoryPost');
+
+Route::get('/modelConversationsManagement', 'ModelConversationsController@modelConversationsManagementGet');
+Route::get('/modelConversationsPlaylist', 'ModelConversationsController@modelConversationsPlaylistGet');
+
+

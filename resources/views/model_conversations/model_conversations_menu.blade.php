@@ -5,6 +5,8 @@
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <link href="{{ asset('/vendor/bootstrap/css/bootstrap.min.css')}}" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('css/model_conversations/styles.css') }}">
     <title>Document</title>
 </head>
@@ -16,24 +18,27 @@
             </div>
             <div class="links">
                 <div class="link link1">
-                    TeamBox
+                    <a href="/">TeamBox</a>
                 </div>
-                <div class="link link2">
-                    Inna strona
+                <div class="link link1">
+                    <a href="/modelConversationMenu">Kategorie</a>
+                </div>
+                <div class="link link3">
+                    <a href="/modelConversationsManagement">Panel zarządzania</a>
+                </div>
+                <div class="link link4">
+                    <a href="/modelConversationsPlaylist">Play lista</a>
                 </div>
             </div>
         </header>
-        <main class="main_part">
+        @yield('section')
+        {{--<main class="main_part">--}}
+           {{----}}
             {{--<div class="category category_1"> Kategoria 1</div>--}}
             {{--<div class="category category_2"> Kategoria 2</div>--}}
             {{--<div class="category category_3"> Kategoria 3</div>--}}
 
-            {{--<div class="category category_1"> Kategoria 4</div>--}}
-            {{--<div class="category category_2"> Kategoria 5</div>--}}
-            {{--<div class="category category_3"> Kategoria 6</div>--}}
-
-            {{--<div class="category category_3"> Kategoria 7</div>--}}
-        </main>
+        {{--</main>--}}
         <footer class="main_part">
             <p>Posted by: Paweł Chmielewski</p>
             <p>Contact information: <a href="mailto:someone@example.com">
@@ -42,17 +47,8 @@
     </div>
 </body>
 </html>
-
-<script>
-    //In this script we define global variables and php variables
-    let APP = {
-        DOMElements: {
-            main: document.querySelector('main')
-        },
-        globalVariables: {
-            categories: @json($categories)
-        }
-    };
-</script>
-<script src="{{ asset('js/model_conversations/script.js') }}"></script>
+<script src="{{ asset('/js/jquery-3.3.1.min.js')}}"></script>
+<script src="{{ asset('/vendor/bootstrap/js/bootstrap.min.js')}}"></script>
 <script src="{{ asset('js/data_structures/queue.js') }}"></script>
+@yield('script')
+
