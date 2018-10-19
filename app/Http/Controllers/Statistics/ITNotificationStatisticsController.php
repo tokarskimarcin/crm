@@ -11,8 +11,7 @@ namespace App\Http\Controllers\Statistics;
 
 use App\Notifications;
 use App\User;
-use App\Utilities\Dates\MonthIntoCompanyWeeksDivision;
-use App\Utilities\Dates\MonthPerWeekDivision;
+use App\Utilities\Dates\MonthFourWeeksDivision;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -61,7 +60,7 @@ class ITNotificationStatisticsController
     }
 
     public function iTNotificationsStatisticsDataToView($view, $month){
-        $monthIntoCompanyWeeksDivision = MonthIntoCompanyWeeksDivision::get(date('m',strtotime($month)),date('Y',strtotime($month)));
+        $monthIntoCompanyWeeksDivision = MonthFourWeeksDivision::get(date('Y',strtotime($month)), date('m',strtotime($month)));
         $iTNotificationStatisticsData = $this->iTNotificationStatisticsData($monthIntoCompanyWeeksDivision);
         return $view->with('iTRealizedNotificationStatistics',$iTNotificationStatisticsData['iTRealizedNotificationStatistics'])
             ->with('iTUnrealizedNotificationStatistics', $iTNotificationStatisticsData['iTUnrealizedNotificationStatistics']);
@@ -70,13 +69,13 @@ class ITNotificationStatisticsController
 
     public function iTNotificationsStatisticsAjax(Request $request){
         $month = $request->selectedMonth;
-        $monthIntoCompanyWeeksDivision = MonthIntoCompanyWeeksDivision::get(date('m',strtotime($month)),date('Y',strtotime($month)));
+        $monthIntoCompanyWeeksDivision = MonthFourWeeksDivision::get(date('Y',strtotime($month)), date('m',strtotime($month)));
+        $monthIntoCompanyWeeksDivision[0]->firstDay = $month.'-01';
         $iTNotificationStatisticsData = $this->iTNotificationStatisticsData($monthIntoCompanyWeeksDivision);
         $ITids = collect(array_merge($iTNotificationStatisticsData['iTRealizedNotificationStatistics']->pluck('displayed_by')->unique()->toArray(),
             $iTNotificationStatisticsData['iTUnrealizedNotificationStatistics']->pluck('displayed_by')->unique()->toArray()))->unique();
-
-
-        return ['programmers'=> User::select('id','first_name','last_name')->whereIn('id', $ITids)->get(),
+        $programmers = User::select('id','first_name','last_name')->whereIn('id', $ITids)->get();
+        return ['programmers'=> $programmers,
             'iTRealizedNotificationStatistics' => $iTNotificationStatisticsData['iTRealizedNotificationStatistics']->groupBy('displayed_by'),
             'iTUnrealizedNotificationStatistics' => $iTNotificationStatisticsData['iTUnrealizedNotificationStatistics']->groupBy('displayed_by'),
             'monthIntoCompanyWeeksDivision' => $monthIntoCompanyWeeksDivision];

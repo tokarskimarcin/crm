@@ -63,6 +63,7 @@
                         <div class="well well-sm" style="border-radius: 10%; background-color: #5bc0de; color: white; margin-bottom: 0;">Legenda <span class="glyphicon glyphicon-info-sign"></span></div>
                         <span class="tooltiptext">
                             <div class="alert alert-info">
+                                Zmiana daty skutkuje zaktualizowaniem listy programistów, którzy w danym okresie mieli jakiekolwiek statystyki zgłoszeń.<br>
                                 <strong>Not CNT</strong> (not count) oznacza, że średnia ocen nie wlicza się w średnią tygodniową, ponieważ nie było w danym dniu ocenionych zgłoszeń.
                             </div>
                         </span>
@@ -172,11 +173,14 @@
                     $.each(VARIABLES.data.monthIntoCompanyWeeksDivision,function (index, week) {
                         let weekTable = $('<table>').addClass('table table-responsive thead-inverse table-striped table-condensed')
                             .append($('<thead>')
-                                .append($('<tr>')
-                                    .append($('<th>').attr('colspan',5)
-                                        .append('Tydzień: '+moment(week.firstDay).format('YYYY.MM.DD')+' - '+moment(week.lastDay).format('YYYY.MM.DD')))
+                                .append($('<tr>').css({'background-color':'black','color':'#efd88f'})
+                                    .append($('<th>').attr('colspan',5).css({'padding':'1em'})
+                                        .append($('<font>').attr('size',5).attr('face','Calibri')
+                                            .append('Tydzień '+moment(week.firstDay).format('YYYY.MM.DD')+' - '+moment(week.lastDay).format('YYYY.MM.DD'))
+                                        )
+                                    )
                                 )
-                                .append($('<tr>')
+                                .append($('<tr>').css({'background-color':'black','color':'#efd88f'})
                                     .append($('<th>').append('Dzień'))
                                     .append($('<th>').append('Lb. zgłoszeń'))
                                     .append($('<th>').append('Śr. ocen'))
