@@ -48,7 +48,12 @@
                                 <td>Nowa kategoria</td>
                                 <td><input class="form-control" type="text" placeholder="Nazwa kategorii" name="name"></td>
                                 <td><input type="file" name="picture"></td>
-                                <td><select name="status"></select></td>
+                                <td>
+                                    <select name="status">
+                                        <option value="1">Aktywna</option>
+                                        <option value="0">Nieaktywna</option>
+                                    </select>
+                                </td>
                                 <td>
                                     <select name="subcategory" class="form-control">
                                         <option value="0">Główna kategoria</option>

@@ -4,38 +4,65 @@ namespace App\Http\Controllers;
 
 use App\ActivityRecorder;
 use App\ModelConvCategories;
+use App\ModelConvItems;
 use App\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Storage;
 
 class ModelConversationsController extends Controller
 {
+
+    private $adminPanelAccessArr = [3]; //Array of user_type_id who can access admin panel
+
     public function modelConversationMenuGet() {
 
         //Mockup of categories
+        $user = Auth::user()->user_type_id;
         $categories = ModelConvCategories::OnlyActive()->where('subcategory_id', '=', 0)->get();
 
         return view('model_conversations.model_conversations_categories')
-            ->with('categories', $categories);
+            ->with('categories', $categories)
+            ->with('adminPanelAccessArr', $this->adminPanelAccessArr)
+            ->with('user', $user);
     }
 
     public function categoryGet($id) {
+        $user = Auth::user()->user_type_id;
         $categories = ModelConvCategories::OnlyActive()->where('subcategory_id', '=', $id)->get();
 
+        $items = ModelConvItems::where('model_category_id', '=', $id)->OnlyActive()->get();
+
         return view('model_conversations.model_conversations_category')
-            ->with('categories', $categories);
+            ->with('adminPanelAccessArr', $this->adminPanelAccessArr)
+            ->with('user', $user)
+            ->with('categories', $categories)
+            ->with('items', $items);
     }
 
     public function modelConversationsManagementGet() {
-        $categories = ModelConvCategories::all();
+        $user = Auth::user()->user_type_id;
+        if(in_array($user, $this->adminPanelAccessArr)) { //Only approved user types can acces this management panel
+            $categories = ModelConvCategories::all();
 
-        return view('model_conversations.model_conversations_management')->with('categories', $categories);
+            return view('model_conversations.model_conversations_management')
+                ->with('categories', $categories)
+                ->with('user', $user)
+                ->with('adminPanelAccessArr', $this->adminPanelAccessArr);
+        }
+        else {
+           return Redirect::back();
+        }
+
     }
 
     public function modelConversationsPlaylistGet() {
+        $user = Auth::user()->user_type_id;
 
-        return view('model_conversations.model_conversations_playlist');
+        return view('model_conversations.model_conversations_playlist')
+            ->with('adminPanelAccessArr', $this->adminPanelAccessArr)
+            ->with('user', $user);
     }
 
     /**
