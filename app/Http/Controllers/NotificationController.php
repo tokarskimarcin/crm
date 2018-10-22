@@ -434,22 +434,9 @@ class NotificationController extends Controller
             ->where('notifications.displayed_by', '=', $id)
             ->get();
 
-        $comments = DB::table('judge_results')
-            ->select(DB::raw('
-                first_name,
-                last_name,
-                comment,
-                judge_results.created_at as add_time
-            '))
-            ->leftJoin('users', 'users.id', '=', 'judge_results.user_id')
-            ->where('judge_results.it_id', '=', $id)
-            ->where('comment', 'not like', 'Brak komentarza')
-            ->get();
-
         return view('notifications.it_worker')
             ->with('user_data',$checkUser)
             ->with('user_results', $data)
-            ->with('comments', $comments)
             ->with('story_of_problem',$story_of_problem);
     }
 
