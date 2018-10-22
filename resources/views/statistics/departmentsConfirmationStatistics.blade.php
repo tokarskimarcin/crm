@@ -745,8 +745,14 @@
                     }
                 }
             };
-            VARIABLES.DATA_TABLES.departmentsConfirmation.ajaxReload();
-            VARIABLES.DATA_TABLES.allDepartmentsConfirmation.ajaxReload();
+
+            VARIABLES.DATA_TABLES.departmentsConfirmation.dataTable.on('init.dt', function () {
+                VARIABLES.DATA_TABLES.departmentsConfirmation.ajaxReload();
+            });
+
+            VARIABLES.DATA_TABLES.allDepartmentsConfirmation.dataTable.on('init.dt', function () {
+                VARIABLES.DATA_TABLES.allDepartmentsConfirmation.ajaxReload();
+            });
             FUNCTIONS.EVENT_HANDLERS.callEvents();
             resizeDatatablesOnMenuToggle([VARIABLES.DATA_TABLES.departmentsConfirmation.dataTable, VARIABLES.DATA_TABLES.allDepartmentsConfirmation.dataTable]);
         });
