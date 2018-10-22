@@ -506,6 +506,7 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
     Route::get('/check_list_cadre', 'WorkHoursController@checkListCadre');
 
     Route::get('/users_live', 'WorkHoursController@usersLive');
+
     // Work_hours --end--
 
     // Users --Start--
@@ -1093,3 +1094,4 @@ Route::get('/setCityApprovalPart5','AutoScriptController@setCityApprovalPart5');
 Route::get('/setCityApprovalPart6','AutoScriptController@setCityApprovalPart6');
 
 //Route::get('/refreshPbxReportExtension', 'AutoScriptController@pbx_update');
+Route::get('/ttt', 'WorkHoursController@test');
