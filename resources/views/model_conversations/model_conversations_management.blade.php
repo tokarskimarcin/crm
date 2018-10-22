@@ -35,7 +35,7 @@
                         @foreach($categories as $category)
                         <tr data-id="{{$category->id}}">
                             <td>{{$category->id}}</td>
-                            <td><input type="text" class="category_name form-control" value="{{$category->name}}" disabled></td>
+                            <td>{{$category->name}}</td>
                             <td>{{$category->img}} <a href="{{asset('storage/')}}/{{$category->img}}"><span class="glyphicon glyphicon-picture"></span></a></td>
                             <td>
                                 <select class="category_status form-control" disabled>
@@ -61,33 +61,10 @@
                             </td>
                         </tr>
                         @endforeach
-                        <form  method="post" action="/modelConversationCategory" enctype="multipart/form-data">
-                            <input type="hidden" name="toAdd" value="1">
-                            <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                            <tr style="background-color: gray;">
-                                <td>Nowa kategoria</td>
-                                <td><input class="form-control" type="text" placeholder="Nazwa kategorii" name="name"></td>
-                                <td><input type="file" name="picture"></td>
-                                <td>
-                                    <select name="status">
-                                        <option value="1">Aktywna</option>
-                                        <option value="0">Nieaktywna</option>
-                                    </select>
-                                </td>
-                                <td>
-                                    <select name="subcategory" class="form-control">
-                                        <option value="0">Główna kategoria</option>
-                                        @foreach($categories as $category)
-                                            @if($category->status == 1)
-                                            <option value="{{$category->id}}">{{$category->name}}</option>
-                                            @endif
-                                        @endforeach
-                                    </select>
-                                </td>
-                                <td><input type="submit" class="btn btn-success" value="Dodaj nową kategorię"></td>
-                            </tr>
-                        </form>
-
+                        <tr>
+                            <td>Dodaj nową kategorie</td>
+                            <td><button class="btn btn-info" id="edit" data-type="category" data-action="5" data-toggle="modal" data-target="#myModal">Dodaj</button></td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
@@ -173,13 +150,42 @@
                     <h4 class="modal-title">Zmień zdjęcie</h4>
                 </div>
                 <div class="modal-body">
-                    <p>Wgraj swoje zdjęcie (wymiary tutaj)</p>
-                    <form method="post" action="/modelConversationCategory" enctype="multipart/form-data">
+
+                    <form  method="post" action="/modelConversationCategory" enctype="multipart/form-data">
+                        <input type="hidden" name="toAdd" value="1" class="category_toAdd">
                         <input type="hidden" name="_token" value="{{ csrf_token() }}">
                         <input type="hidden" name="id" value="">
-                        <input type="hidden" name="toAdd" value="0">
-                        <input type="file" name="picture">
-                        <input class="btn btn-success" type="submit" id="changePictureButton" value="Zapisz!">
+
+                        <div class="form-group">
+                            <label for="name">Nazwa kategorii</label>
+                            <input class="form-control category_name" type="text" placeholder="Nazwa kategorii" name="name">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="picture">Zdjęcie</label>
+                            <input type="file" name="picture">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="status">Status</label>
+                            <select name="status" class="form-control category_status">
+                                <option value="1">Aktywna</option>
+                                <option value="0">Nieaktywna</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="subcategory">Kategoria</label>
+                            <select name="subcategory" class="form-control category_subcategory">
+                                <option value="0">Główna kategoria</option>
+                                @foreach($categories as $category)
+                                    @if($category->status == 1)
+                                        <option value="{{$category->id}}">{{$category->name}}</option>
+                                    @endif
+                                @endforeach
+                            </select>
+                        </div>
+                        <input type="submit" class="btn btn-success" value="Dodaj nową kategorię">
                     </form>
                 </div>
                 <div class="modal-footer">
@@ -202,7 +208,7 @@
                 </div>
                 <div class="modal-body2">
                     <form action="/modelConversationItems" method="post" enctype="multipart/form-data">
-                            <input type="hidden" name="toAdd" value="1">
+                            <input type="hidden" name="toAdd" value="1" class="item_toAdd">
                             <input type="hidden" name="id" class="id">
                             <input type="hidden" name="_token" value="{{ csrf_token() }}">
                         <div class="form-group">
@@ -286,7 +292,8 @@
         let MANAGEMENT = {
             DOMElements: {
                 modal2body: document.querySelector('.modal2-body'),
-                itemEditionModal: document.querySelector('#itemEdition')
+                itemEditionModal: document.querySelector('#itemEdition'),
+                categoryModal: document.querySelector('#myModal')
             },
             globalVariables: {
                 categories: @json($categories),
