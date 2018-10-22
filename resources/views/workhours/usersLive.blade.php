@@ -50,8 +50,10 @@
                                 $start_work = 0;
                                 $start_work_click  =0;
                             @endphp
+                    @isset($schedule)
                         @foreach($shedule as $item)
-                        @if($item->user->department_info_id == Auth::user()->department_info_id && $item->user->status_work == 1 &&  ($item->user->user_type_id == 1 ||  $item->user->user_type_id == 2))
+                        @isset($item)
+                        @if($item->user->department_info_id == Auth::user()->department_info_id && $item->user->status_work == 1 && ($item->user->user_type_id == 1 || $item->user->user_type_id == 2))
                             @php
                                 $work_hour = $item->user->work_hours->where('date','=', date('Y-m-d'))->first();
                                 $start_work_click = 0;
@@ -165,7 +167,9 @@
                                 @endif
                             </tr>
                         @endif
+                        @endisset
                         @endforeach
+                    @endisset
                             </tbody>
                         </table>
                         </div>
