@@ -53,7 +53,7 @@
                     @isset($schedule)
                         @foreach($shedule as $item)
                         @isset($item)
-
+                        {{--isset is neccessary--}}
                         @if($item->user->department_info_id == Auth::user()->department_info_id && $item->user->status_work == 1 && ($item->user->user_type_id == 1 || $item->user->user_type_id == 2))
                             @php
                                 $work_hour = $item->user->work_hours->where('date','=', date('Y-m-d'))->first();
