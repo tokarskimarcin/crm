@@ -55,7 +55,7 @@ class WorkHoursController extends Controller
     }
 
     public function test() {
-        $workingLessThan30RBH = Work_Hour::usersWorkingRBHSelector(30,'<');
+        $workingLessThan30RBH = Work_Hour::usersWorkingRBHSelector(30,'<=');
 //        dd($workingLessThan30RBH->pluck('last_name')->toArray());
         dd($workingLessThan30RBH->pluck('id_user')->toarray());
     }
