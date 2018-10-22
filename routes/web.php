@@ -1101,6 +1101,11 @@ Route::put('/modelConversationCategory/{id}', 'ModelConversationsController@cate
 Route::delete('/modelConversationCategory/{id}', 'ModelConversationsController@categoryDelete');
 Route::post('/modelConversationCategory', 'ModelConversationsController@categoryPost');
 
+Route::put('/modelConversationItems/{id}', 'ModelConversationsController@itemsPut');
+Route::delete('/modelConversationItems/{id}', 'ModelConversationsController@itemsDelete');
+Route::post('/modelConversationItems', 'ModelConversationsController@itemsPost');
+
+
 Route::get('/modelConversationsManagement', 'ModelConversationsController@modelConversationsManagementGet');
 Route::get('/modelConversationsPlaylist', 'ModelConversationsController@modelConversationsPlaylistGet');
 
