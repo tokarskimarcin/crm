@@ -3373,8 +3373,7 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
             $coaches = $coaches->where('department_info_id', '=', Auth::user()->department_info_id);
         $onlyUserID = [];
 
-
-        if(strtotime(date('Y-m-d')) > strtotime($this->firstNovember)){
+        if(strtotime(date('Y-m-d')) < strtotime($this->firstNovember)){
             if($request->onlyNewUser == 1){
                 $onlyUserID = $this::getUser30RBH('<')->pluck('id_user')->toArray();
             }else if($request->onlyNewUser == 2){
@@ -4002,7 +4001,7 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
         }
 
         $newUserID = [];
-        if(strtotime(date('Y-m-d')) > strtotime($this->firstNovember)){
+        if(strtotime(date('Y-m-d')) < strtotime($this->firstNovember)){
             if($request->onlyNewUser == 1){
                 $newUserID = $this::getUser30RBH('<')->pluck('id_user')->toArray();
             }else if($request->onlyNewUser == 2){
@@ -4215,8 +4214,7 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
             ->orderBy('pbx_report_extension.average', 'desc')
             ->get();
 
-
-        if(strtotime(date('Y-m-d')) > strtotime($this->firstNovember)){
+        if(strtotime(date('Y-m-d')) < strtotime($this->firstNovember)){
             if($request->onlyNewUser == 1){
                 $data = $data->whereIn('user_id',$this::getUser30RBH('<')->pluck('id_user'));
             }else if($request->onlyNewUser == 2){
@@ -4888,7 +4886,7 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
 
         $data = self::monthReportConsultantsData($request->coach_id, $date_start, $date_stop);
         $newUserID = [];
-        if(strtotime(date('Y-m-d')) > strtotime($this->firstNovember)){
+        if(strtotime(date('Y-m-d')) < strtotime($this->firstNovember)){
             if($request->onlyNewUser == 1){
                 $newUserID = $this::getUser30RBH('<')->pluck('id_user')->toArray();
             } else if($request->onlyNewUser == 2){
