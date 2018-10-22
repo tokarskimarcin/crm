@@ -29,6 +29,10 @@ document.addEventListener('DOMContentLoaded', function(event) {
             let id = clickedElement.dataset.id; //This variable holds database id of category
             window.location.href = `/modelConversationCategory/${id}`;
         }
+        else if(clickedElement.matches('.play-sound')) {
+            let nameOfFile = clickedElement.dataset.nameoffile;
+            APP.DOMElements.modal2body.innerHTML = "<audio controls style='width:100%;'> <source src=" + APP.globalVariables.url + '/' + nameOfFile + " type='audio/wav'>Twoja przeglądarka nie obsługuje tego formatu pliku.</audio>";
+        }
 
     }
 

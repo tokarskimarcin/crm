@@ -173,7 +173,7 @@ class ModelConversationsController extends Controller
 //        dd('2');
         $toAdd = $request->toAdd;
 
-        if($toAdd == 0) { //we are replacing a sound file
+        if($toAdd == 0) { //we are editing
 
         }
         else { //we are adding new item
