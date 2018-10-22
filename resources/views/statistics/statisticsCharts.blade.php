@@ -10,7 +10,7 @@
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <style>
         .chart{
-            overflow: scroll;
+            /*overflow: scroll;*/
             height: 80vh;
             margin: auto;
             /*width: 80vw;*/
@@ -230,69 +230,6 @@
             }
         }
 
-        function getDepartmentsAveragesForEveryHourAjax(date) {
-            return $.ajax({
-                type: "POST",
-                url: "{{route('api.getDepartmentsAveragesForEveryHourAjax')}}",
-                headers: {'X-CSRF-TOKEN': '{{ csrf_token() }}'},
-                data: {
-                    date: date
-                },
-                success: function (response) {
-                    if(response !== false){
-                        departmentsAveragesForEveryHour = response;
-                        departmentsAveragesForEveryHourChartsData = prepareDataForCharts(departmentsAveragesForEveryHour);
-                    }
-                },
-                error: function (jqXHR, textStatus, thrownError) {
-                    console.log(jqXHR);
-                    console.log('textStatus: ' + textStatus);
-                    console.log('hrownError: ' + thrownError);
-                    swal({
-                        type: 'error',
-                        title: 'Błąd ' + jqXHR.status,
-                        text: 'Wystąpił błąd: ' + thrownError+' "'+jqXHR.responseJSON.message+'"',
-                    });
-                }
-            });
-        }
-
-        function getDepartmentsAveragesForEveryDayAjax(dateStart, dateStop) {
-            return $.ajax({
-                type: "POST",
-                url: "{{route('api.getDepartmentsAveragesForEveryDayAjax')}}",
-                headers: {'X-CSRF-TOKEN': '{{ csrf_token() }}'},
-                data: {
-                    date_start: dateStart,
-                    date_stop: dateStop
-                },
-                success: function (response) {
-                    if(response !== false){
-                        departmentsAveragesForEveryDay = response;
-                        departmentsAveragesForEveryDayChartsData = prepareDataForCharts(departmentsAveragesForEveryDay);
-                    }
-                },
-                error: function (jqXHR, textStatus, thrownError) {
-                    console.log(jqXHR);
-                    console.log('textStatus: ' + textStatus);
-                    console.log('hrownError: ' + thrownError);
-                    swal({
-                        type: 'error',
-                        title: 'Błąd ' + jqXHR.status,
-                        text: 'Wystąpił błąd: ' + thrownError+' "'+jqXHR.responseJSON.message+'"',
-                    });
-                }
-            });
-        }
-
-        setInterval(function(){
-            if($('#date').val() === moment().format('YYYY-MM-DD')  || $('#date_stop').val() === moment().format('YYYY-MM-DD') && moment().minute() === 5) {
-                getDepartmentsAveragesForEveryDayAjax($('#date_start').val(), $('#date_stop').val()).then(function (){
-                    return getDepartmentsAveragesForEveryHourAjax($('#date').val());
-                }).then(function () {
-                    drawProperTypeChart($('#departmentsSelect').val());
-                });
-            }
-        }, 1000*60);
+        //resizeDatatablesOnMenuToggle();
     </script>
 @endsection
