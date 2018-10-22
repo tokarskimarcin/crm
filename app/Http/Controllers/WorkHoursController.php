@@ -65,6 +65,8 @@ class WorkHoursController extends Controller
             ->orderby($dayOfWeekArray[$day_number].'_start')
             ->get();
 
+        dd($shedule);
+
         $workingLessThan30RBH = Work_Hour::usersWorkingRBHSelector(30,'<');
 
         //we are adding field newUser with value 1 if user is new, otherwise 0.
