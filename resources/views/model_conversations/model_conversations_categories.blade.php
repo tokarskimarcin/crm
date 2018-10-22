@@ -1,7 +1,9 @@
 @extends('model_conversations.model_conversations_menu')
 @section('section')
     <main class="main_part">
+        <div class="categories-box">
 
+        </div>
     </main>
 @endsection
 
@@ -11,7 +13,7 @@
         //In this script we define global variables and php variables
         let APP = {
             DOMElements: {
-                main: document.querySelector('main')
+                categoriesBox: document.querySelector('.categories-box')
             },
             globalVariables: {
                 categories: @json($categories),

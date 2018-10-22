@@ -2,31 +2,37 @@
 @section('section')
 
     <main class="main_part">
-        @isset($items)
-            <hr>
-            <table class="table table-responsive">
-                <thead>
-                <tr>
-                    <th>Odtwórz</th>
-                    <th>Nazwa</th>
-                    <th>Upominek</th>
-                    <th>Trener</th>
-                    <th>Klient</th>
-                </tr>
-                </thead>
-                <tbody>
-                @foreach($items as $item)
+        <div class="categories-box">
+
+        </div>
+        <div class="items">
+            @isset($items)
+                <hr>
+                <table class="table table-responsive">
+                    <thead>
                     <tr>
-                        <td><span class="glyphicon glyphicon-play-circle"></span></td>
-                        <td>{{$item->name}}</td>
-                        <td>{{$item->gift}}</td>
-                        <td>{{$item->trainer}}</td>
-                        <td>{{$item->client}}</td>
+                        <th>Odtwórz</th>
+                        <th>Nazwa</th>
+                        <th>Upominek</th>
+                        <th>Trener</th>
+                        <th>Klient</th>
                     </tr>
-                @endforeach
-                </tbody>
-            </table>
-        @endisset
+                    </thead>
+                    <tbody>
+                    @foreach($items as $item)
+                        <tr>
+                            <td><span class="glyphicon glyphicon-play-circle"></span></td>
+                            <td>{{$item->name}}</td>
+                            <td>{{$item->gift}}</td>
+                            <td>{{$item->trainer}}</td>
+                            <td>{{$item->client}}</td>
+                        </tr>
+                    @endforeach
+                    </tbody>
+                </table>
+            @endisset
+        </div>
+
     </main>
 
 @endsection
@@ -37,7 +43,7 @@
         //In this script we define global variables and php variables
         let APP = {
             DOMElements: {
-                main: document.querySelector('main')
+                categoriesBox: document.querySelector('.categories-box')
             },
             globalVariables: {
                 categories: @json($categories),

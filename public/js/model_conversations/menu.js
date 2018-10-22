@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', function(event) {
         while(!queue.isEmpty()) {
             let queue_item = queue.front();
             console.log(queue.front());
-            APP.DOMElements.main.appendChild(queue_item.createDOMElement());
+            APP.DOMElements.categoriesBox.appendChild(queue_item.createDOMElement());
             queue.dequeue();
         }
     })();
