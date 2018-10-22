@@ -425,10 +425,12 @@ class NotificationController extends Controller
                 notifications.*,
                 users.first_name as first_name,
                 users.last_name as last_name,
-                judge_results.judge_sum as judge_sum
+                nr.average_rating,
+                nr.id as nr_id,
+                nr.comment
             '))
             ->leftJoin('users', 'users.id', '=', 'notifications.user_id')
-            ->leftJoin('judge_results', 'judge_results.notification_id', '=', 'notifications.id')
+            ->leftJoin('notification_rating as nr', 'nr.notification_id', '=', 'notifications.id')
             ->where('notifications.displayed_by', '=', $id)
             ->get();
 

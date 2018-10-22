@@ -20,8 +20,10 @@ class ITNotificationsRatingsStatisticsController
     }
 
     public function iTCadreNotificationsRatingsStatisticsAjax(Request $request){
-        $startDate = $request->startDate;
-        $stopDate = $request->stopDate;
+        if($request->noPeriod == 'false'){
+            $startDate = $request->startDate;
+            $stopDate = $request->stopDate;
+        }
         $iTCadreNotificationsRatingsStatistics = Notifications::select(
             'u.id',
             'u.status_work',
@@ -33,9 +35,13 @@ class ITNotificationsRatingsStatisticsController
             ->join('users as u','u.id','displayed_by')
             ->leftJoin('notification_rating as nr','nr.notification_id','notifications.id')
             ->whereNotNull('displayed_by')
-            ->whereBetween('data_stop',[$startDate,$stopDate])
             ->groupBy('displayed_by')
             ->orderByDesc('averageRating');
+        if($request->noPeriod == 'false'){
+            $iTCadreNotificationsRatingsStatistics->whereBetween('data_stop',[$startDate,$stopDate]);
+        }else{
+            $iTCadreNotificationsRatingsStatistics->where('displayed_by',$request->userId);
+        }
 
         $iTCadreNotificationsRatingsStatistics = $iTCadreNotificationsRatingsStatistics->get();
         //dd($iTCadreNotificationsRatingsStatistics->get()->sortByDesc('averageRating')->toArray());

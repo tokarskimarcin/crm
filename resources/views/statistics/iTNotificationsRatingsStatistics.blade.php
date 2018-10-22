@@ -113,7 +113,8 @@
                     headers: {'X-CSRF-TOKEN': '{{ csrf_token() }}'},
                     data: {
                         startDate: VARIABLES.jQElements.startDatetimepicker.find('input').val(),
-                        stopDate: VARIABLES.jQElements.stopDatetimepicker.find('input').val()
+                        stopDate: VARIABLES.jQElements.stopDatetimepicker.find('input').val(),
+                        noPeriod: false
                     },
                     success(response) {
                         return response;
@@ -181,9 +182,9 @@
             averageReactionTime = Math.floor(averageReactionTime/response.length);
             tbody.append($('<tr>').css({'font-weight':'bold','background-color':'#afafaf'})
                 .append($('<td>').append('Suma'))
-                .append($('<td>').append((Math.round(averageRating*10000)/100)+'%'))
-                .append($('<td>').append(FUNCTIONS.secondsToDaysHoursMinutesSeconds(averageRealizationTime)))
-                .append($('<td>').append(FUNCTIONS.secondsToDaysHoursMinutesSeconds(averageReactionTime)))
+                .append($('<td>').append(isNaN(Math.round(averageRating*10000)/100) ?  0 : (Math.round(averageRating*10000)/100)+'%'))
+                .append($('<td>').append(isNaN(averageRealizationTime) ? 0 : FUNCTIONS.secondsToDaysHoursMinutesSeconds(averageRealizationTime)))
+                .append($('<td>').append(isNaN(averageReactionTime) ? 0 : FUNCTIONS.secondsToDaysHoursMinutesSeconds(averageReactionTime)))
             );
         }
     };

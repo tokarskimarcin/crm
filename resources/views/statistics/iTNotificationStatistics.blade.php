@@ -64,7 +64,7 @@
                         <span class="tooltiptext">
                             <div class="alert alert-info">
                                 Zmiana daty skutkuje zaktualizowaniem listy programistów, którzy w danym okresie mieli jakiekolwiek statystyki zgłoszeń.<br>
-                                <strong>Not CNT</strong> (not count) oznacza, że średnia ocen nie wlicza się w średnią tygodniową, ponieważ nie było w danym dniu ocenionych zgłoszeń.
+                                <strong>Not CNT</strong> (not count) oznacza, że średnia ocen nie wlicza się w średnią tygodniową, ponieważ nie było w danym dniu zakończonych zgłoszeń mających ocenę.
                             </div>
                         </span>
                     </div>
@@ -248,7 +248,7 @@
                         let weekSumTr = $('<tr>').css({'text-align':'center','font-weight':'bold', 'background-color':'#afafaf'})
                             .append($('<td>').append('TYDZIEŃ'))
                             .append($('<td>').append(notificationsSumCount))
-                            .append($('<td>').append((Math.round(weekAverageRating*10000/daysWithNotificationsRated)/100)+'%'))
+                            .append($('<td>').append(isNaN(Math.round(weekAverageRating*10000/daysWithNotificationsRated)/100) ? 0 : (Math.round(weekAverageRating*10000/daysWithNotificationsRated)/100)+'%'))
                             .append($('<td>').append(notificationsRatedSumCount))
                             .append($('<td>').append(programmerITUnrealizedNotificationWeek.filter(FUNCTIONS.onlyUnique).length));
 
