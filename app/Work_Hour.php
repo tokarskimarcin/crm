@@ -69,7 +69,6 @@ class Work_Hour extends Model
             ->having(DB::raw('IFNULL(SUM(TIME_TO_SEC(TIMEDIFF(accept_stop, accept_start))), 0)'), $comparator, $iNumberOfSeconds)
             ->get();
 
-        dd($cAllUsers->pluck('id_user'));
         return $cAllUsers;
     }
     
