@@ -4609,9 +4609,6 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
             }
         }
 
-        if(Auth::user()->id == 6964){
-            dd($data);
-        }
         return view('reportpage.weekReportDepartmentSummary')
             ->with([
                 'departments'   => $departments,

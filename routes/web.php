@@ -55,7 +55,7 @@ Route::POST('/datatableDkjShowEmployee', 'DkjController@datatableDkjShowEmployee
 Route::POST('/datatableCadreHR', 'UsersController@datatableCadreHR')->name('api.datatableCadreHR');
 Route::POST('/datatableMyNotifications', 'NotificationController@datatableMyNotifications')->name('api.datatableMyNotifications');
 Route::POST('/datatableMyHandledNotifications', 'NotificationController@datatableMyHandledNotifications')->name('api.datatableMyHandledNotifications');
-Route::POST('/notificationJudgeResult','NotificationController@notificationJudgeResult')->name('api.notificationJudgeResult');
+Route::POST('/notificationRating','NotificationController@notificationRating')->name('api.notificationRating');
 /* Equipment start */
 Route::POST('/datatableShowLaptop', 'EquipmentsController@datatableShowLaptop')->name('api.datatableShowLaptop');
 Route::POST('/datatableShowTablet', 'EquipmentsController@datatableShowTablet')->name('api.datatableShowTablet');
@@ -219,11 +219,18 @@ Route::POST('/recruiterTrainingsData', 'RecruitmentAttemptController@recruiterTr
 Route::POST('/datatableTrainingData', 'RecruitmentStoryController@datatableTrainingData')->name('api.datatableTrainingData');
 
 Route::POST('/delete_notification', 'NotificationController@delete_notification')->name('api.delete_notification');
+Route::Post('/rateNotificationAjax', 'NotificationController@rateNotificationAjax')->name('api.rateNotificationAjax');
 
 Route::POST('/getMedicalPackagesAdminData', 'AdminController@getMedicalPackagesAdminData')->name('api.getMedicalPackagesAdminData');
 Route::POST('/getMedicalPackageData', 'AdminController@getMedicalPackageData')->name('api.getMedicalPackageData');
 Route::POST('/saveMedicalPackageData', 'AdminController@saveMedicalPackageData')->name('api.saveMedicalPackageData');
 Route::POST('/datatableLogInfoAjax', 'AdminPanel\LogsController@datatableLogInfoAjax')->name('api.datatableLogInfo');
+Route::POST('/ratingCriterionDataAjax', 'AdminPanel\NotificationSystemController@ratingCriterionDataAjax')->name('api.ratingCriterionDataAjax');
+Route::POST('/ratingSystemDataAjax', 'AdminPanel\NotificationSystemController@ratingSystemDataAjax')->name('api.ratingSystemDataAjax');
+Route::POST('/newRatingCriterionDataAjax', 'AdminPanel\NotificationSystemController@newRatingCriterionDataAjax')->name('api.newRatingCriterionDataAjax');
+Route::POST('/ratingCriterionStatusChangeAjax', 'AdminPanel\NotificationSystemController@ratingCriterionStatusChangeAjax')->name('api.ratingCriterionStatusChangeAjax');
+Route::POST('/newRatingSystemDataAjax', 'AdminPanel\NotificationSystemController@newRatingSystemDataAjax')->name('api.newRatingSystemDataAjax');
+
 
 
 Route::POST('/getDaysInMonth', 'StatisticsController@getDaysInMonth')->name('api.getDaysInMonth');
@@ -346,6 +353,13 @@ Route::post('/getDepartmentsAveragesForEveryHourAjax', 'StatisticsController@get
 Route::post('/getDepartmentsAveragesForEveryDayAjax', 'StatisticsController@getDepartmentsAveragesForEveryDayAjax')->name('api.getDepartmentsAveragesForEveryDayAjax');
 Route::post('/departmentsConfirmationStatisticsAjax', 'Statistics\DepartmentsConfirmationStatisticsController@departmentsConfirmationStatisticsAjax')->name('api.departmentsConfirmationStatisticsAjax');
 Route::post('/allDepartmentsConfirmationStatisticsAjax', 'Statistics\DepartmentsConfirmationStatisticsController@allDepartmentsConfirmationStatisticsAjax')->name('api.allDepartmentsConfirmationStatisticsAjax');
+
+Route::post('/removedNotificationsCountStatisticsAjax', 'Statistics\RemovedNotificationStatisticsController@removedNotificationsCountStatisticsAjax')->name('api.removedNotificationsCountStatisticsAjax');
+Route::post('/removedNotificationsAjax', 'Statistics\RemovedNotificationStatisticsController@removedNotificationsAjax')->name('api.removedNotificationsAjax');
+
+Route::post('/iTNotificationsStatisticsAjax', 'Statistics\ITNotificationStatisticsController@iTNotificationsStatisticsAjax')->name('api.iTNotificationsStatisticsAjax');
+
+Route::post('/iTCadreNotificationsRatingsStatisticsAjax', 'Statistics\ITNotificationsRatingsStatisticsController@iTCadreNotificationsRatingsStatisticsAjax')->name('api.iTCadreNotificationsRatingsStatisticsAjax');
 /* END STATISTICS ROUTES AJAX */
 
 //********************END AJAX*********************** */
@@ -630,10 +644,10 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
 
     Route::get('/my_notifications', 'NotificationController@myNotifications');
 
-    Route::get('/judge_notification/{id}', 'NotificationController@judgeNotificationGet');
-    Route::Post('/judge_notification', 'NotificationController@judgeNotificationPost');
+    Route::get('/rateNotification/{id}', 'NotificationController@rateNotificationGet');
+    Route::get('/rateNotificationPost', 'NotificationController@rateNotificationPost');
 
-    Route::get('/it_cadre', 'NotificationController@ITCadreGet');
+    Route::get('/iTNotificationsRatingsStatisticsGet', 'Statistics\ITNotificationsRatingsStatisticsController@iTNotificationsRatingsStatisticsGet');
 
     Route::get('/it_worker/{id}', 'NotificationController@ITWorkerGet');
 
@@ -655,6 +669,8 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
 
 
     Route::get('/departmentsConfirmationGet', 'Statistics\DepartmentsConfirmationStatisticsController@departmentsConfirmationGet');
+    Route::get('/removedNotificationGet', 'Statistics\RemovedNotificationStatisticsController@removedNotificationGet');
+    Route::get('/iTNotificationStatisticsGet', 'Statistics\ITNotificationStatisticsController@iTNotificationStatisticsGet');
     //Statistics Stop
 
     //Report Page Start
@@ -935,6 +951,8 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
     Route::get('/userPrivilages', 'AdminPanel\LinksController@userPrivilagesGET');
     Route::post('/userPrivilages', 'AdminPanel\LinksController@userPrivilagesPOST');
 
+    Route::get('/notificationSystemGet', 'AdminPanel\NotificationSystemController@notificationSystemGet');
+
     /** CRM **/
     Route::get('/specificRoute/{id}', 'CrmRouteController@specificRouteGet');
     Route::get('/showClientRoutes', 'CrmRouteController@showClientRoutesGet');
@@ -1087,3 +1105,6 @@ Route::get('/setCityApprovalPart6','AutoScriptController@setCityApprovalPart6');
 //Route::get('/refreshPbxReportExtension', 'AutoScriptController@pbx_update');
 
 Route::get('/testZybura', 'StatisticsController@test');
+
+Route::get('/convertJRtoNewSystem','AdminPanel\NotificationSystemController@convertJRtoNewSystem');
+Route::get('/notificationsPushedWithRemovedBy','AdminPanel\NotificationSystemController@notificationsPushedWithRemovedBy');
