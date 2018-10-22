@@ -13,10 +13,12 @@ use App\HourReport;
 use App\Pbx_report_extension;
 use App\PBXDetailedCampaign;
 use App\PBXDKJTeam;
+use App\Rbh30Report;
 use App\RecruitmentStory;
 use App\ReportCampaign;
 use App\UserEmploymentStatus;
 use App\Utilities\Dates\MonthFourWeeksDivision;
+use App\Utilities\Reports\Report_data_methods\Data30RBHreport;
 use App\Work_Hour;
 use DateTime;
 use Illuminate\Http\Request;
@@ -63,6 +65,7 @@ class StatisticsController extends Controller
             $report->save();
         }
     }
+
 // Wyswietlenie raportu godzinnego na stronie
     public function pageHourReportTelemarketing()
     {
@@ -698,6 +701,12 @@ class StatisticsController extends Controller
 
         $date_stop = $date_stop === null ? $date_start: $date_stop;
 
+        $dayOfWeek = date('w', strtotime($date_stop));
+
+        //changing from sunday to saturday because in sunday there are only 0 in scores.
+        if($dayOfWeek == 0) {
+            $date_stop = date('Y-m-d', strtotime($date_stop . ' - 1 day'));
+        }
         $dkj = DB::table('pbx_dkj_team')
             ->select(DB::raw(
                 '
@@ -4939,7 +4948,7 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
 
 
         $title = 'Miesięczny Raport Oddziały';
-        $this->sendMailByVerona('summaryReportDepartment', $data, $title, USER::where('id', '=', 4646)->get());
+        $this->sendMailByVerona('summaryReportDepartment', $data, $title, USER::whereIn('id', [4646, 6009])->get());
     }
 
     /******** Główna funkcja do wysyłania emaili*************/
@@ -4949,7 +4958,7 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
     *
     */
 
-    private function sendMailByVerona($mail_type, $data, $mail_title, $default_users = null,$depTypeId = [1,2]) {
+    private function sendMailByVerona($mail_type, $data, $mail_title, $default_users = null,$depTypeId = [1,2,6]) {
 //            dd($data);
         if ($default_users !== null) {
             $email = [];

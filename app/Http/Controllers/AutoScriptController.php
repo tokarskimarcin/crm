@@ -7,6 +7,7 @@ use App\Cities;
 use App\ClientRoute;
 use App\ClientRouteInfo;
 use App\PrivilageRelation;
+use App\Rbh30Report;
 use App\Schedule;
 use App\Pbx_report_extension;
 use App\ClientRouteCampaigns;
@@ -18,6 +19,48 @@ use Illuminate\Support\Facades\DB;
 
 class AutoScriptController extends Controller
 {
+
+    /**
+     * This method saves once a day records to rbh30report table
+     */
+    public function get30rbhData() {
+        $today = date('Y-m-d');
+
+        //array of users working less than 30 rbh this day with their data
+        $usersWorkingLessThan30Rbh = Work_Hour::usersWorkingRBHSelector(30, '<');
+        $usersArr = $usersWorkingLessThan30Rbh->pluck('id_user')->toArray();
+        $maxIds = Pbx_report_extension::select(DB::raw('MAX(id) as id'))->whereIn('user_id', $usersArr)->groupBy('user_id', 'report_date')->pluck('id')->toArray(); //max ids for every date for every user
+        $pbxReportExtData = Pbx_report_extension::select('user_id', 'all_bad_talks')->whereIn('id', $maxIds)->get();
+
+        //adding 2 fields janki and avg through maping
+        $usersWorkingLessThan30Rbh->map(function($item) use($pbxReportExtData) {
+            $reportInfo = $pbxReportExtData->where('user_id', '=', $item->id_user); //all records from pbx report extension (only last from each day) related to this user
+            $sumJanki = 0;
+            foreach($reportInfo as $reportItem) {
+                $sumJanki += $reportItem->all_bad_talks;
+            }
+            $item->janki = $sumJanki;
+            $item->avg = $item->sec_sum > 0 && $item->sec_sum != null ? round($item->success / ($item->sec_sum / 3600), 2) : 0; // sum success / sum workhours
+            return $item;
+        });
+
+        //collection of records from rbh30report from this day
+        $actual30RbhRecords = Rbh30Report::where('created_at', '=', $today)->get();
+
+        foreach($usersWorkingLessThan30Rbh as $user) {
+            if($actual30RbhRecords->where('user_id', '=', $user->id_user)->where('created_at', '=', $today)->isEmpty()) { //there is no duplicates
+                $rbh30Report = new Rbh30Report();
+                $rbh30Report->user_id = $user->id_user;
+                $rbh30Report->department_info_id = $user->dep_id;
+                $rbh30Report->success = $user->success;
+                $rbh30Report->sec_sum = $user->sec_sum;
+                $rbh30Report->average = $user->avg;
+                $rbh30Report->janki = $user->janki;
+                $rbh30Report->created_at = $today;
+                $rbh30Report->save();
+            }
+        }
+    }
 
     //Temporary method for assigning successes for given date from pbx report
     public function pbx_update() {
