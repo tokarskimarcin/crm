@@ -91,8 +91,6 @@ class WorkHoursController extends Controller
         //     ->where('users.department_info_id', '=', Auth::user()->department_info_id)
         //     ->get();
 
-        dd($shedule);
-
         return view('workhours.usersLive')
             ->with('shedule',$sheduleWithNewUsers)
             ->with('day_number',$day_number);
