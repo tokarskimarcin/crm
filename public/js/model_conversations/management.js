@@ -41,7 +41,7 @@ document.addEventListener('DOMContentLoaded', function(event) {
                         }
                     })
                 }
-                else if(action == 4) { //change picture
+                else if(action == 4) { //Edition
                     //At first we are assigning category id to form input
                     let changePictureButton = document.querySelector('#changePictureButton');
                     let pictureForm = changePictureButton.closest('form');
@@ -84,6 +84,34 @@ document.addEventListener('DOMContentLoaded', function(event) {
                         }
                     })
                 }
+                else if(action == 4) { //edition of existing item
+                    let name = thisRow.cells[0].textContent;
+                    let trainer = thisRow.cells[2].textContent;
+                    let gift = thisRow.cells[3].textContent;
+                    let client = thisRow.cells[4].textContent;
+
+                    let categorySelect = thisRow.cells[5].querySelector('.item_category');
+                    let selectedCategory = getSelectedValue(categorySelect);
+
+                    let statusSelect = thisRow.cells[6].querySelector('.item_status');
+                    let selectedStatus = getSelectedValue(statusSelect);
+
+                    MANAGEMENT.DOMElements.itemEditionModal.querySelector('.id').value = id;
+                    MANAGEMENT.DOMElements.itemEditionModal.querySelector('.item_name').value = name;
+                    MANAGEMENT.DOMElements.itemEditionModal.querySelector('.item_trainer').value = trainer;
+                    MANAGEMENT.DOMElements.itemEditionModal.querySelector('.item_gift').value = gift;
+                    MANAGEMENT.DOMElements.itemEditionModal.querySelector('.item_client').value = client;
+                    MANAGEMENT.DOMElements.itemEditionModal.querySelector('.item_category_id').value = selectedCategory;
+                    MANAGEMENT.DOMElements.itemEditionModal.querySelector('.item_status').value = selectedStatus;
+                }
+                else if(action == 5) { //adding new item
+                    MANAGEMENT.DOMElements.itemEditionModal.querySelector('.id').value = '';
+                    MANAGEMENT.DOMElements.itemEditionModal.querySelector('.item_name').value = '';
+                    MANAGEMENT.DOMElements.itemEditionModal.querySelector('.item_trainer').value = '';
+                    MANAGEMENT.DOMElements.itemEditionModal.querySelector('.item_gift').value = '';
+                    MANAGEMENT.DOMElements.itemEditionModal.querySelector('.item_client').value = '';
+                    MANAGEMENT.DOMElements.itemEditionModal.querySelector('.item_status').value = 1;
+                }
             }
         }
         else if(clickedElement.matches('.play-sound')) {
@@ -91,6 +119,19 @@ document.addEventListener('DOMContentLoaded', function(event) {
             MANAGEMENT.DOMElements.modal2body.innerHTML = "<audio controls style='width:100%;'> <source src=" + MANAGEMENT.globalVariables.url + '/' + nameOfFile + " type='audio/wav'>Twoja przeglądarka nie obsługuje tego formatu pliku.</audio>";
         }
 
+    }
+
+    /**
+     * This method returns selected by user from list item's value or null.
+     */
+    function getSelectedValue(element) {
+        console.assert(element.tagName === 'SELECT', 'Argument of getSelectedValue is not select element');
+        if(element.options[element.selectedIndex]) {
+            return element.options[element.selectedIndex].value;
+        }
+        else {
+            return null;
+        }
     }
 
     /**

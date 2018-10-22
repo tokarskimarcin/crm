@@ -35,10 +35,21 @@
                         @foreach($categories as $category)
                         <tr data-id="{{$category->id}}">
                             <td>{{$category->id}}</td>
-                            <td>{{$category->name}}</td>
+                            <td><input type="text" class="category_name form-control" value="{{$category->name}}" disabled></td>
                             <td>{{$category->img}} <a href="{{asset('storage/')}}/{{$category->img}}"><span class="glyphicon glyphicon-picture"></span></a></td>
-                            <td>@if($category->status == 1) <span class="active-category">Aktywna</span> @else <div class="inactive-category">Nieaktywna</div> @endif</td>
-                            <td>@if($category->subcategory_id == 0) Głowne kategorie @else {{$categories->where('id', '=', $category->subcategory_id)->first()->name}} @endif</td>
+                            <td>
+                                <select class="category_status form-control" disabled>
+                                    <option value="1" @if($category->status == 1) selected @endif>Aktywna</option>
+                                    <option value="0" @if($category->status == 0) selected @endif>Nieaktywna</option>
+                                </select>
+                            <td>
+                                <select class="category_subcategory form-control" disabled>
+                                    <option value="0" @if($category->id == 0) selected @endif>Główna</option>
+                                    @foreach($categories as $category2)
+                                        <option value="{{$category2->id}}" @if($category->id == $category2->id) selected @endif>{{$category2->name}}</option>
+                                    @endforeach
+                                </select>
+                                @if($category->subcategory_id == 0) Głowne kategorie @else {{$categories->where('id', '=', $category->subcategory_id)->first()->name}} @endif</td>
                             <td>
                                 @if($category->status == 1)
                                     <button class=" btn btn-warning" data-type="category" data-action="1">Wyłącz</button>
@@ -46,7 +57,7 @@
                                     <button class="btn btn-success" data-type="category" data-action="2">Włącz </button>
                                 @endif
                                 <button class="btn btn-danger" data-type="category" data-action="0">Usuń</button>
-                                <button class="btn btn-info" id="changePicture" data-type="category" data-action="4" data-toggle="modal" data-target="#myModal">Zmien zdjęcie</button>
+                                <button class="btn btn-info" id="edit" data-type="category" data-action="4" data-toggle="modal" data-target="#myModal">Edytuj</button>
                             </td>
                         </tr>
                         @endforeach
@@ -107,8 +118,19 @@
                                 <td>{{$item->trainer}}</td>
                                 <td>{{$item->gift}}</td>
                                 <td>{{$item->client}}</td>
-                                <td>{{$categories->where('id', '=', $item->model_category_id)->first()->name}}</td>
-                                <td>{{$item->status}}</td>
+                                <td>
+                                    <select class="form-control item_category" disabled>
+                                        @foreach($categories as $category)
+                                            <option value="{{$category->id}}" @if($category->id == $item->model_category_id) selected @endif>{{$category->name}}</option>
+                                        @endforeach
+                                    </select>
+                                </td>
+                                <td>
+                                    <select class="item_status form-control" disabled>
+                                        <option value="1" @if($item->status == 1) selected @endif>Aktywna</option>
+                                        <option value="0" @if($item->status == 0) selected @endif>Nieaktywna</option>
+                                    </select>
+                                    </td>
                                 <td>
                                     @if($item->status == 1)
                                         <button class=" btn btn-warning" data-type="items" data-action="1">Wyłącz</button>
@@ -116,36 +138,25 @@
                                         <button class="btn btn-success" data-type="items" data-action="2">Włącz </button>
                                     @endif
                                     <button class="btn btn-danger" data-type="items" data-action="0">Usuń</button>
+                                        <button class="btn btn-default" data-type="items" data-action="4" data-toggle="modal" data-target="#itemEdition">Edytuj</button>
                                 </td>
                             </tr>
                         @endforeach
-                        <form action="/modelConversationItems" method="post" enctype="multipart/form-data">
-                            <tr>
-                                <input type="hidden" name="toAdd" value="1">
-                                <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                                <td><input type="text" class="form-control" placeholder="Podaj nazwę" name="name"></td>
-                                <td><input type="file" name="sound"></td>
-                                <td><input type="text" class="form-control" name="trainer" placeholder="Trener"></td>
-                                <td><input type="text" class="form-control" name="gift" placeholder="Prezent"></td>
-                                <td><input type="text" class="form-control" name="client" placeholder="Klient"></td>
-                                <td>
-                                    <select name="category_id" class="form-control">
-                                        <option value="0">Wybierz</option>
-                                        @foreach($categories as $category)
-                                            <option value="{{$category->id}}">{{$category->name}}</option>
-                                        @endforeach
-                                    </select>
-                                </td>
-                                <td>
-                                    <select name="status" class="form-control">
-                                        <option value="1">Aktywna</option>
-                                        <option value="0">Nie Aktywna</option>
-                                    </select>
-                                </td>
-                                <td><input type="submit" class="btn btn-success" value="Dodaj nową rozmowę"></td>
-                            </tr>
-                        </form>
                     </tbody>
+                    <tfoot>
+                    <tr>
+                        <td></td>
+                        <td>Dodaj nową rozmowę</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>
+                            <button class="btn btn-default" data-type="items" data-action="5" data-toggle="modal" data-target="#itemEdition">Dodaj</button>
+                        </td>
+                    </tr>
+                    </tfoot>
                 </table>
             </div>
         </div>
@@ -153,7 +164,7 @@
 
     <!-- Modal -->
     <div id="myModal" class="modal fade" role="dialog">
-        <div class="modal-dialog">
+        <div class="modal-dialog modal-lg">
 
             <!-- Modal content-->
             <div class="modal-content">
@@ -169,6 +180,73 @@
                         <input type="hidden" name="toAdd" value="0">
                         <input type="file" name="picture">
                         <input class="btn btn-success" type="submit" id="changePictureButton" value="Zapisz!">
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div id="itemEdition" class="modal fade" role="dialog">
+        <div class="modal-dialog modal-lg">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Zmień zdjęcie</h4>
+                </div>
+                <div class="modal-body2">
+                    <form action="/modelConversationItems" method="post" enctype="multipart/form-data">
+                            <input type="hidden" name="toAdd" value="1">
+                            <input type="hidden" name="id" class="id">
+                            <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                        <div class="form-group">
+                            <label for="name">Nazwa</label>
+                            <input type="text" class="form-control item_name" placeholder="Podaj nazwę" name="name">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="sound">Plik z rozmową</label>
+                            <input class="item_file" type="file" name="sound">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="trainer">Trener</label>
+                            <input type="text" class="form-control item_trainer" name="trainer" placeholder="Trener">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="gift">Prezent</label>
+                            <input type="text" class="form-control item_gift" name="gift" placeholder="Prezent">
+                        </div>
+
+                         <div class="form-group">
+                             <label for="client">Klient</label>
+                             <input type="text" class="form-control item_client" name="client" placeholder="Klient">
+                         </div>
+
+                        <div class="form-group">
+                            <label for="category_id">Kategoria</label>
+                            <select name="category_id" class="form-control item_category_id">
+                                @foreach($categories as $category)
+                                    <option value="{{$category->id}}">{{$category->name}}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="status">Status</label>
+                            <select name="status" class="form-control item_status">
+                                <option value="1">Aktywna</option>
+                                <option value="0">Nie Aktywna</option>
+                            </select>
+                        </div>
+
+                        <input type="submit" class="btn btn-success" value="Zapisz">
                     </form>
                 </div>
                 <div class="modal-footer">
@@ -207,7 +285,8 @@
         //In this script we define global variables and php variables
         let MANAGEMENT = {
             DOMElements: {
-                modal2body: document.querySelector('.modal2-body')
+                modal2body: document.querySelector('.modal2-body'),
+                itemEditionModal: document.querySelector('#itemEdition')
             },
             globalVariables: {
                 categories: @json($categories),

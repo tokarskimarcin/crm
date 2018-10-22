@@ -121,7 +121,7 @@ class ModelConversationsController extends Controller
             $picture = $request->file('picture');
             $picture_name = null;
             if($picture) {
-                $picture_name = $picture->getClientOriginalName();
+                $picture_name = 'category_' . $picture->getClientOriginalName() . '_' . date('Y-m-d');
                 $picture->storeAs('public',$picture_name);
             }
             else {
@@ -173,38 +173,55 @@ class ModelConversationsController extends Controller
 //        dd('2');
         $toAdd = $request->toAdd;
 
-        if($toAdd == 0) { //we are editing
+        //we are adding new item
+        $name = $request->name;
+        $status = $request->status;
+        $trainer = $request->trainer;
+        $gift = $request->gift;
+        $client = $request->client;
+        $category = $request->category_id;
 
-        }
-        else { //we are adding new item
-            $name = $request->name;
-            $status = $request->status;
-            $trainer = $request->trainer;
-            $gift = $request->gift;
-            $client = $request->client;
-            $category = $request->category_id;
-
-            $sound = $request->file('sound');
-            $sound_name = $sound->getClientOriginalName();
+        $sound = $request->file('sound');
+        $sound_name = null;
+        if(isset($sound)) {
+            $sound_name = 'category_' . $sound->getClientOriginalName() . '_' . date('Y-m-d');
             $sound->storeAs('public',$sound_name);
-
-            $newItem = new ModelConvItems();
-            $newItem->file_name = $sound_name;
-            $newItem->name = $name;
-            $newItem->trainer = $trainer;
-            $newItem->gift = $gift;
-            $newItem->client = $client;
-            $newItem->model_category_id = $category;
-            $user_id = Auth::user()->id;
-            $newItem->status = $status;
-            try {
-                $newItem->save();
-            }
-            catch(\Exception $error) {
-                new ActivityRecorder($error, 1, 6);
-            }
-
         }
+
+
+        $newItem = null;
+        if($toAdd == 0) { //creating new
+            $newItem = new ModelConvItems();
+        }
+        else {
+            $newItem = ModelConvItems::find($request->id);
+        }
+
+        if($toAdd == 1) { //editing
+            if(isset($sound)) { //There is new file
+                $newItem->file_name = $sound_name;
+            }
+        }
+        else {
+            $newItem->file_name = $sound_name;
+        }
+
+        $newItem->name = $name;
+        $newItem->trainer = $trainer;
+        $newItem->gift = $gift;
+        $newItem->client = $client;
+        $newItem->model_category_id = $category;
+        $user_id = Auth::user()->id;
+        $newItem->user_id = $user_id;
+        $newItem->status = $status;
+        try {
+            $newItem->save();
+        }
+        catch(\Exception $error) {
+            new ActivityRecorder($error, 1, 6);
+        }
+
+
         return Redirect::back();
     }
 }
