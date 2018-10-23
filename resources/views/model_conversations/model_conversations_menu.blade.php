@@ -35,13 +35,6 @@
             </div>
         </header>
         @yield('section')
-        {{--<main class="main_part">--}}
-           {{----}}
-            {{--<div class="category category_1"> Kategoria 1</div>--}}
-            {{--<div class="category category_2"> Kategoria 2</div>--}}
-            {{--<div class="category category_3"> Kategoria 3</div>--}}
-
-        {{--</main>--}}
         <footer class="main_part">
             <p>Posted by: Paweł Chmielewski</p>
             <p>Contact information: <a href="mailto:someone@example.com">

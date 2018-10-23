@@ -10,13 +10,18 @@
                 <hr>
             </div>
             <div class="playlist-control">
-                Panel kontrolny
-                <hr>
+                <div class="counter">
+
+                </div>
+                <div class="controls">
+
+                </div>
             </div>
             <div class="playlist-body">
-                <table class="table table-stripped">
+                <table id="playlist-table" class="table table-stripped">
                     <thead>
                     <tr>
+                        <th>Numer</th>
                         <th>Odtwarzanie</th>
                         <th>Nazwa</th>
                         <th>Prezent</th>
@@ -25,15 +30,6 @@
                     </tr>
                     </thead>
                     <tbody>
-                    @foreach($playlist as $item)
-                    <tr>
-                        <td>Tu player</td>
-                        <td>{{$item->conv_name}}</td>
-                        <td>{{$item->gift}}</td>
-                        <td>{{$item->trainer}}</td>
-                        <td>{{$item->client}}</td>
-                    </tr>
-                    @endforeach
                     </tbody>
                 </table>
 
@@ -48,7 +44,8 @@
         //In this script we define global variables and php variables
         let PLAYLIST = {
             DOMElements: {
-                categoriesBox: document.querySelector('.categories-box')
+                categoriesBox: document.querySelector('.categories-box'),
+                playlistTable: document.querySelector('#playlist-table')
             },
             globalVariables: {
                 playlist: @json($playlist),
@@ -56,5 +53,6 @@
             }
         };
     </script>
-
+    <script src="{{asset('js/model_conversations/playlist.js')}}"></script>
+    <script src="{{asset('js/model_conversations/model_conversations_playlist.js')}}"></script>
 @endsection

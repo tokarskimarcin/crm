@@ -8,8 +8,22 @@
     border-radius: 10px;
 }
 
-.playlist-header > hr, playlist-control > hr {
+.playlist-header > hr {
     width: 95%;
     border: 0; height: 2px;
     background-image: linear-gradient(to right, rgba(0, 0, 0, 0), #337ab7, rgba(0, 0, 0, 0));
+}
+
+.playlist-control {
+    border-bottom-width: 3px;
+    border-bottom-style: double;
+    border-bottom-color: #337ab7;
+}
+
+.table {
+    margin-top: 1em;
+}
+
+audio {
+    width: 80%;
 }

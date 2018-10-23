@@ -46,3 +46,18 @@ Playlist.prototype.createDOMElement = function() {
     main_div.style.backgroundImage = 'url(' + PLAYLISTS.globalVariables.url + '/' + this.image + ')';
     return main_div;
 }
+
+/**
+ * This method is used when playlist is started.
+ * @param counter
+ */
+Playlist.prototype.play = function(counter) {
+    let subQueue = new Queue();
+    while(!this.items.isEmpty()) {
+        subQueue.enqueue(this.items.enqueue())
+    }
+    let iterator = 1;
+    if(counter.actual > iterator) {
+        // this.items
+    }
+}

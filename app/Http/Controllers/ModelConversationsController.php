@@ -77,6 +77,9 @@ class ModelConversationsController extends Controller
         $playlist = ModelConvPlaylist::select(
             'model_conv_playlist.name as playlist_name',
             'model_conv_items.name as conv_name',
+            'model_conv_items.file_name',
+            'model_conv_playlist.img as playlist_img',
+            'model_conv_playlist.id as id',
             'order',
             'trainer',
             'gift',

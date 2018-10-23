@@ -22,5 +22,5 @@
     </script>
 
     <script src="{{ asset('js/model_conversations/playlist.js') }}"></script>
-    <script src="{{ asset('js/model_conversations/model_conversations_playlist.js') }}"></script>
+    <script src="{{ asset('js/model_conversations/model_conversations_playlist_categories.js') }}"></script>
 @endsection
