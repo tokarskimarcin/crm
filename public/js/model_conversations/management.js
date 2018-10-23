@@ -51,13 +51,13 @@ document.addEventListener('DOMContentLoaded', function(event) {
                     let subcategorySelect = thisRow.cells[4].querySelector('.category_subcategory');
                     let selectedSubcategory = getSelectedValue(subcategorySelect);
 
-                    MANAGEMENT.DOMElements.categoryModal.querySelector('.category_toAdd').value = 1; //edition
+                    MANAGEMENT.DOMElements.categoryModal.querySelector('.category_toAdd').value = 0; //edition
                     MANAGEMENT.DOMElements.categoryModal.querySelector('.category_name').value = name;
                     MANAGEMENT.DOMElements.categoryModal.querySelector('.category_status').value = selectedStatus;
                     MANAGEMENT.DOMElements.categoryModal.querySelector('.category_subcategory').value = selectedSubcategory;
                 }
                 else if(action == 5) {
-                    MANAGEMENT.DOMElements.categoryModal.querySelector('.category_toAdd').value = 0; //adding new item
+                    MANAGEMENT.DOMElements.categoryModal.querySelector('.category_toAdd').value = 1; //adding new item
                     MANAGEMENT.DOMElements.categoryModal.querySelector('.category_name').value = '';
                     MANAGEMENT.DOMElements.categoryModal.querySelector('.category_status').value = 1;
                     MANAGEMENT.DOMElements.categoryModal.querySelector('.category_subcategory').value = 0;
@@ -110,7 +110,7 @@ document.addEventListener('DOMContentLoaded', function(event) {
                     let statusSelect = thisRow.cells[6].querySelector('.item_status');
                     let selectedStatus = getSelectedValue(statusSelect);
 
-                    MANAGEMENT.DOMElements.itemEditionModal.querySelector('.item_toAdd').value = 1;
+                    MANAGEMENT.DOMElements.itemEditionModal.querySelector('.item_toAdd').value = 0;
                     MANAGEMENT.DOMElements.itemEditionModal.querySelector('.id').value = id;
                     MANAGEMENT.DOMElements.itemEditionModal.querySelector('.item_name').value = name;
                     MANAGEMENT.DOMElements.itemEditionModal.querySelector('.item_trainer').value = trainer;
@@ -120,7 +120,7 @@ document.addEventListener('DOMContentLoaded', function(event) {
                     MANAGEMENT.DOMElements.itemEditionModal.querySelector('.item_status').value = selectedStatus;
                 }
                 else if(action == 5) { //adding new item
-                    MANAGEMENT.DOMElements.itemEditionModal.querySelector('.item_toAdd').value = 0;
+                    MANAGEMENT.DOMElements.itemEditionModal.querySelector('.item_toAdd').value = 1;
                     MANAGEMENT.DOMElements.itemEditionModal.querySelector('.id').value = '';
                     MANAGEMENT.DOMElements.itemEditionModal.querySelector('.item_name').value = '';
                     MANAGEMENT.DOMElements.itemEditionModal.querySelector('.item_trainer').value = '';

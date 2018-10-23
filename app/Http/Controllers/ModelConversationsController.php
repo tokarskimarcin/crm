@@ -101,43 +101,61 @@ class ModelConversationsController extends Controller
      * This method changes picture of category or adds new category
      */
     public function categoryPost(Request $request) {
-        $toAdd = $request->toAdd;
-
-        if($toAdd == 0) { //case when we are only adding new picture
+        $toAdd = $request->toAdd; //This varible defines whether user edit category or add new one 1 - add, 0 - edit
 
             //przy zmianie zdiecia, trzeba usunać stare - trzeba dodać to i przypisanie do danej kategori tego nowego zdiecia
             $id = $request->id;
             $picture = $request->file('picture');
-//            $picture_ext = $picture->getClientOriginalExtension();
-            $picture_name = $picture->getClientOriginalName();
+            $picture_name = null;
 
-            $picture->storeAs('public',$picture_name);
-
-        }
-        else { //case when we are adding new category
+            if($toAdd == 1) {
+                if(isset($picture)) { //user send picture
+                    $picture_name = 'category_' . $picture->getClientOriginalName() . '_' . date('Y-m-d');
+                    $picture->storeAs('public',$picture_name);
+                }
+                else { //user didn't send picture, we assing default one.
+                    $rnd = rand(1,5);
+                    $picture_name = 'category_default_' . $rnd . '.jpeg';
+                }
+            }
+            else {
+                if(isset($picture)) { //user send picture
+                    $picture_name = 'category_' . $picture->getClientOriginalName() . '_' . date('Y-m-d');
+                    $picture->storeAs('public',$picture_name);
+                }
+            }
 
             //trzeba dodać ograniczenie na wielkosc zdiecia i rozszerzenie.
             $name = $request->name;
-            $picture = $request->file('picture');
-            $picture_name = null;
-            if($picture) {
-                $picture_name = 'category_' . $picture->getClientOriginalName() . '_' . date('Y-m-d');
-                $picture->storeAs('public',$picture_name);
-            }
-            else {
-                $picture_name = 'chmury1.jpeg';
-            }
 
             $status = $request->status;
             $subcategory = $request->subcategory;
 
-            $category = new ModelConvCategories();
+            if($toAdd == 1) {
+                $category = new ModelConvCategories();
+            }
+            else {
+                $category = ModelConvCategories::find($id);
+            }
+
             $category->subcategory_id = $subcategory;
             $category->name = $name;
-            $category->img = $picture_name;
+            if($toAdd == 0) {
+                if(isset($picture)) {
+                    $category->img = $picture_name;
+                }
+            }
+            else {
+                $category->img = $picture_name;
+            }
+
             $category->status = $status;
-            $category->save();
-        }
+            try {
+                $category->save();
+            }
+            catch(\Exception $error) {
+                new ActivityRecorder($error, 1, 6);
+            }
         return Redirect::back();
     }
 
@@ -170,7 +188,6 @@ class ModelConversationsController extends Controller
     }
 
     public function itemsPost(Request $request) {
-//        dd('2');
         $toAdd = $request->toAdd;
 
         //we are adding new item
@@ -190,14 +207,14 @@ class ModelConversationsController extends Controller
 
 
         $newItem = null;
-        if($toAdd == 0) { //creating new
+        if($toAdd == 1) { //creating new
             $newItem = new ModelConvItems();
         }
         else {
             $newItem = ModelConvItems::find($request->id);
         }
 
-        if($toAdd == 1) { //editing
+        if($toAdd == 0) { //editing
             if(isset($sound)) { //There is new file
                 $newItem->file_name = $sound_name;
             }
