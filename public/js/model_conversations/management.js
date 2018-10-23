@@ -11,6 +11,7 @@ document.addEventListener('DOMContentLoaded', function(event) {
                 const thisRow = clickedElement.closest('tr');
                 const id = thisRow.dataset.id;
                 const action = clickedElement.dataset.action;
+
                 if(action == 0) { //permanent delete
                     swal({
                         title: 'Jesteś pewien?',
@@ -52,11 +53,12 @@ document.addEventListener('DOMContentLoaded', function(event) {
                     let selectedSubcategory = getSelectedValue(subcategorySelect);
 
                     MANAGEMENT.DOMElements.categoryModal.querySelector('.category_toAdd').value = 0; //edition
+                    MANAGEMENT.DOMElements.categoryModal.querySelector('.category_id').value = id; //edition
                     MANAGEMENT.DOMElements.categoryModal.querySelector('.category_name').value = name;
                     MANAGEMENT.DOMElements.categoryModal.querySelector('.category_status').value = selectedStatus;
                     MANAGEMENT.DOMElements.categoryModal.querySelector('.category_subcategory').value = selectedSubcategory;
                 }
-                else if(action == 5) {
+                else if(action == 5) { //adding new category
                     MANAGEMENT.DOMElements.categoryModal.querySelector('.category_toAdd').value = 1; //adding new item
                     MANAGEMENT.DOMElements.categoryModal.querySelector('.category_name').value = '';
                     MANAGEMENT.DOMElements.categoryModal.querySelector('.category_status').value = 1;
@@ -99,6 +101,11 @@ document.addEventListener('DOMContentLoaded', function(event) {
                     })
                 }
                 else if(action == 4) { //edition of existing item
+                    let header = MANAGEMENT.DOMElements.itemEditionModal.querySelector('h4');
+                    let saveButton = MANAGEMENT.DOMElements.itemEditionModal.querySelector('.item_save');
+                    header.textContent = 'Edycja rozmowy!';
+                    saveButton.value = 'Edytuj!'
+
                     let name = thisRow.cells[0].textContent;
                     let trainer = thisRow.cells[2].textContent;
                     let gift = thisRow.cells[3].textContent;
@@ -111,7 +118,7 @@ document.addEventListener('DOMContentLoaded', function(event) {
                     let selectedStatus = getSelectedValue(statusSelect);
 
                     MANAGEMENT.DOMElements.itemEditionModal.querySelector('.item_toAdd').value = 0;
-                    MANAGEMENT.DOMElements.itemEditionModal.querySelector('.id').value = id;
+                    MANAGEMENT.DOMElements.itemEditionModal.querySelector('.item_id').value = id;
                     MANAGEMENT.DOMElements.itemEditionModal.querySelector('.item_name').value = name;
                     MANAGEMENT.DOMElements.itemEditionModal.querySelector('.item_trainer').value = trainer;
                     MANAGEMENT.DOMElements.itemEditionModal.querySelector('.item_gift').value = gift;
@@ -120,8 +127,13 @@ document.addEventListener('DOMContentLoaded', function(event) {
                     MANAGEMENT.DOMElements.itemEditionModal.querySelector('.item_status').value = selectedStatus;
                 }
                 else if(action == 5) { //adding new item
+                    let header = MANAGEMENT.DOMElements.itemEditionModal.querySelector('h4');
+                    let saveButton = MANAGEMENT.DOMElements.itemEditionModal.querySelector('.item_save');
+                    header.textContent = 'Dodawanie nowej rozmowy!';
+                    saveButton.value = 'Dodaj!'
+
                     MANAGEMENT.DOMElements.itemEditionModal.querySelector('.item_toAdd').value = 1;
-                    MANAGEMENT.DOMElements.itemEditionModal.querySelector('.id').value = '';
+                    MANAGEMENT.DOMElements.itemEditionModal.querySelector('.item_id').value = '';
                     MANAGEMENT.DOMElements.itemEditionModal.querySelector('.item_name').value = '';
                     MANAGEMENT.DOMElements.itemEditionModal.querySelector('.item_trainer').value = '';
                     MANAGEMENT.DOMElements.itemEditionModal.querySelector('.item_gift').value = '';

@@ -44,12 +44,12 @@
                                 </select>
                             <td>
                                 <select class="category_subcategory form-control" disabled>
-                                    <option value="0" @if($category->id == 0) selected @endif>Główna</option>
+                                    <option value="0" @if($category->subcategory_id == 0) selected @endif>Główna</option>
                                     @foreach($categories as $category2)
-                                        <option value="{{$category2->id}}" @if($category->id == $category2->id) selected @endif>{{$category2->name}}</option>
+                                        <option value="{{$category2->id}}" @if($category->subcategory_id == $category2->id) selected @endif>{{$category2->name}}</option>
                                     @endforeach
                                 </select>
-                                @if($category->subcategory_id == 0) Głowne kategorie @else {{$categories->where('id', '=', $category->subcategory_id)->first()->name}} @endif</td>
+                            </td>
                             <td>
                                 @if($category->status == 1)
                                     <button class=" btn btn-warning" data-type="category" data-action="1">Wyłącz</button>
@@ -115,23 +115,21 @@
                                         <button class="btn btn-success" data-type="items" data-action="2">Włącz </button>
                                     @endif
                                     <button class="btn btn-danger" data-type="items" data-action="0">Usuń</button>
-                                        <button class="btn btn-default" data-type="items" data-action="4" data-toggle="modal" data-target="#itemEdition">Edytuj</button>
+                                        <button class="btn btn-info" data-type="items" data-action="4" data-toggle="modal" data-target="#itemEdition">Edytuj</button>
                                 </td>
                             </tr>
                         @endforeach
                     </tbody>
                     <tfoot>
                     <tr>
-                        <td></td>
                         <td>Dodaj nową rozmowę</td>
+                        <td><button class="btn btn-info" data-type="items" data-action="5" data-toggle="modal" data-target="#itemEdition">Dodaj</button></td>
                         <td></td>
                         <td></td>
                         <td></td>
                         <td></td>
                         <td></td>
-                        <td>
-                            <button class="btn btn-default" data-type="items" data-action="5" data-toggle="modal" data-target="#itemEdition">Dodaj</button>
-                        </td>
+                        <td></td>
                     </tr>
                     </tfoot>
                 </table>
@@ -154,7 +152,7 @@
                     <form  method="post" action="/modelConversationCategory" enctype="multipart/form-data">
                         <input type="hidden" name="toAdd" value="1" class="category_toAdd">
                         <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                        <input type="hidden" name="id" value="">
+                        <input type="hidden" name="id" value="" class="category_id">
 
                         <div class="form-group">
                             <label for="name">Nazwa kategorii</label>
@@ -209,7 +207,7 @@
                 <div class="modal-body2">
                     <form action="/modelConversationItems" method="post" enctype="multipart/form-data">
                             <input type="hidden" name="toAdd" value="1" class="item_toAdd">
-                            <input type="hidden" name="id" class="id">
+                            <input type="hidden" name="id" class="item_id">
                             <input type="hidden" name="_token" value="{{ csrf_token() }}">
                         <div class="form-group">
                             <label for="name">Nazwa</label>
@@ -252,7 +250,7 @@
                             </select>
                         </div>
 
-                        <input type="submit" class="btn btn-success" value="Zapisz">
+                        <input type="submit" class="btn btn-success item_save" value="Zapisz">
                     </form>
                 </div>
                 <div class="modal-footer">
