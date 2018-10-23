@@ -1,7 +1,6 @@
 document.addEventListener('DOMContentLoaded', function(event) {
 
-
-    let categories = APP.globalVariables.categories;
+    let categories = CATEGORIES.globalVariables.categories;
 
     //This function at begging sets containers with categories
     (function init() {
@@ -16,7 +15,7 @@ document.addEventListener('DOMContentLoaded', function(event) {
         while(!queue.isEmpty()) {
             let queue_item = queue.front();
             console.log(queue.front());
-            APP.DOMElements.categoriesBox.appendChild(queue_item.createDOMElement());
+            CATEGORIES.DOMElements.categoriesBox.appendChild(queue_item.createDOMElement());
             queue.dequeue();
         }
     })();
@@ -31,7 +30,7 @@ document.addEventListener('DOMContentLoaded', function(event) {
         }
         else if(clickedElement.matches('.play-sound')) {
             let nameOfFile = clickedElement.dataset.nameoffile;
-            APP.DOMElements.modal2body.innerHTML = "<audio controls style='width:100%;'> <source src=" + APP.globalVariables.url + '/' + nameOfFile + " type='audio/wav'>Twoja przeglądarka nie obsługuje tego formatu pliku.</audio>";
+            CATEGORIES.DOMElements.modal2body.innerHTML = "<audio controls style='width:100%;'> <source src=" + CATEGORIES.globalVariables.url + '/' + nameOfFile + " type='audio/wav'>Twoja przeglądarka nie obsługuje tego formatu pliku.</audio>";
         }
 
     }

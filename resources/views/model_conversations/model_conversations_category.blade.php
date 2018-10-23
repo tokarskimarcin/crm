@@ -68,7 +68,7 @@
 @section('script')
     <script>
         //In this script we define global variables and php variables
-        let APP = {
+        let CATEGORIES = {
             DOMElements: {
                 categoriesBox: document.querySelector('.categories-box'),
                 modal2body: document.querySelector('.modal2-body')
