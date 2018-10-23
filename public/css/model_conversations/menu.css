@@ -58,7 +58,7 @@ footer {
     background-color: lightgray;
 }
 
-.category {
+.category, .playlist-category {
     box-shadow: 0 0 10px 10px white inset;
     border-radius: 4%;
 
@@ -67,7 +67,7 @@ footer {
     justify-content: center;
 }
 
-.category:hover {
+.category:hover, .playlist-category:hover {
     cursor: pointer;
     animation-name: changeOpacity;
     animation-duration: 1s;

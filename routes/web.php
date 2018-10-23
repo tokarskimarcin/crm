@@ -1095,6 +1095,7 @@ Route::get('/setCityApprovalPart6','AutoScriptController@setCityApprovalPart6');
 //Route::get('/refreshPbxReportExtension', 'AutoScriptController@pbx_update');
 
 Route::get('/modelConversationMenu', 'ModelConversationsController@modelConversationMenuGet');
+Route::get('/modelConversationsManagement', 'ModelConversationsController@modelConversationsManagementGet');
 
 Route::get('/modelConversationCategory/{id}', 'ModelConversationsController@categoryGet');
 Route::put('/modelConversationCategory/{id}', 'ModelConversationsController@categoryPut');
@@ -1105,8 +1106,7 @@ Route::put('/modelConversationItems/{id}', 'ModelConversationsController@itemsPu
 Route::delete('/modelConversationItems/{id}', 'ModelConversationsController@itemsDelete');
 Route::post('/modelConversationItems', 'ModelConversationsController@itemsPost');
 
-
-Route::get('/modelConversationsManagement', 'ModelConversationsController@modelConversationsManagementGet');
 Route::get('/modelConversationsPlaylist', 'ModelConversationsController@modelConversationsPlaylistGet');
+Route::get('/modelConversationsPlaylist/{id}', 'ModelConversationsController@playlistGet');
 
 

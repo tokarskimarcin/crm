@@ -1,6 +1,5 @@
 document.addEventListener('DOMContentLoaded', function(event) {
 
-
     let categories = CATEGORIES.globalVariables.categories;
 
     //This function at begging sets containers with categories

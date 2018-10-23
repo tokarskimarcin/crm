@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\ActivityRecorder;
 use App\ModelConvCategories;
 use App\ModelConvItems;
+use App\ModelConvPlaylist;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -62,7 +63,36 @@ class ModelConversationsController extends Controller
     public function modelConversationsPlaylistGet() {
         $user = Auth::user()->user_type_id;
 
+        $playlistCategories = ModelConvPlaylist::all();
+
+        return view('model_conversations.model_conversations_playlist_categories')
+            ->with('adminPanelAccessArr', $this->adminPanelAccessArr)
+            ->with('playlistCategories', $playlistCategories)
+            ->with('user', $user);
+    }
+
+    public function playlistGet($id) {
+        $user = Auth::user()->user_type_id;
+
+        $playlist = ModelConvPlaylist::select(
+            'model_conv_playlist.name as playlist_name',
+            'model_conv_items.name as conv_name',
+            'order',
+            'trainer',
+            'gift',
+            'client'
+        )
+            ->join('model_conv_playlist_items', 'model_conv_playlist.id', '=', 'model_conv_playlist_items.playlist_id')
+            ->join('model_conv_items', 'model_conv_playlist_items.item_id', '=', 'model_conv_items.id')
+            ->where('model_conv_items.status', '=', 1)
+            ->where('model_conv_playlist.id', '=', $id)
+            ->orderBy('order')
+            ->get();
+
+//        dd($playlist);
+
         return view('model_conversations.model_conversations_playlist')
+            ->with('playlist', $playlist)
             ->with('adminPanelAccessArr', $this->adminPanelAccessArr)
             ->with('user', $user);
     }

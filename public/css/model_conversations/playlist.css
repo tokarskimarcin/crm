@@ -1,0 +1,15 @@
+.playlist {
+    width: 80%;
+    margin: 0 auto;
+
+    display: flex;
+    flex-direction: column;
+    border: 3px solid #337ab7;
+    border-radius: 10px;
+}
+
+.playlist-header > hr, playlist-control > hr {
+    width: 95%;
+    border: 0; height: 2px;
+    background-image: linear-gradient(to right, rgba(0, 0, 0, 0), #337ab7, rgba(0, 0, 0, 0));
+}
