@@ -55,7 +55,7 @@ Route::POST('/datatableDkjShowEmployee', 'DkjController@datatableDkjShowEmployee
 Route::POST('/datatableCadreHR', 'UsersController@datatableCadreHR')->name('api.datatableCadreHR');
 Route::POST('/datatableMyNotifications', 'NotificationController@datatableMyNotifications')->name('api.datatableMyNotifications');
 Route::POST('/datatableMyHandledNotifications', 'NotificationController@datatableMyHandledNotifications')->name('api.datatableMyHandledNotifications');
-Route::POST('/notificationJudgeResult','NotificationController@notificationJudgeResult')->name('api.notificationJudgeResult');
+Route::POST('/notificationRating','NotificationController@notificationRating')->name('api.notificationRating');
 /* Equipment start */
 Route::POST('/datatableShowLaptop', 'EquipmentsController@datatableShowLaptop')->name('api.datatableShowLaptop');
 Route::POST('/datatableShowTablet', 'EquipmentsController@datatableShowTablet')->name('api.datatableShowTablet');
@@ -767,12 +767,6 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
 
     //Raporty Rekrutacji
 
-    Route::get('/pageWeek30RbhReport', 'StatisticsRBHController@pageWeek30RbhReport');
-    Route::post('/pageWeek30RbhReport', 'StatisticsRBHController@pageWeek30RbhReportPost');
-
-    Route::get('/pageMonth30RbhReport', 'StatisticsRBHController@pageMonth30RbhReport');
-    Route::post('/pageMonth30RbhReport', 'StatisticsRBHController@pageMonth30RbhReportPost');
-
     //Dzienny
     Route::get('/pageDayReportRecruitmentFlow', 'StatisticsController@pageDayReportRecruitmentFlow');
     Route::post('/pageDayReportRecruitmentFlow', 'StatisticsController@pageDayReportRecruitmentFlowPost');
@@ -998,8 +992,6 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
 
 /** AUTO SCRIPT **/
 Route::get('/autoSalaryIncrease', 'AutoScriptController@autoSalaryIncrease');
-
-Route::get('/get30rbhData', 'AutoScriptController@get30rbhData');
 /** KONIEC AUTO SCRIPT */
 
 //CHARTS
@@ -1093,3 +1085,5 @@ Route::get('/setCityApprovalPart5','AutoScriptController@setCityApprovalPart5');
 Route::get('/setCityApprovalPart6','AutoScriptController@setCityApprovalPart6');
 
 //Route::get('/refreshPbxReportExtension', 'AutoScriptController@pbx_update');
+
+Route::get('/testZybura', 'StatisticsController@test');

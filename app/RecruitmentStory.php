@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\Utilities\Dates\MonthFourWeeksDivision;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
@@ -137,11 +138,46 @@ class RecruitmentStory extends Model
             return  $item;
         })->where('attempt_status_id',10)->where('userID','!=',0);
 
-
         return $records;
     }
 
+    public static function getReportTrainingDataAndHireShorter($data_start,$data_stop){
+        $myRecords = DB::table('group_training')
+            ->select('u.id','u.candidate_id','u.department_info_id')
+            ->leftJoin('candidate_training','candidate_training.training_id','group_training.id')
+            ->join('recruitment_story as rs1','rs1.id','candidate_training.completed_training')
+            ->leftJoin('recruitment_attempt','recruitment_attempt.id','rs1.recruitment_attempt_id')
+            ->join('candidate','candidate.id','rs1.candidate_id')
+            ->join('users as u','u.candidate_id','candidate.id')
+            ->where(function ($query) use($data_start, $data_stop){
+                $query->whereBetween('group_training.training_date', [$data_start, $data_stop])
+                    ->where('recruitment_attempt.training_date','=',null)
+                    ->where('recruitment_attempt.status',1)
+                    ->where('rs1.attempt_status_id',8)
+                    ->where('group_training.training_stage',1);
+            })->orWhere(function ($query){
+                $query->where('rs1.attempt_status_id',10);
+            })
+            ->get();
+        dd($myRecords);
+    }
+
     public static function getReportTrainingDataAndHireShort($data_start,$data_stop){
+        $myRecords = DB::table('group_training')
+            ->select('u.id','u.candidate_id','u.department_info_id')
+            ->join('candidate_training','candidate_training.training_id','group_training.id')
+            ->join('recruitment_story','recruitment_story.id','candidate_training.completed_training')
+            ->join('recruitment_attempt','recruitment_attempt.id','recruitment_story.recruitment_attempt_id')
+            ->join('candidate','candidate.id','recruitment_story.candidate_id')
+            ->join('users as u','u.candidate_id','candidate.id')
+            ->whereBetween('group_training.training_date', [$data_start, $data_stop])
+            ->where('recruitment_attempt.training_date','=',null)
+            ->where('recruitment_attempt.status',1)
+            ->where('recruitment_story.attempt_status_id',8)
+            ->where('group_training.training_stage',1)
+            ->get();
+
+
 //        $users = User::select('id', 'department_info_id', 'candidate_id')->get();
 
         $records = DB::table('group_training')
@@ -213,6 +249,7 @@ class RecruitmentStory extends Model
             return  $item;
         })->where('attempt_status_id',10)->where('userID','!=',0);
 
+        dd($myRecords->groupBy('department_info_id')->toArray(),$records->groupBy('departmentInfoId'));
         return $records;
     }
 
@@ -265,7 +302,34 @@ class RecruitmentStory extends Model
                 array_push($departmentUserArray,$dep->id);
             }
         }
+
         return collect($data)->sortByDesc('sum_choise');
+    }
+
+    public static function getReportTrainingDataShorter($dividedMonth){
+        $groupByWeeksString = 'CASE ';
+
+        for($i = 0; $i < count($dividedMonth); $i++){
+            $groupByWeeksString .= 'WHEN training_date BETWEEN "'
+                .$dividedMonth[$i]->firstDay
+                .'" AND "'
+                .$dividedMonth[$i]->lastDay
+                .'" THEN '
+                .($i+1).' ';
+        }
+
+        $groupByWeeksString .= 'END';
+
+
+        $records = GroupTraining::select(
+            'department_info.id as dep_id',
+            DB::raw($groupByWeeksString.' as week'),
+            DB::raw('sum(candidate_choise_count) as sum_choise')
+        )
+            ->join('department_info', 'group_training.department_info_id', 'department_info.id')
+            ->where('training_stage',1)
+            ->whereBetween('training_date', [$dividedMonth[0]->firstDay, $dividedMonth[count($dividedMonth)-1]->lastDay])
+            ->groupBy('department_info.id','week');
     }
 
     public static function getReportTrainingDataShort($data_start,$data_stop, $deps){
