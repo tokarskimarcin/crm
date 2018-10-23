@@ -10,3 +10,12 @@
 .inactive-category {
     background-color: lightcoral;
 }
+
+.glyphicon-play-circle {
+    font-size: 2em;
+}
+
+.glyphicon-picture {
+    font-size: 2em;
+    padding-left: 0.5em;
+}

@@ -1,4 +1,7 @@
 @extends('model_conversations.model_conversations_menu')
+@section('styles')
+    <link rel="stylesheet" href="{{ asset('css/model_conversations/category.css') }}">
+@endsection
 @section('section')
 
     <main class="main_part">

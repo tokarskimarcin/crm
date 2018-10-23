@@ -104,7 +104,7 @@ document.addEventListener('DOMContentLoaded', function(event) {
                     let header = MANAGEMENT.DOMElements.itemEditionModal.querySelector('h4');
                     let saveButton = MANAGEMENT.DOMElements.itemEditionModal.querySelector('.item_save');
                     header.textContent = 'Edycja rozmowy!';
-                    saveButton.value = 'Edytuj!'
+                    saveButton.value = 'Edytuj!';
 
                     let name = thisRow.cells[0].textContent;
                     let trainer = thisRow.cells[2].textContent;
@@ -130,7 +130,7 @@ document.addEventListener('DOMContentLoaded', function(event) {
                     let header = MANAGEMENT.DOMElements.itemEditionModal.querySelector('h4');
                     let saveButton = MANAGEMENT.DOMElements.itemEditionModal.querySelector('.item_save');
                     header.textContent = 'Dodawanie nowej rozmowy!';
-                    saveButton.value = 'Dodaj!'
+                    saveButton.value = 'Dodaj!';
 
                     MANAGEMENT.DOMElements.itemEditionModal.querySelector('.item_toAdd').value = 1;
                     MANAGEMENT.DOMElements.itemEditionModal.querySelector('.item_id').value = '';
