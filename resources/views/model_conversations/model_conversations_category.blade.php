@@ -80,5 +80,5 @@
         };
     </script>
     <script src="{{ asset('js/model_conversations/category.js') }}"></script>
-    <script src="{{ asset('js/model_conversations/categories.js') }}"></script>
+    <script src="{{ asset('js/model_conversations/model_conversations_categories.js') }}"></script>
 @endsection

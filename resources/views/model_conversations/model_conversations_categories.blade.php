@@ -23,5 +23,5 @@
     </script>
 
     <script src="{{ asset('js/model_conversations/category.js') }}"></script>
-    <script src="{{ asset('js/model_conversations/menu.js') }}"></script>
+    <script src="{{ asset('js/model_conversations/model_conversations_menu.js') }}"></script>
 @endsection

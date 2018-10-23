@@ -43,6 +43,11 @@ document.addEventListener('DOMContentLoaded', function(event) {
                     })
                 }
                 else if(action == 4) { //Edition
+                    let header = MANAGEMENT.DOMElements.categoryModal.querySelector('h4');
+                    let saveButton = MANAGEMENT.DOMElements.categoryModal.querySelector('.category_save');
+                    header.textContent = 'Edycja!';
+                    saveButton.value = 'Edytuj!';
+
                     //At first we are assigning category id to form input
                     let name = thisRow.cells[1].textContent;
 
@@ -59,6 +64,11 @@ document.addEventListener('DOMContentLoaded', function(event) {
                     MANAGEMENT.DOMElements.categoryModal.querySelector('.category_subcategory').value = selectedSubcategory;
                 }
                 else if(action == 5) { //adding new category
+                    let header = MANAGEMENT.DOMElements.categoryModal.querySelector('h4');
+                    let saveButton = MANAGEMENT.DOMElements.categoryModal.querySelector('.category_save');
+                    header.textContent = 'Dodawanie nowej kategori!';
+                    saveButton.value = 'Dodaj!';
+
                     MANAGEMENT.DOMElements.categoryModal.querySelector('.category_toAdd').value = 1; //adding new item
                     MANAGEMENT.DOMElements.categoryModal.querySelector('.category_name').value = '';
                     MANAGEMENT.DOMElements.categoryModal.querySelector('.category_status').value = 1;

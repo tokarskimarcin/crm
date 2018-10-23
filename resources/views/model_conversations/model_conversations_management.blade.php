@@ -183,7 +183,7 @@
                                 @endforeach
                             </select>
                         </div>
-                        <input type="submit" class="btn btn-success" value="Dodaj nową kategorię">
+                        <input type="submit" class="btn btn-success category_save" value="Zapisz">
                     </form>
                 </div>
                 <div class="modal-footer">
@@ -301,5 +301,5 @@
     </script>
     <script src="{{ asset('/js/sweetAlert.js')}}"></script>
     <script src="{{ asset('js/model_conversations/category.js') }}"></script>
-    <script src="{{ asset('js/model_conversations/management.js') }}"></script>
+    <script src="{{ asset('js/model_conversations/model_conversations_management.js') }}"></script>
 @endsection
