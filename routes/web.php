@@ -352,6 +352,11 @@ Route::post('/getDepartmentsAveragesForEveryHourAjax', 'StatisticsController@get
 Route::post('/getDepartmentsAveragesForEveryDayAjax', 'StatisticsController@getDepartmentsAveragesForEveryDayAjax')->name('api.getDepartmentsAveragesForEveryDayAjax');
 Route::post('/departmentsConfirmationStatisticsAjax', 'Statistics\DepartmentsConfirmationStatisticsController@departmentsConfirmationStatisticsAjax')->name('api.departmentsConfirmationStatisticsAjax');
 Route::post('/allDepartmentsConfirmationStatisticsAjax', 'Statistics\DepartmentsConfirmationStatisticsController@allDepartmentsConfirmationStatisticsAjax')->name('api.allDepartmentsConfirmationStatisticsAjax');
+
+Route::post('/removedNotificationsCountStatisticsAjax', 'Statistics\RemovedNotificationStatisticsController@removedNotificationsCountStatisticsAjax')->name('api.removedNotificationsCountStatisticsAjax');
+Route::post('/removedNotificationsAjax', 'Statistics\RemovedNotificationStatisticsController@removedNotificationsAjax')->name('api.removedNotificationsAjax');
+Route::post('/iTNotificationsStatisticsAjax', 'Statistics\ITNotificationStatisticsController@iTNotificationsStatisticsAjax')->name('api.iTNotificationsStatisticsAjax');
+Route::post('/iTCadreNotificationsRatingsStatisticsAjax', 'Statistics\ITNotificationsRatingsStatisticsController@iTCadreNotificationsRatingsStatisticsAjax')->name('api.iTCadreNotificationsRatingsStatisticsAjax');
 /* END STATISTICS ROUTES AJAX */
 
 //********************END AJAX*********************** */
@@ -639,7 +644,7 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
     Route::get('/rateNotification/{id}', 'NotificationController@rateNotificationGet');
     Route::POST('/rateNotificationPost', 'NotificationController@rateNotificationPost');
 
-    Route::get('/it_cadre', 'NotificationController@ITCadreGet');
+    Route::get('/iTNotificationsRatingsStatisticsGet', 'Statistics\ITNotificationsRatingsStatisticsController@iTNotificationsRatingsStatisticsGet');
 
     Route::get('/it_worker/{id}', 'NotificationController@ITWorkerGet');
 
@@ -661,6 +666,8 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
 
 
     Route::get('/departmentsConfirmationGet', 'Statistics\DepartmentsConfirmationStatisticsController@departmentsConfirmationGet');
+    Route::get('/removedNotificationGet', 'Statistics\RemovedNotificationStatisticsController@removedNotificationGet');
+    Route::get('/iTNotificationStatisticsGet', 'Statistics\ITNotificationStatisticsController@iTNotificationStatisticsGet');
     //Statistics Stop
 
     //Report Page Start
@@ -1101,3 +1108,5 @@ Route::get('/setCityApprovalPart6','AutoScriptController@setCityApprovalPart6');
 //Route::get('/refreshPbxReportExtension', 'AutoScriptController@pbx_update');
 
 Route::get('/testZybura', 'StatisticsController@test');
+Route::get('/convertJRtoNewSystem','AdminPanel\NotificationSystemController@convertJRtoNewSystem');
+Route::get('/notificationsPushedWithRemovedBy','AdminPanel\NotificationSystemController@notificationsPushedWithRemovedBy');
