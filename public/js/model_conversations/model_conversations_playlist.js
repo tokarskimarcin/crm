@@ -27,9 +27,6 @@ document.addEventListener('DOMContentLoaded', function(event) {
     (function init() {
         if(playlist) {
 
-            // let counter = document.querySelector('.counter');
-            // let counterElement = playlist2.createDOMCounter();
-            // counter.appendChild(counterElement);
             updateCounterElement();
 
             let tbody = PLAYLIST.DOMElements.playlistTable.querySelector('tbody');
@@ -69,6 +66,10 @@ document.addEventListener('DOMContentLoaded', function(event) {
         }
     })();
 
+    /**
+     * This function set all tbody rows color
+     * @param color
+     */
     function setAllRowsColor(color) {
         let rows = PLAYLIST.DOMElements.playlistTable.querySelectorAll('tbody tr');
         if(rows) {
