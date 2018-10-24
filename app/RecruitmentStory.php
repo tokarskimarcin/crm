@@ -169,7 +169,7 @@ class RecruitmentStory extends Model
             //->whereNull('ra.training_date')
             ->where('g.training_stage',1)
             ->whereBetween('g.training_date', [$date_start, $date_stop]);
-        dd($candidates->get()->groupBy('week'));
+        //dd($candidates->get()->groupBy('week'));
 
         return collect($candidates->get()->toArray())->unique();
     }
@@ -285,7 +285,7 @@ class RecruitmentStory extends Model
             return  $item;
         })->where('attempt_status_id',10)->where('userID','!=',0);
 
-        dd($myRecords->groupBy('department_info_id')->toArray(),$records->groupBy('departmentInfoId'));
+        //dd($myRecords->groupBy('department_info_id')->toArray(),$records->groupBy('departmentInfoId'));
         return $records;
     }
 

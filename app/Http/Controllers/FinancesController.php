@@ -660,16 +660,47 @@ class FinancesController extends Controller
                 }
             }
             else if($user->department_type_id == 2){       //szkoleniowiec telemarketing
+                $start = microtime(true);
+                $firstStatisticArr = []; //array of recruited to stage 1 statistics
+                $secondStatisticsArr = []; //array of averages
 
-                /*$reportTrainingData = RecruitmentStory::getReportTrainingDataShorter($dividedMonth);
+                $reportTrainingData = RecruitmentStory::getReportTrainingDataShorter($dividedMonth);
                 $candidates = RecruitmentStory::getCandidatesTrainedStageOne($dividedMonth[0]->firstDay, $dividedMonth[count($dividedMonth)-1]->lastDay, $dividedMonth);
                 $reportTrainingDataAndHire = RecruitmentStory::getReportTrainingDataAndHireShorter($candidates);
 
-                dd($reportTrainingData->groupBy('week')->toArray(),$candidates->where('week',3), $reportTrainingDataAndHire );*/
-
-                $firstStatisticArr = []; //array of recruited to stage 1 statistics
-                $secondStatisticsArr = []; //array of averages
                 foreach($dividedMonth as $companyWeek) {
+                    $weekNumber++;
+                    $weekDataReportTrainingDataAndHire = $reportTrainingDataAndHire->where('week', $weekNumber);
+                    $departmentReportTrainingData = $reportTrainingData->where('week', $weekNumber)->where('dep_id', $dep_info)->first();
+                    if($departmentReportTrainingData != null){
+                        $hiredToCandidatesInStageOne = intval($departmentReportTrainingData->sum_choise) != 0 ? round(100 * $weekDataReportTrainingDataAndHire->where('department_info_id', $dep_info)->count() / intval($departmentReportTrainingData->sum_choise), 2) : 0;
+                        array_push($firstStatisticArr, $hiredToCandidatesInStageOne);
+                    }else{
+                        array_push($firstStatisticArr, 0);
+                    }
+
+                    $date_start = $companyWeek->firstDay;
+                    $date_stop = $companyWeek->lastDay;
+                    $RBH30Data = Data30RBHreport::get($date_start, $date_stop, 1);
+
+                    $sumConsultants = 0; // number of consultants = denumerator for average
+                    if(isset($RBH30Data[$dep_info])) {
+                        $sumConsultants = count($RBH30Data[$dep_info]);
+                    }
+
+                    $sum_success = 0; // number of successes = numerator for average
+                    if(isset($RBH30Data[$dep_info])) {
+                        foreach($RBH30Data[$dep_info] as $rbhInfo) {
+                            $sum_success += $rbhInfo->success;
+                        }
+                    }
+                    $avg = $sumConsultants > 0 ? round($sum_success / $sumConsultants, 2) : 0; //new consultants avg
+
+                    array_push($secondStatisticsArr, $avg);
+                }
+
+                /** SLOW METHOD BELOW*/
+                /*foreach($dividedMonth as $companyWeek) {
                     $date_start = $companyWeek->firstDay;
                     $date_stop = $companyWeek->lastDay;
                     $dataTrainingGroup = RecruitmentStory::getReportTrainingDataShort($date_start,$date_stop, $deps2);
@@ -698,8 +729,10 @@ class FinancesController extends Controller
                     $avg = $sumConsultants > 0 ? round($sum_success / $sumConsultants, 2) : 0; //new consultants avg
 
                     array_push($secondStatisticsArr, $avg);
-                }
+                }*/
 
+                $time_elapsed_secs = microtime(true) - $start;
+                $weekNumber = 0;
                 foreach ($arrayOfDepartmentStatistics as $item) {
                     if(isset($secondStatisticsArr[$weekNumber])) {
                         $user->bonus += ProvisionLevels::get('instructor', $item->janky_proc,3 ,$secondStatisticsArr[$weekNumber], 'avg');
@@ -969,7 +1002,7 @@ class FinancesController extends Controller
                  $newAcceptedPaymentObj->payment_month          = $request->search_money_month.'-01';
                  $newAcceptedPaymentObj->department_info_id     = 13;
                  $newAcceptedPaymentObj->cadrePayment           = 1;
-                 //$newAcceptedPaymentObj->save();
+                 $newAcceptedPaymentObj->save();
             }else{
                 $savePayment = 0;
             }
