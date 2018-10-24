@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\NotificationAbout;
 use App\NotificationChangesDisplayedFlags;
 use App\NotificationRating;
 use App\NotificationRatingComponents;
@@ -18,17 +19,18 @@ use App\CommentsNotifications;
 use App\User;
 use Illuminate\Support\Facades\DB;
 use App\ActivityRecorder;
-use App\JudgeResult;
 use Illuminate\Support\Facades\URL;
 
 class NotificationController extends Controller
 {
     public function addNotificationGet() {
         $notification_types = NotificationTypes::all();
+        $notification_abouts = NotificationAbout::all();
         $department_info = Department_info::all();
 
         return view('notifications.addNewNotification')
             ->with('notification_types', $notification_types)
+            ->with('notification_abouts', $notification_abouts)
             ->with('department_info', $department_info);
     }
 
@@ -46,7 +48,9 @@ class NotificationController extends Controller
         $notification->title = $request->title;
         $notification->content = $request->content;
         $notification->status = 1;
-        $notification->notification_type_id = $request->notification_type_id;
+        $notification->notification_type_id = $request->notification_type_id;;
+        $notification->sticker_number = $request->stickerNr == '' ? null : $request->stickerNr;
+        $notification->notification_about_id = $request->notification_about_id;
         $notification->department_info_id = $request->department_info_id;
         $notification->created_at = date("Y-m-d H:i:s");
         $notification->save();
@@ -65,7 +69,7 @@ class NotificationController extends Controller
     }
 
     public function showNotificationGet($id) {
-        $notification = Notifications::find($id);
+        $notification = Notifications::where('id',$id)->with('notification_about')->first();
 
         if ($notification == null) {
             return view('errors.404');
