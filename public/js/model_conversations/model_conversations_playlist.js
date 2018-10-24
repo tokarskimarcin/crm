@@ -69,6 +69,15 @@ document.addEventListener('DOMContentLoaded', function(event) {
         }
     })();
 
+    function setAllRowsColor(color) {
+        let rows = PLAYLIST.DOMElements.playlistTable.querySelectorAll('tbody tr');
+        if(rows) {
+            rows.forEach(row => {
+                row.style.backgroundColor = color;
+            });
+        }
+    }
+
     function globalClickHandler(e) {
         const clickedElement = e.target;
 
@@ -84,8 +93,14 @@ document.addEventListener('DOMContentLoaded', function(event) {
             updateCounterElement();
         }
         else if(clickedElement.matches('.glyphicon-stop')) { //click on stop icon
+            playlist2.pause();
+            setAllRowsColor('white');
+            playlist2.setState(0);
             playlist2.updateCounter('init');
             updateCounterElement();
+        }
+        else if(clickedElement.matches('.glyphicon-pause')) {
+            playlist2.pause();
         }
     }
 

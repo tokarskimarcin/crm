@@ -1,14 +1,14 @@
-function Playlist(id, name, imageName, itemsArr) {
+function Playlist(id, name, imageName, itemsArr = null) {
     this.name = name;
     this.state = 0; // 0 - initial state, 1 - pause, 2 - play
     this.image = imageName;
     this.itemsArr = itemsArr;
     this.id = id;
-    this.items = setItems(itemsArr);
-    this.counter = {
+    this.items = itemsArr !== null ? setItems(itemsArr) : null;
+    this.counter = itemsArr !== null ? {
         max:  itemsArr.length,
         actual: 1
-    }
+    } : null;
 
     function setItems(itemsArr) {
         console.assert(Array.isArray(itemsArr), 'itemsArr in Playlists items function is not array!');
@@ -155,4 +155,18 @@ Playlist.prototype.play = function() {
         audioElement.play();
         return null;
     }
+}
+
+Playlist.prototype.pause = function() {
+
+    if(this.state === 2 || this.state === 0) { //current playlist state is playing
+        this.state = 1;
+        console.log(this.state);
+        const actualRowNumber = this.counter.actual;
+        const tbody = PLAYLIST.DOMElements.playlistTable.querySelector('tbody');
+        let actualRow = tbody.querySelectorAll(`tr:nth-of-type(${actualRowNumber})`)[0];
+        let audioElement = actualRow.querySelector('audio');
+        audioElement.pause();
+    }
+
 }
