@@ -661,6 +661,12 @@ class FinancesController extends Controller
             }
             else if($user->department_type_id == 2){       //szkoleniowiec telemarketing
 
+                /*$reportTrainingData = RecruitmentStory::getReportTrainingDataShorter($dividedMonth);
+                $candidates = RecruitmentStory::getCandidatesTrainedStageOne($dividedMonth[0]->firstDay, $dividedMonth[count($dividedMonth)-1]->lastDay, $dividedMonth);
+                $reportTrainingDataAndHire = RecruitmentStory::getReportTrainingDataAndHireShorter($candidates);
+
+                dd($reportTrainingData->groupBy('week')->toArray(),$candidates->where('week',3), $reportTrainingDataAndHire );*/
+
                 $firstStatisticArr = []; //array of recruited to stage 1 statistics
                 $secondStatisticsArr = []; //array of averages
                 foreach($dividedMonth as $companyWeek) {
@@ -963,7 +969,7 @@ class FinancesController extends Controller
                  $newAcceptedPaymentObj->payment_month          = $request->search_money_month.'-01';
                  $newAcceptedPaymentObj->department_info_id     = 13;
                  $newAcceptedPaymentObj->cadrePayment           = 1;
-                 $newAcceptedPaymentObj->save();
+                 //$newAcceptedPaymentObj->save();
             }else{
                 $savePayment = 0;
             }
