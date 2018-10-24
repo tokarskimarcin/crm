@@ -36,6 +36,20 @@
                     <div class="alert alert-danger" style="display: none" id="alert_description">
                         Podaj szczegółowy opis!
                     </div>
+                    <hr>
+                    <div class="form-group">
+                        <label for="stickerNr">Numer naklejki urządzenia (np. KA41)</label>
+                        <input type="text" placeholder="Wpisz numer naklejki urządzenia" class="form-control" name="stickerNr" id="stickerNr"/>
+                        <div class="checkbox">
+                            <label>
+                                <input id="involveCheckbox" type="checkbox" style="display: block"> Nie dotyczy
+                            </label>
+                        </div>
+                    </div>
+                    <div class="alert alert-danger" style="display: none" id="alert_stickerNr">
+                        Podaj numer naklejki urządzenia!
+                    </div>
+                    <hr>
                     <div class="form-group">
                         <label for="notification_type_id">Wybierz typ problemu</label>
                         <select name="notification_type_id" class="form-control" id="notification_type_id">
@@ -47,6 +61,18 @@
                     </div>
                     <div class="alert alert-danger" style="display: none" id="alert_type">
                         Wybierz typ problemu!
+                    </div>
+                    <div class="form-group">
+                        <label for="notification_about_id">Wybierz czego dotyczy problem</label>
+                        <select name="notification_about_id" class="form-control" id="notification_about_id">
+                            <option>Wybierz</option>
+                            @foreach($notification_abouts as $notification_about)
+                                <option value="{{$notification_about->id}}">{{$notification_about->name}}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="alert alert-danger" style="display: none" id="alert_about">
+                        Wybierz czego dotyczy problem!
                     </div>
                     <div class="form-group">
                     <label for="department_info_id">Wybierz oddział</label>
@@ -74,10 +100,36 @@
 @section('script')
 <script>
 
-    $("#add_notification").on('click', function() {
+    let stickerNr = $('#stickerNr').on('input',function () {
+
+    });
+    let involveCheckbox = $('#involveCheckbox').click(function (e) {
+            swal({
+                title:'Czy jesteś pewny?',
+                text: 'Czy Twój problem '+(e.target.checked ? 'nie ' : '')+'dotyczy urządzenia z naklejką?',
+                type:'warning',
+                confirmButtonText: 'Tak!',
+                showCancelButton: true,
+
+            }).then((result) => {
+                if (result.value) {
+                    e.target.checked ? stickerNr.prop('disabled', true) : stickerNr.prop('disabled', false);
+                }else{
+                    e.target.checked = !e.target.checked;
+                }
+            });
+
+    });
+
+    $("#add_notification").on('click', function(e) {
+        e.preventDefault();
+
         var title = $("#title").val();
         var content = $("#content").val();
+        var stickerNumber = stickerNr.val();
+        var involved = involveCheckbox.prop('checked');
         var notification_type_id = $("#notification_type_id").val();
+        var notification_about_id = $("#notification_about_id").val();
         var department_info_id = $("#department_info_id").val();
 
         var form_ok = true;
@@ -86,6 +138,13 @@
             form_ok = false;
         } else {
             $('#alert_title').slideUp(1000);
+        }
+
+        if(!involved && stickerNumber == ''){
+            $('#alert_stickerNr').slideDown(1000);
+            form_ok = false;
+        }else{
+            $('#alert_stickerNr').slideUp(1000);
         }
 
         if (content == '') {
@@ -102,6 +161,13 @@
             $('#alert_type').slideUp(1000);
         }
 
+        if (notification_about_id == 'Wybierz') {
+            $('#alert_about').slideDown(1000);
+            form_ok = false;
+        } else {
+            $('#alert_about').slideUp(1000);
+        }
+
         if (department_info_id == 'Wybierz') {
             $('#alert_department').slideDown(1000);
             form_ok = false;
@@ -109,10 +175,10 @@
             $('#alert_department').slideUp(1000);
         }
 
+
         if (form_ok == true) {
-          $('#form').submit(function(){
-              $(this).find(':submit').attr('disabled','disabled');
-          });
+            $(this).find(':submit').attr('disabled','disabled');
+            $('#form').submit();
         }
 
         if (form_ok == false) {
