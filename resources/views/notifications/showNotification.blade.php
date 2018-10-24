@@ -60,6 +60,22 @@
               <b>Treść problemu:</b><br />
                 {{$notification->content}}
             </p>
+              <div class="row">
+                      <div class="col-md-12">
+                          <ul class="list-group">
+                              @if($notification->notification_about_id !== null)
+                                  <li class="list-group-item">
+                                    <b>Problem dotyczy: </b>{{$notification->notification_about->name}}
+                                  </li>
+                              @endif
+                              @if($notification->sticker_number !== null)
+                                  <li class="list-group-item">
+                                      <b>Numer naklejki: </b>{{$notification->sticker_number}}
+                                  </li>
+                              @endif
+                          </ul>
+                      </div>
+              </div>
             <hr>
             @if($notification->status == 2)
             <p>

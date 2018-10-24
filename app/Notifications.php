@@ -16,6 +16,10 @@ class Notifications extends Model
         return $this->belongsTo('App\User', 'user_id');
     }
 
+    public function notification_about() {
+        return $this->belongsTo('App\NotificationAbout', 'notification_about_id');
+    }
+
     public function department_info() {
         return $this->belongsTo('App\Department_info', 'department_info_id');
     }
