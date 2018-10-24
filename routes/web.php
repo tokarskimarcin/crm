@@ -767,6 +767,12 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
 
     //Raporty Rekrutacji
 
+    Route::get('/pageWeek30RbhReport', 'StatisticsRBHController@pageWeek30RbhReport');
+    Route::post('/pageWeek30RbhReport', 'StatisticsRBHController@pageWeek30RbhReportPost');
+
+    Route::get('/pageMonth30RbhReport', 'StatisticsRBHController@pageMonth30RbhReport');
+    Route::post('/pageMonth30RbhReport', 'StatisticsRBHController@pageMonth30RbhReportPost');
+
     //Dzienny
     Route::get('/pageDayReportRecruitmentFlow', 'StatisticsController@pageDayReportRecruitmentFlow');
     Route::post('/pageDayReportRecruitmentFlow', 'StatisticsController@pageDayReportRecruitmentFlowPost');
