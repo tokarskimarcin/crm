@@ -24,18 +24,44 @@ function Playlist(id, name, imageName, itemsArr) {
  * This method update counter property of playlist
  * @returns {boolean}
  */
-Playlist.prototype.updateCounter = function() {
-    if(this.counter.actual < this.counter.max) {
-        this.counter.actual++;
-        return true;
+Playlist.prototype.updateCounter = function(direction) {
+    switch(direction) {
+        case 'forward': {
+            if(this.counter.actual < this.counter.max) {
+                this.counter.actual++;
+                return true;
+            }
+            else if(this.counter.actual === this.counter.max) {
+                this.counter.actual = 1;
+                return null;
+            }
+            else {
+                return false;
+            }
+            break;
+        }
+        case 'backward': {
+            if(this.counter.actual > 1) {
+                this.counter.actual--;
+                return true;
+            }
+            else if(this.counter.actual === 0) {
+                this.counter.actual = 1;
+                return null;
+            }
+            else {
+                return false;
+            }
+            break;
+        }
+        case 'init': {
+            this.counter.actual = 1;
+            return true;
+            break;
+        }
     }
-    else if(this.counter.actual === this.counter.max) {
-        this.counter.actual = 1;
-        return null;
-    }
-    else {
-        return false;
-    }
+
+
 }
 
 Playlist.prototype.setState = function(state_id) {
@@ -96,6 +122,7 @@ Playlist.prototype.createDOMCounter = function() {
  * @param counter
  */
 Playlist.prototype.play = function() {
+    this.state = 2; //playing
     const actualRowNumber = this.counter.actual;
     const lastRowNumber = this.counter.max;
     const tbody = PLAYLIST.DOMElements.playlistTable.querySelector('tbody');
@@ -111,13 +138,11 @@ Playlist.prototype.play = function() {
 
         }
         else { //there isn't any played element
-            console.log(audioElement);
             if(previousRow) {
                 previousRow.style.backgroundColor = 'white';
             }
             actualRow.style.backgroundColor = 'lightgreen';
             audioElement.play();
-            this.state = 2; //playing
             return true;
 
         }

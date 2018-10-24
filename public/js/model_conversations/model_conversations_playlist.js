@@ -69,20 +69,30 @@ document.addEventListener('DOMContentLoaded', function(event) {
         }
     })();
 
-
-    // console.log(playlist2.play(counter));
-
     function globalClickHandler(e) {
         const clickedElement = e.target;
 
-        if(clickedElement.matches(".glyphicon-play")) {
+        if(clickedElement.matches(".glyphicon-play")) { //click on play icon
             playlist2.play();
+        }
+        else if(clickedElement.matches('.glyphicon-forward')) { //click on forward icon
+            playlist2.updateCounter('forward');
+            updateCounterElement();
+        }
+        else if(clickedElement.matches('.glyphicon-backward')) { //click on backward icon
+            playlist2.updateCounter('backward');
+            updateCounterElement();
+        }
+        else if(clickedElement.matches('.glyphicon-stop')) { //click on stop icon
+            playlist2.updateCounter('init');
+            updateCounterElement();
         }
     }
 
     function endedHandler(e) {
-        if(playlist2.state === 2) {
-            let result = playlist2.updateCounter();
+        if(playlist2.state === 2) { //playlist is in play state
+            let result = playlist2.updateCounter('forward');
+
             if(result === true) { //next conversation
                 setTimeout(() => {
                     playlist2.play();
@@ -94,7 +104,6 @@ document.addEventListener('DOMContentLoaded', function(event) {
             else { //end playlist
                 console.log('Koniec playlisty');
                 let lastRow = PLAYLIST.DOMElements.playlistTable.querySelector('tbody tr:last-of-type');
-                console.log(lastRow);
                 setTimeout(() => {
                     lastRow.style.backgroundColor = 'white';
                 }, 1000)
@@ -105,16 +114,15 @@ document.addEventListener('DOMContentLoaded', function(event) {
                 updateCounterElement();
             }, 1000)
         }
-
-
     }
 
     let audioElements = document.querySelectorAll('audio');
 
     audioElements.forEach(audio => {
         audio.addEventListener('ended', endedHandler);
-    })
-    document.addEventListener('click', globalClickHandler)
+    });
+
+    document.addEventListener('click', globalClickHandler);
 
 
 
