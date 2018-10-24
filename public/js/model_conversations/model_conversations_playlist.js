@@ -93,10 +93,8 @@ document.addEventListener('DOMContentLoaded', function(event) {
             updateCounterElement();
         }
         else if(clickedElement.matches('.glyphicon-stop')) { //click on stop icon
-            playlist2.pause();
+            playlist2.stop();
             setAllRowsColor('white');
-            playlist2.setState(0);
-            playlist2.updateCounter('init');
             updateCounterElement();
         }
         else if(clickedElement.matches('.glyphicon-pause')) {

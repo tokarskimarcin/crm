@@ -157,6 +157,9 @@ Playlist.prototype.play = function() {
     }
 }
 
+/**
+ * This method pauses playlist
+ */
 Playlist.prototype.pause = function() {
 
     if(this.state === 2 || this.state === 0) { //current playlist state is playing
@@ -169,4 +172,18 @@ Playlist.prototype.pause = function() {
         audioElement.pause();
     }
 
+}
+
+/**
+ * This method stops playlist and set it to initial state
+ */
+Playlist.prototype.stop = function() {
+        this.state = 0;
+        const actualRowNumber = this.counter.actual;
+        const tbody = PLAYLIST.DOMElements.playlistTable.querySelector('tbody');
+        let actualRow = tbody.querySelectorAll(`tr:nth-of-type(${actualRowNumber})`)[0];
+        let audioElement = actualRow.querySelector('audio');
+        audioElement.pause();
+        audioElement.currentTime = 0;
+        this.counter.actual = 1;
 }
