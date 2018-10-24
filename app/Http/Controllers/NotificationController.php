@@ -295,6 +295,7 @@ class NotificationController extends Controller
             return 'error.404';
         }
 
+
         /**
          * Sprawdzenie czy ID powiadomienia jest zgodne z formularzem
          */
@@ -339,7 +340,6 @@ class NotificationController extends Controller
         $notificationRating->created_at = date("Y-m-d H:i:s");
         $notificationRating->updated_at = date("Y-m-d H:i:s");
         $notificationRating->save();
-
 
         $average_rating = 0;
         foreach ($request->ratingsArray as $ratingItem) {

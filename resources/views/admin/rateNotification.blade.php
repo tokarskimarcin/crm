@@ -114,7 +114,7 @@
             </div>
             <div class="row">
                 <div class="col-md-6">
-                    <form id="rateForm" action="{{url('/rateNotificationPost')}}">
+                    <form id="rateForm" method="post" action="{{url('/rateNotificationPost')}}">
                         <input type="hidden" name="_token" value="{{ csrf_token() }}">
                         <input type="hidden" id="ajaxResponse" name="response" value="">
                         <button id="rateButton" class="btn btn-block btn-primary"><span class="glyphicon glyphicon-list"></span><br>Oceń</button>
@@ -175,6 +175,7 @@
                 },
                 success: function (response) {
                     $('#ajaxResponse').val(response);
+                    //console.log($('#ajaxResponse').val());
                     $('#rateForm').submit();
                 },
                 error: function (jqXHR, textStatus, thrownError) {
