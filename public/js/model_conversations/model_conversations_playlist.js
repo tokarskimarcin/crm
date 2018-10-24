@@ -81,28 +81,32 @@ document.addEventListener('DOMContentLoaded', function(event) {
     }
 
     function endedHandler(e) {
-        let result = playlist2.updateCounter();
-        if(result === true) { //next conversation
+        if(playlist2.state === 2) {
+            let result = playlist2.updateCounter();
+            if(result === true) { //next conversation
+                setTimeout(() => {
+                    playlist2.play();
+                },1000);
+            }
+            else if(result === false) { //error
+                console.log('cos zlego sie dzieje');
+            }
+            else { //end playlist
+                console.log('Koniec playlisty');
+                let lastRow = PLAYLIST.DOMElements.playlistTable.querySelector('tbody tr:last-of-type');
+                console.log(lastRow);
+                setTimeout(() => {
+                    lastRow.style.backgroundColor = 'white';
+                }, 1000)
+                playlist2.setState(0);
+            }
+
             setTimeout(() => {
-                playlist2.play();
-            },1000);
-        }
-        else if(result === false) { //error
-            console.log('cos zlego sie dzieje');
-        }
-        else { //end playlist
-            console.log('Koniec playlisty');
-            let lastRow = PLAYLIST.DOMElements.playlistTable.querySelector('tbody tr:last-of-type');
-            console.log(lastRow);
-            setTimeout(() => {
-                lastRow.style.backgroundColor = 'white';
+                updateCounterElement();
             }, 1000)
-
         }
 
-        setTimeout(() => {
-            updateCounterElement();
-        }, 1000)
+
     }
 
     let audioElements = document.querySelectorAll('audio');

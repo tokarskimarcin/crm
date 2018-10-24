@@ -128,7 +128,6 @@ Playlist.prototype.play = function() {
         }
         actualRow.style.backgroundColor = 'lightgreen';
         audioElement.play();
-        this.state = 0;
         return null;
     }
 }
