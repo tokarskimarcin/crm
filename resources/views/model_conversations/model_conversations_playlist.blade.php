@@ -10,11 +10,14 @@
                 <hr>
             </div>
             <div class="playlist-control">
-                <div class="counter">
-
-                </div>
                 <div class="controls">
-
+                    <span class="glyphicon glyphicon-play"></span>
+                    <span class="glyphicon glyphicon-pause"></span>
+                    <span class="glyphicon glyphicon-stop"></span>
+                    <span class="glyphicon glyphicon-forward"></span>
+                    <span class="glyphicon glyphicon-backward"></span>
+                </div>
+                <div class="counter">
                 </div>
             </div>
             <div class="playlist-body">

@@ -18,6 +18,31 @@
     border-bottom-width: 3px;
     border-bottom-style: double;
     border-bottom-color: #337ab7;
+
+    font-size: 2em;
+    font-weight: bold;
+
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.controls {
+    flex-grow: 2;
+    margin-left: 1em;
+
+}
+
+.glyphicon {
+    cursor: pointer;
+}
+
+.glyphicon:hover {
+    color: red;
+}
+
+.counter {
+    flex-grow: 1;
 }
 
 .table {
