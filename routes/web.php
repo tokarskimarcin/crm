@@ -1094,4 +1094,22 @@ Route::get('/setCityApprovalPart5','AutoScriptController@setCityApprovalPart5');
 Route::get('/setCityApprovalPart6','AutoScriptController@setCityApprovalPart6');
 
 //Route::get('/refreshPbxReportExtension', 'AutoScriptController@pbx_update');
-Route::get('/ttt', 'WorkHoursController@test');
+
+Route::get('/modelConversationMenu', 'ModelConversationsController@modelConversationMenuGet');
+Route::get('/modelConversationsManagement', 'ModelConversationsController@modelConversationsManagementGet');
+
+Route::get('/modelConversationCategory/{id}', 'ModelConversationsController@categoryGet');
+Route::put('/modelConversationCategory/{id}', 'ModelConversationsController@categoryPut');
+Route::delete('/modelConversationCategory/{id}', 'ModelConversationsController@categoryDelete');
+Route::post('/modelConversationCategory', 'ModelConversationsController@categoryPost');
+
+Route::put('/modelConversationItems/{id}', 'ModelConversationsController@itemsPut');
+Route::delete('/modelConversationItems/{id}', 'ModelConversationsController@itemsDelete');
+Route::post('/modelConversationItems', 'ModelConversationsController@itemsPost');
+
+Route::get('/modelConversationsPlaylist', 'ModelConversationsController@modelConversationsPlaylistGet');
+Route::post('/modelConversationsPlaylist', 'ModelConversationsController@modelConversationsPlaylistPost');
+Route::get('/modelConversationsPlaylist/{id}', 'ModelConversationsController@playlistGet');
+
+Route::get('/modelConversationsGetPlaylistItems/{id}', 'ModelConversationsController@managementPlaylistGet');
+Route::delete('/modelConversationsGetPlaylistItems/{id}', 'ModelConversationsController@managementPlaylistDelete');
