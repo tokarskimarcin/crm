@@ -1,9 +1,9 @@
-<div id="playlists" class="tab-pane fade in">
+<div id="playlists" class="tab-pane fade in" style="margin-top: 1em">
     <div class="left-playlist-table">
         <table class="table table-stripped playlist-table">
             <thead>
             <tr>
-                <th>ID</th>
+                {{--<th>ID</th>--}}
                 <th>Nazwa</th>
                 <th>Właściciel</th>
                 <th>Zdjęcie</th>
@@ -25,6 +25,8 @@
             <tr>
                 <td>Dodaj</td>
                 <td><button class="btn btn-info" data-type="playlists" data-action="5" data-toggle="modal" data-target="#playlistEdition">Dodaj</button></td>
+                <td></td>
+                <td></td>
             </tr>
             </tbody>
         </table>
