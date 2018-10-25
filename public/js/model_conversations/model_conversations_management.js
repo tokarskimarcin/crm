@@ -151,6 +151,50 @@ document.addEventListener('DOMContentLoaded', function(event) {
                     MANAGEMENT.DOMElements.itemEditionModal.querySelector('.item_status').value = 1;
                 }
             }
+            else if(type == 'playlists') {
+                const thisRow = clickedElement.closest('tr');
+                const id = thisRow.dataset.id;
+                const action = clickedElement.dataset.action;
+
+                if(action == 0) {
+                    swal({
+                        title: 'Jesteś pewien?',
+                        text: "Usuń playlistę!",
+                        type: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#3085d6',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: 'Usuń!'
+                    }).then((result) => {
+                        if (result.value) {
+                            deletePlaylistCategory(id);
+                        }
+                    });
+
+                }
+                else if(action == 4) {
+                    let header = MANAGEMENT.DOMElements.playlistModal.querySelector('h4');
+                    let saveButton = MANAGEMENT.DOMElements.playlistModal.querySelector('.playlist_save');
+                    header.textContent = 'Edycja playlisty!';
+                    saveButton.value = 'Edytuj!';
+
+                    let name = thisRow.cells[0].textContent;
+
+                    MANAGEMENT.DOMElements.playlistModal.querySelector('.playlist_name').value = name;
+                    MANAGEMENT.DOMElements.playlistModal.querySelector('.playlist_toAdd').value = 0;
+                    MANAGEMENT.DOMElements.playlistModal.querySelector('.playlist_id').value = id;
+                }
+                else if(action == 5) {
+                    let header = MANAGEMENT.DOMElements.playlistModal.querySelector('h4');
+                    let saveButton = MANAGEMENT.DOMElements.playlistModal.querySelector('.playlist_save');
+                    header.textContent = 'Dodaj playliste!';
+                    saveButton.value = 'Dodaj!';
+
+                    MANAGEMENT.DOMElements.playlistModal.querySelector('.playlist_name').value = '';
+                    MANAGEMENT.DOMElements.playlistModal.querySelector('.playlist_toAdd').value = 1;
+                    MANAGEMENT.DOMElements.playlistModal.querySelector('.playlist_id').value = '';
+                }
+            }
         }
         else if(clickedElement.matches('.play-sound')) {
             let nameOfFile = clickedElement.dataset.nameoffile;
@@ -219,6 +263,23 @@ document.addEventListener('DOMContentLoaded', function(event) {
 
            tbody.appendChild(tr);
         });
+    }
+
+    /**
+     * This function sends fetch for deleting playlist category
+     * @param $id
+     */
+    function deletePlaylistCategory(id) {
+        console.assert(!isNaN(id), 'id in getPlaylistItems is not number!');
+        const ourHeaders = new Headers();
+        ourHeaders.append('X-CSRF-TOKEN', $('meta[name="csrf-token"]').attr('content'));
+
+        fetch(`/modelConversationsGetPlaylistItems/${id}`, {
+            method: 'delete',
+            headers: ourHeaders,
+            credentials: "same-origin"
+        })
+            .then(resp => window.location.reload());
     }
 
     /**

@@ -1107,9 +1107,11 @@ Route::delete('/modelConversationItems/{id}', 'ModelConversationsController@item
 Route::post('/modelConversationItems', 'ModelConversationsController@itemsPost');
 
 Route::get('/modelConversationsPlaylist', 'ModelConversationsController@modelConversationsPlaylistGet');
+Route::post('/modelConversationsPlaylist', 'ModelConversationsController@modelConversationsPlaylistPost');
 Route::get('/modelConversationsPlaylist/{id}', 'ModelConversationsController@playlistGet');
 
 Route::get('/modelConversationsGetPlaylistItems/{id}', 'ModelConversationsController@managementPlaylistGet');
+Route::delete('/modelConversationsGetPlaylistItems/{id}', 'ModelConversationsController@managementPlaylistDelete');
 
 
 

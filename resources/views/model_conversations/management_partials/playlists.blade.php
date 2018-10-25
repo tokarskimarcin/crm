@@ -13,7 +13,6 @@
             <tbody>
             @foreach($playlists as $playlist)
                 <tr data-id="{{$playlist->id}}" data-userid="{{$playlist->user_id}}" class="playlist-category-row">
-                    <td>{{$playlist->id}}</td>
                     <td>{{$playlist->name}}</td>
                     <td>{{$playlist->first_name}} {{$playlist->last_name}}</td>
                     <td>{{$playlist->img}} <a href="{{asset('storage/')}}/{{$playlist->img}}"><span class="glyphicon glyphicon-picture"></span></a></td>
@@ -23,6 +22,10 @@
                     </td>
                 </tr>
             @endforeach
+            <tr>
+                <td>Dodaj</td>
+                <td><button class="btn btn-info" data-type="playlists" data-action="5" data-toggle="modal" data-target="#playlistEdition">Dodaj</button></td>
+            </tr>
             </tbody>
         </table>
     </div>

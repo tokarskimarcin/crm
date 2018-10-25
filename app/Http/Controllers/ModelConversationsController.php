@@ -114,6 +114,62 @@ class ModelConversationsController extends Controller
             ->with('user', $user);
     }
 
+    public function modelConversationsPlaylistPost(Request $request) {
+        $toAdd = $request->toAdd;
+
+        $picture = $request->file('picture');
+        $picture_name = null;
+        $id = $request->id;
+
+        if($toAdd == 1) {
+            if(isset($picture)) { //user send picture
+                $picture_name = 'playlist_' . date('Y-m-d') . '_' . $picture->getClientOriginalName();
+                $picture->storeAs('public',$picture_name);
+            }
+            else { //user didn't send picture, we assing default one.
+                $rnd = rand(1,5);
+                $picture_name = 'playlist_default_' . $rnd . '.jpeg';
+            }
+        }
+        else {
+            if(isset($picture)) { //user send picture
+                $picture_name = 'playlist_' . date('Y-m-d') . '_' . $picture->getClientOriginalName();
+                $picture->storeAs('public',$picture_name);
+            }
+        }
+
+        $name = $request->name;
+        $playlist = null;
+        if($toAdd == 1) {
+            $playlist = new ModelConvPlaylist();
+        }
+        else {
+            $playlist = ModelConvPlaylist::find($id);
+        }
+
+
+        if($toAdd == 0) {
+            if(isset($picture)) {
+                $playlist->img = $picture_name;
+            }
+        }
+        else {
+            $playlist->img = $picture_name;
+        }
+
+        $playlist->name = $name;
+        $playlist->user_id = Auth::user()->id;
+        try {
+            $playlist->save();
+        }
+        catch(\Exception $error) {
+            new ActivityRecorder($error, 1, 6);
+        }
+
+        return Redirect::back();
+    }
+
+
     /**
      * @param $id
      * @return mixed
@@ -122,6 +178,10 @@ class ModelConversationsController extends Controller
     public function managementPlaylistGet($id) {
         $info = ModelConvPlaylistItem::getPlaylistInfo($id);
         return $info;
+    }
+
+    public function managementPlaylistDelete($id) {
+       return ModelConvPlaylist::safeDelete($id);
     }
 
     /**
@@ -167,7 +227,7 @@ class ModelConversationsController extends Controller
 
             if($toAdd == 1) {
                 if(isset($picture)) { //user send picture
-                    $picture_name = 'category_' . $picture->getClientOriginalName() . '_' . date('Y-m-d');
+                    $picture_name = 'category_' . date('Y-m-d') . '_' . $picture->getClientOriginalName();
                     $picture->storeAs('public',$picture_name);
                 }
                 else { //user didn't send picture, we assing default one.
@@ -177,7 +237,7 @@ class ModelConversationsController extends Controller
             }
             else {
                 if(isset($picture)) { //user send picture
-                    $picture_name = 'category_' . $picture->getClientOriginalName() . '_' . date('Y-m-d');
+                    $picture_name = 'category_' . date('Y-m-d') . '_' . $picture->getClientOriginalName();
                     $picture->storeAs('public',$picture_name);
                 }
             }
@@ -258,7 +318,7 @@ class ModelConversationsController extends Controller
         $sound = $request->file('sound');
         $sound_name = null;
         if(isset($sound)) {
-            $sound_name = 'category_' . $sound->getClientOriginalName() . '_' . date('Y-m-d');
+            $sound_name = 'category_' . date('Y-m-d') . '_' . $sound->getClientOriginalName();
             $sound->storeAs('public',$sound_name);
         }
 

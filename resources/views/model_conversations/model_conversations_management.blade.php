@@ -148,6 +148,43 @@
         </div>
     </div>
 
+    <!-- Modal -->
+    <div id="playlistEdition" class="modal fade" role="dialog">
+        <div class="modal-dialog modal-lg">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Edytuj playlisty</h4>
+                </div>
+                <div class="modal-body2">
+                    <form action="/modelConversationsPlaylist" method="post" enctype="multipart/form-data">
+                        <input type="hidden" name="toAdd" value="1" class="playlist_toAdd">
+                        <input type="hidden" name="id" class="playlist_id">
+                        <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                        <div class="form-group">
+                            <label for="name">Nazwa</label>
+                            <input type="text" class="form-control playlist_name" placeholder="Podaj nazwę" name="name">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="picture">Zdjęcie</label>
+                            <input class="playlist_file" type="file" name="picture">
+                        </div>
+
+                        <input type="submit" class="btn btn-success playlist_save" value="Zapisz">
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
     <div id="play" class="modal fade" role="dialog">
         <div class="modal-dialog">
 
@@ -178,7 +215,8 @@
             DOMElements: {
                 modal2body: document.querySelector('.modal2-body'),
                 itemEditionModal: document.querySelector('#itemEdition'),
-                categoryModal: document.querySelector('#myModal')
+                categoryModal: document.querySelector('#myModal'),
+                playlistModal: document.querySelector('#playlistEdition')
             },
             globalVariables: {
                 categories: @json($categories),
