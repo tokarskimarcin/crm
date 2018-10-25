@@ -1109,4 +1109,7 @@ Route::post('/modelConversationItems', 'ModelConversationsController@itemsPost')
 Route::get('/modelConversationsPlaylist', 'ModelConversationsController@modelConversationsPlaylistGet');
 Route::get('/modelConversationsPlaylist/{id}', 'ModelConversationsController@playlistGet');
 
+Route::get('/modelConversationsGetPlaylistItems/{id}', 'ModelConversationsController@managementPlaylistGet');
+
+
 

@@ -18,6 +18,7 @@
                     <span class="glyphicon glyphicon-backward"></span>
                 </div>
                 <div class="counter">
+
                 </div>
             </div>
             <div class="playlist-body">

@@ -6,6 +6,7 @@ use App\ActivityRecorder;
 use App\ModelConvCategories;
 use App\ModelConvItems;
 use App\ModelConvPlaylist;
+use App\ModelConvPlaylistItem;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -47,12 +48,25 @@ class ModelConversationsController extends Controller
         if(in_array($user, $this->adminPanelAccessArr)) { //Only approved user types can acces this management panel
             $items = ModelConvItems::all();
             $categories = ModelConvCategories::all();
+            $playlists = ModelConvPlaylist::select(
+                'first_name',
+                'last_name',
+                'model_conv_playlist.id',
+                'model_conv_playlist.name',
+                'users.id as user_id', 'img'
+            )
+                ->join('users', 'model_conv_playlist.user_id', '=', 'users.id')
+                ->get();
+
+            $playlistItems = ModelConvPlaylistItem::all();
 
             return view('model_conversations.model_conversations_management')
                 ->with('categories', $categories)
                 ->with('user', $user)
                 ->with('adminPanelAccessArr', $this->adminPanelAccessArr)
-                ->with('items', $items);
+                ->with('items', $items)
+                ->with('playlists', $playlists)
+                ->with('playlistItems', $playlistItems);
         }
         else {
            return Redirect::back();
@@ -98,6 +112,16 @@ class ModelConversationsController extends Controller
             ->with('playlist', $playlist)
             ->with('adminPanelAccessArr', $this->adminPanelAccessArr)
             ->with('user', $user);
+    }
+
+    /**
+     * @param $id
+     * @return mixed
+     * THis ajax returns info about playlist items for management
+     */
+    public function managementPlaylistGet($id) {
+        $info = ModelConvPlaylistItem::getPlaylistInfo($id);
+        return $info;
     }
 
     /**

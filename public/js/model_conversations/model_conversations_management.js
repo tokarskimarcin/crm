@@ -156,7 +156,86 @@ document.addEventListener('DOMContentLoaded', function(event) {
             let nameOfFile = clickedElement.dataset.nameoffile;
             MANAGEMENT.DOMElements.modal2body.innerHTML = "<audio controls style='width:100%;'> <source src=" + MANAGEMENT.globalVariables.url + '/' + nameOfFile + " type='audio/wav'>Twoja przeglądarka nie obsługuje tego formatu pliku.</audio>";
         }
+        else if(clickedElement.matches('.playlist-table td')) {
+            const clickedRow = clickedElement.closest('tr');
+            const playlistId = clickedRow.dataset.id;
+            const userId = clickedRow.dataset.userid;
 
+            //tutaj kolorowanie wiersza
+
+            let items = null;
+            getPlaylistItems(playlistId)
+                .then(resp => {
+                    items = resp;
+                    console.log(items);
+                    if(items) {
+                        let itemsTable = document.querySelector('.right-playlist-table > table');
+
+                        appendPlaylistItems(items, itemsTable);
+                    }
+
+                })
+                .catch(err => console.log(err));
+        }
+
+    }
+
+    /**
+     * This method appends playlist items to table item.
+     * @param items
+     * @param table
+     */
+    function appendPlaylistItems(items, table) {
+        let tbody = table.querySelector('tbody');
+        tbody.innerHTML = ''; //clearing prev content
+
+        items.forEach(item => {
+           let tr = document.createElement('tr');
+
+           let td1 = document.createElement('td');
+           td1.textContent = item.order;
+
+           let td2 = document.createElement('td');
+           td2.textContent = item.item_name;
+
+           let td3 = document.createElement('td');
+           td3.innerHTML = "<audio controls style='width:100%;'> <source src=" + MANAGEMENT.globalVariables.url + '/' + item.item_file_name + " type='audio/wav'>Twoja przeglądarka nie obsługuje tego formatu pliku.</audio>";
+
+           let td4 = document.createElement('td');
+           td4.textContent = item.item_client;
+
+           let td5 = document.createElement('td');
+           td5.textContent = item.item_gift;
+
+           let td6 = document.createElement('td');
+           td6.textContent = item.item_trainer;
+
+           tr.appendChild(td1);
+           tr.appendChild(td2);
+           tr.appendChild(td3);
+           tr.appendChild(td4);
+           tr.appendChild(td5);
+           tr.appendChild(td6);
+
+           tbody.appendChild(tr);
+        });
+    }
+
+    /**
+     * This method return collection of playlist items
+     * @param id
+     */
+    function getPlaylistItems(id) {
+        console.assert(!isNaN(id), 'id in getPlaylistItems is not number!');
+        const ourHeaders = new Headers();
+        ourHeaders.append('X-CSRF-TOKEN', $('meta[name="csrf-token"]').attr('content'));
+
+        return fetch(`/modelConversationsGetPlaylistItems/${id}`, {
+            method: 'get',
+            headers: ourHeaders,
+            credentials: "same-origin"
+        })
+            .then(resp => resp.json());
     }
 
     /**
@@ -267,6 +346,4 @@ document.addEventListener('DOMContentLoaded', function(event) {
 
     document.addEventListener('click', globalClickHandler);
 
-            // document.getElementsByClassName('modal2-body')[0].innerHTML = "<audio controls style='width:100%;'> <source src='/api/getAuditScan/" + e.target.dataset.nameoffile + "'>Twoja przeglądarka nie obsługuje tego formatu pliku.</audio>";
-
-});
+    });
