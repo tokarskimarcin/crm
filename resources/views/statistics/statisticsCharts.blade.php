@@ -10,7 +10,7 @@
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <style>
         .chart{
-            overflow: scroll;
+            /*overflow: scroll;*/
             height: 80vh;
             margin: auto;
             /*width: 80vw;*/
@@ -229,7 +229,6 @@
                 drawDepartmentsAveragesForEveryHourCharts(parseInt(value));
             }
         }
-
         function getDepartmentsAveragesForEveryHourAjax(date) {
             return $.ajax({
                 type: "POST",
@@ -256,7 +255,6 @@
                 }
             });
         }
-
         function getDepartmentsAveragesForEveryDayAjax(dateStart, dateStop) {
             return $.ajax({
                 type: "POST",
@@ -284,7 +282,6 @@
                 }
             });
         }
-
         setInterval(function(){
             if($('#date').val() === moment().format('YYYY-MM-DD')  || $('#date_stop').val() === moment().format('YYYY-MM-DD') && moment().minute() === 5) {
                 getDepartmentsAveragesForEveryDayAjax($('#date_start').val(), $('#date_stop').val()).then(function (){
