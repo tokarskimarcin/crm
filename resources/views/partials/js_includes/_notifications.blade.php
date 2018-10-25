@@ -144,6 +144,7 @@ $(document).ready(function(){
                     let loggedUserId = ({{Auth::user()->id}});
                     //console.log(loggedUserId);
                     countNotificationsCadre().then(function (unratedNotifications) {
+
                         if(unratedNotifications > 0){
                             let title = 'Masz zakończone zgłoszenia, które nie są ocenione';
                             let text = unratedNotifications;

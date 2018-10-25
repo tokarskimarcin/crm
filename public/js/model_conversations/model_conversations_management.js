@@ -1,8 +1,13 @@
 document.addEventListener('DOMContentLoaded', function(event) {
+    let selectedTr = [];
 
     function globalClickHandler(e) {
         const clickedElement = e.target;
 
+
+        if(clickedElement.matches('.arrowButtonAfter') || clickedElement.matches('.arrowButtonBefore')){
+            changeOrderFetch($(clickedElement).parent().parent().parent().data('order'));
+        }else
         //User clicks on category div
         if(clickedElement.matches('.btn')) {
             const type = clickedElement.dataset.type;
@@ -220,6 +225,40 @@ document.addEventListener('DOMContentLoaded', function(event) {
 
                 })
                 .catch(err => console.log(err));
+        }else if(clickedElement.matches('td')){
+            let tr = $(clickedElement).parent();
+            if($('.right-playlist-table tbody').has(tr)){
+                if(tr.hasClass('selectedTr')){
+                    selectedTr = [];
+                    tr.removeClass('selectedTr');
+                }else{
+                    $('.right-playlist-table tbody tr').removeClass('selectedTr');
+                    tr.addClass('selectedTr');
+                    selectedTr = [];
+                    selectedTr.push(tr.data('order'));
+                }
+                $('.arrow').remove();
+                if(selectedTr.length > 0){
+                    $.each($('.right-playlist-table tbody tr'), function (index, trElement) {
+                        if($(trElement).data('order') !== tr.data('order')){
+                            let button = $('<button>').addClass('btn btn-default')
+                                .append( $('<span>').addClass('glyphicon glyphicon-arrow-right')
+                                );
+                            if($(trElement).data('order') > tr.data('order')){
+                                button.addClass('arrowButtonAfter');
+                            }else{
+                                button.addClass('arrowButtonBefore');
+                            }
+                            $($(trElement).children()[0])
+                                .append($('<div>')
+                                    .addClass('arrow')
+                                    .append(button)
+                                );
+                        }
+
+                    });
+                }
+            }
         }
 
     }
@@ -235,6 +274,8 @@ document.addEventListener('DOMContentLoaded', function(event) {
 
         items.forEach(item => {
            let tr = document.createElement('tr');
+
+           $(tr).attr('data-order',item.order);
 
            let td1 = document.createElement('td');
            td1.textContent = item.order;
@@ -404,7 +445,29 @@ document.addEventListener('DOMContentLoaded', function(event) {
         }
     }
 
+    function changeOrderFetch(selectedOrder){
+        let formData = new FormData();
+        formData.append('selectedTr', selectedTr);
+        formData.append('selectedOrder', selectedOrder);
 
+        const ourHeaders = new Headers();
+        ourHeaders.append('X-CSRF-TOKEN', $('meta[name="csrf-token"]').attr('content'));
+
+        fetch(`/changeOrder`, {
+            method: 'post',
+            headers: ourHeaders,
+            credentials: "same-origin",
+            body: formData,
+        })
+            .then(resp => {
+                window.location.reload();
+            })
+            .catch(err => {
+                swal(
+                    err
+                )
+            });
+    }
     document.addEventListener('click', globalClickHandler);
 
     });
