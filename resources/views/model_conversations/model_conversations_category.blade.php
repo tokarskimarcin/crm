@@ -19,11 +19,13 @@
                         <th>Upominek</th>
                         <th>Trener</th>
                         <th>Klient</th>
+                        <th>Aktualna Kategoria</th>
+                        <th>Akcja</th>
                     </tr>
                     </thead>
                     <tbody>
                     @foreach($items as $item)
-                        <tr>
+                        <tr data-id="{{$item->id}}" data-playlist="{{$item->model_category_id}}">
                             <td>
                                 <a data-toggle="modal" class="modal_trigger2" href="#play">
                                     <span data-nameOfFile="{{$item->file_name}}" class="play-sound glyphicon glyphicon-play-circle"></span>
@@ -33,6 +35,24 @@
                             <td>{{$item->gift}}</td>
                             <td>{{$item->trainer}}</td>
                             <td>{{$item->client}}</td>
+                            <td>
+                                @php
+                                $count = count($item->playlists);
+                                $i = 0;
+                                    foreach($item->playlists as $playlist) {
+                                        if($i == $count - 1) {
+                                            echo $playlist;
+                                        }
+                                        else {
+                                            echo $playlist . ', ';
+                                        }
+                                        $i++;
+                                    }
+                                @endphp
+                            </td>
+                            <td>
+                                <button class="btn btn-info change-playlist" data-type="playlists" data-action="5" data-toggle="modal" data-target="#playlistAdd">Edytuj</button>
+                            </td>
                         </tr>
                     @endforeach
                     </tbody>
@@ -62,6 +82,42 @@
         </div>
     </div>
 
+    <!-- Modal -->
+    <div id="playlistAdd" class="modal fade" role="dialog">
+        <div class="modal-dialog modal-sm">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Edytuj playlisty</h4>
+                </div>
+                <div class="modal-body2">
+                    <form action="/modelConversationCategoryChangePlaylist" method="post">
+                        <input type="hidden" name="id" class="item_id">
+                        <input type="hidden" name="_token" value="{{ csrf_token() }}">
+
+                        <div class="form-group">
+                            <label for="playlists">Playlisty</label>
+                            <select name="playlist" class="form-control playlists">
+                                <option value="0">Wybierz</option>
+                                @foreach($playlists as $playlist)
+                                    <option value="{{$playlist->id}}">{{$playlist->name}}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <input type="submit" class="btn btn-success playlist_save" value="Zapisz">
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
 @endsection
 
 
@@ -71,7 +127,8 @@
         let CATEGORIES = {
             DOMElements: {
                 categoriesBox: document.querySelector('.categories-box'),
-                modal2body: document.querySelector('.modal2-body')
+                modal2body: document.querySelector('.modal2-body'),
+                playlistAddModal: document.querySelector('#playlistAdd')
             },
             globalVariables: {
                 categories: @json($categories),

@@ -31,7 +31,25 @@ document.addEventListener('DOMContentLoaded', function(event) {
             let nameOfFile = clickedElement.dataset.nameoffile;
             CATEGORIES.DOMElements.modal2body.innerHTML = "<audio controls style='width:100%;'> <source src=" + CATEGORIES.globalVariables.url + '/' + nameOfFile + " type='audio/wav'>Twoja przeglądarka nie obsługuje tego formatu pliku.</audio>";
         }
+        else if(clickedElement.matches('.change-playlist')) {
+            let currentRow = clickedElement.closest('tr');
+            let itemId = currentRow.dataset.id;
 
+            CATEGORIES.DOMElements.playlistAddModal.querySelector('.item_id').value = itemId;
+        }
+    }
+
+    /**
+     * This method returns selected by user from list item's value or null.
+     */
+    function getSelectedValue(element) {
+        console.assert(element.tagName === 'SELECT', 'Argument of getSelectedValue is not select element');
+        if(element.options[element.selectedIndex]) {
+            return element.options[element.selectedIndex].value;
+        }
+        else {
+            return null;
+        }
     }
 
     document.addEventListener('click', globalClickHandler);

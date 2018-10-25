@@ -33,14 +33,27 @@ class ModelConversationsController extends Controller
     public function categoryGet($id) {
         $user = Auth::user()->user_type_id;
         $categories = ModelConvCategories::OnlyActive()->where('subcategory_id', '=', $id)->get();
+        $playlists = ModelConvPlaylist::all();
+        $playlistItems = ModelConvPlaylistItem::select(
+            'model_conv_playlist.name as name',
+            'model_conv_playlist.id as id',
+            'model_conv_playlist_items.item_id as item_id'
+        )->join('model_conv_playlist', 'model_conv_playlist_items.playlist_id', '=', 'model_conv_playlist.id')
+        ->get();
 
         $items = ModelConvItems::where('model_category_id', '=', $id)->OnlyActive()->get();
+        $items->map(function($item) use($playlistItems) {
+             $allItemsInPlaylists = $playlistItems->where('item_id', '=',$item->id)->pluck('name')->toArray();
+             $item->playlists = $allItemsInPlaylists;
+            return $item;
+        });
 
         return view('model_conversations.model_conversations_category')
             ->with('adminPanelAccessArr', $this->adminPanelAccessArr)
             ->with('user', $user)
             ->with('categories', $categories)
-            ->with('items', $items);
+            ->with('items', $items)
+            ->with('playlists', $playlists);
     }
 
     public function modelConversationsManagementGet() {
@@ -74,6 +87,56 @@ class ModelConversationsController extends Controller
 
     }
 
+    /**
+     * @param Request $request
+     * @return mixed
+     * This method assigns item to playlist
+     */
+    public function modelConversationCategoryChangePlaylist(Request $request) {
+        $itemId = $request->id;
+        $newPlaylist = $request->playlist;
+        $allPlaylistItems = ModelConvPlaylistItem::where('playlist_id', '=', $newPlaylist)->get();
+        $flag = true;
+        foreach($allPlaylistItems as $item) {
+            if($item->id == $itemId || $newPlaylist == 0) { //this item exist in this playlist
+                $flag = false;
+            }
+        }
+
+        if($flag) {
+            $playlist_item = new ModelConvPlaylistItem();
+            $playlist_item->playlist_id = $newPlaylist;
+            $playlist_item->item_id = $itemId;
+            $order = $this->generatateOrder($newPlaylist);
+            $playlist_item->order = $order;
+            $playlist_item->save();
+        }
+
+        return Redirect::back();
+    }
+
+    /**
+     * @param $playlist_id
+     * @return int
+     * This method return last order number
+     */
+    private function generatateOrder($playlist_id) {
+
+        $playlist_last_order_item = ModelConvPlaylistItem::where('playlist_id', '=', $playlist_id)->orderBy('order')->get();
+//        dd($playlist_last_order_item->last());
+        $lastItem = null;
+        if($playlist_last_order_item) {
+            $lastItem = $playlist_last_order_item->last();
+        }
+        if($lastItem) {
+            return $lastItem->order + 1;
+        }
+        else { //first element in playlist
+            return 1;
+        }
+
+    }
+
     public function modelConversationsPlaylistGet() {
         $user = Auth::user()->user_type_id;
 
@@ -87,6 +150,8 @@ class ModelConversationsController extends Controller
 
     public function playlistGet($id) {
         $user = Auth::user()->user_type_id;
+
+        $playlistObject = ModelConvPlaylist::find($id);
 
         $playlist = ModelConvPlaylist::select(
             'model_conv_playlist.name as playlist_name',
@@ -110,6 +175,7 @@ class ModelConversationsController extends Controller
 
         return view('model_conversations.model_conversations_playlist')
             ->with('playlist', $playlist)
+            ->with('playlistObject', $playlistObject)
             ->with('adminPanelAccessArr', $this->adminPanelAccessArr)
             ->with('user', $user);
     }
@@ -322,7 +388,6 @@ class ModelConversationsController extends Controller
             $sound->storeAs('public',$sound_name);
         }
 
-
         $newItem = null;
         if($toAdd == 1) { //creating new
             $newItem = new ModelConvItems();
@@ -354,7 +419,6 @@ class ModelConversationsController extends Controller
         catch(\Exception $error) {
             new ActivityRecorder($error, 1, 6);
         }
-
 
         return Redirect::back();
     }

@@ -184,7 +184,6 @@
         </div>
     </div>
 
-
     <div id="play" class="modal fade" role="dialog">
         <div class="modal-dialog">
 
@@ -201,7 +200,6 @@
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                 </div>
             </div>
-
         </div>
     </div>
 
