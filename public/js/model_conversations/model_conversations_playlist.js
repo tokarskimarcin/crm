@@ -82,24 +82,26 @@ document.addEventListener('DOMContentLoaded', function(event) {
     function globalClickHandler(e) {
         const clickedElement = e.target;
 
-        if(clickedElement.matches(".glyphicon-play")) { //click on play icon
-            playlist2.play();
-        }
-        else if(clickedElement.matches('.glyphicon-forward')) { //click on forward icon
-            playlist2.updateCounter('forward');
-            updateCounterElement();
-        }
-        else if(clickedElement.matches('.glyphicon-backward')) { //click on backward icon
-            playlist2.updateCounter('backward');
-            updateCounterElement();
-        }
-        else if(clickedElement.matches('.glyphicon-stop')) { //click on stop icon
-            playlist2.stop();
-            setAllRowsColor('white');
-            updateCounterElement();
-        }
-        else if(clickedElement.matches('.glyphicon-pause')) {
-            playlist2.pause();
+        if(playlist2) {
+            if(clickedElement.matches(".glyphicon-play")) { //click on play icon
+                playlist2.play();
+            }
+            else if(clickedElement.matches('.glyphicon-forward')) { //click on forward icon
+                playlist2.updateCounter('forward');
+                updateCounterElement();
+            }
+            else if(clickedElement.matches('.glyphicon-backward')) { //click on backward icon
+                playlist2.updateCounter('backward');
+                updateCounterElement();
+            }
+            else if(clickedElement.matches('.glyphicon-stop')) { //click on stop icon
+                playlist2.stop();
+                setAllRowsColor('white');
+                updateCounterElement();
+            }
+            else if(clickedElement.matches('.glyphicon-pause')) {
+                playlist2.pause();
+            }
         }
     }
 

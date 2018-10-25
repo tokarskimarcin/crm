@@ -6,7 +6,7 @@
     <main class="main_part">
         <div class="playlist">
             <div class="playlist-header">
-                <h3>{{$playlist->first()->playlist_name}}</h3>
+                <h3>{{$playlistObject->name}}</h3>
                 <hr>
             </div>
             <div class="playlist-control">
