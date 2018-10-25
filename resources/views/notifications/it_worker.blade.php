@@ -25,26 +25,18 @@
 
 ?>
 <div class="row">
-  <div class="col-md-6">
+  {{--<div class="col-md-6">
     <div id="dual_x_div" style="width: 400px; height: 400px;"></div>
-  </div>
-  <div class="col-md-6">
+  </div>--}}
+  <div class="col-md-12">
       <div class="panel panel-green" style="height: 100%">
-          <div class="panel-heading"><h3>{{$user_data->first_name . ' ' . $user_data->last_name.' ('.$polish_month[intval (date('m'))].')'}}</h3></div>
-          <div class="panel-body">
-              <div class="list-group">
-                  <div class="list-group-item">Liczba ocen pozytywnych: <b>{{$data->user_sum_repaired . '/' . $data->user_sum}}</b></div>
-                  <div class="list-group-item">Średni czas realizacji: <b>{{round($data->notifications_time_sum, 2)}} h</b></div>
-                  <div class="list-group-item">Oddzwonienia: <b>{{$data->response_after . '/' . $data->user_sum}}</b></div>
-              </div>
+          <div class="panel-heading"><h3>{{$user_data->first_name . ' ' . $user_data->last_name}}</h3></div>
+          <div class="panel-body" id="userDataPanelBody">
           </div>
-          <div class="panel-footer"></div>
       </div>
   </div>
 </div>
-<br  /><br />
-<br  /><br />
-<br  /><br />
+<hr>
 {{--<div class="row">--}}
   {{--<div class="col-md-12">--}}
       {{--<div class="panel panel-default">--}}
@@ -97,14 +89,10 @@
                                             <td>{{$item->data_stop}}</td>
                                         @endif
                                         <td>{{$item->first_name.' '.$item->last_name}}</td>
-                                        @if($item->judge_sum == null)
-                                            <td>Brak Oceny</td>
+                                        @if($item->average_rating == null)
+                                            <td><button class="notificationRatingButton btn btn-block btn-primary" disabled="disabled">Brak</button></td>
                                         @else
-                                            @php
-                                                $avg_grade += $item->judge_sum;
-                                                $count_grade++;
-                                            @endphp
-                                            <td>{{$item->judge_sum}}</td>
+                                            <td><button class="notificationRatingButton btn btn-block btn-primary" data-nrid="{{$item->nr_id}}">@if($item->comment !== null)<span class="glyphicon glyphicon-comment"></span> @endif{{($item->average_rating*100).'%'}}</button></td>
                                         @endif
                                     </tr>
                                 @endforeach
@@ -119,6 +107,21 @@
     </div>
 </div>
 
+<div id="modalNotificationRating" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">Ocena</h4>
+            </div>
+            <div class="modal-body">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Zamknij</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
 
 @endsection
 @section('script')
@@ -127,8 +130,10 @@
     <script src="{{ asset('/js/buttons.bootstrap.min.js')}}"></script>
     <script src="{{ asset('/js/dataTables.select.min.js')}}"></script>
 <script>
-google.charts.load('current', {'packages':['bar']});
-google.charts.setOnLoadCallback(drawStuff);
+/*google.charts.load('current', {'packages':['bar']});
+google.charts.setOnLoadCallback(drawStuff);*/
+
+let userDataPanelBody = $('#userDataPanelBody');
 
 $(document).ready( function () {
     var table = $('#history_of_notification').DataTable({
@@ -164,7 +169,167 @@ function drawStuff() {
 
 var chart = new google.charts.Bar(document.getElementById('dual_x_div'));
 chart.draw(data, options);
-};
+}
 
+$('.panel-body').click(function (e) {
+    if($(e.target).hasClass('notificationRatingButton')){
+        notificationRatingButtonHandler(e);
+    }
+
+});
+
+
+function normalize(score, scoreRange, normalizeRange = [0,1]){
+    return ((score-scoreRange[0])/(scoreRange[1] - scoreRange[0]))*(normalizeRange[1]-normalizeRange[0])+normalizeRange[0];
+}
+
+function iTCadreNotificationsRatingsStatisticsAjax() {
+    return $.ajax({
+        url: '{{route('api.iTCadreNotificationsRatingsStatisticsAjax')}}',
+        method: 'POST',
+        headers: {'X-CSRF-TOKEN': '{{ csrf_token() }}'},
+        data: {
+            noPeriod: true,
+            userId: '{{$user_data->id}}'
+        },
+        success(response) {
+            return response;
+        },
+        error(jqXHR, textStatus, thrownError) {
+            console.log(jqXHR);
+            console.log('textStatus: ' + textStatus);
+            console.log('thrownError: ' + thrownError);
+            swal({
+                type: 'error',
+                title: 'Błąd ' + jqXHR.status,
+                text: 'Wystąpił błąd: ' + thrownError + ' "' + jqXHR.responseJSON.message + '"',
+            });
+        }
+    });
+}
+
+function notificationRatingButtonHandler(e) {
+    swal({
+        title: 'Ładowawnie...',
+        text: 'To może chwilę zająć',
+        showConfirmButton: false,
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+        allowEnterKey: false,
+        onOpen: () => {
+            swal.showLoading();
+            $.ajax({
+                url: "{{ route('api.notificationRating') }}",
+                type: 'POST',
+                headers: {'X-CSRF-TOKEN': '{{ csrf_token() }}'},
+                data: {
+                    'notificationRatingId': $(e.target).data('nrid')
+                },
+                success: function (response) {
+                    if(response.hasOwnProperty('notificationRating') && response.hasOwnProperty('notificationRatingComponents') && response.hasOwnProperty('notificationRatingCriterion')){
+                        let modalBody = $('#modalNotificationRating .modal-body');
+                        modalBody.text('');
+                        modalBody.append(createNotificationRatingModalBody(response));
+                        $('#modalNotificationRating').modal('show');
+                    }
+                },
+                error: function (jqXHR, textStatus, thrownError) {
+                    console.log(jqXHR);
+                    console.log('textStatus: ' + textStatus);
+                    console.log('hrownError: ' + thrownError);
+                    swal({
+                        type: 'error',
+                        title: 'Błąd ' + jqXHR.status,
+                        text: 'Wystąpił błąd: ' + thrownError+' "'+jqXHR.responseJSON.message+'"',
+                    });
+                }
+            }).then((response) => {
+                swal.close();
+            });
+        }
+    });
+
+
+}
+function createNotificationRatingModalBody(response){
+    let thead1 = $(document.createElement('thead'))
+        .append($(document.createElement('tr'))
+            .append($(document.createElement('th')).append('Kryterium'))
+            .append($('<th>').append('Wynik'))
+            .append($(document.createElement('th')).append('Ocena')));
+
+
+    let tbody1 = $(document.createElement('tbody'));
+
+    $.each(response.notificationRatingComponents, function (componentIndex, component) {
+        let notificationRatingCriterion = response.notificationRatingCriterion.find(x => x.id === component.notification_rating_criterion_id);
+        let tr = $('<tr>')
+            .append($('<td>').append(notificationRatingCriterion.criterion))
+            .append($('<td>').append(Math.round(normalize(component.rating,
+                [notificationRatingCriterion.rating_system.rating_start, notificationRatingCriterion.rating_system.rating_stop])*10000)/100).append('%'));
+        if (notificationRatingCriterion.rating_system.id === 1) {
+            tr.append($('<td>').append(component.rating === 1 ? 'NIE' : 'TAK').css({'background-color': component.rating === 1 ? 'rgba(255,0,0,0.75)' : 'rgba(0,175,0,0.75)'}))
+        } else if (notificationRatingCriterion.rating_system.id === 3) {
+            tr.append($('<td>').append(component.rating === 1 ? 'NIE' : component.rating === 2 ? 'ŚREDNIO' : 'TAK')
+                .css({'background-color': component.rating === 1 ? 'rgba(255,0,0,0.75)' : component.rating === 2 ? 'rgba(0,0,255,0.50)' : 'rgba(0,175,0,0.75)'}))
+        } else {
+            tr.append($('<td>').append(component.rating));
+        }
+        tbody1.append(tr);
+    });
+    tbody1.append( $('<tr>').css({'font-weight':'bold','color':'white','background-color':'#696969'})
+        .append($('<td>').append('Suma:'))
+        .append($('<td>').append(Math.round(response.notificationRating.average_rating*10000)/100).append('%')));
+    let table1 = $(document.createElement('table')).addClass('table table-striped table-bordered thead-inverse')
+        .append(thead1).append(tbody1);
+    let tablesCol1 = $(document.createElement('div')).addClass('col-md-12').append(table1);
+
+
+    let tablesRow = $(document.createElement('div')).addClass('row').append(tablesCol1);
+
+    let commentCol = $(document.createElement('div')).addClass('col-md-12')
+        .append($(document.createElement('label')).append('Komentarz:'))
+        .append($(document.createElement('div')).addClass('well well-sm').append(response.notificationRating.comment));
+    let commentRow = $(document.createElement('div')).addClass('row').append(commentCol);
+
+    let append = $(document.createElement('div')).append(tablesRow);
+    if(response.notificationRating.comment !== null){
+        append.append($(document.createElement('hr'))).append(commentRow);
+    }
+    return append;
+
+}
+
+function secondsToDaysHoursMinutesSeconds(averageRealizationTime){
+    let minutes = 60;
+    let hours = minutes*60;
+    let days = hours*24;
+    let averageRealizationTimeString = '';
+    let diff = Math.floor(averageRealizationTime/days);
+    averageRealizationTimeString += diff+'D ';
+    averageRealizationTime -= diff*days;
+    diff = Math.floor(averageRealizationTime/hours);
+    averageRealizationTimeString += (diff < 10 ? '0'+diff : diff)+':';
+    averageRealizationTime -= diff*hours;
+    diff = Math.floor(averageRealizationTime/minutes);
+    averageRealizationTimeString += (diff < 10 ? '0'+diff : diff)+':';
+    averageRealizationTime -= diff*minutes;
+    averageRealizationTimeString += (averageRealizationTime < 10 ? '0'+averageRealizationTime : averageRealizationTime);
+    return averageRealizationTimeString;
+}
+
+iTCadreNotificationsRatingsStatisticsAjax().then(function (response) {
+    userDataPanelBody.append($('<ul>').addClass('list-group')
+        .append($('<li>').addClass('list-group-item')
+            .append($('<strong>').append('Średnia ocen: '))
+            .append(response[0].averageRating == null ? '-' : (Math.round(response[0].averageRating*10000)/100)+'%'))
+        .append($('<li>').addClass('list-group-item')
+            .append($('<strong>').append('Średni czas realizacji: '))
+            .append(secondsToDaysHoursMinutesSeconds(response[0].averageRealizationTime)))
+        .append($('<li>').addClass('list-group-item')
+            .append($('<strong>').append('Średni czas reakcji: '))
+            .append(secondsToDaysHoursMinutesSeconds(response[0].averageReactionTime)))
+    );
+});
 </script>
 @endsection

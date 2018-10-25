@@ -210,13 +210,10 @@ class StatisticsRBHController extends Controller
 
         $data = $this->get30RBHData($date_start, $date_stop);
 
-        $infoAboutDepartments = Department_info::getDepartmentsWithNames()->groupBy('id');
-
         return view('reportpage.Week30RbhReport')->with([
             'date_start' => $date_start,
             'date_stop' => $date_stop,
-            'data' => $data,
-            'infoAboutDepartments' => $infoAboutDepartments
+            'data' => $data
         ]);
     }
 
@@ -226,13 +223,10 @@ class StatisticsRBHController extends Controller
 
         $data = $this->get30RBHData($date_start, $date_stop);
 
-        $infoAboutDepartments = Department_info::getDepartmentsWithNames()->groupBy('id');
-
         return view('reportpage.Week30RbhReport')->with([
             'date_start' => $date_start,
             'date_stop' => $date_stop,
-            'data' => $data,
-            'infoAboutDepartments' => $infoAboutDepartments
+            'data' => $data
         ]);
     }
 
@@ -246,13 +240,10 @@ class StatisticsRBHController extends Controller
 
         $data = $this->get30RBHData($date_start, $date_stop);
 
-        $infoAboutDepartments = Department_info::getDepartmentsWithNames()->groupBy('id');
-
         return view('reportpage.Month30RbhReport')->with([
             'date_start' => $date_start,
             'date_stop' => $date_stop,
-            'data' => $data,
-            'infoAboutDepartments' => $infoAboutDepartments
+            'data' => $data
         ]);
     }
 
@@ -262,13 +253,10 @@ class StatisticsRBHController extends Controller
 
         $data = $this->get30RBHData($date_start, $date_stop);
 
-        $infoAboutDepartments = Department_info::getDepartmentsWithNames()->groupBy('id');
-
         return view('reportpage.Month30RbhReport')->with([
             'date_start' => $date_start,
             'date_stop' => $date_stop,
-            'data' => $data,
-            'infoAboutDepartments' => $infoAboutDepartments
+            'data' => $data
         ]);
     }
 

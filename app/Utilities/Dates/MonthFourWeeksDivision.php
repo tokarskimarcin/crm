@@ -13,6 +13,7 @@ class MonthFourWeeksDivision
 {
     public static function get($year, $month){
         $dividedMonthIntoCompanyWeeks = MonthIntoCompanyWeeksDivision::get($month,$year);
+        //dd($dividedMonthIntoCompanyWeeks);
         $lastDay = date('t',strtotime($year.'-'.$month));
         $dividedMonthIntoCompanyWeeks[0]->firstDay = date('Y-m-d',strtotime($year.'-'.$month));
         $dividedMonthIntoCompanyWeeks[3]->lastDay = date('Y-m-d',strtotime($year.'-'.$month.'-'.$lastDay));
