@@ -11,7 +11,7 @@ namespace App\Utilities\Salary\ProvisionLevels;
 
 class TrainerProvisionLevels
 {
-    public static function get($level, $subtype, $subsubtype, $subsubsubtype){
+    public static function get($level, $subtype, $subsubtype = null, $subsubsubtype = null){
         $provision = 0;
         switch ($subtype) {
             case '1': { //case when red shows
@@ -59,6 +59,9 @@ class TrainerProvisionLevels
                                 $provision = 0;
                             }
                             break;
+                        }
+                        default:{
+                            throw new \Exception('No such case - $subsubsubtype');
                         }
                     }
                 }else {

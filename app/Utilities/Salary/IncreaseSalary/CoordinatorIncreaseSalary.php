@@ -8,7 +8,6 @@
 
 namespace App\Utilities\Salary\IncreaseSalary;
 
-
 use App\User;
 
 class CoordinatorIncreaseSalary

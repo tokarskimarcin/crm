@@ -45,6 +45,10 @@ class ConsultantProvisionLevels
                 return $provision;
                 break;
             }
+            default:{
+                throw new \Exception('No such subtype');
+                break;
+            }
         }
     }
 }
