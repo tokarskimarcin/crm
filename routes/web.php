@@ -506,6 +506,7 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
     Route::get('/check_list_cadre', 'WorkHoursController@checkListCadre');
 
     Route::get('/users_live', 'WorkHoursController@usersLive');
+
     // Work_hours --end--
 
     // Users --Start--
@@ -1112,6 +1113,3 @@ Route::get('/modelConversationsPlaylist/{id}', 'ModelConversationsController@pla
 
 Route::get('/modelConversationsGetPlaylistItems/{id}', 'ModelConversationsController@managementPlaylistGet');
 Route::delete('/modelConversationsGetPlaylistItems/{id}', 'ModelConversationsController@managementPlaylistDelete');
-
-
-
