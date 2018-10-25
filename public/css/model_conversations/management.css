@@ -1,0 +1,35 @@
+.box {
+    width: 95%;
+    margin: 0 auto;
+}
+
+.active-category {
+    background-color: lightgreen;
+}
+
+.inactive-category {
+    background-color: lightcoral;
+}
+
+.glyphicon-play-circle {
+    font-size: 2em;
+}
+
+.glyphicon-picture {
+    font-size: 2em;
+    padding-left: 0.5em;
+}
+
+#playlists {
+    display: flex;
+    flex-direction: row;
+}
+
+.left-playlist-table {
+    flex-grow: 1;
+    padding-right: 1em;
+}
+
+.right-playlist-table {
+    flex-grow: 2;
+}
