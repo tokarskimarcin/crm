@@ -455,7 +455,7 @@ class ModelConversationsController extends Controller
         }
         $selectedItem = $modelConvPlaylistItem->where('playlist_order', $selectedTr)->first();
 
-        foreach ($modelConvPlaylistItem->where('order', $selectedTr > $selectedOrder ? '<' : '>', $selectedTr) as $item){
+        foreach ($modelConvPlaylistItem->where('playlist_order', $selectedTr > $selectedOrder ? '<' : '>', $selectedTr) as $item){
             $item->playlist_order = $item->playlist_order + $variable;
             $item->save();
         }
