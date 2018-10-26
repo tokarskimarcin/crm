@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', function(event) {
 
 
         if(clickedElement.matches('.arrowButtonAfter') || clickedElement.matches('.arrowButtonBefore')){
-            modelConversationsManagementChangeOrder($(clickedElement).parent().parent().parent().data('order'));
+            modelConversationsManagementChangeOrder($(clickedElement).parent().parent().parent().data('playlist_order'));
         }else
         //User clicks on category div
         if(clickedElement.matches('.btn')) {
@@ -261,16 +261,16 @@ document.addEventListener('DOMContentLoaded', function(event) {
                     $('.right-playlist-table tbody tr').removeClass('selectedTr');
                     tr.addClass('selectedTr');
                     selectedTr = [];
-                    selectedTr.push(tr.data('order'));
+                    selectedTr.push(tr.data('playlist_order'));
                 }
                 $('.arrow').remove();
                 if(selectedTr.length > 0){
                     $.each($('.right-playlist-table tbody tr'), function (index, trElement) {
-                        if($(trElement).data('order') !== tr.data('order')){
+                        if($(trElement).data('playlist_order') !== tr.data('playlist_order')){
                             let button = $('<button>').addClass('btn btn-default')
                                 .append( $('<span>').addClass('glyphicon glyphicon-arrow-right')
                                 );
-                            if($(trElement).data('order') > tr.data('order')){
+                            if($(trElement).data('playlist_order') > tr.data('playlist_order')){
                                 button.addClass('arrowButtonAfter');
                             }else{
                                 button.addClass('arrowButtonBefore');
@@ -304,11 +304,11 @@ document.addEventListener('DOMContentLoaded', function(event) {
             console.log(item);
            let tr = document.createElement('tr');
 
-           $(tr).attr('data-order',item.order);
+           $(tr).attr('data-playlist_order',item.playlist_order);
            $(tr).attr('data-id',item.id);
 
            let td1 = document.createElement('td');
-           td1.textContent = item.order;
+           td1.textContent = item.playlist_order;
 
            let td2 = document.createElement('td');
            td2.textContent = item.item_name;

@@ -36,7 +36,7 @@ document.addEventListener('DOMContentLoaded', function(event) {
                 let tr = document.createElement('tr');
 
                 let td_number = document.createElement('td');
-                td_number.textContent = item.order;
+                td_number.textContent = item.playlist_order;
 
                 let td_name = document.createElement('td');
                 td_name.textContent = item.conv_name;

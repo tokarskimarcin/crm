@@ -9,7 +9,7 @@
     <link href="{{ asset('/vendor/bootstrap/css/bootstrap.min.css')}}" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('css/model_conversations/menu.css') }}">
     @yield('styles')
-    <title>Document</title>
+    <title>Rozmowy wzorcowe</title>
 </head>
 <body>
     <div class="wrapper">
