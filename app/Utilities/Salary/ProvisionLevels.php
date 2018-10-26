@@ -112,6 +112,12 @@ class ProvisionLevels
                         return $provision;
                         break;
                     }
+//                    case '4': {
+//
+//
+//                        return $provision;
+//                        break;
+//                    }
                 }
                 break;
             }
@@ -287,29 +293,23 @@ class ProvisionLevels
                         break;
                     }
                     case '3':{ // Telemarketing
-                        if($level < 5) {
-                            switch($subsubsubtype) {
-                                case 'avg': {
-                                    if($subsubtype >= 100) { //target avg in %
-                                        $provision = 150;
-                                    }
-                                    else {
-                                        $provision = 0;
-                                    }
-                                    break;
+                        if($level < 5) { //janki less than 5%
+                            if($subsubsubtype == 'avg') {
+                                if($subsubtype > 2.25) {
+                                    $provision = 150;
                                 }
-                                case 'ammount': {
-                                    if($subsubtype >= 100) { //target ammount in %
-                                        $provision = 150;
-                                    }
-                                    else {
-                                        $provision = 0;
-                                    }
-                                    break;
+                                else {
+                                    $provision = 0;
                                 }
                             }
-                        }else {
-                            $provision = 0;
+                            else if($subsubsubtype == 'employment') {
+                                if($subsubtype > 80) {
+                                    $provision = 150;
+                                }
+                                else {
+                                    $provision = 0;
+                                }
+                            }
                         }
                         return $provision;
                         break;

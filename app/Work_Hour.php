@@ -57,15 +57,11 @@ class Work_Hour extends Model
             ->join('department_type', 'department_info.id_dep_type', '=', 'department_type.id')
             ->where(function ($querry) use ($SactualMonth, $comparator){
                 if($comparator == '<' || $comparator == '<=' ){
-                    $querry->where(function ($query) use ($SactualMonth, $comparator){
-                        if($comparator == '<' || $comparator == '<=' ){
-                                $query->where(function ($query) use ($SactualMonth) {
-                                $query->where('users.status_work', '=', 1)->where('users.start_work','like',$SactualMonth.'%');
-                                })
-                                ->orwhere('users.end_work','like',$SactualMonth.'%');
-                            }
-                        })
-                        ->orwhere('users.end_work','like',$SactualMonth.'%');
+                    $querry->where(function ($query) use ($SactualMonth) {
+                        $query->where('users.status_work', '=', 1)
+                            ->where('users.start_work','like',$SactualMonth.'%');
+                    })
+                    ->orwhere('users.end_work','like',$SactualMonth.'%');
                 }
             })
             ->whereIn('users.user_type_id', [1,2])

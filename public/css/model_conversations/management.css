@@ -1,0 +1,62 @@
+.box {
+    width: 95%;
+    margin: 0 auto;
+}
+
+.active-category {
+    background-color: lightgreen;
+}
+
+.inactive-category {
+    background-color: lightcoral;
+}
+
+.glyphicon-play-circle {
+    font-size: 2em;
+}
+
+.glyphicon-picture {
+    font-size: 2em;
+    padding-left: 0.5em;
+}
+
+#playlists {
+    display: flex;
+    flex-direction: row;
+}
+
+.left-playlist-table {
+    flex-grow: 1;
+    padding-right: 1em;
+}
+
+.right-playlist-table {
+    flex-grow: 2;
+    padding: 1em;
+    border-left: solid 1px #ddd;
+}
+
+.right-playlist-table tbody tr:hover {
+    cursor: pointer;
+    background-color: #ddd;
+}
+
+.selectedTr{
+    background-color: #b9b9b9  !important;
+}
+
+.arrowButtonAfter{
+    left: -2em;
+    position: relative;
+    top: 1.9em;
+    padding-right: 3em;
+    background-color: rgba(255,255,255,0.5);
+}
+
+.arrowButtonBefore{
+    left: -2em;
+    position: relative;
+    top: -3.3em;
+    padding-right: 3em;
+    background-color: rgba(255,255,255,0.5);
+}

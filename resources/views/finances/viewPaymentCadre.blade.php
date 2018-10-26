@@ -51,7 +51,7 @@
                                             <form action="view_payment_cadre" id="view_payment_cadre" method="post">
                                                 <input type="hidden" name="_token" value="{{ csrf_token() }}">
                                                 <div class="col-md-8">
-                                                    <select name="search_money_month" class="form-control" style="font-size:18px;">
+                                                    <select name="search_money_month" class="form-control" style="font-size:18px;" id="search_money_month">
                                                         @for ($i=0; $i < 3; $i++)
                                                             @php
                                                             $date = date("Y-m", mktime(0, 0, 0, date("m")-$i, 1, date("Y")));
@@ -584,6 +584,31 @@
                 $('#toSave').val(1);
                 $('#accept_payment').prop('disabled',true);
                 $('#view_payment_cadre').submit();
+                {{--let moneyMonth = document.querySelector('#search_money_month');--}}
+                {{--console.log(moneyMonth.value);--}}
+
+                {{--let url = `{{URL::to('/savePaymentsAjax')}}`;--}}
+                {{--console.log(url);--}}
+                {{--const ourHeaders = new Headers();--}}
+                {{--ourHeaders.append('X-CSRF-TOKEN', $('meta[name="csrf-token"]').attr('content'));--}}
+                {{--let data = new FormData();--}}
+                {{--data.append('toSave', '1');--}}
+                {{--data.append('search_money_month', `${moneyMonth.value}`);--}}
+
+                {{--console.time('Początek pomiaru czasu');--}}
+                {{--fetch(url, {--}}
+                    {{--method: 'post',--}}
+                    {{--headers: ourHeaders,--}}
+                    {{--credentials: "same-origin",--}}
+                    {{--body: data--}}
+                {{--})--}}
+                    {{--.then(function(response) {--}}
+                        {{--return response.blob();--}}
+                    {{--}).then(function(blob) {--}}
+                        {{--console.timeEnd('Początek pomiaru czasu');--}}
+                        {{--console.log(blob);--}}
+                    {{--})--}}
+                    {{--.catch(err => console.log(err))--}}
             }
         });
     });

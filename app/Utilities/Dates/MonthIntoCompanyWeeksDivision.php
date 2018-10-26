@@ -14,7 +14,14 @@ class MonthIntoCompanyWeeksDivision
     public static function get($month, $year){
         $dividedMonth = MonthPerWeekDivision::get($month,$year);
 
-        $weekDateArr = []; // array of objects with week info
+        $newDividedMonth = [];
+        foreach ($dividedMonth as $day){
+            if($day->date !== 'Suma'){
+                array_push($newDividedMonth, $day);
+            }
+        }
+        //dd($newDividedMonth);
+        /*$weekDateArr = []; // array of objects with week info
         //*****Generating weekDateArr
         $tempFirstDate = $dividedMonth[0]->date;
         $tempLastDate = null;
@@ -46,9 +53,17 @@ class MonthIntoCompanyWeeksDivision
             if($i == count($dividedMonth) - 1) {
                 $dateObj->weekNumber = $dividedMonth[$i]->weekNumber;
                 $dateObj->firstDay = $tempFirstDate;
-                $dateObj->lastDay = $tempLastDate;
+                $dateObj->lastDay = $tempLastDate;//$dividedMonth[$i]->date == 'Suma' ? $tempLastDate : $dividedMonth[$i]->date;
+                //dd($dateObj);
                 array_push($weekDateArr, $dateObj);
             }
+        }*/
+        $newDividedMonth = collect($newDividedMonth);
+        $weekDateArr = [];
+        $weekNumbers = $newDividedMonth->pluck('weekNumber')->unique()->toArray();
+        foreach ($weekNumbers as $weekNumber){
+            $weekData = $newDividedMonth->where('weekNumber',$weekNumber)->sortBy('dayNumber');
+            array_push($weekDateArr, (object)['weekNumber' => $weekNumber,'firstDay' => $weekData->first()->date,'lastDay'=> $weekData->last()->date]);
         }
         //*****End of generating weekDateArr
         return $weekDateArr;

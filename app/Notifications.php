@@ -6,8 +6,18 @@ use Illuminate\Database\Eloquent\Model;
 
 class Notifications extends Model
 {
+
+
+    public function rating() {
+        return $this->hasMany('App\NotificationRating', 'notification_rating_id');
+    }
+
     public function user() {
         return $this->belongsTo('App\User', 'user_id');
+    }
+
+    public function notification_about() {
+        return $this->belongsTo('App\NotificationAbout', 'notification_about_id');
     }
 
     public function department_info() {
