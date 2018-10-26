@@ -10,9 +10,8 @@ document.addEventListener('DOMContentLoaded', function(event) {
 
         if(clickedElement.matches('.arrowButtonAfter') || clickedElement.matches('.arrowButtonBefore')){
             modelConversationsManagementChangeOrder($(clickedElement).parent().parent().parent().data('playlist_order'));
-        }else
-        //User clicks on category div
-        if(clickedElement.matches('.btn')) {
+        }
+        else if(clickedElement.matches('.btn')) {
             const type = clickedElement.dataset.type;
 
             if(type == 'category') { //Button from category page
@@ -231,9 +230,12 @@ document.addEventListener('DOMContentLoaded', function(event) {
             MANAGEMENT.DOMElements.modal2body.innerHTML = "<audio controls style='width:100%;'> <source src=" + MANAGEMENT.globalVariables.url + '/' + nameOfFile + " type='audio/wav'>Twoja przeglądarka nie obsługuje tego formatu pliku.</audio>";
         }
         else if(clickedElement.matches('.playlist-table td')) {
+            console.log(clickedElement);
             const clickedRow = clickedElement.closest('tr');
             const playlistId = clickedRow.dataset.id;
             // const userId = clickedRow.dataset.userid;
+            console.log(clickedRow);
+            console.log(playlistId);
 
             selectedPlaylistId = playlistId;
             //tutaj kolorowanie wiersza
@@ -345,6 +347,7 @@ document.addEventListener('DOMContentLoaded', function(event) {
      * @param id
      */
     function getPlaylistItems(id) {
+        console.log(id);
         console.assert(!isNaN(id), 'id in getPlaylistItems is not number!');
         const ourHeaders = new Headers();
         ourHeaders.append('X-CSRF-TOKEN', $('meta[name="csrf-token"]').attr('content'));
