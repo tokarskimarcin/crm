@@ -2,12 +2,16 @@
 @section('style')
     <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
     <link href="https://cdn.datatables.net/rowgroup/1.0.3/css/rowGroup.dataTables.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="{{asset('/assets/css/VCtooltip.css')}}">
     {{--<link rel="stylesheet" href="{{asset('/css/fixedHeader.dataTables.min.css')}}">
 --}}
 @endsection
 @section('content')
 
     <style>
+        .bootstrap-select > .dropdown-menu{
+            left: 0 !important;
+        }
         textarea.baseDivision {
             resize: none;
         }
@@ -31,15 +35,52 @@
             from {background-color: white;}
             to {background-color: #565fff ;}
         }
+        .VCtooltip .well:hover {
+             background-color: rgba(185,185,185,0.75) !important;
+             cursor: help;
+        }
+        .dep1{
+            background-color: #ff744e !important;
+        }
+        .dep2{
+            background-color: #c0ff7b !important;
+        }
+        .dep3{
+            background-color: #8888ff !important;
+        }
+        .dep4{
+            background-color: #f9ff6a !important;
+        }
+        .dep5{
+            background-color: #ff92ef !important;
+        }
+        .dep6{
+            background-color: #89ecff !important;
+        }
+        .dep7{
+            background-color: #888 !important;
+        }
+        .dep8{
+            background-color: #ff6a7a !important;
+        }
+
+        .dep9{
+            background-color: #6dff8c !important;
+        }
+
+        .dep10{
+            background-color: #55f !important;
+        }
+
     </style>
 
 {{--Header page --}}
 
-    <div class="col-md-12">
+   {{-- <div class="col-md-12">
         <div class="page-header">
             <div class="alert gray-nav "> Grafik dla potwierdzeń
         </div>
-    </div>
+    </div>--}}
 
 
 <div class="row">
@@ -49,13 +90,6 @@
                 Szczegółowe informacje o grafiku
             </div>
             <div class="panel-body">
-                <div class="alert alert-info page-info">
-                    Moduł <strong>Grafik dla potwierdzeń</strong> wyświetla informacje o pokazo-godzinach.<br>
-                    W kolumnie <i>"Potwierdzająca osoba"</i> dostępne są osoby, które wg. grafiku są dostępne dla danej daty potwierdzenia w oddziale osoby wyświetlającej tą zakładkę. <br>
-                    Gdy wiersz jest podświetlony na <span style="background-color: indianred;">czerwono</span>, oznacza to, że osoba potwierdzająca w dniu potwierdzania nie nacisneła przycisku start do godziny 9:00 lub wogóle go nie nacisneła. <br>
-                    Dla otrzymania lepszego wyglądu tabeli zaleca się <i>wyłącznie</i> panelu nawigacyjnego naciskając przycisk <u>"OFF"</u> w górnym lewym rogu strony. <br>
-                    Pokazy <u>anulowane</u> mają cały wiersz w kolorze <span style="background-color: #fdff78;">żółtym</span>.
-                </div>
                 <div class="row">
 
                     <div class="row">
@@ -92,13 +126,27 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-2">
                             <div class="form-group">
                                 <label for="typ">Typ</label>
                                 <select id="typ" multiple="multiple" style="width: 100%;">
                                     <option value="2">Wysyłka</option>
                                     <option value="1">Badania</option>
                                 </select>
+                            </div>
+                        </div>
+                        <div class="col-md-2" align="right">
+                            <div class="VCtooltip VCtooltip-left" align="right">
+                                <div class="well well-sm" style="border-radius: 10%; background-color: #5bc0de; color: white; margin-bottom: 0;">Legenda <span class="glyphicon glyphicon-info-sign"></span></div>
+                                <span class="tooltiptext">
+                                    <div class="alert alert-info page-info">
+                                        Moduł <strong>Grafik dla potwierdzeń</strong> wyświetla informacje o pokazo-godzinach.<br>
+                                        W kolumnie <i>"Potwierdzająca osoba"</i> dostępne są osoby, które wg. grafiku są dostępne dla danej daty potwierdzenia w oddziale osoby wyświetlającej tą zakładkę. <br>
+                                        Gdy wiersz jest podświetlony na <span style="background-color: indianred;">czerwono</span>, oznacza to, że osoba potwierdzająca w dniu potwierdzania nie nacisneła przycisku start do godziny 9:00 lub wogóle go nie nacisneła. <br>
+                                        Dla otrzymania lepszego wyglądu tabeli zaleca się <i>wyłącznie</i> panelu nawigacyjnego naciskając przycisk <u>"OFF"</u> w górnym lewym rogu strony. <br>
+                                        Pokazy <u>anulowane</u> mają cały wiersz w kolorze <span style="background-color: #fdff78;">żółtym</span>.
+                                    </div>
+                                </span>
                             </div>
                         </div>
                     </div>
@@ -153,7 +201,18 @@
                arrays: {
                    selectedDepartments: ["0"], //this array collect selected by user departments
                    selectedTypes: ['0'], //array of selected by user types
-                   changeArr: [] //This array collect changed rows
+                   changeArr: [], //This array collect changed rows
+                   departmentsColors: ['#f00',
+                       '#0f0',
+                       '#8888ff',
+                       '#ff0',
+                       '#f0f',
+                       '#0ff',
+                       '#888',
+                       '#f55',
+                       '#5f5',
+                       '#55f'
+                   ]
                },
                JSONS: {
                    userData: @json($userData),
@@ -171,7 +230,7 @@
                    datatableHeight: '75vh', //this variable defines height of table
                    loggedUserDepartment: {{Auth::user()->department_info_id}}
                }
-           }
+           };
 
            /********* END OF GLOBAL VARIABLES*********/
 
@@ -259,6 +318,7 @@
                let optionElement = document.createElement('option');
                optionElement.value = person.userId;
                optionElement.textContent = `${person.name} ${person.surname}`;
+               $(optionElement).addClass('dep'+person.department_id);
                placeToAppend.appendChild(optionElement);
            }
 
@@ -412,6 +472,7 @@
                    }
                },
                "fnDrawCallback": function(settings) {
+                   $('.selectpicker').selectpicker('refresh');
                    $('#datatable tbody tr').on('change', function(e) {
                         const changedElement = e.target;
                         const elementRow = this;
@@ -563,14 +624,16 @@
                        },"name":"departmentName", "searchable": "false", "orderable": false
                    },
                    {"data":function(data, type, dataToSet) {
-                       let customSelect =  `<select class="confirming form-control" style="width: 100%;">
-                                    <option value="0">Wybierz</option>`;
+                       let customSelect =  $('<select>').addClass('confirming selectpicker form-control').css({'width':'100%'});
+                       customSelect.append($('<option>').val(0).append('Wybierz'));
                                 if(data.confirmingUser) {
-                                    customSelect += `<option value="${data.confirmingUser}" selected>${data.first_name} ${data.last_name}</option>`;
-                               }
+                                    let option = $('<option>').prop('selected', true).val(data.confirmingUser).append(data.first_name+' '+data.last_name)
+                                        .addClass('dep'+data.confirm_id_dep);
 
-                           customSelect += `</select>`;
-                                    return customSelect;
+                                    customSelect.append(option);
+                                    customSelect.attr('data-confirm-id-dep', data.confirm_id_dep).addClass('dep'+data.confirm_id_dep);
+                               }
+                                    return customSelect.prop('outerHTML');
                         }, "name": "potwierdzający", "width": "20%", "orderable": false, "searchable": false
                    },
                    {"data":function (data, type, dataToSet) {
@@ -750,7 +813,6 @@
                            allHighlightedRows.forEach(item => {
                                item.classList.remove('colorRow');
                            })
-
                        })
 
                }
