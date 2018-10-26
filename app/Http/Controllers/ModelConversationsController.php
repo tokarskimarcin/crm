@@ -265,12 +265,11 @@ class ModelConversationsController extends Controller
 
     /**
      * @param $id
-     * This method permanently delete category
+     * This method permanently delete category and remove its references
      */
     public function categoryDelete($id) {
-        //Dodatkowo usunac wszystkie zależności!!
         try {
-            ModelConvCategories::find($id)->delete();
+            ModelConvCategories::deleteWithReferences($id);
         }
         catch(\Exception $error) {
             new ActivityRecorder($error, 1, 6);

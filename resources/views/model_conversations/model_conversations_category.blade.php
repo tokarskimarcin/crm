@@ -9,9 +9,10 @@
 
         </div>
         <div class="items">
+            <hr>
             @isset($items)
-                <hr>
-                <table class="table table-responsive">
+                @if(count($items) > 0)
+                <table class="table table-responsive items-table">
                     <thead>
                     <tr>
                         <th>Odtwórz</th>
@@ -57,6 +58,9 @@
                     @endforeach
                     </tbody>
                 </table>
+                @else
+                    <div class="alert alert-info">Brak rozmów w tej kategorii!</div>
+                @endif
             @endisset
         </div>
 

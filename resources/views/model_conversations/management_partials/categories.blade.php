@@ -25,6 +25,7 @@
                 </select>
             <td>
                 <select class="category_subcategory form-control" disabled>
+                    <option> Wybierz</option>
                     <option value="0" @if($category->subcategory_id == 0) selected @endif>Główna</option>
                     @foreach($categories as $category2)
                     <option value="{{$category2->id}}" @if($category->subcategory_id == $category2->id) selected @endif>{{$category2->name}}</option>

@@ -18,6 +18,11 @@ class ModelConvCategories extends Model
         $query->where('status', '=', 1);
     }
 
+    public static function deleteWithReferences($id) {
+        ModelConvCategories::find($id)->delete();
+        ModelConvItems::where('model_category_id', '=', $id)->update(['model_category_id' => null]);
+    }
+
     /**
      * @param $id
      * @return mixed
