@@ -1367,12 +1367,6 @@ class UsersController extends Controller
             $user->status_work = 0;
             $user->disabled_by_system = 1;
             /*$user->save()*/;
-            /*
-            $disable_account_info = new DisableAccountInfo();
-            $disable_account_info->user_id = $user->id;
-            $disable_account_info->department_info_id = $user->department_info_id;
-            $disable_account_info->disable_date = $today;
-            $disable_account_info->save();*/
         }
 
         //check if should send mails
@@ -1402,7 +1396,7 @@ class UsersController extends Controller
                 $data_to_send = array_merge($data_to_send, [
                     'user_to_show' => $manager]);
 
-                $mail = new VeronaMail('accountMail.weekReportUnusedAccount',$data_to_send,$title, $manager);
+                $mail = new VeronaMail('accountMail.weekReportUnusedAccount',$data_to_send, $title, $manager);
                 try {
                     dd($data_to_send);
                     //$mail->sendMail();

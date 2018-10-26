@@ -4109,7 +4109,6 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
             'managers'          => $managers
         ];
         return $data;
-
     }
 
     /**
