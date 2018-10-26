@@ -108,7 +108,7 @@ class ModelConversationsController extends Controller
             $playlist_item->playlist_id = $newPlaylist;
             $playlist_item->item_id = $itemId;
             $order = $this->generatateOrder($newPlaylist);
-            $playlist_item->order = $order;
+            $playlist_item->playlist_order = $order;
             $playlist_item->save();
         }
 
@@ -122,14 +122,13 @@ class ModelConversationsController extends Controller
      */
     private function generatateOrder($playlist_id) {
 
-        $playlist_last_order_item = ModelConvPlaylistItem::where('playlist_id', '=', $playlist_id)->orderBy('order')->get();
-//        dd($playlist_last_order_item->last());
+        $playlist_last_order_item = ModelConvPlaylistItem::where('playlist_id', '=', $playlist_id)->orderBy('playlist_order')->get();
         $lastItem = null;
         if($playlist_last_order_item) {
             $lastItem = $playlist_last_order_item->last();
         }
         if($lastItem) {
-            return $lastItem->order + 1;
+            return $lastItem->playlist_order + 1;
         }
         else { //first element in playlist
             return 1;
@@ -159,7 +158,7 @@ class ModelConversationsController extends Controller
             'model_conv_items.file_name',
             'model_conv_playlist.img as playlist_img',
             'model_conv_playlist.id as id',
-            'order',
+            'playlist_order',
             'trainer',
             'gift',
             'client'
@@ -168,7 +167,7 @@ class ModelConversationsController extends Controller
             ->join('model_conv_items', 'model_conv_playlist_items.item_id', '=', 'model_conv_items.id')
             ->where('model_conv_items.status', '=', 1)
             ->where('model_conv_playlist.id', '=', $id)
-            ->orderBy('order')
+            ->orderBy('playlist_order')
             ->get();
 
 //        dd($playlist);
@@ -441,21 +440,21 @@ class ModelConversationsController extends Controller
 
         $variable = 0;
         $modelConvPlaylistItem = ModelConvPlaylistItem::where('playlist_id', $selectedPlaylistId)
-            ->where('order', '>=', $selectedTr > $selectedOrder ? $selectedOrder : $selectedTr)
-            ->where('order', '<=',  $selectedTr > $selectedOrder ? $selectedTr : $selectedOrder)
+            ->where('playlist_order', '>=', $selectedTr > $selectedOrder ? $selectedOrder : $selectedTr)
+            ->where('playlist_order', '<=',  $selectedTr > $selectedOrder ? $selectedTr : $selectedOrder)
             ->get();
         if($selectedTr > $selectedOrder){
             $variable = 1;
         }else if($selectedTr < $selectedOrder){
             $variable = -1;
         }
-        $selectedItem = $modelConvPlaylistItem->where('order', $selectedTr)->first();
+        $selectedItem = $modelConvPlaylistItem->where('playlist_order', $selectedTr)->first();
 
         foreach ($modelConvPlaylistItem->where('order', $selectedTr > $selectedOrder ? '<' : '>', $selectedTr) as $item){
-            $item->order = $item->order + $variable;
+            $item->playlist_order = $item->playlist_order + $variable;
             $item->save();
         }
-        $selectedItem->order = intval($selectedOrder);
+        $selectedItem->playlist_order = intval($selectedOrder);
         $selectedItem->save();
     }
 }
