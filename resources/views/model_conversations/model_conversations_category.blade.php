@@ -20,7 +20,7 @@
                         <th>Upominek</th>
                         <th>Trener</th>
                         <th>Klient</th>
-                        <th>Aktualna Kategoria</th>
+                        <th>Playlisty</th>
                         <th>Akcja</th>
                     </tr>
                     </thead>
@@ -52,7 +52,7 @@
                                 @endphp
                             </td>
                             <td>
-                                <button class="btn btn-info change-playlist" data-type="playlists" data-action="5" data-toggle="modal" data-target="#playlistAdd">Edytuj</button>
+                                <button class="btn btn-info change-playlist" data-type="playlists" data-action="5" data-toggle="modal" data-target="#playlistAdd">Zarządzaj playlistami</button>
                             </td>
                         </tr>
                     @endforeach
