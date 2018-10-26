@@ -188,7 +188,8 @@ class ModelConversationsController extends Controller
 
         if($toAdd == 1) {
             if(isset($picture)) { //user send picture
-                $picture_name = 'playlist_' . date('Y-m-d') . '_' . $picture->getClientOriginalName();
+                $clientOriginalName = str_replace(' ','_',$picture->getClientOriginalName());
+                $picture_name = 'playlist_' . date('Y-m-d') . '_' . $clientOriginalName;
                 $picture->storeAs('public',$picture_name);
             }
             else { //user didn't send picture, we assing default one.
@@ -198,7 +199,8 @@ class ModelConversationsController extends Controller
         }
         else {
             if(isset($picture)) { //user send picture
-                $picture_name = 'playlist_' . date('Y-m-d') . '_' . $picture->getClientOriginalName();
+                $clientOriginalName = str_replace(' ','_',$picture->getClientOriginalName());
+                $picture_name = 'playlist_' . date('Y-m-d') . '_' . $clientOriginalName;
                 $picture->storeAs('public',$picture_name);
             }
         }
@@ -303,7 +305,8 @@ class ModelConversationsController extends Controller
 
             if($toAdd == 1) {
                 if(isset($picture)) { //user send picture
-                    $picture_name = 'category_' . date('Y-m-d') . '_' . $picture->getClientOriginalName();
+                    $clientOriginalName = str_replace(' ','_',$picture->getClientOriginalName());
+                    $picture_name = 'category_' . date('Y-m-d') . '_' . $clientOriginalName;
                     $picture->storeAs('public',$picture_name);
                 }
                 else { //user didn't send picture, we assing default one.
@@ -313,7 +316,8 @@ class ModelConversationsController extends Controller
             }
             else {
                 if(isset($picture)) { //user send picture
-                    $picture_name = 'category_' . date('Y-m-d') . '_' . $picture->getClientOriginalName();
+                    $clientOriginalName = str_replace(' ','_',$picture->getClientOriginalName());
+                    $picture_name = 'category_' . date('Y-m-d') . '_' . $clientOriginalName;
                     $picture->storeAs('public',$picture_name);
                 }
             }
@@ -394,7 +398,8 @@ class ModelConversationsController extends Controller
         $sound = $request->file('sound');
         $sound_name = null;
         if(isset($sound)) {
-            $sound_name = 'item_' . date('Y-m-d') . '_' . $sound->getClientOriginalName();
+            $clientOriginalName = str_replace(' ','_',$sound->getClientOriginalName());
+            $sound_name = 'item_' . date('Y-m-d') . '_' . $clientOriginalName;
             $sound->storeAs('public',$sound_name);
         }
 
