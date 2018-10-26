@@ -1,12 +1,13 @@
 document.addEventListener('DOMContentLoaded', function(event) {
     let selectedTr = [];
+    let selectedPlaylistId = null;
 
     function globalClickHandler(e) {
         const clickedElement = e.target;
 
 
         if(clickedElement.matches('.arrowButtonAfter') || clickedElement.matches('.arrowButtonBefore')){
-            changeOrderFetch($(clickedElement).parent().parent().parent().data('order'));
+            modelConversationsManagementChangeOrder($(clickedElement).parent().parent().parent().data('order'));
         }else
         //User clicks on category div
         if(clickedElement.matches('.btn')) {
@@ -210,6 +211,7 @@ document.addEventListener('DOMContentLoaded', function(event) {
             const playlistId = clickedRow.dataset.id;
             const userId = clickedRow.dataset.userid;
 
+            selectedPlaylistId = playlistId;
             //tutaj kolorowanie wiersza
 
             let items = null;
@@ -445,22 +447,34 @@ document.addEventListener('DOMContentLoaded', function(event) {
         }
     }
 
-    function changeOrderFetch(selectedOrder){
+    function modelConversationsManagementChangeOrder(selectedOrder){
         let formData = new FormData();
         formData.append('selectedTr', selectedTr);
         formData.append('selectedOrder', selectedOrder);
+        formData.append('selectedPlaylistId', selectedPlaylistId);
 
         const ourHeaders = new Headers();
         ourHeaders.append('X-CSRF-TOKEN', $('meta[name="csrf-token"]').attr('content'));
 
-        fetch(`/changeOrder`, {
+        fetch(`/modelConversationsManagementChangeOrder`, {
             method: 'post',
             headers: ourHeaders,
             credentials: "same-origin",
             body: formData,
         })
             .then(resp => {
-                window.location.reload();
+                getPlaylistItems(selectedPlaylistId)
+                .then(resp => {
+                    items = resp;
+                    console.log(items);
+                    if(items) {
+                        let itemsTable = document.querySelector('.right-playlist-table > table');
+
+                        appendPlaylistItems(items, itemsTable);
+                    }
+
+                })
+                .catch(err => console.log(err));
             })
             .catch(err => {
                 swal(

@@ -1116,6 +1116,7 @@ Route::get('/notificationsPushedWithRemovedBy','AdminPanel\NotificationSystemCon
 
 Route::get('/modelConversationMenu', 'ModelConversationsController@modelConversationMenuGet');
 Route::get('/modelConversationsManagement', 'ModelConversationsController@modelConversationsManagementGet');
+Route::post('/modelConversationsManagementChangeOrder', 'ModelConversationsController@modelConversationsManagementChangeOrder');
 
 Route::get('/modelConversationCategory/{id}', 'ModelConversationsController@categoryGet');
 Route::put('/modelConversationCategory/{id}', 'ModelConversationsController@categoryPut');
