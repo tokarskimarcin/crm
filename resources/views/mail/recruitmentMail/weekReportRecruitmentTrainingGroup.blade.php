@@ -17,7 +17,7 @@
         <th style="border:1px solid #231f20;padding:3px;background:#231f20">Umówionych Etap - 2</th>
         <th style="border:1px solid #231f20;padding:3px;background:#231f20">Obecnych Etap - 2</th>
         <th style="border:1px solid #231f20;padding:3px;background:#231f20">Nieobecnych Etap - 2</th>
-        <th style="border:1px solid #231f20;padding:3px;background:#231f20">Zatrudnieni / Obecni_Etap1</th>
+        <th style="border:1px solid #231f20;padding:3px;background:#231f20">Obecni_Etap1 / Zatrudnieni</th>
         <th style="border:1px solid #231f20;padding:3px;background:#231f20">Obecni_Etap2 / Obecni_Etap1</th>
         <th style="border:1px solid #231f20;padding:3px;background:#231f20">Obecni_Etap1 / Umowieni_Etap1</th>
         <th style="border:1px solid #231f20;padding:3px;background:#231f20">Zatrudnieni Kandydaci</th>
@@ -60,7 +60,7 @@
         <td  style="border:1px solid #231f20;text-align:center;padding:3px">{{$stat_total_1}}%</td>
         <td  style="border:1px solid #231f20;text-align:center;padding:3px">{{$stat_total_2}}%</td>
         <td  style="border:1px solid #231f20;text-align:center;padding:3px">{{$stat_total_3}}%</td>
-        <td  style="border:1px solid #231f20;text-align:center;padding:3px;background-color: #f5e79e">{{$data->sum('countHireUserFromFirstTrainingGroup')}}</td>
+        <td  style="border:1px solid #231f20;text-align:center;padding:3px;">{{$data->sum('countHireUserFromFirstTrainingGroup')}}</td>
     </tr>
     </tbody>
 </table>
