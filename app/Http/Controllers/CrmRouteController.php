@@ -4454,6 +4454,7 @@ class CrmRouteController extends Controller
         client_route_info.confirmingUser as confirmingUser,
         client_route_info.confirmDate as confirmDate,
         client_route_info.actual_success as actual_success,
+        DATE(FROM_UNIXTIME(client_route_info.client_route_id * 86400)) as client_route_id,
         YEAR(client_route_info.date) as year,
         client.name as clientName,
         departments.name as departmentName,

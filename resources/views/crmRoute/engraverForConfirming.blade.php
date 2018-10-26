@@ -125,6 +125,7 @@
                             <th>Frekw.</th>
                             <th>Pary</th>
                             <th>Data potw.</th>
+                            <th>cri</th>
                         </tr>
                         </thead>
                     </table>
@@ -144,6 +145,7 @@
         <script src="https://cdn.datatables.net/rowgroup/1.0.3/js/dataTables.rowGroup.min.js"></script>
         <script src="{{ asset('/js/dataTables.bootstrap.min.js')}}"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
+        <script src="{{asset('/js/numeric-comma.js')}}"></script>
         {{--<script src="{{asset('/js/dataTables.fixedHeader.min.js')}}"></script>--}}
     <script>
        document.addEventListener('DOMContentLoaded', function() {
@@ -604,9 +606,13 @@
                        }
 
                        }, "name": "dataPotwierdzenia", "orderable": false, "searchable": false
+                   },
+                   {"data":function(data, type, dataToSet) {
+                           return data.client_route_id;
+                       }, "name": "client_route_id", "orderable": true, "searchable": false, "visible": false
                    }
                ],
-               order: [[1, 'asc'], [3, 'desc'], [4, 'asc']],
+               order: [[1, 'asc'], [3, 'asc'], [12, 'desc'], [4, 'asc']],
                rowGroup: {
                    dataSrc: 'date',
                    startRender: null,
@@ -641,7 +647,6 @@
                    },
                },
            });
-
 
            /*********************EVENT LISTENERS FUNCTIONS****************************/
            /*Functions from this section moslty update arrays which are going to be send by ajax for datatable.
@@ -720,6 +725,7 @@
             */
            $('#date_start, #date_stop').on('change', () => {
                table.ajax.reload();
+
            });
 
            function saveHandler(e) {
