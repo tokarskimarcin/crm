@@ -45,7 +45,7 @@
         @endforeach
         <tr>
             <td>Dodaj nową kategorie</td>
-            <td><button class="btn btn-info" id="edit" data-type="category" data-action="5" data-toggle="modal" data-target="#myModal">Dodaj</button></td>
+            <td><button class="btn btn-info" data-type="category" data-action="5" data-toggle="modal" data-target="#myModal">Dodaj</button></td>
         </tr>
         </tbody>
     </table>

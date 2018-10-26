@@ -16,6 +16,15 @@ class ModelConvItems extends Model
 
     /**
      * @param $id
+     * This method deletes items with its references
+     */
+    public static function deleteWithReferences($id) {
+        ModelConvItems::find($id)->delete();
+        ModelConvPlaylistItem::where('item_id', '=', $id)->delete();
+    }
+
+    /**
+     * @param $id
      * @return mixed
      * @throws \Exception
      * This method changes status of category

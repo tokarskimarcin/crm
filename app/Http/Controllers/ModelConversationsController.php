@@ -246,8 +246,21 @@ class ModelConversationsController extends Controller
         return $info;
     }
 
+    /**
+     * @param $id
+     * This method removes playlist with references
+     */
     public function managementPlaylistDelete($id) {
-       return ModelConvPlaylist::safeDelete($id);
+       return ModelConvPlaylist::deleteWithReferences($id);
+    }
+
+    /**
+     * @param $id
+     * This method removes playlist item
+     */
+    public function managementPlaylistItemsDelete($id) {
+
+        return ModelConvPlaylistItem::smartDelete($id);
     }
 
     /**
@@ -274,7 +287,6 @@ class ModelConversationsController extends Controller
         catch(\Exception $error) {
             new ActivityRecorder($error, 1, 6);
         }
-
     }
 
     /**
@@ -361,7 +373,7 @@ class ModelConversationsController extends Controller
     public function itemsDelete($id) {
         //DOdatkowo usunąć wszystkie zależności!
         try {
-            ModelConvItems::find($id)->delete();
+            ModelConvItems::deleteWithReferences($id);
         }
         catch(\Exception $error) {
             new ActivityRecorder($error, 1, 6);
@@ -383,7 +395,7 @@ class ModelConversationsController extends Controller
         $sound = $request->file('sound');
         $sound_name = null;
         if(isset($sound)) {
-            $sound_name = 'category_' . date('Y-m-d') . '_' . $sound->getClientOriginalName();
+            $sound_name = 'item_' . date('Y-m-d') . '_' . $sound->getClientOriginalName();
             $sound->storeAs('public',$sound_name);
         }
 

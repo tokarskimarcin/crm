@@ -14,10 +14,7 @@
         </ul>
 
         <div class="tab-content">
-            <div id="home" class="tab-pane fade in active">
-                <h3>HOME</h3>
-                <p>Some content.</p>
-            </div>
+            @include('model_conversations.management_partials.legend')
             @include('model_conversations.management_partials.categories')
             @include('model_conversations.management_partials.conversations')
             @include('model_conversations.management_partials.playlists')

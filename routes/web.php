@@ -1131,6 +1131,8 @@ Route::post('/modelConversationItems', 'ModelConversationsController@itemsPost')
 Route::get('/modelConversationsPlaylist', 'ModelConversationsController@modelConversationsPlaylistGet');
 Route::post('/modelConversationsPlaylist', 'ModelConversationsController@modelConversationsPlaylistPost');
 Route::get('/modelConversationsPlaylist/{id}', 'ModelConversationsController@playlistGet');
+Route::delete('/modelConversationsGetPlaylist/{id}', 'ModelConversationsController@managementPlaylistDelete');
+
 
 Route::get('/modelConversationsGetPlaylistItems/{id}', 'ModelConversationsController@managementPlaylistGet');
-Route::delete('/modelConversationsGetPlaylistItems/{id}', 'ModelConversationsController@managementPlaylistDelete');
+Route::delete('/modelConversationsGetPlaylistItems/{id}', 'ModelConversationsController@managementPlaylistItemsDelete');

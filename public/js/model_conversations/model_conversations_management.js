@@ -2,6 +2,8 @@ document.addEventListener('DOMContentLoaded', function(event) {
     let selectedTr = [];
     let selectedPlaylistId = null;
 
+    /* EVENT LISTENERS FUNCTIONS */
+
     function globalClickHandler(e) {
         const clickedElement = e.target;
 
@@ -201,6 +203,28 @@ document.addEventListener('DOMContentLoaded', function(event) {
                     MANAGEMENT.DOMElements.playlistModal.querySelector('.playlist_id').value = '';
                 }
             }
+            else if(type == 'playlist-item') {
+                const thisRow = clickedElement.closest('tr');
+                const id = thisRow.dataset.id;
+                const action = clickedElement.dataset.action;
+
+                if(action == 0) {
+                    swal({
+                        title: 'Jesteś pewien?',
+                        text: "Usuń rozmowę z playlisty!",
+                        type: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#3085d6',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: 'Usuń!'
+                    }).then((result) => {
+                        if (result.value) {
+                            console.log('id', id);
+                            deletePlaylistItem(id);
+                        }
+                    });
+                }
+            }
         }
         else if(clickedElement.matches('.play-sound')) {
             let nameOfFile = clickedElement.dataset.nameoffile;
@@ -209,7 +233,7 @@ document.addEventListener('DOMContentLoaded', function(event) {
         else if(clickedElement.matches('.playlist-table td')) {
             const clickedRow = clickedElement.closest('tr');
             const playlistId = clickedRow.dataset.id;
-            const userId = clickedRow.dataset.userid;
+            // const userId = clickedRow.dataset.userid;
 
             selectedPlaylistId = playlistId;
             //tutaj kolorowanie wiersza
@@ -218,7 +242,6 @@ document.addEventListener('DOMContentLoaded', function(event) {
             getPlaylistItems(playlistId)
                 .then(resp => {
                     items = resp;
-                    console.log(items);
                     if(items) {
                         let itemsTable = document.querySelector('.right-playlist-table > table');
 
@@ -227,7 +250,8 @@ document.addEventListener('DOMContentLoaded', function(event) {
 
                 })
                 .catch(err => console.log(err));
-        }else if(clickedElement.matches('td')){
+        }
+        else if(clickedElement.matches('td')){
             let tr = $(clickedElement).parent();
             if($('.right-playlist-table tbody').has(tr)){
                 if(tr.hasClass('selectedTr')){
@@ -265,6 +289,8 @@ document.addEventListener('DOMContentLoaded', function(event) {
 
     }
 
+    /* END OF EVENT LISTENERS FUNCTIONS */
+
     /**
      * This method appends playlist items to table item.
      * @param items
@@ -275,9 +301,11 @@ document.addEventListener('DOMContentLoaded', function(event) {
         tbody.innerHTML = ''; //clearing prev content
 
         items.forEach(item => {
+            console.log(item);
            let tr = document.createElement('tr');
 
            $(tr).attr('data-order',item.order);
+           $(tr).attr('data-id',item.id);
 
            let td1 = document.createElement('td');
            td1.textContent = item.order;
@@ -297,32 +325,19 @@ document.addEventListener('DOMContentLoaded', function(event) {
            let td6 = document.createElement('td');
            td6.textContent = item.item_trainer;
 
+           let td7 = document.createElement('td');
+           td7.innerHTML = `<button class="btn btn-danger" data-type="playlist-item" data-action="0">Usuń</button>`;
+
            tr.appendChild(td1);
            tr.appendChild(td2);
            tr.appendChild(td3);
            tr.appendChild(td4);
            tr.appendChild(td5);
            tr.appendChild(td6);
+           tr.appendChild(td7);
 
            tbody.appendChild(tr);
         });
-    }
-
-    /**
-     * This function sends fetch for deleting playlist category
-     * @param $id
-     */
-    function deletePlaylistCategory(id) {
-        console.assert(!isNaN(id), 'id in getPlaylistItems is not number!');
-        const ourHeaders = new Headers();
-        ourHeaders.append('X-CSRF-TOKEN', $('meta[name="csrf-token"]').attr('content'));
-
-        fetch(`/modelConversationsGetPlaylistItems/${id}`, {
-            method: 'delete',
-            headers: ourHeaders,
-            credentials: "same-origin"
-        })
-            .then(resp => window.location.reload());
     }
 
     /**
@@ -404,6 +419,44 @@ document.addEventListener('DOMContentLoaded', function(event) {
         }
     }
 
+    function modelConversationsManagementChangeOrder(selectedOrder){
+        let formData = new FormData();
+        formData.append('selectedTr', selectedTr);
+        formData.append('selectedOrder', selectedOrder);
+        formData.append('selectedPlaylistId', selectedPlaylistId);
+
+        const ourHeaders = new Headers();
+        ourHeaders.append('X-CSRF-TOKEN', $('meta[name="csrf-token"]').attr('content'));
+
+        fetch(`/modelConversationsManagementChangeOrder`, {
+            method: 'post',
+            headers: ourHeaders,
+            credentials: "same-origin",
+            body: formData,
+        })
+            .then(resp => {
+                getPlaylistItems(selectedPlaylistId)
+                    .then(resp => {
+                        items = resp;
+                        console.log(items);
+                        if(items) {
+                            let itemsTable = document.querySelector('.right-playlist-table > table');
+
+                            appendPlaylistItems(items, itemsTable);
+                        }
+
+                    })
+                    .catch(err => console.log(err));
+            })
+            .catch(err => {
+                swal(
+                    err
+                )
+            });
+    }
+
+    /* DELETE FUNCTIONS PART */
+
     function permanentDeleteFetch(type, id) {
         switch(type) {
             case 'category': {
@@ -447,41 +500,38 @@ document.addEventListener('DOMContentLoaded', function(event) {
         }
     }
 
-    function modelConversationsManagementChangeOrder(selectedOrder){
-        let formData = new FormData();
-        formData.append('selectedTr', selectedTr);
-        formData.append('selectedOrder', selectedOrder);
-        formData.append('selectedPlaylistId', selectedPlaylistId);
-
+    /**
+     * This function sends fetch for deleting playlist category
+     * @param $id
+     */
+    function deletePlaylistCategory(id) {
+        console.assert(!isNaN(id), 'id in getPlaylistItems is not number!');
         const ourHeaders = new Headers();
         ourHeaders.append('X-CSRF-TOKEN', $('meta[name="csrf-token"]').attr('content'));
 
-        fetch(`/modelConversationsManagementChangeOrder`, {
-            method: 'post',
+        fetch(`/modelConversationsGetPlaylist/${id}`, {
+            method: 'delete',
             headers: ourHeaders,
-            credentials: "same-origin",
-            body: formData,
+            credentials: "same-origin"
         })
-            .then(resp => {
-                getPlaylistItems(selectedPlaylistId)
-                .then(resp => {
-                    items = resp;
-                    console.log(items);
-                    if(items) {
-                        let itemsTable = document.querySelector('.right-playlist-table > table');
-
-                        appendPlaylistItems(items, itemsTable);
-                    }
-
-                })
-                .catch(err => console.log(err));
-            })
-            .catch(err => {
-                swal(
-                    err
-                )
-            });
+            .then(resp => window.location.reload());
     }
+
+    function deletePlaylistItem(id) {
+        console.assert(!isNaN(id), 'id in deletePlaylistItem is not number!');
+        const ourHeaders = new Headers();
+        ourHeaders.append('X-CSRF-TOKEN', $('meta[name="csrf-token"]').attr('content'));
+
+        fetch(`/modelConversationsGetPlaylistItems/${id}`, {
+            method: 'delete',
+            headers: ourHeaders,
+            credentials: "same-origin"
+        })
+            .then(resp => window.location.reload());
+    }
+
+    /* END OF DELETE FUNCTIONS PART */
+
     document.addEventListener('click', globalClickHandler);
 
     });

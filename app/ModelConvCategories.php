@@ -18,6 +18,10 @@ class ModelConvCategories extends Model
         $query->where('status', '=', 1);
     }
 
+    /**
+     * @param $id
+     * This method deletes playlist with its references
+     */
     public static function deleteWithReferences($id) {
         ModelConvCategories::find($id)->delete();
         ModelConvItems::where('model_category_id', '=', $id)->update(['model_category_id' => null]);

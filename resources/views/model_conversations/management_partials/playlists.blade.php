@@ -1,4 +1,4 @@
-<div id="playlists" class="tab-pane fade in" style="margin-top: 1em">
+<div id="playlists" class="tab-pane fade" style="margin-top: 1em">
     <div class="left-playlist-table">
         <table class="table table-stripped playlist-table">
             <thead>
@@ -41,6 +41,7 @@
                 <th>Klient</th>
                 <th>Prezent</th>
                 <th>Trener</th>
+                <th>Akcja</th>
             </tr>
             </thead>
             <tbody>

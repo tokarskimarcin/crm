@@ -9,6 +9,12 @@ class ModelConvPlaylistItem extends Model
     protected $table = 'model_conv_playlist_items';
     public $timestamps = false;
 
+
+    public static function smartDelete($id) {
+        //Nalezy dodac funkcje uaktualniającą kolejność playlisty
+        ModelConvPlaylistItem::find($id)->delete();
+    }
+
     /**
      * @param $id
      * This method returns collection of playlist items
@@ -21,7 +27,8 @@ class ModelConvPlaylistItem extends Model
             'model_conv_items.trainer as item_trainer',
             'model_conv_items.gift as item_gift',
             'model_conv_items.client as item_client',
-            'order'
+            'order',
+            'model_conv_playlist_items.id as id'
         )
             ->join('model_conv_items', 'model_conv_playlist_items.item_id', '=', 'model_conv_items.id')
             ->join('model_conv_playlist', 'model_conv_playlist.id', '=', 'model_conv_playlist_items.playlist_id')
