@@ -18,19 +18,17 @@
                 <img src="http://teambox.pl/image/logovc.png" class="CToWUd">
             </div>
             <div class="links">
-                <div class="link link1">
-                    <a href="/">TeamBox</a>
+                <div class="link link4">
+                    <a href="/modelConversationsPlaylist">Play lista</a>
                 </div>
                 <div class="link link1">
                     <a href="/modelConversationMenu">Kategorie</a>
                 </div>
-                @if(in_array($user, $adminPanelAccessArr))
                 <div class="link link3">
                     <a href="/modelConversationsManagement">Panel zarządzania</a>
                 </div>
-                @endif
-                <div class="link link4">
-                    <a href="/modelConversationsPlaylist">Play lista</a>
+                <div class="link link1">
+                    <a href="/">TeamBox</a>
                 </div>
             </div>
         </header>

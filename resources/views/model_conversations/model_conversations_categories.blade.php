@@ -7,6 +7,10 @@
     </main>
 @endsection
 
+@section('styles')
+
+@endsection
+
 
 @section('script')
     <script>
