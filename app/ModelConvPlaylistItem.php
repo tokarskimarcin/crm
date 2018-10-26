@@ -27,6 +27,7 @@ class ModelConvPlaylistItem extends Model
             ->join('model_conv_playlist', 'model_conv_playlist.id', '=', 'model_conv_playlist_items.playlist_id')
             ->where('model_conv_playlist.id', '=', $id)
             ->where('model_conv_items.status', '=', 1) //only active
+            ->orderBy('order')
             ->get();
 
         return $info;

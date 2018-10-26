@@ -422,4 +422,29 @@ class ModelConversationsController extends Controller
 
         return Redirect::back();
     }
+
+    public function modelConversationsManagementChangeOrder(Request $request){
+        $selectedTr = $request->selectedTr;
+        $selectedOrder = $request->selectedOrder;
+        $selectedPlaylistId = $request->selectedPlaylistId;
+
+        $variable = 0;
+        $modelConvPlaylistItem = ModelConvPlaylistItem::where('playlist_id', $selectedPlaylistId)
+            ->where('order', '>=', $selectedTr > $selectedOrder ? $selectedOrder : $selectedTr)
+            ->where('order', '<=',  $selectedTr > $selectedOrder ? $selectedTr : $selectedOrder)
+            ->get();
+        if($selectedTr > $selectedOrder){
+            $variable = 1;
+        }else if($selectedTr < $selectedOrder){
+            $variable = -1;
+        }
+        $selectedItem = $modelConvPlaylistItem->where('order', $selectedTr)->first();
+
+        foreach ($modelConvPlaylistItem->where('order', $selectedTr > $selectedOrder ? '<' : '>', $selectedTr) as $item){
+            $item->order = $item->order + $variable;
+            $item->save();
+        }
+        $selectedItem->order = intval($selectedOrder);
+        $selectedItem->save();
+    }
 }
