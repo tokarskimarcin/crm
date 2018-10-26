@@ -517,6 +517,7 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
     Route::get('/check_list_cadre', 'WorkHoursController@checkListCadre');
 
     Route::get('/users_live', 'WorkHoursController@usersLive');
+
     // Work_hours --end--
 
     // Users --Start--
@@ -1013,6 +1014,8 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
 
 /** AUTO SCRIPT **/
 Route::get('/autoSalaryIncrease', 'AutoScriptController@autoSalaryIncrease');
+
+Route::get('/get30rbhData', 'AutoScriptController@get30rbhData');
 /** KONIEC AUTO SCRIPT */
 
 //CHARTS
@@ -1110,3 +1113,26 @@ Route::get('/setCityApprovalPart6','AutoScriptController@setCityApprovalPart6');
 Route::get('/testZybura', 'StatisticsController@test');
 Route::get('/convertJRtoNewSystem','AdminPanel\NotificationSystemController@convertJRtoNewSystem');
 Route::get('/notificationsPushedWithRemovedBy','AdminPanel\NotificationSystemController@notificationsPushedWithRemovedBy');
+
+Route::get('/modelConversationMenu', 'ModelConversationsController@modelConversationMenuGet');
+Route::get('/modelConversationsManagement', 'ModelConversationsController@modelConversationsManagementGet');
+Route::post('/modelConversationsManagementChangeOrder', 'ModelConversationsController@modelConversationsManagementChangeOrder');
+
+Route::get('/modelConversationCategory/{id}', 'ModelConversationsController@categoryGet');
+Route::put('/modelConversationCategory/{id}', 'ModelConversationsController@categoryPut');
+Route::delete('/modelConversationCategory/{id}', 'ModelConversationsController@categoryDelete');
+Route::post('/modelConversationCategory', 'ModelConversationsController@categoryPost');
+Route::post('/modelConversationCategoryChangePlaylist', 'ModelConversationsController@modelConversationCategoryChangePlaylist');
+
+Route::put('/modelConversationItems/{id}', 'ModelConversationsController@itemsPut');
+Route::delete('/modelConversationItems/{id}', 'ModelConversationsController@itemsDelete');
+Route::post('/modelConversationItems', 'ModelConversationsController@itemsPost');
+
+Route::get('/modelConversationsPlaylist', 'ModelConversationsController@modelConversationsPlaylistGet');
+Route::post('/modelConversationsPlaylist', 'ModelConversationsController@modelConversationsPlaylistPost');
+Route::get('/modelConversationsPlaylist/{id}', 'ModelConversationsController@playlistGet');
+Route::delete('/modelConversationsGetPlaylist/{id}', 'ModelConversationsController@managementPlaylistDelete');
+
+
+Route::get('/modelConversationsGetPlaylistItems/{id}', 'ModelConversationsController@managementPlaylistGet');
+Route::delete('/modelConversationsGetPlaylistItems/{id}', 'ModelConversationsController@managementPlaylistItemsDelete');
