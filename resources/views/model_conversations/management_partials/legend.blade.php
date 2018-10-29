@@ -1,4 +1,4 @@
-<div id="home" class="tab-pane fade in active">
+<div id="home" class="tab-pane fade">
     <h4>Legenda</h4>
     <div class="alert alert-info">
         <ul class="list-group">
