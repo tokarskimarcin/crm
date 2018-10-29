@@ -1111,8 +1111,6 @@ Route::get('/setCityApprovalPart6','AutoScriptController@setCityApprovalPart6');
 //Route::get('/refreshPbxReportExtension', 'AutoScriptController@pbx_update');
 
 Route::get('/testZybura', 'StatisticsController@test');
-Route::get('/convertJRtoNewSystem','AdminPanel\NotificationSystemController@convertJRtoNewSystem');
-Route::get('/notificationsPushedWithRemovedBy','AdminPanel\NotificationSystemController@notificationsPushedWithRemovedBy');
 
 Route::get('/modelConversationMenu', 'ModelConversationsController@modelConversationMenuGet');
 Route::get('/modelConversationsManagement', 'ModelConversationsController@modelConversationsManagementGet');

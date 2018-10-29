@@ -68,7 +68,7 @@
                 <div class="table_of_conntent">
                     <div id="menu1" class="tab-pane fade in active">
                         <div class="table-responsive" style="margin-top: 30px;">
-                            <table id="history_of_notification" class="table table-striped table-bordered thead-inverse" cellspacing="0" width="100%" >
+                            <table id="history_of_notification" class="table table-striped table-bordered thead-inverse compact" cellspacing="0" width="100%" >
                                 <thead>
                                 <tr>
                                     <td style="width: 15%">Data złoszenia</td>
@@ -76,6 +76,7 @@
                                     <td style="width: 15%">Data zakończenia zgłoszenia</td>
                                     <td style="width: 10%">Zgłoszone przez</td>
                                     <td style="width: 10%">Ocena końcowa</td>
+                                    <td style="width: 10%">Podgląd</td>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -94,6 +95,7 @@
                                         @else
                                             <td><button class="notificationRatingButton btn btn-block btn-primary" data-nrid="{{$item->nr_id}}">@if($item->comment !== null)<span class="glyphicon glyphicon-comment"></span> @endif{{($item->average_rating*100).'%'}}</button></td>
                                         @endif
+                                        <td><a class="btn btn-default  btn-block" href="/show_notification/{{$item->id}}" ><span class="glyphicon glyphicon-search"></span></a></td>
                                     </tr>
                                 @endforeach
 
