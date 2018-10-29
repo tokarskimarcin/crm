@@ -7,6 +7,10 @@
     </main>
 @endsection
 
+@section('styles')
+    <link rel="stylesheet" href="{{asset('css/model_conversations/playlist-categories.css')}}">
+@endsection
+
 @section('script')
     <script>
         //In this script we define global variables and php variables

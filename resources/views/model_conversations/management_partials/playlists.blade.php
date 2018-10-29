@@ -31,6 +31,9 @@
             </tbody>
         </table>
     </div>
+
+    <span class="glyphicon glyphicon-arrow-down"></span>
+
     <div class="right-playlist-table">
         <table class="table">
             <thead>
