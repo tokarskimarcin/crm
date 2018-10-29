@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\Storage;
 class ModelConversationsController extends Controller
 {
 
-    private $adminPanelAccessArr = [3]; //Array of user_type_id who can access admin panel
+    private $adminPanelAccessArr = [3, 13]; //Array of user_type_id who can access admin panel
 
     public function modelConversationMenuGet() {
 
