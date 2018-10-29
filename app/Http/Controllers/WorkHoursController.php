@@ -25,7 +25,7 @@ class WorkHoursController extends Controller
 
 
     public static function getUserTypesPermissionToEditSuccess(){
-        return [3,23];
+        return [3,23, 10];
     }
     //******************acceptHour****************** START
     public function acceptHour()
@@ -54,6 +54,12 @@ class WorkHoursController extends Controller
         return view('workhourscadre.checkListCadre')->with('departments', $departments)->with('userTypes', $userTypes);
     }
 
+    public function test() {
+        $workingLessThan30RBH = Work_Hour::usersWorkingRBHSelector(30,'<=');
+//        dd($workingLessThan30RBH->pluck('last_name')->toArray());
+        dd($workingLessThan30RBH->pluck('id_user')->toarray());
+    }
+
     public function usersLive()
     {
         $date = date("W", strtotime( date('Y-m-d'))); // numer tygodnia
@@ -64,6 +70,8 @@ class WorkHoursController extends Controller
             ->where($dayOfWeekArray[$day_number].'_start','!=',null)
             ->orderby($dayOfWeekArray[$day_number].'_start')
             ->get();
+
+//        dd($shedule);
 
         $workingLessThan30RBH = Work_Hour::usersWorkingRBHSelector(30,'<');
 

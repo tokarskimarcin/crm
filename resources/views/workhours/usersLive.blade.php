@@ -50,8 +50,16 @@
                                 $start_work = 0;
                                 $start_work_click  =0;
                             @endphp
+                    @isset($shedule)
                         @foreach($shedule as $item)
-                        @if($item->user->department_info_id == Auth::user()->department_info_id && $item->user->status_work == 1 &&  ($item->user->user_type_id == 1 ||  $item->user->user_type_id == 2))
+
+                        @isset($item)
+                        {{--isset is neccessary--}}
+                        @isset($item->user->department_info_id)
+                        @isset(Auth::user()->department_info_id)
+                        @isset($item->user->status_work)
+                        @isset($item->user->user_type_id)
+                        @if($item->user->department_info_id == Auth::user()->department_info_id && $item->user->status_work == 1 && ($item->user->user_type_id == 1 || $item->user->user_type_id == 2))
                             @php
                                 $work_hour = $item->user->work_hours->where('date','=', date('Y-m-d'))->first();
                                 $start_work_click = 0;
@@ -165,7 +173,13 @@
                                 @endif
                             </tr>
                         @endif
+                        @endisset
+                        @endisset
+                        @endisset
+                        @endisset
+                        @endisset
                         @endforeach
+                    @endisset
                             </tbody>
                         </table>
                         </div>
