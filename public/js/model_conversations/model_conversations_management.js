@@ -1,6 +1,33 @@
-document.addEventListener('DOMContentLoaded', function(event) {
+document.addEventListener('DOMContentLoaded', function() {
     let selectedTr = [];
     let selectedPlaylistId = null;
+
+    /**
+     * This method is called as page loads
+     */
+    (function init() {
+        if(sessionStorage.getItem('activeElementName')) {
+            const activeElementName = sessionStorage.getItem('activeElementName');
+            const navElement = document.querySelector('.nav-tabs');
+            let allAElements = navElement.querySelectorAll('a');
+
+            //assigning class active to given element
+            allAElements.forEach(element => {
+               if(element.textContent == activeElementName) {
+                   let hrefAttribute = element.attributes.href.textContent;
+                   let tabPane = document.querySelector(`${hrefAttribute}`);
+                   console.log(tabPane);
+                   tabPane.classList.add('active');
+                   tabPane.classList.add('in');
+                   let tabElement = element.closest('li');
+
+                   tabElement.classList.add('active');
+                   element.setAttribute('aria-expanded', true);
+               }
+            });
+            sessionStorage.removeItem('activeElementName');
+        }
+    })();
 
     /* EVENT LISTENERS FUNCTIONS */
 
@@ -535,6 +562,23 @@ document.addEventListener('DOMContentLoaded', function(event) {
 
     /* END OF DELETE FUNCTIONS PART */
 
-    document.addEventListener('click', globalClickHandler);
+    /**
+     * This method saves to session storage name of active tab
+     * @param e
+     */
+    function submitHandler(e) {
+        e.preventDefault();
+        const navElement = document.querySelector('.nav-tabs');
+        const activeTab = navElement.querySelector('.active');
+        const activeElement = activeTab.querySelector('a');
+        const activeElementName = activeElement.textContent;
+        sessionStorage.setItem('activeElementName', activeElementName);
+        e.target.submit();
+    }
 
+    document.addEventListener('click', globalClickHandler);
+    MANAGEMENT.DOMElements.allForms.forEach(form => {
+        form.addEventListener('submit', submitHandler);
     });
+
+});
