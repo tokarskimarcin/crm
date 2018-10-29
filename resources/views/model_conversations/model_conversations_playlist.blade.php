@@ -1,6 +1,6 @@
 @extends('model_conversations.model_conversations_menu')
 @section('styles')
-    <link rel="stylesheet" href="{{asset('css/model_conversations/playlist.css')}}">
+    <link rel="stylesheet" href="{{asset('css/model_conversations/playlist2.css')}}">
 @endsection
 @section('section')
     <main class="main_part">
@@ -58,5 +58,5 @@
         };
     </script>
     <script src="{{asset('js/model_conversations/playlist.js')}}"></script>
-    <script src="{{asset('js/model_conversations/model_conversations_playlist.js')}}"></script>
+    <script src="{{asset('js/model_conversations/playlist_page.js')}}"></script>
 @endsection

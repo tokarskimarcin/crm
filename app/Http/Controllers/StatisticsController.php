@@ -3454,9 +3454,6 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
         }
         $pbx_data = $pbx_data->get();
 
-        if($coach_id == 639)
-            dd($coach_id, $max_from_day);
-
         $total_data = $pbx_data->groupBy('pbx_id');
 
 
@@ -4219,7 +4216,6 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
             }
         }
 
-        dd($data);
         return view('reportpage.dayReportCoaches')
             ->with([
                 'coaches'       => $coaches,
