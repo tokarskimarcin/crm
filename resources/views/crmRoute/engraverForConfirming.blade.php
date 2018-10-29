@@ -9,6 +9,15 @@
 @section('content')
 
     <style>
+        .VCtooltip .tooltiptext {
+            max-width: 65vw;
+        }
+
+        .departmentColors li{
+            padding-top: 0;
+            padding-bottom: 0;
+        }
+
         .bootstrap-select > .dropdown-menu{
             left: 0 !important;
         }
@@ -145,6 +154,17 @@
                                         Gdy wiersz jest podświetlony na <span style="background-color: indianred;">czerwono</span>, oznacza to, że osoba potwierdzająca w dniu potwierdzania nie nacisneła przycisku start do godziny 9:00 lub wogóle go nie nacisneła. <br>
                                         Dla otrzymania lepszego wyglądu tabeli zaleca się <i>wyłącznie</i> panelu nawigacyjnego naciskając przycisk <u>"OFF"</u> w górnym lewym rogu strony. <br>
                                         Pokazy <u>anulowane</u> mają cały wiersz w kolorze <span style="background-color: #fdff78;">żółtym</span>.
+                                        <br>
+                                        <strong>Kolory oddziałów potwierdzających:</strong>
+                                        <ul class="list-group departmentColors">
+                                        @foreach($departmentInfo as $item)
+                                                @if($item->depId == 1)
+                                                    <li class="list-group-item dep{{$item->departmentId}}" style="color: black">
+                                                        {{$item->name2}} {{$item->name}}
+                                                    </li>
+                                                @endif
+                                            @endforeach
+                                        </ul>
                                     </div>
                                 </span>
                             </div>
@@ -409,10 +429,10 @@
                    let frequencyCell = row.cells['9'];
                    let frequencyInput = frequencyCell.firstChild;
                    if(frequencyInput.value != null && frequencyInput.value != '') {
-                       if(frequencyInput.value < 15) {
+                       if(frequencyInput.value < 16) {
                            frequencyCell.style.backgroundColor = 'red';
                        }
-                       else if(frequencyInput.value >= 15 && frequencyInput.value < 19) {
+                       else if(frequencyInput.value < 20) {
                            frequencyCell.style.backgroundColor = 'yellow';
                        }
                        else {
@@ -472,7 +492,13 @@
                    }
                },
                "fnDrawCallback": function(settings) {
-                   $('.selectpicker').selectpicker('refresh');
+                   //$('.selectpicker').selectpicker('refresh');
+                   $('select.confirming').change(function (e) {
+                       let select = $(e.target);
+                       select.removeClass().addClass('confirming form-control');
+                       let className = select.find('option[value="'+select.val()+'"]').attr('class');
+                       select.addClass(className);
+                   });
                    $('#datatable tbody tr').on('change', function(e) {
                         const changedElement = e.target;
                         const elementRow = this;
@@ -624,7 +650,7 @@
                        },"name":"departmentName", "searchable": "false", "orderable": false
                    },
                    {"data":function(data, type, dataToSet) {
-                       let customSelect =  $('<select>').addClass('confirming selectpicker form-control').css({'width':'100%'});
+                       let customSelect =  $('<select>').addClass('confirming form-control').css({'width':'100%'});
                        customSelect.append($('<option>').val(0).append('Wybierz'));
                                 if(data.confirmingUser) {
                                     let option = $('<option>').prop('selected', true).val(data.confirmingUser).append(data.first_name+' '+data.last_name)

@@ -4321,6 +4321,7 @@ class CrmRouteController extends Controller
         department_info.id as id, 
         department_type.name as name, 
         departments.name as name2,
+        departments.id as departmentId,
         department_type.id as depId
         '))
             ->join('department_type', 'department_info.id_dep_type', '=', 'department_type.id')
