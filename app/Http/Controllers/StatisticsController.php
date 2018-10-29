@@ -18,6 +18,8 @@ use App\RecruitmentStory;
 use App\ReportCampaign;
 use App\UserEmploymentStatus;
 use App\Utilities\Dates\MonthFourWeeksDivision;
+use App\Utilities\GlobalVariables\StatisticsGlobalVariables;
+use App\Utilities\Reports\Report_data_methods\Data30RBHreport;
 use App\Work_Hour;
 use DateTime;
 use Illuminate\Http\Request;
@@ -4037,18 +4039,6 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
             ]);
     }
 
-
-    public static function getUserTypeIdsForTrainersReportOfUnusedAccounts(){
-        return [3, 4];
-    }
-
-    public static function getUserTypeIdsForManagersReportOfUnusedAccounts(){
-        return [3, 7, 17];
-    }
-    public static function getUserTypeIdsForDepartmentsReportOfUnusedAccounts(){
-        return [3, 15];
-    }
-
     /*
      *  Strona z informacją o dezaktywowanych kontach
      */
@@ -4061,9 +4051,9 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
             ->with('users_warning', $data['users_warning'])
             ->with('users_disable', $data['users_disable'])
             ->with('coaches', $data['coaches'])
-            ->with('user_type_ids_for_trainers_report', StatisticsController::getUserTypeIdsForTrainersReportOfUnusedAccounts())
-            ->with('user_type_ids_for_managers_report', StatisticsController::getUserTypeIdsForManagersReportOfUnusedAccounts())
-            ->with('user_type_ids_for_departments_report', StatisticsController::getUserTypeIdsForDepartmentsReportOfUnusedAccounts())
+            ->with('user_type_ids_for_trainers_report', StatisticsGlobalVariables::$userTypeIdsForTrainersReportOfUnusedAccounts)
+            ->with('user_type_ids_for_managers_report', StatisticsGlobalVariables::$userTypeIdsForManagersReportOfUnusedAccounts)
+            ->with('user_type_ids_for_departments_report', StatisticsGlobalVariables::$userTypeIdsForDepartmentsReportOfUnusedAccounts)
             ->with('user_to_show', $user);
     }
 
@@ -4676,9 +4666,6 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
             }
         }
 
-        if(Auth::user()->id == 6964){
-            dd($data);
-        }
         return view('reportpage.weekReportDepartmentSummary')
             ->with([
                 'departments'   => $departments,

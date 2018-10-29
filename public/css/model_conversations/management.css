@@ -1,0 +1,119 @@
+.box {
+    width: 95%;
+    margin: 0 auto;
+}
+
+.active-category {
+    background-color: lightgreen;
+}
+
+.inactive-category {
+    background-color: lightcoral;
+}
+
+.glyphicon-play-circle {
+    font-size: 2em;
+}
+
+.glyphicon-picture {
+    font-size: 2em;
+    padding-left: 0.5em;
+}
+
+.right-playlist-table tbody tr:hover {
+    cursor: pointer;
+    background-color: #ddd;
+}
+
+.selectedTr{
+    background-color: #b9b9b9  !important;
+}
+
+.arrowButtonAfter{
+    left: -2em;
+    position: relative;
+    top: 1.9em;
+    padding-right: 3em;
+    background-color: rgba(255,255,255,0.5);
+}
+
+.arrowButtonBefore{
+    left: -2em;
+    position: relative;
+    top: -3.3em;
+    padding-right: 3em;
+    background-color: rgba(255,255,255,0.5);
+}
+
+@media only screen and (max-width: 600px) {
+    /*Telefony*/
+    #playlists {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .right-playlist-table {
+        flex-grow: 2;
+    }
+
+    .left-playlist-table {
+        flex-grow: 1;
+    }
+
+    .glyphicon-arrow-down {
+        display: block;
+        margin: 0 auto;
+        width: 1.5em;
+        padding-top: 1em;
+        padding-bottom: 2em;
+    }
+}
+
+@media only screen and (min-width: 600px) {
+    /*Tablety*/
+
+    #playlists {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .right-playlist-table {
+        flex-grow: 2;
+    }
+
+    .left-playlist-table {
+        flex-grow: 1;
+    }
+
+    .glyphicon-arrow-down {
+        display: block;
+        margin: 0 auto;
+        width: 1.5em;
+        padding-top: 1em;
+        padding-bottom: 2em;
+    }
+}
+
+@media only screen and (min-width: 801px) {
+    /*Komputery*/
+
+    #playlists {
+        display: flex;
+        flex-direction: row;
+    }
+
+    .right-playlist-table {
+        flex-grow: 2;
+        padding: 1em;
+        border-left: solid 1px #ddd;
+    }
+
+    .left-playlist-table {
+        flex-grow: 1;
+        padding-right: 1em;
+    }
+
+    .glyphicon-arrow-down {
+        display: none;
+    }
+}

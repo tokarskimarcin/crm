@@ -9,6 +9,7 @@ use App\Department_info;
 use App\DisableAccountInfo;
 use App\Pbx_report_extension;
 use App\SuccessorHistory;
+use App\Utilities\GlobalVariables\StatisticsGlobalVariables;
 use App\VeronaMail;
 use Exception;
 use App\PrivilageRelation;
@@ -1373,9 +1374,9 @@ class UsersController extends Controller
         if(count($data['users_warning']) > 0 || count($data['users_disable']) > 0){
             $data_to_send = array_merge($data, [
                 'department_info' => Department_info::all(),
-                'user_type_ids_for_trainers_report' => StatisticsController::getUserTypeIdsForTrainersReportOfUnusedAccounts(),
-                'user_type_ids_for_managers_report' => StatisticsController::getUserTypeIdsForManagersReportOfUnusedAccounts(),
-                'user_type_ids_for_departments_report' => StatisticsController::getUserTypeIdsForDepartmentsReportOfUnusedAccounts()]);
+                'user_type_ids_for_trainers_report' => StatisticsGlobalVariables::$userTypeIdsForTrainersReportOfUnusedAccounts,
+                'user_type_ids_for_managers_report' => StatisticsGlobalVariables::$userTypeIdsForManagersReportOfUnusedAccounts,
+                'user_type_ids_for_departments_report' => StatisticsGlobalVariables::$userTypeIdsForDepartmentsReportOfUnusedAccounts]);
             $title = 'Raport Nieaktywnych Kont Konsultantów '.date('Y-m-d');
 
 

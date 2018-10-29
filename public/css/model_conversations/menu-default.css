@@ -1,0 +1,87 @@
+body {
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+}
+
+.wrapper {
+    min-height: 100vh;
+    display: grid;
+    grid-template-rows: 2fr 8fr 1fr;
+}
+
+/***HEADER PART****/
+header {
+    background-color: #231f20;
+    color: white;
+
+    box-shadow: 0 0 10px 15px #231f20;
+    margin-bottom: 2em;
+
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.logo {
+    flex-grow: 1;
+    /*border: 1px solid red;*/
+}
+
+.links {
+    /*border: 1px solid red;*/
+    flex-grow: 5;
+
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-end;
+
+    font-size: 1.2em;
+    color: white;
+    font-weight: bold;
+    font-family: verdana;
+
+}
+
+.link {
+    margin-left: 1em;
+    margin-right: 1em;
+}
+
+/**END HEADER PART**/
+
+footer {
+    background-color: white;
+    border-top-color: black;
+    border-top-style: double;
+}
+
+@keyframes largeText {
+    from {font-size: 2em;}
+    to {font-size: 2.5em;}
+}
+
+@keyframes changeOpacity {
+    from {opacity: 1;}
+    to {opacity: 0.8;}
+}
+
+.center {
+    font-size: 2em;
+    color: white;
+    font-family: Comic Sans MS;
+}
+
+.center:hover {
+    animation-name: largeText;
+    animation-duration: 1.3s;
+    animation-fill-mode: forwards;
+}
+
+main {
+    display:flex;
+    flex-direction: column;
+}
