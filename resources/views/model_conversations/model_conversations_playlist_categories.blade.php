@@ -8,7 +8,7 @@
 @endsection
 
 @section('styles')
-    <link rel="stylesheet" href="{{asset('css/model_conversations/playlist-categories.css')}}">
+    <link rel="stylesheet" href="{{asset('css/model_conversations/playlist_categories.css')}}">
 @endsection
 
 @section('script')
@@ -26,5 +26,5 @@
     </script>
 
     <script src="{{ asset('js/model_conversations/playlist.js') }}"></script>
-    <script src="{{ asset('js/model_conversations/model_conversations_playlist_categories.js') }}"></script>
+    <script src="{{ asset('js/model_conversations/playlist_categories.js') }}"></script>
 @endsection

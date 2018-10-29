@@ -1,6 +1,6 @@
 @extends('model_conversations.model_conversations_menu')
 @section('styles')
-    <link rel="stylesheet" href="{{asset('css/model_conversations/management.css')}}">
+    <link rel="stylesheet" href="{{asset('css/model_conversations/management2.css')}}">
 @endsection
 
 @section('section')
@@ -228,5 +228,5 @@
     </script>
     <script src="{{ asset('/js/sweetAlert.js')}}"></script>
     <script src="{{ asset('js/model_conversations/category.js') }}"></script>
-    <script src="{{ asset('js/model_conversations/model_conversations_management.js') }}"></script>
+    <script src="{{ asset('js/model_conversations/management.js') }}"></script>
 @endsection
