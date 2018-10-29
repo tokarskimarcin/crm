@@ -1,0 +1,130 @@
+.category, .playlist-category {
+    box-shadow: 0 0 10px 10px white inset;
+    border-radius: 4%;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.category:hover, .playlist-category:hover {
+    cursor: pointer;
+    animation-name: changeOpacity;
+    animation-duration: 1s;
+    animation-fill-mode: forwards;
+}
+
+
+@keyframes changeOpacity {
+    from {opacity: 1;}
+    to {opacity: 0.8;}
+}
+
+@media only screen and (max-width: 600px) {
+    /*Telefony komorkowe*/
+.categories-box {
+
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-gap: 2em;
+    grid-auto-rows: minmax(100px, 250px);
+    justify-items: stretch;
+    align-items: stretch;
+
+}
+
+@keyframes largeText {
+    from {font-size: 1.3em;}
+    to {font-size: 1.6em;}
+}
+
+.center:hover {
+    animation-name: largeText;
+    animation-duration: 1.3s;
+    animation-fill-mode: forwards;
+}
+
+.center {
+    font-size: 1.3em;
+    color: white;
+    font-family: Comic Sans MS;
+}
+
+.link {
+    margin-left: 0.6em;
+    margin-right: 0.6em;
+    font-size: .8em;
+}
+}
+
+@media only screen and (min-width: 600px) {
+    /*Tablety*/
+    .categories-box {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        grid-gap: 2em;
+        grid-auto-rows: minmax(100px, 250px);
+        justify-items: stretch;
+        align-items: stretch;
+    }
+
+    .center {
+        font-size: 1.6em;
+        color: white;
+        font-family: Comic Sans MS;
+    }
+
+    @keyframes largeText {
+        from {font-size: 1.6em;}
+        to {font-size: 1.9em;}
+    }
+
+    .center:hover {
+        animation-name: largeText;
+        animation-duration: 1.3s;
+        animation-fill-mode: forwards;
+    }
+
+    .link {
+        margin-left: 0.8em;
+        margin-right: 0.8em;
+        font-size: .9em;
+    }
+}
+
+@media only screen and (min-width: 801px) {
+    /*Komputery*/
+
+    .categories-box {
+
+        padding-left: 2em;
+        padding-right: 2em;
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        grid-gap: 2em;
+        grid-auto-rows: minmax(100px, 250px);
+    }
+
+    .center {
+        font-size: 2em;
+        color: white;
+        font-family: Comic Sans MS;
+    }
+
+    @keyframes largeText {
+        from {font-size: 2em;}
+        to {font-size: 2.4em;}
+    }
+
+    .center:hover {
+        animation-name: largeText;
+        animation-duration: 1.3s;
+        animation-fill-mode: forwards;
+    }
+
+    .link {
+        margin-left: 1em;
+        margin-right: 1em;
+    }
+
+}

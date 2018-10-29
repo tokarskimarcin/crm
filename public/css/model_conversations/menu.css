@@ -54,7 +54,9 @@ header {
 /**END HEADER PART**/
 
 footer {
-    background-color: lightgray;
+    background-color: white;
+    border-top-color: black;
+    border-top-style: double;
 }
 
 @keyframes largeText {

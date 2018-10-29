@@ -34,9 +34,9 @@
         </header>
         @yield('section')
         <footer class="main_part">
-            <p>Posted by: Paweł Chmielewski</p>
-            <p>Contact information: <a href="mailto:someone@example.com">
-                    someone@example.com</a>.</p>
+            <p>Własność <u>Verona Consulting</u> </p>
+            <p>Pomoc techniczna: <a href="mailto:pawel.chmielewski@veronaconsulting.pl">
+                    pawel.chmielewski@veronaconsulting.pl</a>.</p>
         </footer>
     </div>
 </body>
