@@ -87,12 +87,24 @@ document.addEventListener('DOMContentLoaded', function(event) {
                 playlist2.play();
             }
             else if(clickedElement.matches('.glyphicon-forward')) { //click on forward icon
+                let prevState = playlist2.state;
+                playlist2.pause();
+                setAllRowsColor('white');
                 playlist2.updateCounter('forward');
                 updateCounterElement();
+                if(prevState == 2) {
+                    playlist2.play();
+                }
             }
             else if(clickedElement.matches('.glyphicon-backward')) { //click on backward icon
+                let prevState = playlist2.state;
+                playlist2.pause();
+                setAllRowsColor('white');
                 playlist2.updateCounter('backward');
                 updateCounterElement();
+                if(prevState == 2) {
+                    playlist2.play();
+                }
             }
             else if(clickedElement.matches('.glyphicon-stop')) { //click on stop icon
                 playlist2.stop();

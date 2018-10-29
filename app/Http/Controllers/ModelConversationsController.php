@@ -58,7 +58,7 @@ class ModelConversationsController extends Controller
 
     public function modelConversationsManagementGet() {
         $user = Auth::user()->user_type_id;
-        if(in_array($user, $this->adminPanelAccessArr)) { //Only approved user types can acces this management panel
+
             $items = ModelConvItems::all();
             $categories = ModelConvCategories::all();
             $playlists = ModelConvPlaylist::select(
@@ -80,10 +80,6 @@ class ModelConversationsController extends Controller
                 ->with('items', $items)
                 ->with('playlists', $playlists)
                 ->with('playlistItems', $playlistItems);
-        }
-        else {
-           return Redirect::back();
-        }
 
     }
 

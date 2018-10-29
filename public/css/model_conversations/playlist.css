@@ -1,12 +1,3 @@
-.playlist {
-    width: 80%;
-    margin: 0 auto;
-
-    display: flex;
-    flex-direction: column;
-    border: 3px solid #337ab7;
-    border-radius: 10px;
-}
 
 .playlist-header > hr {
     width: 95%;
@@ -51,4 +42,43 @@
 
 audio {
     width: 80%;
+}
+
+@media only screen and (max-width: 600px) {
+    /*Telefony komorkowe*/
+    .playlist {
+        width: 99%;
+        margin: 0 auto;
+
+        display: flex;
+        flex-direction: column;
+        border: 3px solid #337ab7;
+        border-radius: 10px;
+    }
+}
+
+@media only screen and (min-width: 600px) {
+    /*Tablety*/
+    .playlist {
+        width: 95%;
+        margin: 0 auto;
+
+        display: flex;
+        flex-direction: column;
+        border: 3px solid #337ab7;
+        border-radius: 10px;
+    }
+}
+
+@media only screen and (min-width: 801px) {
+    /*Komputery*/
+    .playlist {
+        width: 80%;
+        margin: 0 auto;
+
+        display: flex;
+        flex-direction: column;
+        border: 3px solid #337ab7;
+        border-radius: 10px;
+    }
 }
