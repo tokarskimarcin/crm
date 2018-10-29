@@ -31,6 +31,20 @@ document.addEventListener('DOMContentLoaded', function() {
 
     /* EVENT LISTENERS FUNCTIONS */
 
+    /**
+     * This method saves to session storage name of active tab
+     * @param e
+     */
+    function submitHandler(e) {
+        e.preventDefault();
+        const navElement = document.querySelector('.nav-tabs');
+        const activeTab = navElement.querySelector('.active');
+        const activeElement = activeTab.querySelector('a');
+        const activeElementName = activeElement.textContent;
+        sessionStorage.setItem('activeElementName', activeElementName);
+        e.target.submit();
+    }
+
     function globalClickHandler(e) {
         const clickedElement = e.target;
 
@@ -561,20 +575,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     /* END OF DELETE FUNCTIONS PART */
-
-    /**
-     * This method saves to session storage name of active tab
-     * @param e
-     */
-    function submitHandler(e) {
-        e.preventDefault();
-        const navElement = document.querySelector('.nav-tabs');
-        const activeTab = navElement.querySelector('.active');
-        const activeElement = activeTab.querySelector('a');
-        const activeElementName = activeElement.textContent;
-        sessionStorage.setItem('activeElementName', activeElementName);
-        e.target.submit();
-    }
 
     document.addEventListener('click', globalClickHandler);
     MANAGEMENT.DOMElements.allForms.forEach(form => {
