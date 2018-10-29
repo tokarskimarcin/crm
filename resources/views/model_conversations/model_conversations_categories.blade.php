@@ -8,7 +8,7 @@
 @endsection
 
 @section('styles')
-
+    <link rel="stylesheet" href="{{asset('css/model_conversations/categories.css')}}">
 @endsection
 
 

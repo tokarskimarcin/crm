@@ -2,7 +2,6 @@ body {
     margin: 0;
     padding: 0;
     min-height: 100vh;
-
 }
 
 .wrapper {
@@ -58,22 +57,6 @@ footer {
     background-color: lightgray;
 }
 
-.category, .playlist-category {
-    box-shadow: 0 0 10px 10px white inset;
-    border-radius: 4%;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.category:hover, .playlist-category:hover {
-    cursor: pointer;
-    animation-name: changeOpacity;
-    animation-duration: 1s;
-    animation-fill-mode: forwards;
-}
-
 @keyframes largeText {
     from {font-size: 2em;}
     to {font-size: 2.5em;}
@@ -99,59 +82,5 @@ footer {
 main {
     display:flex;
     flex-direction: column;
-
-}
-
-@media only screen and (max-width: 600px) {
-    /*Telefony komorkowe*/
-    .categories-box {
-
-        display: grid;
-        grid-template-columns: 1fr;
-        grid-gap: 2em;
-        grid-auto-rows: minmax(100px, 250px);
-        justify-items: stretch;
-        align-items: stretch;
-
-    }
-
-    footer {
-        background-color: red;
-    }
-}
-
-@media only screen and (min-width: 600px) {
-/*Tablety*/
-    .categories-box {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        grid-gap: 2em;
-        grid-auto-rows: minmax(100px, 250px);
-        justify-items: stretch;
-        align-items: stretch;
-
-    }
-
-    footer {
-        background-color: blue;
-    }
-}
-
-@media only screen and (min-width: 768px) {
-/*Komputery*/
-
-    .categories-box {
-
-        padding-left: 2em;
-        padding-right: 2em;
-        display: grid;
-        grid-template-columns: 1fr 1fr 1fr;
-        grid-gap: 2em;
-        grid-auto-rows: minmax(100px, 250px);
-
-    }
-    footer {
-        background-color: green;
-    }
 
 }
