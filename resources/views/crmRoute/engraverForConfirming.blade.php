@@ -14,8 +14,8 @@
         }
 
         .departmentColors li{
-            padding-top: 0;
-            padding-bottom: 0;
+            padding-top: 0.5em;
+            padding-bottom: 0.5em;
         }
 
         .bootstrap-select > .dropdown-menu{
@@ -248,7 +248,8 @@
                    numberOfChanges: 0,
                    dataTableData: null,
                    datatableHeight: '75vh', //this variable defines height of table
-                   loggedUserDepartment: {{Auth::user()->department_info_id}}
+                   loggedUserDepartment: {{Auth::user()->department_info_id}},
+                   loggedUserType: {{Auth::user()->user_type_id}}
                }
            };
 
@@ -445,23 +446,23 @@
                    const confirmDateInput = row.querySelector('.confirm-date');
                    const confirmDate = confirmDateInput.value;
                    let confirmingPeopleSelect = row.querySelector('.confirming');
-                   let alreadyIn = false;
+                   let alreadyIn;
                     APP.JSONS.userData.forEach(person => { //looping over all data about people
-                       alreadyIn = false;
-                       //Confirming user is deremined and saved in database
-                       if(data.confirmingUser == person.userId) {
-                           alreadyIn = true;
-                       }
-                       if(person.hasOwnProperty('date')) {
-                           person.date.forEach(day => {
-                               if(day == confirmDate && !alreadyIn) { //current person is available this day
-                                   if(APP.globalVariables.loggedUserDepartment == person.depId) {
-                                       alreadyIn = true;
-                                       addPersonToConfirmationList(person, confirmingPeopleSelect);
-                                   }
-                               }
-                           });
-                       }
+                        alreadyIn = false;
+                        //Confirming user is deremined and saved in database
+                        if(data.confirmingUser == person.userId) {
+                            alreadyIn = true;
+                        }
+                        if(person.hasOwnProperty('date')) {
+                            person.date.forEach(day => {
+                                if(day == confirmDate && !alreadyIn) { //current person is available this day
+                                    if(APP.globalVariables.loggedUserDepartment == person.depId) {
+                                        alreadyIn = true;
+                                        addPersonToConfirmationList(person, confirmingPeopleSelect);
+                                    }
+                                }
+                            });
+                        }
                    });
 
                    setOldValues(confirmingPeopleSelect, data.confirmingUser);
