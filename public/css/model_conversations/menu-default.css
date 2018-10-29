@@ -14,6 +14,7 @@ body {
 header {
     background-color: #231f20;
     color: white;
+    max-height: 180px;
 
     box-shadow: 0 0 10px 15px #231f20;
     margin-bottom: 2em;
@@ -57,6 +58,7 @@ footer {
     background-color: white;
     border-top-color: black;
     border-top-style: double;
+    max-height: 150px;
 }
 
 @keyframes largeText {
@@ -84,4 +86,34 @@ footer {
 main {
     display:flex;
     flex-direction: column;
+}
+
+@media only screen and (max-width: 600px) {
+    /*Telefony komorkowe*/
+
+    .link {
+        margin-left: 0.6em;
+        margin-right: 0.6em;
+        font-size: .8em;
+    }
+}
+
+@media only screen and (min-width: 600px) {
+    /*Tablety*/
+
+    .link {
+        margin-left: 0.8em;
+        margin-right: 0.8em;
+        font-size: .9em;
+    }
+}
+
+@media only screen and (min-width: 801px) {
+    /*Komputery*/
+
+    .link {
+        margin-left: 1em;
+        margin-right: 1em;
+    }
+
 }
