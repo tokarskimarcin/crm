@@ -1,13 +1,13 @@
 @extends('model_conversations.model_conversations_menu')
 @section('styles')
-    <link rel="stylesheet" href="{{asset('css/model_conversations/management.css')}}">
+    <link rel="stylesheet" href="{{asset('css/model_conversations/management2.css')}}">
 @endsection
 
 @section('section')
 
     <div class="box">
         <ul class="nav nav-tabs">
-            <li class="active"><a data-toggle="tab" href="#home">Home</a></li>
+            <li><a data-toggle="tab" href="#home">Legenda</a></li>
             @if(in_array($user, $adminPanelAccessArr))
             <li><a data-toggle="tab" href="#menu1">Kategorie</a></li>
             <li><a data-toggle="tab" href="#menu2">Rozmowy</a></li>
@@ -215,7 +215,8 @@
                 modal2body: document.querySelector('.modal2-body'),
                 itemEditionModal: document.querySelector('#itemEdition'),
                 categoryModal: document.querySelector('#myModal'),
-                playlistModal: document.querySelector('#playlistEdition')
+                playlistModal: document.querySelector('#playlistEdition'),
+                allForms: document.querySelectorAll('form')
             },
             globalVariables: {
                 categories: @json($categories),
@@ -227,5 +228,5 @@
     </script>
     <script src="{{ asset('/js/sweetAlert.js')}}"></script>
     <script src="{{ asset('js/model_conversations/category.js') }}"></script>
-    <script src="{{ asset('js/model_conversations/model_conversations_management.js') }}"></script>
+    <script src="{{ asset('js/model_conversations/management.js') }}"></script>
 @endsection
