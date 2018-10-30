@@ -90,7 +90,7 @@
                                             <td>{{$item->data_stop}}</td>
                                         @endif
                                         <td>{{$item->first_name.' '.$item->last_name}}</td>
-                                        @if($item->average_rating == null)
+                                        @if($item->nr_id == null)
                                             <td><button class="notificationRatingButton btn btn-block btn-primary" disabled="disabled">Brak</button></td>
                                         @else
                                             <td><button class="notificationRatingButton btn btn-block btn-primary" data-nrid="{{$item->nr_id}}">@if($item->comment !== null)<span class="glyphicon glyphicon-comment"></span> @endif{{($item->average_rating*100).'%'}}</button></td>
