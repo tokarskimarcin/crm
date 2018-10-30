@@ -626,7 +626,7 @@ class FinancesController extends Controller
         $user->provision = 0;
         
             if($user->department_type_id == 1){             //szkoleniowiec potwierdzeń
-//                dd('1');
+
                 $clientRouteInfo = ClientRouteInfo::select(
                     DB::raw('concat(users.first_name," ",users.last_name) as confirmingUserName'),
                     DB::raw('concat(trainer.first_name," ",trainer.last_name) as confirmingUserTrainerName'),
