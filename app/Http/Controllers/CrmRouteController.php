@@ -4321,6 +4321,7 @@ class CrmRouteController extends Controller
         department_info.id as id, 
         department_type.name as name, 
         departments.name as name2,
+        departments.id as departmentId,
         department_type.id as depId
         '))
             ->join('department_type', 'department_info.id_dep_type', '=', 'department_type.id')
@@ -4332,6 +4333,7 @@ class CrmRouteController extends Controller
 
         $scheduleData = Schedule::select(
             'id_user as userId',
+            'departments.id as department_id',
             'users.first_name as name',
             'department_info.id as depId',
             'users.last_name as surname',
@@ -4346,6 +4348,7 @@ class CrmRouteController extends Controller
             'sunday_comment as nd')
             ->join('users', 'schedule.id_user', '=', 'users.id')
             ->join('department_info', 'users.department_info_id', '=', 'department_info.id')
+            ->join('departments', 'departments.id', '=', 'department_info.id_dep')
             ->where('week_num', '>', $limitDate)
             ->where('department_info.id_dep_type', '=', 1) //gdy beda juz grafiki dla potwierdzen
             ->where('users.status_work', '=', 1)
@@ -4387,6 +4390,7 @@ class CrmRouteController extends Controller
                     $user->name = $item->name;
                     $user->surname = $item->surname;
                     $user->depId = $item->depId;
+                    $user->department_id = $item->department_id;
                 }
                 $i++;
                 $firstDayOfGivenWeek = Date('Y-m-d', strtotime($item->year . 'W' . $item->week_num));
@@ -4464,7 +4468,8 @@ class CrmRouteController extends Controller
         client_route.type as typ,
         client_route.canceled,
         users.first_name,
-        users.last_name
+        users.last_name,
+        di.id_dep as confirm_id_dep
         '))
             ->join('client_route','client_route.id','client_route_info.client_route_id')
             ->leftjoin('client','client.id','client_route.client_id')
@@ -4473,6 +4478,8 @@ class CrmRouteController extends Controller
             ->leftjoin('departments','departments.id','department_info.id_dep')
             ->leftjoin('department_type', 'department_type.id', '=', 'department_info.id_dep_type')
             ->leftjoin('users', 'client_route_info.confirmingUser', '=', 'users.id')
+            ->leftjoin('department_info as di','di.id','users.department_info_id')
+            ->leftjoin('departments as dep','dep.id','di.id_dep')
             ->where('client_route_info.status', '=', 1) //now it's important
             ->where('client_route_info.date', '>=', $from)
             ->where('client_route_info.date', '<=', $to)
