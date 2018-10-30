@@ -61,7 +61,18 @@ class AutoScriptController extends Controller
                 $rbh30Report->janki = $user->janki;
                 $rbh30Report->received_calls = $user->received_calls;
                 $rbh30Report->created_at = $today;
+                $rbh30Report->updated_at = null;
                 $rbh30Report->save();
+            }
+            else {
+                $updatedRecord = $actual30RbhRecords->where('user_id', '=', $user->id_user)->where('created_at', '=', $today)->first();
+                $updatedRecord->success = $user->success;
+                $updatedRecord->sec_sum = $user->sec_sum;
+                $updatedRecord->average = $user->avg;
+                $updatedRecord->janki = $user->janki;
+                $updatedRecord->received_calls = $user->received_calls;
+                $updatedRecord->updated_at = date('Y-m-d H:i:s');
+                $updatedRecord->save();
             }
         }
     }
