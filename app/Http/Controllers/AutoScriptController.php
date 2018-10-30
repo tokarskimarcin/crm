@@ -6,13 +6,18 @@ use App\ActivityRecorder;
 use App\Cities;
 use App\ClientRoute;
 use App\ClientRouteInfo;
+use App\Department_info;
+use App\MedicalPackage;
+use Exception;
 use App\PrivilageRelation;
 use App\Rbh30Report;
 use App\Schedule;
 use App\Pbx_report_extension;
 use App\ClientRouteCampaigns;
 use App\User;
+use App\Utilities\GlobalVariables\StatisticsGlobalVariables;
 use App\Utilities\Salary\IncreaseSalary;
+use App\VeronaMail;
 use App\Work_Hour;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -486,5 +491,82 @@ class AutoScriptController extends Controller
         new ActivityRecorder($log, 245, 2);
     }
 
+//Wyłączenie użytkowników którzy nie logowali się od 14 dni
+    public function DisableUnusedAccount()
+    {
+        $today = date('Y-m-d');
+        $data = StatisticsController::UnusedAccountsInfo();
+        // disabling accounts
+        foreach ($data['users_disable'] as $user) {
+            /**
+             * automatyczne rozwiązanie pakietu medycznego w przypadku zakończenia pracy
+             */
+            $month_to_end = date('Y-m-t', strtotime($today));
+            MedicalPackage::where('user_id', '=', $user->id)
+                ->where('deleted', '=', 0)
+                ->where('month_stop', '=', null)
+                ->update(['deleted' => 1, 'month_stop' => $month_to_end]);
+            $user->end_work = $today;
+            $user->status_work = 0;
+            $user->disabled_by_system = 1;
+            $user->save();
+        }
 
+        //check if should send mails
+        if(count($data['users_warning']) > 0 || count($data['users_disable']) > 0){
+            $department_info =  Department_info::all();
+            $data_to_send = array_merge($data, [
+                'department_info' => $department_info,
+                'user_type_ids_for_trainers_report' => StatisticsGlobalVariables::$userTypeIdsForTrainersReportOfUnusedAccounts,
+                'user_type_ids_for_managers_report' => StatisticsGlobalVariables::$userTypeIdsForManagersReportOfUnusedAccounts,
+                'user_type_ids_for_departments_report' => StatisticsGlobalVariables::$userTypeIdsForDepartmentsReportOfUnusedAccounts]);
+            $title = 'Raport Nieaktywnych Kont Konsultantów '.date('Y-m-d');
+
+
+            echo('<strong>Coaches:</strong><br>');
+            foreach ($data_to_send['coaches'] as $coach) {
+                $tempUserType = $coach->user_type_id;
+                $coach->user_type_id = 4;
+                $data_to_send = array_merge($data_to_send, [
+                    'user_to_show' => $coach]);
+                $mail = new VeronaMail('accountMail.weekReportUnusedAccount',$data_to_send,$title, User::where('id', $coach->id)->get());//User::where('id', 6964)->get());
+
+                //$coach->user_type_id = $tempUserType;
+                try {
+                    $mail->sendMail();
+                    echo('Mails with disabled accounts sent '.$coach->last_name.' '.$coach->first_name.' '.$tempUserType.($tempUserType !== 4 ? ' as 4': '').'<br>');
+                } catch (Exception $e) {
+                    echo('Could not send mail with disabled accounts'.$coach->last_name.' '.$coach->first_name.' '.$tempUserType.($tempUserType !== 4 ? ' as 4': '').' ERROR:'.$e.'<br>');
+                }
+            }
+
+
+            echo('<strong>Managers:</strong><br>');
+            foreach($data_to_send['managers'] as $manager){
+                $tempUserType = $manager->user_type_id;
+                $changedTo = null;
+                if(!in_array($tempUserType, StatisticsGlobalVariables::$userTypeIdsForManagersReportOfUnusedAccounts)){
+                    if(count($department_info->where('menager_id', $manager->id))>0){
+                        $manager->user_type_id = $changedTo = 7;
+                    }else{
+                        $manager->user_type_id = $changedTo = 17;
+                    }
+                }
+                $data_to_send = array_merge($data_to_send, [
+                    'user_to_show' => $manager]);
+
+                $mail = new VeronaMail('accountMail.weekReportUnusedAccount',$data_to_send, $title, User::where('id', $manager->id)->get());//User::where('id', 6964)->get());
+                /*if($tempUserType !== null){
+                    $manager->user_type_id = $tempUserType;
+                }*/
+                try {
+                    $mail->sendMail();
+                    echo('Mails with disabled accounts sent '.$manager->last_name.' '.$manager->first_name.' '.$tempUserType.($changedTo !== null ? ' as '.$changedTo: '').'<br>');
+                } catch (Exception $e) {
+                    echo('Could not send mail with disabled accounts'.$manager->last_name.' '.$manager->first_name.' '.$tempUserType.($changedTo !== null ? ' as '.$changedTo: '').' ERROR:'.$e.'<br>');
+                }
+            }
+        }
+
+    }
 }

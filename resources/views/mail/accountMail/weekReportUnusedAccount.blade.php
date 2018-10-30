@@ -71,7 +71,6 @@
             $all_disable = 0;
             $departments = $department_info;
             if($user_to_show->user_type_id != 3){
-
                 if($user_to_show->user_type_id == 7){
                     $departments = $department_info->where('menager_id', $user_to_show->id);
                 }
