@@ -35,19 +35,22 @@ class AutoScriptController extends Controller
         $usersWorkingLessThan30Rbh = Work_Hour::usersWorkingRBHSelector(30, '<');
         $usersArr = $usersWorkingLessThan30Rbh->pluck('id_user')->toArray();
         $maxIds = Pbx_report_extension::select(DB::raw('MAX(id) as id'))->whereIn('user_id', $usersArr)->groupBy('user_id', 'report_date')->pluck('id')->toArray(); //max ids for every date for every user
-        $pbxReportExtData = Pbx_report_extension::select('user_id', 'all_bad_talks', 'received_calls')->whereIn('id', $maxIds)->get();
+        $pbxReportExtData = Pbx_report_extension::select('user_id', 'all_bad_talks', 'received_calls', 'all_checked_talks')->whereIn('id', $maxIds)->get();
 
         //adding 2 fields janki and avg through maping
         $usersWorkingLessThan30Rbh->map(function($item) use($pbxReportExtData) {
             $reportInfo = $pbxReportExtData->where('user_id', '=', $item->id_user); //all records from pbx report extension (only last from each day) related to this user
             $sumJanki = 0;
             $sumReceivedCalls = 0;
+            $sumCheckedTalks = 0;
             foreach($reportInfo as $reportItem) {
                 $sumJanki += $reportItem->all_bad_talks;
                 $sumReceivedCalls += $reportItem->received_calls;
+                $sumCheckedTalks += $reportItem->all_checked_talks;
             }
             $item->janki = $sumJanki;
             $item->received_calls = $sumReceivedCalls;
+            $item->all_checked_talks = $sumCheckedTalks;
             $item->avg = $item->sec_sum > 0 && $item->sec_sum != null ? round($item->success / ($item->sec_sum / 3600), 2) : 0; // sum success / sum workhours
             return $item;
         });
@@ -65,6 +68,7 @@ class AutoScriptController extends Controller
                 $rbh30Report->average = $user->avg;
                 $rbh30Report->janki = $user->janki;
                 $rbh30Report->received_calls = $user->received_calls;
+                $rbh30Report->all_checked_talks = $user->all_checked_talks;
                 $rbh30Report->created_at = $today;
                 $rbh30Report->updated_at = null;
                 $rbh30Report->save();
@@ -76,6 +80,7 @@ class AutoScriptController extends Controller
                 $updatedRecord->average = $user->avg;
                 $updatedRecord->janki = $user->janki;
                 $updatedRecord->received_calls = $user->received_calls;
+                $updatedRecord->all_checked_talks = $user->all_checked_talks;
                 $updatedRecord->updated_at = date('Y-m-d H:i:s');
                 $updatedRecord->save();
             }

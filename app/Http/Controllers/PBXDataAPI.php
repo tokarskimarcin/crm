@@ -488,9 +488,6 @@ class PBXDataAPI extends Controller
         }
     }
 
-
-
-
     public function pbx_detailed_campaign_report() {
         $department_id = null;
         $url = "https://vc.e-pbx.pl/callcenter/api/statistic-report?statType=23&groupType=PRESENTATION";
