@@ -4132,7 +4132,6 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
         if (Auth::user()->user_type_id == 4 || Auth::user()->user_type_id == 12 || Auth::user()->user_type_id == 20)
             $coaches = $coaches->where('department_info_id', '=', Auth::user()->department_info_id);
 
-
         $year = date('Y');
         $month = date('m');
         $days_in_month = date('t', strtotime($year.'-'.$month));
