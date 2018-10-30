@@ -1046,7 +1046,6 @@ Route::get('/ConfirmationReport', 'PBXDataAPI@ConfirmationReport');
 
 //campaign reports mothod for database
 Route::get('/report_campaign', 'PBXDataAPI@report_campaign');
-Route::get('/report_campaign_temp', 'PBXDataAPI@report_campaign_temp');
 
 Route::get('/pbxDetailedReport', 'PBXDataAPI@pbx_detailed_campaign_report');
 
