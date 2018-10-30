@@ -79,8 +79,8 @@
                         </select>
                     </label>
                 </div>
-                <div class="col-md-2">
-                    <div class="VCtooltip VCtooltip-left">
+                <div class="col-md-2" align="right">
+                    <div class="VCtooltip VCtooltip-left" align="right">
                         <div class="well well-sm" style="border-radius: 10%; background-color: #5bc0de; color: white; margin-bottom: 0;">Legenda <span class="glyphicon glyphicon-info-sign"></span></div>
                         <span class="tooltiptext">
                             <div class="alert alert-info">
