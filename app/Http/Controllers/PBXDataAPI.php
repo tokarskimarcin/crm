@@ -489,6 +489,54 @@ class PBXDataAPI extends Controller
     }
 
 
+    /**
+     * This method save data about campaigns into report_campaign table
+     */
+    public function report_campaign_temp() {
+        $department_id = null;
+        $url = "https://vc.e-pbx.pl/callcenter/api/statistic-report?statType=26&groupType=PRESENTATION&date=2018-10-29";
+
+        if (!ini_set('default_socket_timeout', 15)) echo "<!-- unable to change socket timeout -->";
+        if (($handle = fopen($url, "r")) !== FALSE) {
+            $row = 0;
+            $data_to_insert = [];
+            while (($rowData = fgetcsv($handle, 1000, ";")) !== false) {
+                if ($row > 2) {
+                    $temp_key = 0;
+                    $save = true;
+                    foreach ($rowData as $key => $rowItem) {
+                        $removeData = false;
+                        if ($key == 0) {
+//                            $data_to_insert[$temp_key]['name'] = iconv("iso-8859-2","UTF-8", $rowItem);
+                            $data_to_insert[$temp_key]['name'] = $this::w1250_to_utf8($rowItem);
+                        } else if ($key == 1) {
+                            $data_to_insert[$temp_key]['all_campaigns'] = intval($rowItem);
+                        } else if ($key == 2) {
+                            $data_to_insert[$temp_key]['active_campaigns'] = intval($rowItem);
+                        } else if ($key == 3) {
+                            $data_to_insert[$temp_key]['received_campaigns'] = intval($rowItem);
+                        } else if ($key == 4) {
+                            $data_to_insert[$temp_key]['unreceived_campaigns'] = intval($rowItem);
+                        }
+                        else{
+                            $removeData = true;
+                        }
+                        $data_to_insert[$temp_key]['date'] = date('2018-10-29');
+                        $data_to_insert[$temp_key]['time'] = date('23:00:00');
+
+                    }
+                    if ($removeData !== null && $removeData === true) {
+                        unset($data_to_insert[$temp_key]);
+                    } else if ($data_to_insert[$temp_key]['name'] == "") { //delete last row with aggregated info
+                        unset($data_to_insert[$temp_key]);
+                    }
+                }
+                ReportCampaign::insert($data_to_insert);
+                $row++;
+            }
+            fclose($handle);
+        }
+    }
 
 
     public function pbx_detailed_campaign_report() {
