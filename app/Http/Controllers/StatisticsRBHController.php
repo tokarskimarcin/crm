@@ -287,7 +287,8 @@ class StatisticsRBHController extends Controller
             'sec_sum',
             'janki',
             'average',
-            'received_calls'
+            'received_calls',
+            'all_checked_talks'
         )
             ->join('users', 'rbh_30_report.user_id', '=', 'users.id')
             ->join('department_info', 'rbh_30_report.department_info_id', '=', 'department_info.id')
