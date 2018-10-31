@@ -210,10 +210,18 @@ class StatisticsRBHController extends Controller
 
         $data = $this->get30RBHData($date_start, $date_stop);
 
+        $regionalManagersInstructors = Department_info::select('instructor_regional_id')
+            ->join('users', 'department_info.instructor_regional_id', '=', 'users.id')
+            ->where('instructor_regional_id', '!=', null)
+            ->where('id_dep_type', '=', 2)
+            ->distinct()
+            ->get();
+
         return view('reportpage.Week30RbhReport')->with([
             'date_start' => $date_start,
             'date_stop' => $date_stop,
-            'data' => $data
+            'data' => $data,
+            'regionalManagersInstructors' => $regionalManagersInstructors
         ]);
     }
 
@@ -223,10 +231,18 @@ class StatisticsRBHController extends Controller
 
         $data = $this->get30RBHData($date_start, $date_stop);
 
+        $regionalManagersInstructors = Department_info::select('instructor_regional_id', 'users.first_name', 'users.last_name')
+            ->join('users', 'department_info.instructor_regional_id', '=', 'users.id')
+            ->where('instructor_regional_id', '!=', null)
+            ->where('id_dep_type', '=', 2)
+            ->distinct()
+            ->get();
+
         return view('reportpage.Week30RbhReport')->with([
             'date_start' => $date_start,
             'date_stop' => $date_stop,
-            'data' => $data
+            'data' => $data,
+            'regionalManagersInstructors' => $regionalManagersInstructors
         ]);
     }
 
@@ -240,10 +256,18 @@ class StatisticsRBHController extends Controller
 
         $data = $this->get30RBHData($date_start, $date_stop);
 
+        $regionalManagersInstructors = Department_info::select('instructor_regional_id', 'users.first_name', 'users.last_name')
+            ->join('users', 'department_info.instructor_regional_id', '=', 'users.id')
+            ->where('instructor_regional_id', '!=', null)
+            ->where('id_dep_type', '=', 2)
+            ->distinct()
+            ->get();
+
         return view('reportpage.Month30RbhReport')->with([
             'date_start' => $date_start,
             'date_stop' => $date_stop,
-            'data' => $data
+            'data' => $data,
+            'regionalManagersInstructors' => $regionalManagersInstructors
         ]);
     }
 
@@ -253,10 +277,18 @@ class StatisticsRBHController extends Controller
 
         $data = $this->get30RBHData($date_start, $date_stop);
 
+        $regionalManagersInstructors = Department_info::select('instructor_regional_id', 'users.first_name', 'users.last_name')
+            ->join('users', 'department_info.instructor_regional_id', '=', 'users.id')
+            ->where('instructor_regional_id', '!=', null)
+            ->where('id_dep_type', '=', 2)
+            ->distinct()
+            ->get();
+
         return view('reportpage.Month30RbhReport')->with([
             'date_start' => $date_start,
             'date_stop' => $date_stop,
-            'data' => $data
+            'data' => $data,
+            'regionalManagersInstructors' => $regionalManagersInstructors
         ]);
     }
 
@@ -278,6 +310,7 @@ class StatisticsRBHController extends Controller
             ])
             ->pluck('id')->toArray();
 
+
         //All most recent records from given range
         $data = Rbh30Report::select(
             DB::raw('CONCAT(departments.name, " ", department_type.name) as department_info_id'),
@@ -288,7 +321,8 @@ class StatisticsRBHController extends Controller
             'janki',
             'average',
             'received_calls',
-            'all_checked_talks'
+            'all_checked_talks',
+            'instructor_regional_id'
         )
             ->join('users', 'rbh_30_report.user_id', '=', 'users.id')
             ->join('department_info', 'rbh_30_report.department_info_id', '=', 'department_info.id')
