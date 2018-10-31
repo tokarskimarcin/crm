@@ -1,7 +1,7 @@
 
 {{-- table for directors--}}
 @if(in_array($user_to_show->user_type_id, $user_type_ids_for_every_data) )
-    <div class="alert alert-info" style="margin-top: 1em">Raporty zbiorczy oddziałów</div>
+    <h2>Raport zbiorczy oddziałów</h2>
 @endif
 @if($user_to_show->user_type_id == 3){{--
     <div class="alert alert-info">Raport wysyłany mailem do dyrektorów</div>--}}
@@ -52,7 +52,7 @@
 
 @if(in_array($user_to_show->user_type_id, $user_type_ids_for_every_data) )
     <hr>
-    <div class="alert alert-info" style="margin-top: 1em">Raporty zbiorczy trenerów</div>
+    <h2>Raport zbiorczy trenerów</h2>
 @endif
 @if($user_to_show->user_type_id == 3)
     <div class="alert alert-info" style="margin-top: 1em">Raport wysyłany mailem do kierowników i kierowników regionalnych</div>
@@ -133,10 +133,10 @@
 {{-- table for trainers--}}
 @if(in_array($user_to_show->user_type_id, $user_type_ids_for_every_data) )
     <hr>
-    <div class="alert alert-info" style="margin-top: 1em">Raporty poszczególnych konsultantów</div>
+    <h2>Raporty poszczególnych konsultantów</h2>
 @endif
 @if($user_to_show->user_type_id == 3)
-    <div class="alert alert-info" style="margin-top: 1em">Raporty wysyłany mailem do trenerów</div>
+    <div class="alert alert-info" style="margin-top: 1em">Raporty wysyłane mailem do trenerów</div>
 @endif
 @if(in_array($user_to_show->user_type_id, $user_type_ids_for_trainers_report) > 0)
     <table style="width:100%;border:1px solid #231f20;border-collapse:collapse;padding:3px">
@@ -193,6 +193,10 @@
         </tr>
         </tbody>
     </table>
+    @if(!$sendingMails)
+        <br>
+        <div class="alert alert-info">Konsultanci o kolorze <label style="background-color: #ff744e; padding: 0.5em"> </label> zostaną zablokowani następnego dnia o godzinie 00:01, jeżeli nie zalogują się do tego momentu.</div>
+    @endif
     <table style="width:100%;border:1px solid #231f20;border-collapse:collapse;padding:3px">
         <thead style="color:#efd88f">
         <tr>
@@ -229,10 +233,13 @@
             </tr>
             @endif
             @foreach($users_warning_for_trainer->sortBy('last_login') as $user)
-                    <tr>
+                @php
+                    $daysInterval = intval(abs(strtotime($user->last_login)-strtotime(date('Y-m-d')))/86400);
+                @endphp
+                    <tr @if($daysInterval>=14) style="background-color: #ff744e"@endif>
                         <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$lp++}}</td>
                         <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$user->last_name.' '.$user->first_name}}</td>
-                        <td style="border:1px solid #231f20;text-align:center;padding:3px">{{intval(abs(strtotime($user->last_login)-strtotime(date('Y-m-d')))/86400)}}</td>
+                        <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$daysInterval}}</td>
                         <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$user->last_login}}</td>
                     </tr>
                     @php

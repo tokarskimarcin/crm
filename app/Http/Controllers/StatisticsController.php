@@ -4049,6 +4049,7 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
             ->with('user_type_ids_for_managers_report', array_merge(StatisticsGlobalVariables::$userTypeIdsForManagersReportOfUnusedAccounts, StatisticsGlobalVariables::$userTypeIdsForEveryData))
             ->with('user_type_ids_for_departments_report', array_merge(StatisticsGlobalVariables::$userTypeIdsForDepartmentsReportOfUnusedAccounts, StatisticsGlobalVariables::$userTypeIdsForEveryData))
             ->with('user_type_ids_for_every_data', StatisticsGlobalVariables::$userTypeIdsForEveryData)
+            ->with('sendingMails',  $data['sendingMails'])
             ->with('user_to_show', $user);
     }
 
@@ -4066,7 +4067,7 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
         //Pobranie użytkowników do zakończenia umowy
 
         $users_warning = User::
-        whereBetween('last_login', [$date_disable, $date_warning])
+        where('last_login','<', $date_warning)
             ->whereIn('users.user_type_id', [1, 2])
             ->where('status_work', '=', 1)
             ->get();
@@ -4098,7 +4099,8 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
             'coaches'           => $coaches,
             'managers'          => $managers,
             'cadre'             => $cadre,
-            'administrationManagers'          => $administrationManagers
+            'administrationManagers'          => $administrationManagers,
+            'sendingMails'     => $sendingMails
         ];
         return $data;
     }
