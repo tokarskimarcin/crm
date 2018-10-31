@@ -93,7 +93,7 @@ class Work_Hour extends Model
         $cAllUsers = Work_Hour::select(DB::raw('
         id_user,
         Concat(users.first_name," ",users.last_name) as userNameInfo,
-        IF(work_hours.date = "' . $today . '",IFNULL(SUM(TIME_TO_SEC(TIMEDIFF(IFNULL(click_stop, "' . $actualHour . '"), click_start))), 0), IFNULL(SUM(TIME_TO_SEC(TIMEDIFF(click_stop, click_start))), 0)) as sec_sum,
+        IF(work_hours.date = "' . $today . '",IFNULL(SUM(TIME_TO_SEC(TIMEDIFF(IFNULL(click_stop, "' . $actualHour . '"), click_start))), 0), IFNULL(SUM(TIME_TO_SEC(TIMEDIFF(accept_stop, accept_start))), 0)) as sec_sum,
         sum(success) as success,
         departments.name as dep_city,
         department_type.name as dep_type,
