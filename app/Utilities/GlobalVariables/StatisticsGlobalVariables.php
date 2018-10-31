@@ -15,4 +15,8 @@ class StatisticsGlobalVariables
     public static $userTypeIdsForManagersReportOfUnusedAccounts = [17];
     public static $userTypeIdsForDepartmentsReportOfUnusedAccounts = [15];
     public static $userTypeIdsForEveryData = [3, 10, 23];
+
+    public static $firstJune = '2018-06-01';
+    public static $firstAugust = '2018-08-01';
+    public static $firstNovember = '2018-11-01';
 }
