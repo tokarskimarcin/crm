@@ -97,6 +97,7 @@
                             <input type="hidden" name="toAdd" value="1" class="item_toAdd">
                             <input type="hidden" name="id" class="item_id">
                             <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                            <input type="hidden" name="temp" @if(in_array($user, $adminPanelAccessArr)) value="0" @else value="1" @endif>
                         <div class="form-group">
                             <label for="name">Nazwa</label>
                             <input type="text" class="form-control item_name" placeholder="Podaj nazwę" name="name">
@@ -125,16 +126,20 @@
                         <div class="form-group">
                             <label for="category_id">Kategoria</label>
                             <select name="category_id" class="form-control item_category_id">
-                                @foreach($categories as $category)
-                                    <option value="{{$category->id}}">{{$category->name}}</option>
-                                @endforeach
+                                @if(in_array($user, $adminPanelAccessArr))
+                                    @foreach($categories as $category)
+                                        <option value="{{$category->id}}">{{$category->name}}</option>
+                                    @endforeach
+                                @else
+                                    <option value="1">Własne rozmowy</option>
+                                @endif
                             </select>
                         </div>
                         <div class="form-group">
                             <label for="status">Status</label>
                             <select name="status" class="form-control item_status">
-                                <option value="1">Aktywna</option>
-                                <option value="0">Nie Aktywna</option>
+                                    <option value="1">Aktywna</option>
+                                    <option value="0">Nie Aktywna</option>
                             </select>
                         </div>
 

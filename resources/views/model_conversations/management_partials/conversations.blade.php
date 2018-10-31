@@ -4,12 +4,13 @@
         <thead>
         <tr>
             <th>Nazwa</th>
-            <th>Rozmowa</th>
+            <th>Rozm</th>
             <th>Trener</th>
             <th>Prezent</th>
             <th>Klient</th>
             <th>Kategoria</th>
             <th>Status</th>
+            <th>Osoba która dodała</th>
             <th>Akcja</th>
         </tr>
         </thead>
@@ -38,6 +39,7 @@
                         <option value="0" @if($item->status == 0) selected @endif>Nieaktywna</option>
                     </select>
                 </td>
+                <td>{{$item->first_name}} {{$item->last_name}}</td>
                 <td>
                     @if($item->status == 1)
                         <button class=" btn btn-warning" data-type="items" data-action="1">Wyłącz</button>

@@ -71,7 +71,7 @@ class ModelConversationsController extends Controller
     public function modelConversationsManagementGet() {
         $user = Auth::user()->user_type_id;
 
-            $items = ModelConvItems::all();
+            $items = null;
             $categories = ModelConvCategories::whereNotIn('status', [-1])->get(); //all categories without this with status -1 (permanent)
 
             $playlists = null;
@@ -85,6 +85,23 @@ class ModelConversationsController extends Controller
                 )
                     ->join('users', 'model_conv_playlist.user_id', '=', 'users.id')
                     ->get();
+
+                $items = ModelConvItems::select(
+                    'model_conv_items.id as id',
+                    'file_name',
+                    'model_conv_items.name as name',
+                    'model_conv_items.trainer as trainer',
+                    'gift',
+                    'client',
+                    'model_category_id',
+                    'user_id',
+                    'model_conv_items.status as status',
+                    'first_name',
+                    'last_name'
+                )
+                    ->join('users', 'model_conv_items.user_id', '=', 'users.id')
+                    ->get();
+
             }
             else { //this see regular user (only his own playlist)
                 $playlists = ModelConvPlaylist::select(
@@ -95,6 +112,23 @@ class ModelConversationsController extends Controller
                     'users.id as user_id', 'img'
                 )
                     ->join('users', 'model_conv_playlist.user_id', '=', 'users.id')
+                    ->where('user_id', '=', Auth::user()->id)
+                    ->get();
+
+                $items = ModelConvItems::select(
+                    'model_conv_items.id as id',
+                    'file_name',
+                    'model_conv_items.name as name',
+                    'model_conv_items.trainer as trainer',
+                    'gift',
+                    'client',
+                    'model_category_id',
+                    'user_id',
+                    'model_conv_items.status as status',
+                    'first_name',
+                    'last_name'
+                )
+                    ->join('users', 'model_conv_items.user_id', '=', 'users.id')
                     ->where('user_id', '=', Auth::user()->id)
                     ->get();
             }
@@ -418,6 +452,7 @@ class ModelConversationsController extends Controller
         $gift = $request->gift;
         $client = $request->client;
         $category = $request->category_id;
+        $temp = $request->temp;
 
         $sound = $request->file('sound');
         $sound_name = null;
@@ -452,6 +487,8 @@ class ModelConversationsController extends Controller
         $user_id = Auth::user()->id;
         $newItem->user_id = $user_id;
         $newItem->status = $status;
+        $newItem->temp = $temp;
+        $newItem->created_at = date('Y-m-d');
         try {
             $newItem->save();
         }

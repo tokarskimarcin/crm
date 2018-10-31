@@ -10,6 +10,8 @@ class ModelConvItems extends Model
     public $timestamps = false;
     protected $guarded = [];
 
+    //status 0 nieaktywne, status 1 aktywne, status 2 tymczasowe
+
     public static function scopeOnlyActive($query) {
        return $query->where('status', '=', 1);
     }
