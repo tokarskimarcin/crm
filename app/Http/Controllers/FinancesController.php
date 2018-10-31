@@ -984,7 +984,7 @@ class FinancesController extends Controller
 
     public function viewPaymentCadrePost(Request $request)
     {
-        ini_set('max_execution_time', '500');
+        ini_set('max_execution_time', '1800');
 //        dd($request);
         $this->setToSave($request->toSave);
         //Zapisanie infromacji o zaakceptowaniu wypłat
