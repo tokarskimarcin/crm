@@ -1698,13 +1698,24 @@ class FinancesController extends Controller
                     ->orwhere('successor_history.date_stop',null);
             })
             ->get()->groupBy('user_id');
+
         $map->map(function ($item) use ($month,&$usersSalary){
             $salaryAdd = 0;
             $user_id = $item->first()->successorUserId;
             $rate = $item->first()->rate;
             foreach ($item as $row){
-                $date_stop = $row->date_stop == null ? substr($month,0,7).'-31' : $row->date_stop;
-                $salaryAdd +=  $this::getInfoAboutWorkHour($row->user_id,$row->date_start,$date_stop)->first()->sumHour;
+                $actualDate = new DateTime(date('Y-m-d'));
+                $successorHistoryDateStart = new DateTime($row->date_start);
+                $date_start = null;
+
+                if($actualDate->format('m') == $successorHistoryDateStart->format('m')) {
+                    $date_start = $row->date_start;
+                }
+                else {
+                    $date_start = substr($month,0,7).'-01';
+                }
+                $date_stop = $row->date_stop == null ? date('Y-m-t', strtotime(substr($month,0,7).'-01')) : $row->date_stop;
+                $salaryAdd +=  $this::getInfoAboutWorkHour($row->user_id,$date_start,$date_stop)->first()->sumHour;
             }
             $salaryAdd = round(($salaryAdd/3600)*$rate,2);
             $usersSalary->where('id',$user_id)->map(function ($itemSalary) use ($salaryAdd,$user_id){
