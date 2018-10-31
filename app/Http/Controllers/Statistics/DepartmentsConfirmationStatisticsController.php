@@ -33,6 +33,7 @@ class DepartmentsConfirmationStatisticsController extends Controller
 
 
     public function departmentsConfirmationStatisticsAjax(Request $request){
+        set_time_limit ( 300);
         $month = $request->selectedMonth;
         $trainersGrouping = $request->trainersGrouping;
         $departmentId = $request->departmentId;
@@ -149,6 +150,7 @@ class DepartmentsConfirmationStatisticsController extends Controller
      * @return \Illuminate\Support\Collection
      */
     public static function getEveryPbxConfirmationReport($userId, $dateGroupSum){
+        set_time_limit ( 300);
         $consultantEmploymentStatus = UserEmploymentStatus::where('user_id', $userId)
             ->where(function ($query) use ($dateGroupSum){
                 /*                         dateGroup->firstDay              dateGroup->lastDay                   dateGroup->firstDay                      dateGroup->lastDay*/
