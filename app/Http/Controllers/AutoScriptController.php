@@ -517,9 +517,10 @@ class AutoScriptController extends Controller
             $department_info =  Department_info::all();
             $data_to_send = array_merge($data, [
                 'department_info' => $department_info,
-                'user_type_ids_for_trainers_report' => StatisticsGlobalVariables::$userTypeIdsForTrainersReportOfUnusedAccounts,
-                'user_type_ids_for_managers_report' => StatisticsGlobalVariables::$userTypeIdsForManagersReportOfUnusedAccounts,
-                'user_type_ids_for_departments_report' => StatisticsGlobalVariables::$userTypeIdsForDepartmentsReportOfUnusedAccounts]);
+                'user_type_ids_for_trainers_report' => array_merge(StatisticsGlobalVariables::$userTypeIdsForTrainersReportOfUnusedAccounts, StatisticsGlobalVariables::$userTypeIdsForEveryData),
+                'user_type_ids_for_managers_report' => array_merge(StatisticsGlobalVariables::$userTypeIdsForManagersReportOfUnusedAccounts, StatisticsGlobalVariables::$userTypeIdsForEveryData),
+                'user_type_ids_for_departments_report' => array_merge(StatisticsGlobalVariables::$userTypeIdsForDepartmentsReportOfUnusedAccounts, StatisticsGlobalVariables::$userTypeIdsForEveryData),
+                'user_type_ids_for_every_data' => StatisticsGlobalVariables::$userTypeIdsForEveryData]);
             $title = 'Raport Nieaktywnych Kont Konsultantów '.date('Y-m-d');
 
 
