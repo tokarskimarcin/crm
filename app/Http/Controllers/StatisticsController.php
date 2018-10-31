@@ -32,9 +32,6 @@ use App\User;
 
 class StatisticsController extends Controller
 {
-    private $firstJune = '2018-06-01';
-    private $firstAugust = '2018-08-01';
-    private $firstNovember = '2018-11-01';
     // Dane do raportu godzinnego Telemarketing
     private function hourReportTelemarketing()
     {
@@ -3375,7 +3372,7 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
             $coaches = $coaches->where('department_info_id', '=', Auth::user()->department_info_id);
         $onlyUserID = [];
 
-        if(strtotime(date('Y-m-d')) < strtotime($this->firstNovember)){
+        if(strtotime(date('Y-m-d')) < strtotime(StatisticsGlobalVariables::$firstNovember)){
             if($request->onlyNewUser == 1){
                 $onlyUserID = $this::getUser30RBH('<')->pluck('id_user')->toArray();
             }else if($request->onlyNewUser == 2){
@@ -3426,10 +3423,10 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
             '))
             ->whereBetween('report_date', [$date_start, $date_stop]);
         //Wyszukaj po id_user i department_info_id
-        if($date_start >= $this->firstJune) {
+        if($date_start >= StatisticsGlobalVariables::$firstJune) {
             $max_from_day = $max_from_day
                 ->where('pbx_report_extension.pbx_department_info', '=', $pbx_department_id);
-            if($date_start >= $this->firstAugust){
+            if($date_start >= StatisticsGlobalVariables::$firstAugust){
                 $max_from_day->where('actual_coach_id','=', $coach_id);
             }else{
                 $max_from_day->whereIn('user_id', $consultantsId);
@@ -3444,12 +3441,12 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
 
         $pbx_data = Pbx_report_extension::whereBetween('report_date', [$date_start, $date_stop])
             ->whereIn('id', $max_from_day->pluck('id')->toArray());
-        if($date_start < $this->firstJune) {
+        if($date_start < StatisticsGlobalVariables::$firstJune) {
             $pbx_data = $pbx_data->whereIn('pbx_id', $consultantsLoginPhone);
-            if($date_start >= $this->firstAugust){
+            if($date_start >= StatisticsGlobalVariables::$firstAugust){
                 $pbx_data->where('actual_coach_id','=', $coach_id);
             }
-        }else if($date_start < $this->firstJune){
+        }else if($date_start < StatisticsGlobalVariables::$firstJune){
             $pbx_data = $pbx_data->whereIn('user_id', $consultantsId);
         }
         $pbx_data = $pbx_data->get();
@@ -3461,7 +3458,7 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
         $allData = $total_data->map(function($item, $key) use ($date_stop, $date_start, $leader) {
             $allUniceUserId = array();
             //Wysłuskanie wszystkich user_id
-            if($date_start < $this->firstJune){
+            if($date_start < StatisticsGlobalVariables::$firstJune){
                 array_push($allUniceUserId,0);
             }else{
                 foreach ($item as $value){
@@ -3551,11 +3548,11 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
             '))
             ->whereBetween('report_date', [$date_start, $date_stop]);
             //Wyszukaj po id_user i department_info_id
-            if($date_start >= $this->firstJune) {
+            if($date_start >= StatisticsGlobalVariables::$firstJune) {
                 $max_from_day = $max_from_day
                             ->where('pbx_report_extension.pbx_department_info', '=', $pbx_department_id)
                             ->whereIn('user_id', $consultantsId);
-                if($date_start >= $this->firstAugust)
+                if($date_start >= StatisticsGlobalVariables::$firstAugust)
                     $max_from_day = $max_from_day->where('actual_coach_id','=',$coach_id);
             }else{
                 //Niedokładnie po pbx_id
@@ -3567,9 +3564,9 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
 
         $pbx_data = Pbx_report_extension::whereBetween('report_date', [$date_start, $date_stop])
             ->whereIn('id', $max_from_day->pluck('id')->toArray());
-             if($date_start >= $this->firstJune) {
+             if($date_start >= StatisticsGlobalVariables::$firstJune) {
                  $pbx_data = $pbx_data->whereIn('user_id', $consultantsId);
-                 if($date_start >= $this->firstAugust)
+                 if($date_start >= StatisticsGlobalVariables::$firstAugust)
                      $pbx_data = $pbx_data->where('actual_coach_id','=',$coach_id);
             }else{
                  $pbx_data = $pbx_data->whereIn('pbx_id', $consultantsLoginPhone);
@@ -3582,7 +3579,7 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
         $terefere = $total_data->map(function($item, $pbx_id) use ($days_in_month, $date_start, $leader) {
             $allUniceUserId = array();
             //Wyłuskanie wszystkich user_id
-            if($date_start >= $this->firstJune){
+            if($date_start >= StatisticsGlobalVariables::$firstJune){
                 foreach ($item as $user){
                     if(!in_array($user->user_id,$allUniceUserId) && $user->user_id != null)
                         array_push($allUniceUserId,$user->user_id);
@@ -3594,7 +3591,7 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
             foreach ($allUniceUserId as $user_id) {
                 $user_sum = [];
 
-                if ($date_start < $this->firstJune) {
+                if ($date_start < StatisticsGlobalVariables::$firstJune) {
                     $consultant = User::where('login_phone', '=', $pbx_id)
                         ->where('coach_id', '=', $leader->id)
                         ->get();
@@ -3642,24 +3639,24 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
                     if ($user_sum[$week_num]['first_week_day'] == null) {
                         $user_sum[$week_num]['first_week_day'] = $actual_loop_day;
                     }
-                    if($date_start < $this->firstJune) {
+                    if($date_start < StatisticsGlobalVariables::$firstJune) {
                         $question = $item->where('report_date', '=', $actual_loop_day)
                             ->count();
                     }else{
                         $question = $item->where('report_date', '=', $actual_loop_day)
                             ->where('user_id','=',$user_id);
-                        if($date_start > $this->firstAugust)
+                        if($date_start > StatisticsGlobalVariables::$firstAugust)
                             $question = $question->where('actual_coach_id','=',$leader->id);
                         $question =$question ->count();
                     }
                     if ($question > 0) {
                         //Wyłuskanie informacji o konsultanciee
-                        if($date_start < $this->firstJune) {
+                        if($date_start < StatisticsGlobalVariables::$firstJune) {
                             $report = $item->where('report_date', '=', $actual_loop_day)->first();
                         }else{
                             $report = $item->where('report_date', '=', $actual_loop_day)
                                 ->where('user_id','=',$user_id);
-                            if($date_start > $this->firstAugust)
+                            if($date_start > StatisticsGlobalVariables::$firstAugust)
                                 $report = $report->where('actual_coach_id','=',$leader->id);
                             $report = $report->first();
                         }
@@ -4000,7 +3997,7 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
         }
 
         $newUserID = [];
-        if(strtotime(date('Y-m-d')) < strtotime($this->firstNovember)){
+        if(strtotime(date('Y-m-d')) < strtotime(StatisticsGlobalVariables::$firstNovember)){
             if($request->onlyNewUser == 1){
                 $newUserID = $this::getUser30RBH('<')->pluck('id_user')->toArray();
             }else if($request->onlyNewUser == 2){
@@ -4092,13 +4089,16 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
         $managers_id = Department_info::whereIn('id',$coaches->pluck('department_info_id')->unique()->toArray())->get()->pluck('menager_id')->toArray();
         $regionalManagers_id = Department_info::whereIn('id',$coaches->pluck('department_info_id')->unique()->toArray())->get()->pluck('regionalManager_id')->toArray();
         $managers = User::whereIn('id',array_merge($managers_id,$regionalManagers_id))->get();
-
+        $cadre = User::where('user_type_id', 10)->where('status_work',1)->get();
+        $administrationManagers = User::where('user_type_id', 23)->where('status_work',1)->get();
         $data = [
             'users_warning'     => $users_warning,
             'users_disable'     => $users_disable,
             'departments'       => $departments,
             'coaches'           => $coaches,
-            'managers'          => $managers
+            'managers'          => $managers,
+            'cadre'             => $cadre,
+            'administrationManagers'          => $administrationManagers
         ];
         return $data;
     }
@@ -4184,12 +4184,12 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
                 users.last_name as user_last_name,
                 users.first_name as user_first_name
             '));
-            if($request->day_select < $this->firstJune) {
+            if($request->day_select < StatisticsGlobalVariables::$firstJune) {
                 $data = $data ->join('users', 'users.login_phone', 'pbx_report_extension.pbx_id');
             }else{
                 $data = $data->join('users', 'users.id', 'pbx_report_extension.user_id');
             }
-            if($request->day_select > $this->firstAugust){
+            if($request->day_select > StatisticsGlobalVariables::$firstAugust){
                 $data = $data->where('actual_coach_id','=',$request->coach_id);
             }else{
                 $data = $data->where('users.coach_id', '=', $request->coach_id)
@@ -4204,7 +4204,7 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
             ->orderBy('pbx_report_extension.average', 'desc')
             ->get();
 
-        if(strtotime(date('Y-m-d')) < strtotime($this->firstNovember)){
+        if(strtotime(date('Y-m-d')) < strtotime(StatisticsGlobalVariables::$firstNovember)){
             if($request->onlyNewUser == 1){
                 $data = $data->whereIn('user_id',$this::getUser30RBH('<')->pluck('id_user'));
             }else if($request->onlyNewUser == 2){
@@ -4278,7 +4278,7 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
 
         $data = $this->getDayCoachStatistics($request->dep_id, $request->day_select);
         $onlyUserID = [];
-        if (strtotime(date('Y-m-d')) > strtotime($this->firstNovember)) {
+        if (strtotime(date('Y-m-d')) > strtotime(StatisticsGlobalVariables::$firstNovember)) {
             if ($request->onlyNewUser == 1) {
                 $onlyUserID = $this::getUser30RBH('<')->pluck('id_user')->toArray();
             } else if ($request->onlyNewUser == 2) {
@@ -4334,18 +4334,18 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
                 ->select(DB::raw('
                     MAX(pbx_report_extension.id) as id
                 '));
-            if($report_date < $this->firstJune) {
+            if($report_date < StatisticsGlobalVariables::$firstJune) {
                 $ids = $ids->join('users', 'users.login_phone', 'pbx_report_extension.pbx_id');
             }else{
                 $ids = $ids->join('users', 'users.id', 'pbx_report_extension.user_id');
             }
 
-            if($report_date >= $this->firstAugust){
+            if($report_date >= StatisticsGlobalVariables::$firstAugust){
                 $ids->where('actual_coach_id','=',$coach->id);
             }else{
                 $ids->where('users.coach_id', '=', $coach->id);
             }
-                if($report_date >= $this->firstJune) {
+                if($report_date >= StatisticsGlobalVariables::$firstJune) {
                     $ids = $ids->where('pbx_report_extension.pbx_department_info', '=', $pbx_department_id);
                 }
                 $ids = $ids->groupBy('users.id')
@@ -4369,13 +4369,13 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
                     work_hours.accept_stop as stop_time
                 '));
 
-            if($report_date < $this->firstJune) {
+            if($report_date < StatisticsGlobalVariables::$firstJune) {
                 $coach_data = $coach_data->join('users', 'users.login_phone', 'pbx_report_extension.pbx_id');
             }else{
                 $coach_data = $coach_data->join('users', 'users.id', 'pbx_report_extension.user_id');
             }
 
-            if($report_date >= $this->firstAugust){
+            if($report_date >= StatisticsGlobalVariables::$firstAugust){
                 $coach_data->where('actual_coach_id','=',$coach->id);
             }else{
                 $coach_data->where('users.coach_id', '=', $coach->id);
@@ -4872,7 +4872,7 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
 
         $data = self::monthReportConsultantsData($request->coach_id, $date_start, $date_stop);
         $newUserID = [];
-        if(strtotime(date('Y-m-d')) < strtotime($this->firstNovember)){
+        if(strtotime(date('Y-m-d')) < strtotime(StatisticsGlobalVariables::$firstNovember)){
             if($request->onlyNewUser == 1){
                 $newUserID = $this::getUser30RBH('<')->pluck('id_user')->toArray();
             } else if($request->onlyNewUser == 2){
@@ -4920,11 +4920,11 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
                         MAX(id) as id
                     '))
                     ->whereBetween('report_date', [$date_start, $date_stop]);
-                    if($date_start >= $this->firstJune) {
+                    if($date_start >= StatisticsGlobalVariables::$firstJune) {
                         $max_ids = $max_ids
                             ->where('pbx_report_extension.pbx_department_info', '=', $pbx_department_id)
                             ->where('user_id','=',$consultant->id);
-                        if($date_start >= $this->firstAugust){
+                        if($date_start >= StatisticsGlobalVariables::$firstAugust){
                             $max_ids->where('actual_coach_id','=',$coach_id);
                         }
                     }else{
@@ -4936,9 +4936,9 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
 
                 $repos = Pbx_report_extension::
                     whereIn('id', $max_ids->pluck('id')->toArray());
-                    if($date_start >= $this->firstJune) {
+                    if($date_start >= StatisticsGlobalVariables::$firstJune) {
                         $repos = $repos->where('user_id', '=',  $consultant->id);
-                        if($date_start >= $this->firstAugust) {
+                        if($date_start >= StatisticsGlobalVariables::$firstAugust) {
                             $repos->where('actual_coach_id', '=', $coach_id);
                         }
                     }else{
