@@ -9,11 +9,10 @@
     <tr>
         <th style="border:1px solid #231f20;padding:3px;background:#231f20">Oddział</th>
         <th style="border:1px solid #231f20;padding:3px;background:#231f20">Imie i nazwisko</th>
-        <th style="border:1px solid #231f20;padding:3px;background:#231f20">L.Połączeń (l.sprawdzonych)</th>
         <th style="border:1px solid #231f20;padding:3px;background:#231f20">Zgody</th>
-        <th style="border:1px solid #231f20;padding:3px;background:#231f20">Janki</th>
         <th style="border:1px solid #231f20;padding:3px;background:#231f20">Średnia</th>
         <th style="border:1px solid #231f20;padding:3px;background:#231f20">Czas pracy</th>
+        <th style="border:1px solid #231f20;padding:3px;background:#231f20">Janki</th>
     </tr>
     </thead>
 <tbody>
@@ -36,8 +35,8 @@
         $instructor_iterator = 0;
     @endphp
 
-    <tr>
-        <td>{{$instructor->first_name}} {{$instructor->last_name}}</td>
+    <tr style="background-color: lightslategrey; font-size: 1.3em;text-align: center;font-weight: bold;">
+        <td  colspan="6">{{$instructor->first_name}} {{$instructor->last_name}}</td>
     </tr>
     @foreach($data as $department_name => $department_info)
         @php
@@ -84,11 +83,10 @@
                             $instructor_iterator += $iterator;
                         @endphp
                         <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$info->first_name}} {{$info->last_name}}</td>
-                        <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$info->received_calls}} ({{$info->all_checked_talks}})</td>
                         <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$info->success}}</td>
-                        <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$info->janki}}</td>
                         <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$info->average}}</td>
                         <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$rbh}}</td>
+                        <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$info->janki}}</td>
                     </tr>
                 @endforeach
                 <tr>
@@ -109,11 +107,10 @@
 
                     <td style="text-align: center; font-size: 1.2em; font-weight: bold; background-color: #464a51; color: white;">Podsumowanie {{$department_name}}</td>
                     <td style="text-align: center; font-size: 1.2em; font-weight: bold; background-color: #464a51; color: white;">{{$iterator}}</td>
-                    <td style="text-align: center; font-size: 1.2em; font-weight: bold; background-color: #464a51; color: white;">{{$sum_calls}} ({{$sum_checked_talks}})</td>
                     <td style="text-align: center; font-size: 1.2em; font-weight: bold; background-color: #464a51; color: white;">{{$sum_success}}</td>
-                    <td style="text-align: center; font-size: 1.2em; font-weight: bold; background-color: #464a51; color: white;">{{$sum_janki}} ({{$janki_percent}}%)</td>
                     <td style="text-align: center; font-size: 1.2em; font-weight: bold; background-color: #464a51; color: white;">{{$average}}</td>
                     <td style="text-align: center; font-size: 1.2em; font-weight: bold; background-color: #464a51; color: white;">{{$sum_rbh}} RBH</td>
+                    <td style="text-align: center; font-size: 1.2em; font-weight: bold; background-color: #464a51; color: white;">{{$janki_percent}}%</td>
                 </tr>
         @endif
     @endforeach
@@ -122,13 +119,12 @@
         $total_instructor_janki_percent = $instructor_total_checked_talks > 0 ? round(100 * $instructor_total_janki / $instructor_total_checked_talks,2) : 0;
     @endphp
 
-    <td style="text-align: center; font-size: 1.2em; font-weight: bold; background-color: #464a51; color: white;">Podsumowanie {{$instructor->first_name}} {{$instructor->last_name}}</td>
-    <td style="text-align: center; font-size: 1.2em; font-weight: bold; background-color: #464a51; color: white;">{{$instructor_iterator}}</td>
-    <td style="text-align: center; font-size: 1.2em; font-weight: bold; background-color: #464a51; color: white;">{{$instructor_total_calls}} ({{$instructor_total_checked_talks}}) </td>
-    <td style="text-align: center; font-size: 1.2em; font-weight: bold; background-color: #464a51; color: white;">{{$instructor_total_success}} </td>
-    <td style="text-align: center; font-size: 1.2em; font-weight: bold; background-color: #464a51; color: white;">{{$instructor_total_janki}} ({{$total_instructor_janki_percent}}) </td>
-    <td style="text-align: center; font-size: 1.2em; font-weight: bold; background-color: #464a51; color: white;">{{$total_instructor_average}} </td>
-    <td style="text-align: center; font-size: 1.2em; font-weight: bold; background-color: #464a51; color: white;">{{$instructor_total_rbh}} </td>
+    <td style="text-align: center; font-size: 1.2em; font-weight: bold; background-color: black; color: white;">Podsumowanie {{$instructor->first_name}} {{$instructor->last_name}}</td>
+    <td style="text-align: center; font-size: 1.2em; font-weight: bold; background-color: black; color: white;">{{$instructor_iterator}}</td>
+    <td style="text-align: center; font-size: 1.2em; font-weight: bold; background-color: black; color: white;">{{$instructor_total_success}} </td>
+    <td style="text-align: center; font-size: 1.2em; font-weight: bold; background-color: black; color: white;">{{$total_instructor_average}} </td>
+    <td style="text-align: center; font-size: 1.2em; font-weight: bold; background-color: black; color: white;">{{$instructor_total_rbh}} </td>
+    <td style="text-align: center; font-size: 1.2em; font-weight: bold; background-color: black; color: white;">{{$total_instructor_janki_percent}}%</td>
 
 @endforeach
 
@@ -140,11 +136,10 @@
     <tr style="background-color: orange; font-size: 1.4em;">
         <td style="border:1px solid #231f20;text-align:center;padding:3px;"><b>TOTAL</b></td>
         <td style="border:1px solid #231f20;text-align:center;padding:3px;"><b>{{$total_iterator}}</b></td>
-        <td style="border:1px solid #231f20;text-align:center;padding:3px;"><b>{{$total_calls}} ({{$total_checked_talks}})</b></td>
         <td style="border:1px solid #231f20;text-align:center;padding:3px;"><b>{{$total_success}}</b></td>
-        <td style="border:1px solid #231f20;text-align:center;padding:3px;"><b>{{$total_janki}} ({{$total_janki_percent}}%)</b></td>
         <td style="border:1px solid #231f20;text-align:center;padding:3px;"><b>{{$total_average}}</b></td>
         <td style="border:1px solid #231f20;text-align:center;padding:3px;"><b>{{$total_rbh}} RBH</b></td>
+        <td style="border:1px solid #231f20;text-align:center;padding:3px;"><b>{{$total_janki_percent}}%</b></td>
     </tr>
 
 </tbody>
