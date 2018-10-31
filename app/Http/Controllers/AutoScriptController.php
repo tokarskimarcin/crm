@@ -495,6 +495,7 @@ class AutoScriptController extends Controller
 //Wyłączenie użytkowników którzy nie logowali się od 14 dni
     public function DisableUnusedAccount()
     {
+        ini_set('max_execution_time', 10000);
         $today = date('Y-m-d');
         $data = StatisticsController::UnusedAccountsInfo();
         // disabling accounts
