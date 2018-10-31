@@ -29,10 +29,13 @@
         @endphp
 
         @foreach($data as $item)
+            @php
+                $janky_proc_item = $item->all_checked_talks > 0 ? round(100 * $item->all_bad_talks / $item->all_checked_talks,2) : 0;
+            @endphp
             <tr>
                 <td style="border:1px solid #231f20;text-align:center;padding:3px">{{ $item->user_last_name . ' ' . $item->user_first_name }}</td>
                 <td style="border:1px solid #231f20;text-align:center;padding:3px">{{ $item->average }}</td>
-                <td style="border:1px solid #231f20;text-align:center;padding:3px">{{ $item->dkj_proc }} %</td>
+                <td style="border:1px solid #231f20;text-align:center;padding:3px">{{ $janky_proc_item }} %</td>
                 <td style="border:1px solid #231f20;text-align:center;padding:3px">{{ $item->received_calls }}</td>
                 <td style="border:1px solid #231f20;text-align:center;padding:3px">{{ $item->success }}</td>
                 <td style="border:1px solid #231f20;text-align:center;padding:3px">{{ ($item->received_calls > 0) ? round(($item->success / $item->received_calls) * 100, 2) : 0 }} %</td>
@@ -49,7 +52,7 @@
                 $total_pause_time += $item->time_pause;
                 $hours_array = explode(':', $item->login_time);
                 $total_login_time += (($hours_array[0] * 3600) + ($hours_array[1] * 60) + $hours_array[2]);
-                $total_janky_count += round($item->success * $item->dkj_proc);
+               // $total_janky_count += round($item->success * $item->dkj_proc);
             @endphp
         @endforeach
 
