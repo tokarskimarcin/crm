@@ -4066,9 +4066,6 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
     public static function UnusedAccountsInfo($sendingMails = true){
         $date_warning = date("Y-m-d",strtotime('-7 Days'));
         $date_disable = date("Y-m-d",strtotime('-14 Days'));
-        if(!$sendingMails){
-            $date_disable = date("Y-m-d",strtotime('-15 Days'));
-        }
         //Pobranie użytkowników do zakończenia umowy
 
         $users_warning = User::
