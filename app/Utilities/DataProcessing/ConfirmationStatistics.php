@@ -143,7 +143,7 @@ class ConfirmationStatistics
                     $consultantConfirmationStatistics->avgFrequency     = round($consultantFrequencySum/$consultantConfirmationStatistics->shows,2);
                     $consultantConfirmationStatistics->avgPairs         = round($consultantPairsSum/$consultantConfirmationStatistics->shows,2);
 
-                    $consultantConfirmationReports = DepartmentsConfirmationStatisticsController::getEveryPbxConfirmationReport($consultantConfirmationStatistics->confirmingUser, $dateGroupSum);
+                    $consultantConfirmationReports = [];//DepartmentsConfirmationStatisticsController::getEveryPbxConfirmationReport($consultantConfirmationStatistics->confirmingUser, $dateGroupSum);
 
                     foreach($consultantConfirmationReports as $confirmationReport){
                         if(!is_null($confirmationReport['time_on_record'])){
