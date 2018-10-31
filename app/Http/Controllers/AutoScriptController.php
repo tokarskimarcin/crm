@@ -519,9 +519,9 @@ class AutoScriptController extends Controller
                 //$coach->user_type_id = $tempUserType;
                 try {
                     $mail->sendMail();
-                    echo('Mails with disabled accounts sent '.$coach->last_name.' '.$coach->first_name.' '.$tempUserType.($tempUserType !== 4 ? ' as 4': '').'<br>');
+                    echo('Mails with disabled accounts sent to '.$coach->last_name.' '.$coach->first_name.' '.$tempUserType.($tempUserType !== 4 ? ' as 4': '').'<br>');
                 } catch (Exception $e) {
-                    echo('Could not send mail with disabled accounts'.$coach->last_name.' '.$coach->first_name.' '.$tempUserType.($tempUserType !== 4 ? ' as 4': '').' ERROR:'.$e.'<br>');
+                    echo('Could not send mail with disabled accounts to '.$coach->last_name.' '.$coach->first_name.' '.$tempUserType.($tempUserType !== 4 ? ' as 4': '').' ERROR:'.$e.'<br>');
                 }
             }
 
@@ -546,9 +546,40 @@ class AutoScriptController extends Controller
                 }*/
                 try {
                     $mail->sendMail();
-                    echo('Mails with disabled accounts sent '.$manager->last_name.' '.$manager->first_name.' '.$tempUserType.($changedTo !== null ? ' as '.$changedTo: '').'<br>');
+                    echo('Mails with disabled accounts sent to '.$manager->last_name.' '.$manager->first_name.' '.$tempUserType.($changedTo !== null ? ' as '.$changedTo: '').'<br>');
                 } catch (Exception $e) {
-                    echo('Could not send mail with disabled accounts'.$manager->last_name.' '.$manager->first_name.' '.$tempUserType.($changedTo !== null ? ' as '.$changedTo: '').' ERROR:'.$e.'<br>');
+                    echo('Could not send mail with disabled accounts to '.$manager->last_name.' '.$manager->first_name.' '.$tempUserType.($changedTo !== null ? ' as '.$changedTo: '').' ERROR:'.$e.'<br>');
+                }
+            }
+
+
+            echo('<strong>Cadre:</strong><br>');
+            foreach($data_to_send['cadre'] as $cadre) {
+               $data_to_send = array_merge($data_to_send, [
+                    'user_to_show' => $cadre]);
+
+                $mail = new VeronaMail('accountMail.weekReportUnusedAccount',$data_to_send, $title, User::where('id', $cadre->id)->get());
+                //$mail = new VeronaMail('accountMail.weekReportUnusedAccount',$data_to_send, $title, User::where('id', 6964)->get());
+                try {
+                    $mail->sendMail();
+                    echo('Mails with disabled accounts sent to '.$cadre->last_name.' '.$cadre->first_name.'<br>');
+                } catch (Exception $e) {
+                    echo('Could not send mail with disabled accounts to '.$cadre->last_name.' '.$cadre->first_name.' ERROR:'.$e.'<br>');
+                }
+            }
+
+            echo('<strong>Administration managers:</strong><br>');
+            foreach($data_to_send['administrationManagers'] as $administrationManager) {
+                $data_to_send = array_merge($data_to_send, [
+                    'user_to_show' => $administrationManager]);
+
+                $mail = new VeronaMail('accountMail.weekReportUnusedAccount',$data_to_send, $title, User::where('id', $cadre->id)->get());
+                //$mail = new VeronaMail('accountMail.weekReportUnusedAccount',$data_to_send, $title, User::where('id', 6964)->get());
+                try {
+                    $mail->sendMail();
+                    echo('Mails with disabled accounts sent to '.$administrationManager->last_name.' '.$administrationManager->first_name.'<br>');
+                } catch (Exception $e) {
+                    echo('Could not send mail with disabled accounts to '.$administrationManager->last_name.' '.$administrationManager->first_name.' ERROR:'.$e.'<br>');
                 }
             }
         }
