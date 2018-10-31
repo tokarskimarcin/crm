@@ -71,7 +71,55 @@ class Work_Hour extends Model
 
         return $cAllUsers;
     }
-    
+
+    /**
+     * Return users who work <comparator> than number of hours
+     * @param $iNumberOfHours
+     * @param $comparator
+     * @param null $SactualMonth
+     * @return Collection
+     */
+    public static function usersWorkingRBHSelectorActual($iNumberOfHours, $comparator, $SactualMonth = null): Collection {
+        $availableComparators = ['<','>','<=','>=','=','<>'];
+        if(!in_array($comparator, $availableComparators)){
+            throw new \Exception('Wrong param (comparator) in usersWorkingRBHSelector function');
+        }
+        if($SactualMonth == null) $SactualMonth = date('Y-m');
+        $iNumberOfSeconds = $iNumberOfHours * 60 * 60;
+
+        $today = date('Y-m-d');
+        $actualHour = date('H:i:s');
+
+        $cAllUsers = Work_Hour::select(DB::raw('
+        id_user,
+        Concat(users.first_name," ",users.last_name) as userNameInfo,
+        IF(work_hours.date = "' . $today . '",IFNULL(SUM(TIME_TO_SEC(TIMEDIFF(IFNULL(click_stop, "' . $actualHour . '"), click_start))), 0), IFNULL(SUM(TIME_TO_SEC(TIMEDIFF(accept_stop, accept_start))), 0)) as sec_sum,
+        sum(success) as success,
+        departments.name as dep_city,
+        department_type.name as dep_type,
+        department_info.id as dep_id
+        '))
+            ->join('users', 'work_hours.id_user', '=', 'users.id')
+            ->join('department_info', 'users.department_info_id', '=', 'department_info.id')
+            ->join('departments', 'department_info.id_dep', '=', 'departments.id')
+            ->join('department_type', 'department_info.id_dep_type', '=', 'department_type.id')
+            ->where(function ($querry) use ($SactualMonth, $comparator){
+                if($comparator == '<' || $comparator == '<=' ){
+                    $querry->where(function ($query) use ($SactualMonth) {
+                        $query->where('users.status_work', '=', 1)
+                            ->where('users.start_work','like',$SactualMonth.'%');
+                    })
+                        ->orwhere('users.end_work','like',$SactualMonth.'%');
+                }
+            })
+            ->whereIn('users.user_type_id', [1,2])
+            ->groupBy('id_user')
+            ->having(DB::raw('sec_sum'), $comparator, $iNumberOfSeconds)
+            ->get();
+
+        return $cAllUsers;
+    }
+
     /**
      * Pobranie tablicy z miesiącami
      */

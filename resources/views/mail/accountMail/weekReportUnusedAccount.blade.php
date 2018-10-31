@@ -1,7 +1,11 @@
-@if($user_to_show->user_type_id == 3)
-    <div class="alert alert-info">Raport dla dyrektorów</div>
-@endif
+
 {{-- table for directors--}}
+@if(in_array($user_to_show->user_type_id, $user_type_ids_for_every_data) )
+    <div class="alert alert-info" style="margin-top: 1em">Raporty zbiorczy oddziałów</div>
+@endif
+@if($user_to_show->user_type_id == 3){{--
+    <div class="alert alert-info">Raport wysyłany mailem do dyrektorów</div>--}}
+@endif
 @if(in_array($user_to_show->user_type_id, $user_type_ids_for_departments_report) > 0)
     <table style="width:100%;border:1px solid #231f20;border-collapse:collapse;padding:3px">
         <thead style="color:#efd88f">
@@ -46,8 +50,12 @@
     </table>
 @endif
 
+@if(in_array($user_to_show->user_type_id, $user_type_ids_for_every_data) )
+    <hr>
+    <div class="alert alert-info" style="margin-top: 1em">Raporty zbiorczy trenerów</div>
+@endif
 @if($user_to_show->user_type_id == 3)
-    <div class="alert alert-info" style="margin-top: 1em">Raport dla kierowników i kierowników regionalnych</div>
+    <div class="alert alert-info" style="margin-top: 1em">Raport wysyłany mailem do kierowników i kierowników regionalnych</div>
 @endif
 {{-- table for managers--}}
 @if(in_array($user_to_show->user_type_id, $user_type_ids_for_managers_report) > 0)
@@ -71,7 +79,6 @@
             $all_disable = 0;
             $departments = $department_info;
             if($user_to_show->user_type_id != 3){
-
                 if($user_to_show->user_type_id == 7){
                     $departments = $department_info->where('menager_id', $user_to_show->id);
                 }
@@ -122,10 +129,15 @@
     </table>
 @endif
 
-@if($user_to_show->user_type_id == 3)
-    <div class="alert alert-info" style="margin-top: 1em">Raporty dla trenerów</div>
-@endif
+
 {{-- table for trainers--}}
+@if(in_array($user_to_show->user_type_id, $user_type_ids_for_every_data) )
+    <hr>
+    <div class="alert alert-info" style="margin-top: 1em">Raporty poszczególnych konsultantów</div>
+@endif
+@if($user_to_show->user_type_id == 3)
+    <div class="alert alert-info" style="margin-top: 1em">Raporty wysyłany mailem do trenerów</div>
+@endif
 @if(in_array($user_to_show->user_type_id, $user_type_ids_for_trainers_report) > 0)
     <table style="width:100%;border:1px solid #231f20;border-collapse:collapse;padding:3px">
         <thead style="color:#efd88f">
@@ -152,7 +164,7 @@
                 $all_warning = 0;
                 $all_disable = 0;
                 $users_disable_for_trainer = $users_disable->where('department_info_id',$dep_info->id);
-                if ($user_to_show->user_type_id != 3){
+                if (!in_array($user_to_show->user_type_id, $user_type_ids_for_every_data) ){
                     $users_disable_for_trainer = $users_disable_for_trainer->where('coach_id', $user_to_show->id);
                 }
             @endphp
@@ -206,7 +218,7 @@
                 $all_warning = 0;
                 $all_disable = 0;
                 $users_warning_for_trainer = $users_warning->where('department_info_id',$dep_info->id);
-                if ($user_to_show->user_type_id != 3){
+                if (!in_array($user_to_show->user_type_id, $user_type_ids_for_every_data)){
                     $users_warning_for_trainer = $users_warning_for_trainer->where('coach_id', $user_to_show->id);
                 }
             @endphp

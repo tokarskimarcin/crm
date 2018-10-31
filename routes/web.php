@@ -449,11 +449,8 @@ Route::get('/mailMonthReportCampaign', 'StatisticsController@mailMonthReportCamp
 
 //Maila dotyczące wyłączonych kont
 //Raport Usunietych kont
-Route::get('/weekReportUnuserdAccount', 'StatisticsController@MailWeekReportUnuserdAccount');
-
 //wyłączenie danych użytkowników którzy nie logowali się już 14 dni i więcej
-Route::GET('/disableUnusedAccount', 'UsersController@DisableUnusedAccount');
-
+Route::GET('/disableUnusedAccount', 'AutoScriptController@DisableUnusedAccount');
 
 Auth::routes();
 //'check-firewall'
