@@ -9,18 +9,18 @@
         <ul class="nav nav-tabs">
             <li><a data-toggle="tab" href="#home">Legenda</a></li>
             @if(in_array($user, $adminPanelAccessArr))
-            <li><a data-toggle="tab" href="#menu1">Kategorie</a></li>
-            <li><a data-toggle="tab" href="#menu2">Rozmowy</a></li>
+                <li><a data-toggle="tab" href="#menu1">Kategorie</a></li>
             @endif
-            <li><a data-toggle="tab" href="#playlists">Playlisty</a></li>
+            <li><a data-toggle="tab" href="#menu2">Rozmowy</a></li>
+            <li><a data-toggle="tab" href="#playlists2">Playlisty</a></li>
         </ul>
 
         <div class="tab-content">
             @include('model_conversations.management_partials.legend')
             @if(in_array($user, $adminPanelAccessArr))
-            @include('model_conversations.management_partials.categories')
-            @include('model_conversations.management_partials.conversations')
+                @include('model_conversations.management_partials.categories')
             @endif
+            @include('model_conversations.management_partials.conversations')
             @include('model_conversations.management_partials.playlists')
         </div>
     </div>
