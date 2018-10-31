@@ -26,6 +26,11 @@
 
 @media only screen and (max-width: 600px) {
     /*Telefony komorkowe*/
+    .items-table {
+        width: 100%;
+        margin: 0 auto;
+    }
+
     .categories-box {
 
         display: grid;
@@ -63,6 +68,12 @@
 
 @media only screen and (min-width: 600px) {
     /*Tablety*/
+
+    .items-table {
+        width: 96%;
+        margin: 0 auto;
+    }
+
     .categories-box {
         display: grid;
         grid-template-columns: 1fr 1fr;
@@ -98,6 +109,11 @@
 
 @media only screen and (min-width: 801px) {
     /*Komputery*/
+
+    .items-table {
+        width: 90%;
+        margin: 0 auto;
+    }
 
     .categories-box {
 

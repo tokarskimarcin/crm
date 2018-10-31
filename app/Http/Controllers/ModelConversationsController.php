@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\Storage;
 class ModelConversationsController extends Controller
 {
 
-    private $adminPanelAccessArr = [3, 13]; //Array of user_type_id who can access admin panel
+    private $adminPanelAccessArr = [3, 13]; //Array of privilaged user types
 
     public function modelConversationMenuGet() {
 
@@ -33,20 +33,32 @@ class ModelConversationsController extends Controller
     public function categoryGet($id) {
         $user = Auth::user()->user_type_id;
         $categories = ModelConvCategories::OnlyActive()->where('subcategory_id', '=', $id)->get();
-        $playlists = ModelConvPlaylist::all();
+
+        $playlists = null;
+        if(in_array($user, $this->adminPanelAccessArr)) { //this see privilaged user (all available users playlists)
+            $playlists = ModelConvPlaylist::all();
+        }
+        else {
+            $playlists = ModelConvPlaylist::where('user_id', '=', Auth::user()->id)->get();
+        }
+
         $playlistItems = ModelConvPlaylistItem::select(
             'model_conv_playlist.name as name',
+            'model_conv_playlist.user_id as user_id',
             'model_conv_playlist.id as id',
             'model_conv_playlist_items.item_id as item_id'
-        )->join('model_conv_playlist', 'model_conv_playlist_items.playlist_id', '=', 'model_conv_playlist.id')
-        ->get();
+        )
+            ->join('model_conv_playlist', 'model_conv_playlist_items.playlist_id', '=', 'model_conv_playlist.id')
+            ->get();
 
         $items = ModelConvItems::where('model_category_id', '=', $id)->OnlyActive()->get();
         $items->map(function($item) use($playlistItems) {
-             $allItemsInPlaylists = $playlistItems->where('item_id', '=',$item->id)->pluck('name')->toArray();
+             $allItemsInPlaylists = $playlistItems->where('item_id', '=',$item->id);
              $item->playlists = $allItemsInPlaylists;
             return $item;
         });
+
+//        dd($items);
 
         return view('model_conversations.model_conversations_category')
             ->with('adminPanelAccessArr', $this->adminPanelAccessArr)
@@ -60,16 +72,32 @@ class ModelConversationsController extends Controller
         $user = Auth::user()->user_type_id;
 
             $items = ModelConvItems::all();
-            $categories = ModelConvCategories::all();
-            $playlists = ModelConvPlaylist::select(
-                'first_name',
-                'last_name',
-                'model_conv_playlist.id',
-                'model_conv_playlist.name',
-                'users.id as user_id', 'img'
-            )
-                ->join('users', 'model_conv_playlist.user_id', '=', 'users.id')
-                ->get();
+            $categories = ModelConvCategories::whereNotIn('status', [-1])->get(); //all categories without this with status -1 (permanent)
+
+            $playlists = null;
+            if(in_array($user, $this->adminPanelAccessArr)) { //this see privilaged user (all available users playlists)
+                $playlists = ModelConvPlaylist::select(
+                    'first_name',
+                    'last_name',
+                    'model_conv_playlist.id',
+                    'model_conv_playlist.name',
+                    'users.id as user_id', 'img'
+                )
+                    ->join('users', 'model_conv_playlist.user_id', '=', 'users.id')
+                    ->get();
+            }
+            else { //this see regular user (only his own playlist)
+                $playlists = ModelConvPlaylist::select(
+                    'first_name',
+                    'last_name',
+                    'model_conv_playlist.id',
+                    'model_conv_playlist.name',
+                    'users.id as user_id', 'img'
+                )
+                    ->join('users', 'model_conv_playlist.user_id', '=', 'users.id')
+                    ->where('user_id', '=', Auth::user()->id)
+                    ->get();
+            }
 
             $playlistItems = ModelConvPlaylistItem::all();
 
@@ -135,7 +163,7 @@ class ModelConversationsController extends Controller
     public function modelConversationsPlaylistGet() {
         $user = Auth::user()->user_type_id;
 
-        $playlistCategories = ModelConvPlaylist::all();
+        $playlistCategories = ModelConvPlaylist::where('user_id', '=', Auth::user()->id)->get(); //only logged user's playlists
 
         return view('model_conversations.model_conversations_playlist_categories')
             ->with('adminPanelAccessArr', $this->adminPanelAccessArr)
