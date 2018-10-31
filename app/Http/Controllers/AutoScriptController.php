@@ -8,6 +8,7 @@ use App\ClientRoute;
 use App\ClientRouteInfo;
 use App\Department_info;
 use App\MedicalPackage;
+use App\UserEmploymentStatus;
 use Exception;
 use App\PrivilageRelation;
 use App\Rbh30Report;
@@ -499,6 +500,26 @@ class AutoScriptController extends Controller
         // disabling accounts
         foreach ($data['users_disable'] as $user) {
             /**
+             * Usuwanie numeru pbx
+             */
+            $userEmployment = UserEmploymentStatus::
+            where('pbx_id', '=', $user->login_phone)
+                ->where('user_id', '=', $user->id)
+                ->orderBy('id', 'desc')
+                ->first();
+            if ($userEmployment) { //user has history in user_employment_status
+                $userEmployment->pbx_id_remove_date = date('Y-m-d');
+                $userEmployment->save();
+            } else { // user has no history in user_employment_status
+                $userEmployment2 = new UserEmploymentStatus();
+                $userEmployment2->pbx_id = $user->login_phone;
+                $userEmployment2->user_id = $user->id;
+                $userEmployment2->pbx_id_add_date = date('Y-m-d');
+                $userEmployment2->pbx_id_remove_date = date('Y-m-d');
+                $userEmployment2->save();
+            }
+
+            /**
              * automatyczne rozwiązanie pakietu medycznego w przypadku zakończenia pracy
              */
             $month_to_end = date('Y-m-t', strtotime($today));
@@ -509,7 +530,10 @@ class AutoScriptController extends Controller
             $user->end_work = $today;
             $user->status_work = 0;
             $user->disabled_by_system = 1;
+            $user->login_phone = null;
             $user->save();
+
+
         }
 
         //check if should send mails

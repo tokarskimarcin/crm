@@ -195,7 +195,10 @@
     </table>
     @if(!$sendingMails)
         <br>
-        <div class="alert alert-info">Konsultanci o kolorze <label style="background-color: #ff744e; padding: 0.5em"> </label> zostaną zablokowani następnego dnia o godzinie 00:01, jeżeli nie zalogują się do tego momentu.</div>
+        <div class="alert alert-info">Konsultanci o kolorze <label style="background-color: #ff744e; padding: 0.5em"> </label> zostaną zablokowani następnego dnia o godzinie 00:01, jeżeli nie zalogują się do tego momentu.
+        <br>
+        Przypisane do nich numery PBX zostaną usunięte.
+        </div>
     @endif
     <table style="width:100%;border:1px solid #231f20;border-collapse:collapse;padding:3px">
         <thead style="color:#efd88f">
