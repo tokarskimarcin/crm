@@ -4042,15 +4042,16 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
 
     public function pageReportUnusedAccounts(){
         $user = Auth::user();
-        $data = StatisticsController::UnusedAccountsInfo();
+        $data = StatisticsController::UnusedAccountsInfo(false);
         return view('reportpage.accountReport.ReportUnusedAccount')
             ->with('department_info', $data['departments'])
             ->with('users_warning', $data['users_warning'])
             ->with('users_disable', $data['users_disable'])
             ->with('coaches', $data['coaches'])
-            ->with('user_type_ids_for_trainers_report', StatisticsGlobalVariables::$userTypeIdsForTrainersReportOfUnusedAccounts)
-            ->with('user_type_ids_for_managers_report', StatisticsGlobalVariables::$userTypeIdsForManagersReportOfUnusedAccounts)
-            ->with('user_type_ids_for_departments_report', StatisticsGlobalVariables::$userTypeIdsForDepartmentsReportOfUnusedAccounts)
+            ->with('user_type_ids_for_trainers_report', array_merge(StatisticsGlobalVariables::$userTypeIdsForTrainersReportOfUnusedAccounts, StatisticsGlobalVariables::$userTypeIdsForEveryData))
+            ->with('user_type_ids_for_managers_report', array_merge(StatisticsGlobalVariables::$userTypeIdsForManagersReportOfUnusedAccounts, StatisticsGlobalVariables::$userTypeIdsForEveryData))
+            ->with('user_type_ids_for_departments_report', array_merge(StatisticsGlobalVariables::$userTypeIdsForDepartmentsReportOfUnusedAccounts, StatisticsGlobalVariables::$userTypeIdsForEveryData))
+            ->with('user_type_ids_for_every_data', StatisticsGlobalVariables::$userTypeIdsForEveryData)
             ->with('user_to_show', $user);
     }
 
@@ -4062,9 +4063,12 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
 
     }*/
 
-    public static function UnusedAccountsInfo(){
+    public static function UnusedAccountsInfo($sendingMails = true){
         $date_warning = date("Y-m-d",strtotime('-7 Days'));
         $date_disable = date("Y-m-d",strtotime('-14 Days'));
+        if(!$sendingMails){
+            $date_disable = date("Y-m-d",strtotime('-15 Days'));
+        }
         //Pobranie użytkowników do zakończenia umowy
 
         $users_warning = User::
@@ -4073,11 +4077,15 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
             ->where('status_work', '=', 1)
             ->get();
 
-        $users_disable = User::
-        where('last_login', '<', $date_disable)
-            ->whereIn('users.user_type_id', [1, 2])
-            ->where('status_work', '=', 1)
-            ->get();
+        $users_disable = User::whereIn('users.user_type_id', [1, 2]);
+        if($sendingMails){
+            $users_disable->where('last_login', '<', $date_disable)
+                ->where('status_work', '=', 1);
+        }else{
+            $users_disable->where('end_work', date('Y-m-d'))->where('disabled_by_system', 1);
+        }
+
+        $users_disable = $users_disable->get();
         $departments = Department_info::all();
 
         $coach_ids = collect(array_merge($users_warning->pluck('coach_id')->unique()->toArray(), $users_disable->pluck('coach_id')->unique()->toArray()))->unique()->toArray();

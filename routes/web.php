@@ -452,7 +452,6 @@ Route::get('/mailMonthReportCampaign', 'StatisticsController@mailMonthReportCamp
 //wyłączenie danych użytkowników którzy nie logowali się już 14 dni i więcej
 Route::GET('/disableUnusedAccount', 'AutoScriptController@DisableUnusedAccount');
 
-
 Auth::routes();
 //'check-firewall'
 Route::middleware(['check-permission', 'check-firewall'])->group(function () {
