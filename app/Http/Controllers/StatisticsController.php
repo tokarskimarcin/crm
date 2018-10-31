@@ -4280,7 +4280,7 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
 
         $data = $this->getDayCoachStatistics($request->dep_id, $request->day_select);
         $onlyUserID = [];
-        if (strtotime(date('Y-m-d')) > strtotime(StatisticsGlobalVariables::$firstNovember)) {
+        if (strtotime(date('Y-m-d')) < strtotime(StatisticsGlobalVariables::$firstNovember)) {
             if ($request->onlyNewUser == 1) {
                 $onlyUserID = $this::getUser30RBH('<')->pluck('id_user')->toArray();
             } else if ($request->onlyNewUser == 2) {
