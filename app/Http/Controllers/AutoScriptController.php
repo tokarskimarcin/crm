@@ -59,33 +59,33 @@ class AutoScriptController extends Controller
         //collection of records from rbh30report from this day
         $actual30RbhRecords = Rbh30Report::where('created_at', '=', $today)->get();
 
-//        foreach($usersWorkingLessThan30Rbh as $user) {
-//            if($actual30RbhRecords->where('user_id', '=', $user->id_user)->where('created_at', '=', $today)->isEmpty()) { //there is no duplicates
-//                $rbh30Report = new Rbh30Report();
-//                $rbh30Report->user_id = $user->id_user;
-//                $rbh30Report->department_info_id = $user->dep_id;
-//                $rbh30Report->success = $user->success;
-//                $rbh30Report->sec_sum = $user->sec_sum;
-//                $rbh30Report->average = $user->avg;
-//                $rbh30Report->janki = $user->janki;
-//                $rbh30Report->received_calls = $user->received_calls;
-//                $rbh30Report->all_checked_talks = $user->all_checked_talks;
-//                $rbh30Report->created_at = $today;
-//                $rbh30Report->updated_at = null;
-//                $rbh30Report->save();
-//            }
-//            else {
-//                $updatedRecord = $actual30RbhRecords->where('user_id', '=', $user->id_user)->where('created_at', '=', $today)->first();
-//                $updatedRecord->success = $user->success;
-//                $updatedRecord->sec_sum = $user->sec_sum;
-//                $updatedRecord->average = $user->avg;
-//                $updatedRecord->janki = $user->janki;
-//                $updatedRecord->received_calls = $user->received_calls;
-//                $updatedRecord->all_checked_talks = $user->all_checked_talks;
-//                $updatedRecord->updated_at = date('Y-m-d H:i:s');
-//                $updatedRecord->save();
-//            }
-//        }
+        foreach($usersWorkingLessThan30Rbh as $user) {
+            if($actual30RbhRecords->where('user_id', '=', $user->id_user)->where('created_at', '=', $today)->isEmpty()) { //there is no duplicates
+                $rbh30Report = new Rbh30Report();
+                $rbh30Report->user_id = $user->id_user;
+                $rbh30Report->department_info_id = $user->dep_id;
+                $rbh30Report->success = $user->success;
+                $rbh30Report->sec_sum = $user->sec_sum;
+                $rbh30Report->average = $user->avg;
+                $rbh30Report->janki = $user->janki;
+                $rbh30Report->received_calls = $user->received_calls;
+                $rbh30Report->all_checked_talks = $user->all_checked_talks;
+                $rbh30Report->created_at = $today;
+                $rbh30Report->updated_at = null;
+                $rbh30Report->save();
+            }
+            else {
+                $updatedRecord = $actual30RbhRecords->where('user_id', '=', $user->id_user)->where('created_at', '=', $today)->first();
+                $updatedRecord->success = $user->success;
+                $updatedRecord->sec_sum = $user->sec_sum;
+                $updatedRecord->average = $user->avg;
+                $updatedRecord->janki = $user->janki;
+                $updatedRecord->received_calls = $user->received_calls;
+                $updatedRecord->all_checked_talks = $user->all_checked_talks;
+                $updatedRecord->updated_at = date('Y-m-d H:i:s');
+                $updatedRecord->save();
+            }
+        }
     }
 
     //Temporary method for assigning successes for given date from pbx report
