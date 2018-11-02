@@ -9,6 +9,9 @@
             <th>Zdjęcie</th>
             <th>Status</th>
             <th>Podkategoria</th>
+            @if($showAvailableDepartmentTypes)
+            <th>Typ oddziału</th>
+            @endif
             <th>Akcja</th>
         </tr>
         </thead>
@@ -32,6 +35,16 @@
                     @endforeach
                 </select>
             </td>
+            @if($showAvailableDepartmentTypes)
+                <td>
+                    <select class="form-control" disabled>
+                        <option>Wybierz</option>
+                        @foreach($availableDepartmentTypes as $dep)
+                            <option value="{{$dep->id}}" @if($category->department_type_id == $dep->id) selected @endif>{{$dep->name}}</option>
+                        @endforeach
+                    </select>
+                </td>
+            @endif
             <td>
                 @if($category->status == 1)
                 <button class=" btn btn-warning" data-type="category" data-action="1">Wyłącz</button>

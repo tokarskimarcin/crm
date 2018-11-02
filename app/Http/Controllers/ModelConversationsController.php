@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\ActivityRecorder;
+use App\Department_info;
+use App\Department_types;
 use App\ModelConvCategories;
 use App\ModelConvItems;
 use App\ModelConvPlaylist;
@@ -17,30 +19,61 @@ class ModelConversationsController extends Controller
 {
 
     private $adminPanelAccessArr = [3, 13]; //Array of privilaged user types
+    private $superUserDepartmentType = 6;
 
     public function modelConversationMenuGet() {
+        $user = Auth::user();
+        $user_type_id = $user->user_type_id;
+        $user_department_type = Department_info::getUserDepartmentType($user->id)->id_dep_type;
 
-        //Mockup of categories
-        $user = Auth::user()->user_type_id;
-        $categories = ModelConvCategories::OnlyActive()->where('subcategory_id', '=', 0)->get();
+        $categories = null;
+        if($user_department_type == $this->superUserDepartmentType) {
+            if(in_array($user_type_id, $this->adminPanelAccessArr)) { //sees all available categories
+                $categories = ModelConvCategories::OnlyActive()
+                    ->where('subcategory_id', '=', 0)
+                    ->get();
+            }
+            else { //sees only categories from it's own department_type
+                $categories = ModelConvCategories::OnlyActive()
+                    ->where('subcategory_id', '=', 0)
+                    ->where('department_type_id', '=', $user_type_id)
+                    ->get();
+            }
+        }
+        else { //sees only categories from its own department_type
+            $categories = ModelConvCategories::OnlyActive()
+                ->where('subcategory_id', '=', 0)
+                ->where('department_type_id', '=', $user_type_id)
+                ->get();
+        }
 
         return view('model_conversations.model_conversations_categories')
             ->with('categories', $categories)
             ->with('adminPanelAccessArr', $this->adminPanelAccessArr)
-            ->with('user', $user);
+            ->with('user', $user_type_id);
     }
 
     public function categoryGet($id) {
-        $user = Auth::user()->user_type_id;
+        $user = Auth::user();
+        $user_type_id = $user->user_type_id;
+        $user_department_type = Department_info::getUserDepartmentType($user->id)->id_dep_type;
+
         $categories = ModelConvCategories::OnlyActive()->where('subcategory_id', '=', $id)->get();
 
         $playlists = null;
-        if(in_array($user, $this->adminPanelAccessArr)) { //this see privilaged user (all available users playlists)
-            $playlists = ModelConvPlaylist::all();
+
+        if($user_department_type == $this->superUserDepartmentType) {
+            if(in_array($user_type_id, $this->adminPanelAccessArr)) { //this see privilaged user (all available users playlists)
+                $playlists = ModelConvPlaylist::all();
+            }
+            else {
+                $playlists = ModelConvPlaylist::where('user_id', '=', Auth::user()->id)->get();
+            }
         }
         else {
             $playlists = ModelConvPlaylist::where('user_id', '=', Auth::user()->id)->get();
         }
+
 
         $playlistItems = ModelConvPlaylistItem::select(
             'model_conv_playlist.name as name',
@@ -58,42 +91,52 @@ class ModelConversationsController extends Controller
             return $item;
         });
 
-//        dd($items);
-
         return view('model_conversations.model_conversations_category')
             ->with('adminPanelAccessArr', $this->adminPanelAccessArr)
-            ->with('user', $user)
+            ->with('user', $user_type_id)
             ->with('categories', $categories)
             ->with('items', $items)
             ->with('playlists', $playlists);
     }
 
     public function modelConversationsManagementGet() {
-        $user = Auth::user()->user_type_id;
+        $user = Auth::user();
+        $user_type_id = $user->user_type_id;
+        $user_department_type = Department_info::getUserDepartmentType($user->id)->id_dep_type;
 
-            $items = null;
-            $categories = ModelConvCategories::whereNotIn('status', [-1])->get(); //all categories without this with status -1 (permanent)
-
-            $playlists = null;
-            if(in_array($user, $this->adminPanelAccessArr)) { //this see privilaged user (all available users playlists)
-                $playlists = ModelConvPlaylist::getPlaylistInfo();
-                $items = ModelConvItems::getPlaylistItemsInfo();
-
+        $availableDepartmentTypes = Department_types::whereIn('id', [1,2,6])->get();
+        $showAvailableDepartmentTypes = false;
+        if($user_department_type == $this->superUserDepartmentType) {
+            if(in_array($user_type_id, $this->adminPanelAccessArr)) {
+                $showAvailableDepartmentTypes = true;
             }
-            else { //this see regular user (only his own playlist)
-                $playlists = ModelConvPlaylist::getPlaylistInfo(true);
-                $items = ModelConvItems::getPlaylistItemsInfo(true);
-            }
+        }
 
-            $playlistItems = ModelConvPlaylistItem::all();
+        $items = null;
+        $categories = ModelConvCategories::whereNotIn('status', [-1])->get(); //all categories without this with status -1 (permanent)
 
-            return view('model_conversations.model_conversations_management')
-                ->with('categories', $categories)
-                ->with('user', $user)
-                ->with('adminPanelAccessArr', $this->adminPanelAccessArr)
-                ->with('items', $items)
-                ->with('playlists', $playlists)
-                ->with('playlistItems', $playlistItems);
+        $playlists = null;
+        if(in_array($user_type_id, $this->adminPanelAccessArr)) { //this see privilaged user (all available users playlists)
+            $playlists = ModelConvPlaylist::getPlaylistInfo();
+            $items = ModelConvItems::getPlaylistItemsInfo();
+        }
+        else { //this see regular user (only his own playlist)
+            $playlists = ModelConvPlaylist::getPlaylistInfo(true);
+            $items = ModelConvItems::getPlaylistItemsInfo(true);
+        }
+
+        $playlistItems = ModelConvPlaylistItem::all();
+
+        return view('model_conversations.model_conversations_management')
+            ->with('categories', $categories)
+            ->with('user', $user_type_id)
+            ->with('adminPanelAccessArr', $this->adminPanelAccessArr)
+            ->with('items', $items)
+            ->with('playlists', $playlists)
+            ->with('playlistItems', $playlistItems)
+            ->with('superUserDepartmentType', $this->superUserDepartmentType)
+            ->with('showAvailableDepartmentTypes', $showAvailableDepartmentTypes)
+            ->with('availableDepartmentTypes', $availableDepartmentTypes);
 
     }
 
@@ -147,18 +190,22 @@ class ModelConversationsController extends Controller
     }
 
     public function modelConversationsPlaylistGet() {
-        $user = Auth::user()->user_type_id;
+        $user = Auth::user();
+        $user_type_id = $user->user_type_id;
+        $user_department_type = Department_info::getUserDepartmentType($user->id)->id_dep_type;
 
-        $playlistCategories = ModelConvPlaylist::where('user_id', '=', Auth::user()->id)->get(); //only logged user's playlists
+        $playlistCategories = ModelConvPlaylist::where('user_id', '=', $user->id)->get(); //only logged user's playlists
 
         return view('model_conversations.model_conversations_playlist_categories')
             ->with('adminPanelAccessArr', $this->adminPanelAccessArr)
             ->with('playlistCategories', $playlistCategories)
-            ->with('user', $user);
+            ->with('user', $user_type_id);
     }
 
     public function playlistGet($id) {
-        $user = Auth::user()->user_type_id;
+        $user = Auth::user();
+        $user_type_id = $user->user_type_id;
+        $user_department_type = Department_info::getUserDepartmentType($user->id)->id_dep_type;
 
         $playlistObject = ModelConvPlaylist::find($id);
 
@@ -184,7 +231,7 @@ class ModelConversationsController extends Controller
             ->with('playlist', $playlist)
             ->with('playlistObject', $playlistObject)
             ->with('adminPanelAccessArr', $this->adminPanelAccessArr)
-            ->with('user', $user);
+            ->with('user', $user_type_id);
     }
 
     public function modelConversationsPlaylistPost(Request $request) {
@@ -304,6 +351,11 @@ class ModelConversationsController extends Controller
      * This method changes picture of category or adds new category
      */
     public function categoryPost(Request $request) {
+
+        $user = Auth::user();
+        $user_type_id = $user->user_type_id;
+        $user_department_type = Department_info::getUserDepartmentType($user->id)->id_dep_type;
+
         $toAdd = $request->toAdd; //This varible defines whether user edit category or add new one 1 - add, 0 - edit
 
             //przy zmianie zdiecia, trzeba usunać stare - trzeba dodać to i przypisanie do danej kategori tego nowego zdiecia
@@ -355,6 +407,16 @@ class ModelConversationsController extends Controller
             }
 
             $category->status = $status;
+
+            $department_type_request = null;
+            if($request->has('department_type_id')) {
+                $department_type_request = $request->department_type_id;
+            }
+            else {
+                $department_type_request = $user_department_type;
+            }
+            $category->department_type_id = $department_type_request;
+
             try {
                 $category->save();
             }

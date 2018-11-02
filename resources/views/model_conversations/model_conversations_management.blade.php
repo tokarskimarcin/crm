@@ -60,6 +60,17 @@
                             </select>
                         </div>
 
+                        @if($showAvailableDepartmentTypes)
+                            <div class="form-group">
+                                <label for="department_type_id">Rodzaj oddziału</label>
+                                <select class="form-control" name="department_type_id" id="department_type_id">
+                                    @foreach($availableDepartmentTypes as $dep)
+                                        <option value="{{$dep->id}}">{{$dep->name}}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        @endif
+
                         <div class="form-group">
                             <label for="subcategory">Kategoria</label>
                             <select name="subcategory" class="form-control category_subcategory">
