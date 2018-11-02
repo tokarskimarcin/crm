@@ -12,7 +12,7 @@ use App\UserEmploymentStatus;
 use App\Utilities\GlobalVariables\UsersGlobalVariables;
 use Exception;
 use App\PrivilageRelation;
-use App\Rbh30Report;
+use App\NewUsersRbhReport;
 use App\Schedule;
 use App\Pbx_report_extension;
 use App\ClientRouteCampaigns;
@@ -58,11 +58,11 @@ class AutoScriptController extends Controller
         });
 
         //collection of records from rbh30report from this day
-        $actualNewUsersRecords = Rbh30Report::where('created_at', '=', $today)->get();
+        $actualNewUsersRecords = NewUsersRbhReport::where('created_at', '=', $today)->get();
 
-        foreach($usersWorkingLessThan30Rbh as $user) {
-            if($actual30RbhRecords->where('user_id', '=', $user->id_user)->where('created_at', '=', $today)->isEmpty()) { //there is no duplicates
-                $rbh30Report = new Rbh30Report();
+        foreach($usersWorkingLessThanNewUsers as $user) {
+            if($usersWorkingLessThanNewUsers->where('user_id', '=', $user->id_user)->where('created_at', '=', $today)->isEmpty()) { //there is no duplicates
+                $rbh30Report = new NewUsersRbhReport();
                 $rbh30Report->user_id = $user->id_user;
                 $rbh30Report->department_info_id = $user->dep_id;
                 $rbh30Report->success = $user->success;
@@ -76,7 +76,7 @@ class AutoScriptController extends Controller
                 $rbh30Report->save();
             }
             else {
-                $updatedRecord = $actual30RbhRecords->where('user_id', '=', $user->id_user)->where('created_at', '=', $today)->first();
+                $updatedRecord = $actualNewUsersRecords->where('user_id', '=', $user->id_user)->where('created_at', '=', $today)->first();
                 $updatedRecord->success = $user->success;
                 $updatedRecord->sec_sum = $user->sec_sum;
                 $updatedRecord->average = $user->avg;

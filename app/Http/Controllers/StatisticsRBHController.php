@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Department_info;
 use App\Pbx_report_extension;
-use App\Rbh30Report;
+use App\NewUsersRbhReport;
 use App\User;
 use App\Utilities\Dates\MonthFourWeeksDivision;
 use App\Utilities\GlobalVariables\UsersGlobalVariables;
@@ -318,7 +318,7 @@ class StatisticsRBHController extends Controller
 
 
         //All most recent records from given range
-        $data = Rbh30Report::select(
+        $data = NewUsersRbhReport::select(
             DB::raw('CONCAT(departments.name, " ", department_type.name) as department_info_id'),
             'first_name',
             'last_name',

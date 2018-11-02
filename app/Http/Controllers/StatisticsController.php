@@ -13,7 +13,7 @@ use App\HourReport;
 use App\Pbx_report_extension;
 use App\PBXDetailedCampaign;
 use App\PBXDKJTeam;
-use App\Rbh30Report;
+use App\NewUsersRbhReport;
 use App\RecruitmentStory;
 use App\ReportCampaign;
 use App\UserEmploymentStatus;
@@ -3380,7 +3380,7 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
                 $onlyUserID = $this::getUserNewUsers('>=')->pluck('id_user')->toArray();
             }
         }else{
-            $RBHUsersBetweenDates = Rbh30Report::RBHUsersBetweenDates([$date_start,$date_stop])->get()->pluck('user_id')->toArray();
+            $RBHUsersBetweenDates = NewUsersRbhReport::RBHUsersBetweenDates([$date_start,$date_stop])->get()->pluck('user_id')->toArray();
             if($request->onlyNewUser == 1){
                 $onlyUserID = $RBHUsersBetweenDates;
             }else if($request->onlyNewUser == 2){
@@ -4008,7 +4008,7 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
             }
         }
         else{
-            $RBHUsersBetweenDates = Rbh30Report::RBHUsersBetweenDates([$data_start,$data_stop])->get()->pluck('user_id')->toArray();
+            $RBHUsersBetweenDates = NewUsersRbhReport::RBHUsersBetweenDates([$data_start,$data_stop])->get()->pluck('user_id')->toArray();
             if($request->onlyNewUser == 1){
                 $newUserID = $RBHUsersBetweenDates;
             }else if($request->onlyNewUser == 2){
@@ -4218,7 +4218,7 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
                 $data = $data->whereIn('user_id',$this::getUserNewUsers('>=')->pluck('id_user'));
             }
         }else{
-            $RBHUsersBetweenDates = Rbh30Report::RBHUsersBetweenDates([$request->day_select,$request->day_select])->get()->pluck('user_id')->toArray();
+            $RBHUsersBetweenDates = NewUsersRbhReport::RBHUsersBetweenDates([$request->day_select,$request->day_select])->get()->pluck('user_id')->toArray();
             if($request->onlyNewUser == 1){
                 $data = $data->whereIn('user_id',$RBHUsersBetweenDates);
             }else if($request->onlyNewUser == 2){
@@ -4294,7 +4294,7 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
                 $onlyUserID = $this::getUserNewUsers('>=')->pluck('id_user')->toArray();
             }
         } else {
-            $RBHUsersBetweenDates = Rbh30Report::RBHUsersBetweenDates([$request->day_select, $request->day_select])->get()->pluck('user_id')->toArray();
+            $RBHUsersBetweenDates = NewUsersRbhReport::RBHUsersBetweenDates([$request->day_select, $request->day_select])->get()->pluck('user_id')->toArray();
             if ($request->onlyNewUser == 1) {
                 $onlyUserID = $RBHUsersBetweenDates;
             } else if ($request->onlyNewUser == 2) {
@@ -4890,7 +4890,7 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
                 $newUserID = $this::getUserNewUsers('>=')->pluck('id_user')->toArray();
             }
         }else{
-            $RBHUsersBetweenDates = Rbh30Report::RBHUsersBetweenDates([$request->day_select,$request->day_select])->get()->pluck('user_id')->toArray();
+            $RBHUsersBetweenDates = NewUsersRbhReport::RBHUsersBetweenDates([$request->day_select,$request->day_select])->get()->pluck('user_id')->toArray();
             if($request->onlyNewUser == 1){
                 $newUserID =$RBHUsersBetweenDates;
             }else if($request->onlyNewUser == 2){
