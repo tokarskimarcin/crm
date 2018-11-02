@@ -228,8 +228,6 @@ class ModelConversationsController extends Controller
             ->orderBy('playlist_order')
             ->get();
 
-//        dd($playlist);
-
         return view('model_conversations.model_conversations_playlist')
             ->with('playlist', $playlist)
             ->with('playlistObject', $playlistObject)
@@ -318,7 +316,7 @@ class ModelConversationsController extends Controller
      * This method removes playlist item
      */
     public function managementPlaylistItemsDelete($id) {
-
+//        dd($id);
         return ModelConvPlaylistItem::smartDelete($id);
     }
 

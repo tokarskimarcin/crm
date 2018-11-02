@@ -23,7 +23,14 @@ class ModelConvItems extends Model
      */
     public static function deleteWithReferences($id) {
         ModelConvItems::find($id)->delete();
-        ModelConvPlaylistItem::where('item_id', '=', $id)->delete();
+        $playlist_items = ModelConvPlaylistItem::where('item_id', '=', $id)->get();
+
+        //This part adjust order as deleting files
+        foreach($playlist_items as $item) {
+            $playlist_id = $item->playlist_id;
+            $item->delete();
+            ModelConvPlaylistItem::updateOrder($playlist_id);
+        }
     }
 
     /**
