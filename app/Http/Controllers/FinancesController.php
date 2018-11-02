@@ -706,7 +706,7 @@ class FinancesController extends Controller
                     $dataTrainingGroup = RecruitmentStory::getReportTrainingDataShort($date_start,$date_stop, $deps2);
                     $dateHireCandidate = RecruitmentStory::getReportTrainingDataAndHireShort($date_start,$date_stop);
                     $dataTrainingGroup = $this::mapTrainingGroupInfoAndHireCandidate($dataTrainingGroup,$dateHireCandidate);
-                    $RBH30Data = DataNewUsersRbhReport::get($date_start, $date_stop, 1);
+                    $newUsersData = DataNewUsersRbhReport::get($date_start, $date_stop, 1);
 
                     foreach($dataTrainingGroup as $recruitmentInfo) { //we are filling firstStatistcArr with parameter: recruited to stage 1.
                         if($recruitmentInfo->dep_id == $dep_info) { //data from user's department
@@ -716,13 +716,13 @@ class FinancesController extends Controller
                     }
 
                     $sumConsultants = 0; // number of consultants = denumerator for average
-                    if2(isset($RBH30Data[$dep_info])) {
-                        $sumConsultants = count($RBH30Data[$dep_info]);
+                    if2(isset($newUsersData[$dep_info])) {
+                        $sumConsultants = count($newUsersData[$dep_info]);
                     }
 
                     $sum_success = 0; // number of successes = numerator for average
-                    if(isset($RBH30Data[$dep_info])) {
-                        foreach($RBH30Data[$dep_info] as $rbhInfo) {
+                    if(isset($newUsersData[$dep_info])) {
+                        foreach($newUsersData[$dep_info] as $rbhInfo) {
                             $sum_success += $rbhInfo->success;
                         }
                     }

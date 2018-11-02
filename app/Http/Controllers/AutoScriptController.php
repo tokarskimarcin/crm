@@ -28,7 +28,7 @@ class AutoScriptController extends Controller
 {
 
     /**
-     * This method saves once a day records to rbh30report table
+     * This method saves once a day records to newUsersReport table
      */
     public function getNewUsersData() {
         $today = date('Y-m-d');
@@ -57,23 +57,23 @@ class AutoScriptController extends Controller
             return $item;
         });
 
-        //collection of records from rbh30report from this day
+        //collection of records from newUsersReport from this day
         $actualNewUsersRecords = NewUsersRbhReport::where('created_at', '=', $today)->get();
 
         foreach($usersWorkingLessThanNewUsers as $user) {
             if($usersWorkingLessThanNewUsers->where('user_id', '=', $user->id_user)->where('created_at', '=', $today)->isEmpty()) { //there is no duplicates
-                $rbh30Report = new NewUsersRbhReport();
-                $rbh30Report->user_id = $user->id_user;
-                $rbh30Report->department_info_id = $user->dep_id;
-                $rbh30Report->success = $user->success;
-                $rbh30Report->sec_sum = $user->sec_sum;
-                $rbh30Report->average = $user->avg;
-                $rbh30Report->janki = $user->janki;
-                $rbh30Report->received_calls = $user->received_calls;
-                $rbh30Report->all_checked_talks = $user->all_checked_talks;
-                $rbh30Report->created_at = $today;
-                $rbh30Report->updated_at = null;
-                $rbh30Report->save();
+                $newUsersReport = new NewUsersRbhReport();
+                $newUsersReport->user_id = $user->id_user;
+                $newUsersReport->department_info_id = $user->dep_id;
+                $newUsersReport->success = $user->success;
+                $newUsersReport->sec_sum = $user->sec_sum;
+                $newUsersReport->average = $user->avg;
+                $newUsersReport->janki = $user->janki;
+                $newUsersReport->received_calls = $user->received_calls;
+                $newUsersReport->all_checked_talks = $user->all_checked_talks;
+                $newUsersReport->created_at = $today;
+                $newUsersReport->updated_at = null;
+                $newUsersReport->save();
             }
             else {
                 $updatedRecord = $actualNewUsersRecords->where('user_id', '=', $user->id_user)->where('created_at', '=', $today)->first();
