@@ -8,6 +8,9 @@ use App\ClientRoute;
 use App\ClientRouteInfo;
 use App\Department_info;
 use App\MedicalPackage;
+use App\ModelConvItems;
+use App\ModelConvPlaylistItem;
+use DateTime;
 use Exception;
 use App\PrivilageRelation;
 use App\Rbh30Report;
@@ -21,9 +24,31 @@ use App\VeronaMail;
 use App\Work_Hour;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class AutoScriptController extends Controller
 {
+
+    /**
+     * This method removes temporary files uploaded by user after $daysToRemove period.
+     */
+    public function removeTemporaryConversations() {
+        $daysToRemove = 3; //ammount of days to delete
+
+        $today = new DateTime(date('Y-m-d'));
+        $tempConversations = ModelConvItems::select('id', 'temp', 'created_at', 'file_name')->where('temp', '=', 1)->get(); //all temporary conversations
+
+        foreach($tempConversations as $conversation) {
+            $created_at = new DateTime(date('Y-m-d', strtotime($conversation->created_at)));
+            $difference = $today->diff($created_at)->d; //difference between date of upload and actual date in terms of days
+            if($difference >= $daysToRemove) {
+                //Remove database records and files from file system
+                $item = ModelConvItems::find($conversation->id);
+                ModelConvPlaylistItem::where('item_id', '=', $item->id)->delete();
+                Storage::delete('public/' . $item->file_name);
+            }
+        }
+    }
 
     /**
      * This method saves once a day records to rbh30report table

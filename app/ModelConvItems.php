@@ -10,7 +10,8 @@ class ModelConvItems extends Model
     public $timestamps = false;
     protected $guarded = [];
 
-    //status 0 nieaktywne, status 1 aktywne, status 2 tymczasowe
+    //status 0 nieaktywne, status 1 aktywne
+    //temp 0 - permanentne rozmowy, temp 1 - tymczasowe rozmowy
 
     public static function scopeOnlyActive($query) {
        return $query->where('status', '=', 1);
