@@ -113,7 +113,18 @@ class ModelConversationsController extends Controller
         }
 
         $items = null;
-        $categories = ModelConvCategories::whereNotIn('status', [-1])->get(); //all categories without this with status -1 (permanent)
+
+        if($user_department_type == $this->superUserDepartmentType) {
+            if (in_array($user_type_id, $this->adminPanelAccessArr)) {
+                $categories = ModelConvCategories::whereNotIn('status', [-1])->get(); //all categories without this with status -1 (permanent)
+            }
+            else {
+                $categories = ModelConvCategories::whereNotIn('status', [-1])->where('department_type_id', '=', $user_department_type)->get(); //all categories from user department type without this with status -1 (permanent)
+            }
+        }
+        else {
+            $categories = ModelConvCategories::whereNotIn('status', [-1])->where('department_type_id', '=', $user_department_type)->get();  //all categories from user department type without this with status -1 (permanent)
+        }
 
         $playlists = null;
         if(in_array($user_type_id, $this->adminPanelAccessArr)) { //this see privilaged user (all available users playlists)

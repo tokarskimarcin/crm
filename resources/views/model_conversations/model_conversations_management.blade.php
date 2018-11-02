@@ -77,7 +77,7 @@
                                 <option value="0">Główna kategoria</option>
                                 @foreach($categories as $category)
                                     @if($category->status == 1)
-                                        <option value="{{$category->id}}">{{$category->name}}</option>
+                                        <option value="{{$category->id}}">{{$category->name}} @if($showAvailableDepartmentTypes) - {{$availableDepartmentTypes->where('id', '=', $category->department_type_id)->first()->name}} @endif</option>
                                     @endif
                                 @endforeach
                             </select>

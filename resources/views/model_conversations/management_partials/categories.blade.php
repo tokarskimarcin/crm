@@ -37,7 +37,7 @@
             </td>
             @if($showAvailableDepartmentTypes)
                 <td>
-                    <select class="form-control" disabled>
+                    <select class="form-control department_type_id" disabled>
                         <option>Wybierz</option>
                         @foreach($availableDepartmentTypes as $dep)
                             <option value="{{$dep->id}}" @if($category->department_type_id == $dep->id) selected @endif>{{$dep->name}}</option>
