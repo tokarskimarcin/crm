@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\Utilities\GlobalVariables\UsersGlobalVariables;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
@@ -40,7 +41,7 @@ class Work_Hour extends Model
             throw new \Exception('Wrong param (comparator) in usersWorkingRBHSelector function');
         }
         if($SactualMonth == null) $SactualMonth = date('Y-m');
-        $iNumberOfSeconds = $iNumberOfHours * 60 * 60;
+        $iNumberOfSeconds = $iNumberOfHours * 60 * 60; //rbh in seconds
 
         $cAllUsers = Work_Hour::select(DB::raw('
         id_user,
@@ -216,7 +217,7 @@ class Work_Hour extends Model
 
                 $allUserRecords = Work_Hour::getWorkHoursRecordsGroupedByDate($item->id_user);
                 $iSecondSum = 0;
-                $only30RBHSuccess = 0;
+                $onlyNewUsersRbhSuccess = 0;
                 $sDateStart = null;
                 $sDateStop = null;
 
@@ -226,12 +227,12 @@ class Work_Hour extends Model
                             $sDateStart = $value->date;
                         }
                         $iSecondSum += $value->sec_sum;
-                        $only30RBHSuccess += $value->success;
+                        $onlyNewUsersRbhSuccess += $value->success;
                     }
                     if($iSecondSum >= $iTimeInSeconds) {
                         $sDateStop = $value->date;
                         $item->secondStop = $iSecondSum;
-                        $item->success = $only30RBHSuccess;
+                        $item->success = $onlyNewUsersRbhSuccess;
                         break;
                     }
                 }

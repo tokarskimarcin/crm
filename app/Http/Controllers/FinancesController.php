@@ -681,16 +681,16 @@ class FinancesController extends Controller
 
                     $date_start = $companyWeek->firstDay;
                     $date_stop = $companyWeek->lastDay;
-                    $RBH30Data = Data30RBHreport::get($date_start, $date_stop, 1);
+                    $newUsersRbhData = Data30RBHreport::get($date_start, $date_stop, 1);
 
                     $sumConsultants = 0; // number of consultants = denumerator for average
-                    if(isset($RBH30Data[$dep_info])) {
-                        $sumConsultants = count($RBH30Data[$dep_info]);
+                    if(isset($newUsersRbhData[$dep_info])) {
+                        $sumConsultants = count($newUsersRbhData[$dep_info]);
                     }
 
                     $sum_success = 0; // number of successes = numerator for average
-                    if(isset($RBH30Data[$dep_info])) {
-                        foreach($RBH30Data[$dep_info] as $rbhInfo) {
+                    if(isset($newUsersRbhData[$dep_info])) {
+                        foreach($newUsersRbhData[$dep_info] as $rbhInfo) {
                             $sum_success += $rbhInfo->success;
                         }
                     }
@@ -716,7 +716,7 @@ class FinancesController extends Controller
                     }
 
                     $sumConsultants = 0; // number of consultants = denumerator for average
-                    if(isset($RBH30Data[$dep_info])) {
+                    if2(isset($RBH30Data[$dep_info])) {
                         $sumConsultants = count($RBH30Data[$dep_info]);
                     }
 

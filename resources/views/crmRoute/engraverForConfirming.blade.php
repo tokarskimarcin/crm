@@ -49,10 +49,10 @@
              cursor: help;
         }
         .dep1{
-            background-color: #ff744e !important;
+            background-color: #a0c1ff !important;
         }
         .dep2{
-            background-color: #c0ff7b !important;
+            background-color: #ffffff !important;
         }
         .dep3{
             background-color: #8888ff !important;
@@ -95,9 +95,9 @@
 <div class="row">
     <div class="col-lg-12">
         <div class="panel panel-default">
-            <div class="panel-heading">
+            {{--<div class="panel-heading">
                 Szczegółowe informacje o grafiku
-            </div>
+            </div>--}}
             <div class="panel-body">
                 <div class="row">
 
