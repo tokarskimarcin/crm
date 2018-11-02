@@ -13,7 +13,7 @@
                 });
             }else if(item.departmentSubtype == 'Wysyłka'){
                 $.each(item.depAverages, function (index, depAverages) {
-                    depReportChartData.push([depAverages.time, parseFloat(depAverages.average), depAverages.average.toString(), 2.5, 3.5]);
+                    depReportChartData.push([depAverages.time, parseFloat(depAverages.average), depAverages.average.toString(), 2.2, 3.3]);
                 });
             }
             departmentsChartsData[item.dep_info_id] = depReportChartData;
