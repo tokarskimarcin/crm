@@ -18,6 +18,7 @@ use App\RecruitmentStory;
 use App\ReportCampaign;
 use App\UserEmploymentStatus;
 use App\Utilities\Dates\MonthFourWeeksDivision;
+use App\Utilities\GlobalVariables\DepartmentsTypeGlobalVariables;
 use App\Utilities\GlobalVariables\StatisticsGlobalVariables;
 use App\Utilities\Reports\Report_data_methods\Data30RBHreport;
 use App\Work_Hour;
@@ -49,7 +50,8 @@ class StatisticsController extends Controller
             'hour' => $hour,
             'date' => $date,
             'reports' => $reports,
-            'last_reports' => $last_reports
+            'last_reports' => $last_reports,
+            'telemarketingLevels' => DepartmentsTypeGlobalVariables::$telemarketingLevels
         ];
         return $data;
     }
@@ -74,7 +76,8 @@ class StatisticsController extends Controller
             ->with('reports', $data['reports'])
             ->with('hour', $data['hour'])
             ->with('date', $data['date'])
-            ->with('last_reports', $data['last_reports']);
+            ->with('last_reports', $data['last_reports'])
+            ->with('telemarketingLevels', DepartmentsTypeGlobalVariables::$telemarketingLevels);
     }
 // Przygotowanie danych do raportu tygodniowego telemarketing
     private function weekReportTelemarketing($date_start, $date_stop)
@@ -5658,7 +5661,8 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
                 'dep_info_id' => $dep_info->id,
                 'departmentName'=>$dep_info->departments->name.' '.$dep_info->department_type->name,
                 'departmentSubtype' => $dep_info->type,
-                'depAverages' => $depAveragesForEveryHour]);
+                'depAverages' => $depAveragesForEveryHour,
+                'telemarketingLevels' => DepartmentsTypeGlobalVariables::$telemarketingLevels]);
         }
         $allDepAverages = [];
         $successBefore = null;
@@ -5676,7 +5680,8 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
             'dep_info_id' => -1,
             'departmentName'=> 'Wszystkie oddziały',
             'departmentSubtype' => 'Wysyłka',
-            'depAverages' => $allDepAverages]);
+            'depAverages' => $allDepAverages,
+            'telemarketingLevels' => DepartmentsTypeGlobalVariables::$telemarketingLevels]);
 
         //dd($departmentsAveragesForEveryHour);
         return $departmentsAveragesForEveryHour;
@@ -5711,7 +5716,8 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
                 'dep_info_id' => $dep_info->id,
                 'departmentName'=>$dep_info->departments->name.' '.$dep_info->department_type->name,
                 'departmentSubtype' => $dep_info->type,
-                'depAverages' => $depAveragesForEveryDay]);
+                'depAverages' => $depAveragesForEveryDay,
+                'telemarketingLevels' => DepartmentsTypeGlobalVariables::$telemarketingLevels]);
         }
         $allDepAverages = [];
         foreach ($allDeps as $hour => $data){
@@ -5725,7 +5731,8 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
             'dep_info_id' => -1,
             'departmentName'=> 'Wszystkie oddziały',
             'departmentSubtype' => 'Wysyłka',
-            'depAverages' => $allDepAverages]);
+            'depAverages' => $allDepAverages,
+            'telemarketingLevels' => DepartmentsTypeGlobalVariables::$telemarketingLevels]);
 
         //dd($departmentsAveragesForEveryDay);
         return $departmentsAveragesForEveryDay;
