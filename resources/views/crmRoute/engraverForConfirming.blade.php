@@ -155,6 +155,8 @@
                                         Dla otrzymania lepszego wyglądu tabeli zaleca się <i>wyłącznie</i> panelu nawigacyjnego naciskając przycisk <u>"OFF"</u> w górnym lewym rogu strony. <br>
                                         Pokazy <u>anulowane</u> mają cały wiersz w kolorze <span style="background-color: #fdff78;">żółtym</span>.
                                         <br>
+                                        Data potwierdzania jest podświetlana na <span style="background-color: #ff9c87">czerowono</span>, jeżeli różnica daty pokazu i daty potwierdzania jest większa niż 1 dzień.
+                                        <br>
                                         <strong>Kolory oddziałów potwierdzających:</strong>
                                         <ul class="list-group departmentColors">
                                         @foreach($departmentInfo as $item)
