@@ -58,8 +58,7 @@ class Work_Hour extends Model
             ->where(function ($querry) use ($SactualMonth, $comparator){
                 if($comparator == '<' || $comparator == '<=' ){
                     $querry->where(function ($query) use ($SactualMonth) {
-                        $query->where('users.status_work', '=', 1)
-                            ->where('users.start_work','like',$SactualMonth.'%');
+                        $query->where('users.status_work', '=', 1);
                     })
                     ->orwhere('users.end_work','like',$SactualMonth.'%');
                 }
@@ -106,8 +105,7 @@ class Work_Hour extends Model
             ->where(function ($querry) use ($SactualMonth, $comparator){
                 if($comparator == '<' || $comparator == '<=' ){
                     $querry->where(function ($query) use ($SactualMonth) {
-                        $query->where('users.status_work', '=', 1)
-                            ->where('users.start_work','like',$SactualMonth.'%');
+                        $query->where('users.status_work', '=', 1);
                     })
                         ->orwhere('users.end_work','like',$SactualMonth.'%');
                 }
