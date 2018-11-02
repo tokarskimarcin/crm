@@ -172,6 +172,13 @@
                     </div>
                 </div>
                 <div class="row">
+                    <div class="col-md-2">
+                        <div class="checkbox" >
+                            <label>
+                                <input id="confirmationDateFilterCheckbox" type="checkbox" style="display: block;"> Filtruj po dacie potwierdzeń
+                            </label>
+                        </div>
+                    </div>
                     <div class="col-md-4 buttonSection" style="min-height: 3.5em;">
                         <button class="btn btn-success" style="margin-bottom: 1em;  width: 100%;" id="save" disabled>
                             <span class='glyphicon glyphicon-save'></span> Zapisz zmiany <span class="badge">0</span></button>
@@ -595,6 +602,7 @@
                         d.to = APP.DOMElements.to.value;
                         d.departments = APP.arrays.selectedDepartments;
                         d.typ = APP.arrays.selectedTypes;
+                        d.confirmationDateFilter = $('#confirmationDateFilterCheckbox').prop('checked');
                    },
                    'headers': {'X-CSRF-TOKEN': '{{ csrf_token() }}'}
                },
@@ -815,6 +823,10 @@
            $('#date_start, #date_stop').on('change', () => {
                table.ajax.reload();
 
+           });
+
+           $('#confirmationDateFilterCheckbox').change(function () {
+              table.ajax.reload();
            });
 
            function saveHandler(e) {
