@@ -24,7 +24,7 @@
                     </tr>
                 @endforeach
                 <tr>
-                    <td>Dodaj</td>
+                    <td>Dodaj playlistę</td>
                     <td><button class="btn btn-info" data-type="playlists" data-action="5" data-toggle="modal" data-target="#playlistEdition">Dodaj</button></td>
                     <td></td>
                     <td></td>

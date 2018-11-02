@@ -54,7 +54,7 @@
         </tbody>
         <tfoot>
         <tr>
-            <td>Dodaj nową rozmowę</td>
+            <td>Dodaj rozmowę</td>
             <td><button class="btn btn-info" data-type="items" data-action="5" data-toggle="modal" data-target="#itemEdition">Dodaj</button></td>
             <td></td>
             <td></td>
