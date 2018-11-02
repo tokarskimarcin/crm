@@ -53,4 +53,52 @@ class ModelConvItems extends Model
             return ModelConvItems::find($id)->update(['status' => '1']);
         }
     }
+
+    /**
+     * @param bool $onlyLoggedUser
+     * @return null/Collection
+     * This method returns info about playlist items
+     */
+    public static function getPlaylistItemsInfo($onlyLoggedUser = false) {
+        $items = null;
+        if($onlyLoggedUser) {
+            $items = ModelConvItems::select(
+                'model_conv_items.id as id',
+                'file_name',
+                'model_conv_items.name as name',
+                'model_conv_items.trainer as trainer',
+                'gift',
+                'client',
+                'model_category_id',
+                'user_id',
+                'model_conv_items.status as status',
+                'first_name',
+                'last_name'
+            )
+                ->join('users', 'model_conv_items.user_id', '=', 'users.id')
+                ->where('user_id', '=', Auth::user()->id)
+                ->get();
+        }
+        else {
+            $items = ModelConvItems::select(
+                'model_conv_items.id as id',
+                'file_name',
+                'model_conv_items.name as name',
+                'model_conv_items.trainer as trainer',
+                'gift',
+                'client',
+                'model_category_id',
+                'user_id',
+                'model_conv_items.status as status',
+                'first_name',
+                'last_name'
+            )
+                ->join('users', 'model_conv_items.user_id', '=', 'users.id')
+                ->get();
+        }
+
+
+
+        return $items;
+    }
 }

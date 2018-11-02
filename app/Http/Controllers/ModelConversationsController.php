@@ -76,61 +76,13 @@ class ModelConversationsController extends Controller
 
             $playlists = null;
             if(in_array($user, $this->adminPanelAccessArr)) { //this see privilaged user (all available users playlists)
-                $playlists = ModelConvPlaylist::select(
-                    'first_name',
-                    'last_name',
-                    'model_conv_playlist.id',
-                    'model_conv_playlist.name',
-                    'users.id as user_id', 'img'
-                )
-                    ->join('users', 'model_conv_playlist.user_id', '=', 'users.id')
-                    ->get();
-
-                $items = ModelConvItems::select(
-                    'model_conv_items.id as id',
-                    'file_name',
-                    'model_conv_items.name as name',
-                    'model_conv_items.trainer as trainer',
-                    'gift',
-                    'client',
-                    'model_category_id',
-                    'user_id',
-                    'model_conv_items.status as status',
-                    'first_name',
-                    'last_name'
-                )
-                    ->join('users', 'model_conv_items.user_id', '=', 'users.id')
-                    ->get();
+                $playlists = ModelConvPlaylist::getPlaylistInfo();
+                $items = ModelConvItems::getPlaylistItemsInfo();
 
             }
             else { //this see regular user (only his own playlist)
-                $playlists = ModelConvPlaylist::select(
-                    'first_name',
-                    'last_name',
-                    'model_conv_playlist.id',
-                    'model_conv_playlist.name',
-                    'users.id as user_id', 'img'
-                )
-                    ->join('users', 'model_conv_playlist.user_id', '=', 'users.id')
-                    ->where('user_id', '=', Auth::user()->id)
-                    ->get();
-
-                $items = ModelConvItems::select(
-                    'model_conv_items.id as id',
-                    'file_name',
-                    'model_conv_items.name as name',
-                    'model_conv_items.trainer as trainer',
-                    'gift',
-                    'client',
-                    'model_category_id',
-                    'user_id',
-                    'model_conv_items.status as status',
-                    'first_name',
-                    'last_name'
-                )
-                    ->join('users', 'model_conv_items.user_id', '=', 'users.id')
-                    ->where('user_id', '=', Auth::user()->id)
-                    ->get();
+                $playlists = ModelConvPlaylist::getPlaylistInfo(true);
+                $items = ModelConvItems::getPlaylistItemsInfo(true);
             }
 
             $playlistItems = ModelConvPlaylistItem::all();
@@ -440,6 +392,11 @@ class ModelConversationsController extends Controller
 
     }
 
+    /**
+     * @param Request $request
+     * @return mixed
+     * This method enables to edit or add new item
+     */
     public function itemsPost(Request $request) {
         $toAdd = $request->toAdd;
 
