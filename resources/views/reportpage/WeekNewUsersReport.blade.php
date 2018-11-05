@@ -6,7 +6,7 @@
     <div class="row">
         <div class="col-lg-12">
             <div class="page-header">
-                <div class="alert gray-nav">Raport Tygodniowy 30 Rbh(zbiorczy)</div>
+                <div class="alert gray-nav">Raport Tygodniowy {{$newUsersRbh}} Rbh(zbiorczy)</div>
             </div>
         </div>
     </div>
@@ -18,7 +18,7 @@
             </div>
         </div>
     </div>
-    <form action="{{URL::to('/pageWeek30RbhReport')}}" method="post">
+    <form action="{{URL::to('/pageWeekNewUsersReport')}}" method="post">
     <div class="row">
         <div class="col-lg-6">
             <input type="hidden" name="_token" value="{{ csrf_token() }}">
