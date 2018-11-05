@@ -9,7 +9,6 @@ use App\ClientRouteInfo;
 use App\Department_info;
 use App\MedicalPackage;
 use App\UserEmploymentStatus;
-use App\Utilities\GlobalVariables\UsersGlobalVariables;
 use Exception;
 use App\PrivilageRelation;
 use App\NewUsersRbhReport;
@@ -30,17 +29,17 @@ class AutoScriptController extends Controller
     /**
      * This method saves once a day records to newUsersReport table
      */
-    public function getNewUsersData() {
+    public function get30rbhData() {
         $today = date('Y-m-d');
 
         //array of users working less than 30 rbh this day with their data
-        $usersWorkingLessThanNewUsers = Work_Hour::usersWorkingRBHSelectorActual(30, '<');
-        $usersArr = $usersWorkingLessThanNewUsers->pluck('id_user')->toArray();
+        $usersWorkingLessThan30Rbh = Work_Hour::usersWorkingRBHSelectorActual(30, '<');
+        $usersArr = $usersWorkingLessThan30Rbh->pluck('id_user')->toArray();
         $maxIds = Pbx_report_extension::select(DB::raw('MAX(id) as id'))->whereIn('user_id', $usersArr)->groupBy('user_id', 'report_date')->pluck('id')->toArray(); //max ids for every date for every user
         $pbxReportExtData = Pbx_report_extension::select('user_id', 'all_bad_talks', 'received_calls', 'all_checked_talks')->whereIn('id', $maxIds)->get();
 
         //adding 2 fields janki and avg through maping
-        $usersWorkingLessThanNewUsers->map(function($item) use($pbxReportExtData) {
+        $usersWorkingLessThan30Rbh->map(function($item) use($pbxReportExtData) {
             $reportInfo = $pbxReportExtData->where('user_id', '=', $item->id_user); //all records from pbx report extension (only last from each day) related to this user
             $sumJanki = 0;
             $sumReceivedCalls = 0;
@@ -297,7 +296,7 @@ class AutoScriptController extends Controller
             ->get();
 
         $scheduleGroupedByUser = $scheduleData->groupBy('userId', 'week_num');
-        $usersWorkingLessThanNewUsers = Work_Hour::usersWorkingRBHSelector(UsersGlobalVariables::$newUsersRbh,'<');
+        $usersWorkingLessThan30RBH = Work_Hour::usersWorkingRBHSelector(30,'<');
         $cl = $clientRouteInfoRecords->where('confirmingUser', '!=', null)->where('confirmDate', '<>', null)->where('confirmDate', '>', $lastMonthFull);
 
         $confirmingUsersArr = $cl->pluck('confirmingUser')->toArray();
@@ -309,7 +308,7 @@ class AutoScriptController extends Controller
             $user = new \stdClass();
             $user->user_id = $id; //id of consultant
             $user->new_user = 0; //indices whether consultant it is new consultant(working less than x RBH)
-            foreach($usersWorkingLessThanNewUsers as $newUser) { //change new_user fild value to 1 if it is new consultant
+            foreach($usersWorkingLessThan30RBH as $newUser) { //change new_user fild value to 1 if it is new consultant
                 if($newUser->id_user == $id) {
                     $user->new_user = 1;
                 }

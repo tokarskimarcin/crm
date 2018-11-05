@@ -35,11 +35,11 @@
             </div>
             <div class="col-md-3">
                 <div class="form-group">
-                    <label>Nowi konsultanci <{{$newUsersRbh}}RBH:</label>
+                    <label>Nowi konsultanci <30RBH:</label>
                     <select class="form-control" name="onlyNewUser" id="onlyNewUser">
-                        <option value="0" @if(isset($onlyNewUser) && $onlyNewUser == 0) selected  @endif>Z konsultantami <{{$newUsersRbh}}RBH</option>
-                        <option value="1" @if(isset($onlyNewUser) && $onlyNewUser == 1) selected @endif>Tylko konsultanci <{{$newUsersRbh}}RBH</option>
-                        <option value="2" @if(isset($onlyNewUser) && $onlyNewUser == 2) selected @endif>Bez konsultantów <{{$newUsersRbh}}RBH</option>
+                        <option value="0" @if(isset($onlyNewUser) && $onlyNewUser == 0) selected  @endif>Z konsultantami <30RBH</option>
+                        <option value="1" @if(isset($onlyNewUser) && $onlyNewUser == 1) selected @endif>Tylko konsultanci <30RBH</option>
+                        <option value="2" @if(isset($onlyNewUser) && $onlyNewUser == 2) selected @endif>Bez konsultantów <30RBH</option>
                     </select>
                 </div>
             </div>

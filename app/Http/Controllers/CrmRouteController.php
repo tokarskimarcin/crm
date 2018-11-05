@@ -4446,6 +4446,8 @@ class CrmRouteController extends Controller
         $departments = $request->departments;
         $typ = $request->typ;
 
+        $confirmiationDateFilter = $request->confirmationDateFilter;
+
         $campaignsInfo = ClientRouteInfo::select(DB::raw('
         client_route_info.id as id,
         client_route_info.date as date,
@@ -4481,10 +4483,14 @@ class CrmRouteController extends Controller
             ->leftjoin('department_info as di','di.id','users.department_info_id')
             ->leftjoin('departments as dep','dep.id','di.id_dep')
             ->where('client_route_info.status', '=', 1) //now it's important
-            ->where('client_route_info.date', '>=', $from)
-            ->where('client_route_info.date', '<=', $to)
             ->whereIn('client_route.status',[1,2]);
 
+        if($confirmiationDateFilter == 'true'){
+            $campaignsInfo->whereBetween('client_route_info.confirmDate', [$from,$to]);
+        }else{
+
+            $campaignsInfo->whereBetween('client_route_info.date', [$from,$to]);
+        }
         if($departments[0] != '0') {
             $campaignsInfo->where(function ($query) use ($departments){
                 $query->whereIn('client_route_info.department_info_id', $departments);

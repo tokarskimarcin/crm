@@ -155,6 +155,8 @@
                                         Dla otrzymania lepszego wyglądu tabeli zaleca się <i>wyłącznie</i> panelu nawigacyjnego naciskając przycisk <u>"OFF"</u> w górnym lewym rogu strony. <br>
                                         Pokazy <u>anulowane</u> mają cały wiersz w kolorze <span style="background-color: #fdff78;">żółtym</span>.
                                         <br>
+                                        Data potwierdzania jest podświetlana na <span style="background-color: #ff9c87">czerowono</span>, jeżeli różnica daty pokazu i daty potwierdzania jest większa niż 1 dzień.
+                                        <br>
                                         <strong>Kolory oddziałów potwierdzających:</strong>
                                         <ul class="list-group departmentColors">
                                         @foreach($departmentInfo as $item)
@@ -172,6 +174,13 @@
                     </div>
                 </div>
                 <div class="row">
+                    <div class="col-md-2">
+                        <div class="checkbox" >
+                            <label>
+                                <input id="confirmationDateFilterCheckbox" type="checkbox" style="display: block;"> Filtruj po dacie potwierdzeń
+                            </label>
+                        </div>
+                    </div>
                     <div class="col-md-4 buttonSection" style="min-height: 3.5em;">
                         <button class="btn btn-success" style="margin-bottom: 1em;  width: 100%;" id="save" disabled>
                             <span class='glyphicon glyphicon-save'></span> Zapisz zmiany <span class="badge">0</span></button>
@@ -182,7 +191,7 @@
                         <thead>
                         <tr>
                             <th>T</th>
-                            <th>Data</th>
+                            <th>Data potw.</th>
                             <th>Miasto</th>
                             <th>Nazwa_klienta</th>
                             <th>G</th>
@@ -192,7 +201,7 @@
                             <th>Zgody</th>
                             <th>Frekw.</th>
                             <th>Pary</th>
-                            <th>Data potw.</th>
+                            <th>Data</th>
                             <th>cri</th>
                         </tr>
                         </thead>
@@ -215,6 +224,7 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
         <script src="{{asset('/js/numeric-comma.js')}}"></script>
         {{--<script src="{{asset('/js/dataTables.fixedHeader.min.js')}}"></script>--}}
+        <script src="{{ asset('/js/moment.js')}}"></script>
     <script>
        document.addEventListener('DOMContentLoaded', function() {
            /********** GLOBAL VARIABLES ***********/
@@ -223,18 +233,7 @@
                arrays: {
                    selectedDepartments: ["0"], //this array collect selected by user departments
                    selectedTypes: ['0'], //array of selected by user types
-                   changeArr: [], //This array collect changed rows
-                   departmentsColors: ['#f00',
-                       '#0f0',
-                       '#8888ff',
-                       '#ff0',
-                       '#f0f',
-                       '#0ff',
-                       '#888',
-                       '#f55',
-                       '#5f5',
-                       '#55f'
-                   ]
+                   changeArr: [] //This array collect changed rows
                },
                JSONS: {
                    userData: @json($userData),
@@ -306,14 +305,14 @@
            /**
             * This function shows notification.
             */
-           function notify(htmltext$string, type$string = 'info', delay$miliseconds$number = 5000) {
+           function notify(htmltext$string, typestring = 'info', delaymilisecondsnumber = 5000) {
                $.notify({
                    // options
                    message: htmltext$string
                },{
                    // settings
-                   type: type$string,
-                   delay: delay$miliseconds$number,
+                   type: typestring,
+                   delay: delaymilisecondsnumber,
                    animate: {
                        enter: 'animated fadeInRight',
                        exit: 'animated fadeOutRight'
@@ -424,6 +423,7 @@
                processing: true,
                serverSide: true,
                scrollY: APP.globalVariables.datatableHeight,
+               "lengthMenu": [[10, 25, 50, 100, 150, 200], [10, 25, 50, 100, 150, 200]],
                "iDisplayLength": 100,
                "drawCallback": function( settings ) {
 
@@ -447,6 +447,9 @@
 
                    const confirmDateInput = row.querySelector('.confirm-date');
                    const confirmDate = confirmDateInput.value;
+                   if(moment(data.date).diff(moment(data.confirmDate),'days') > 1){
+                       $(confirmDateInput).css('background-color', '#ff9c87')
+                   }
                    let confirmingPeopleSelect = row.querySelector('.confirming');
                    let alreadyIn;
                     APP.JSONS.userData.forEach(person => { //looping over all data about people
@@ -601,6 +604,7 @@
                         d.to = APP.DOMElements.to.value;
                         d.departments = APP.arrays.selectedDepartments;
                         d.typ = APP.arrays.selectedTypes;
+                        d.confirmationDateFilter = $('#confirmationDateFilterCheckbox').prop('checked');
                    },
                    'headers': {'X-CSRF-TOKEN': '{{ csrf_token() }}'}
                },
@@ -613,9 +617,26 @@
                            return data.weekOfYear;
                        },"name":"weekOfYear", "width": "1%", "searchable": false
                    },
-                   {"data":function (data, type, dataToSet) {
-                           return data.date;
-                       },"name":"date", "searchable": false
+                   {"data":function(data, type, dataToSet) {
+                           if(data.confirmDate != null) {
+
+                               /*let confirmDateInput = $('<input>').attr('type', 'date').css({'width':'100%'}).addClass('form-control confirm-date').val(data.confirmDate);
+                               //console.log(moment(data.date).diff(moment(data.confirmDate),'days'), confirmDateInput);
+                               return confirmDateInput.prop('outerHTML');*/
+
+                               return `<input type="date" style="width: 100%;" class="form-control confirm-date" value="${data.confirmDate}">`;
+                           }
+                           else {
+                               const showDate = new Date(data.date);
+                               const dayBeforeShowDate = new Date(showDate.setDate(showDate.getDate() - 1));
+                               const day = ("0" + dayBeforeShowDate.getDate()).slice(-2);
+                               const month = ("0" + (dayBeforeShowDate.getMonth() + 1)).slice(-2);
+                               const year = dayBeforeShowDate.getFullYear();
+                               const fullDate =  year + "-" + month + "-" + day;
+                               return `<input type="date" style="width: 100%;" class="form-control confirm-date" value="${fullDate}">`;
+                           }
+
+                       }, "name": "dataPotwierdzenia", "orderable": false, "searchable": false
                    },
                    {"data":function (data, type, dataToSet) {
                            if(data.nrPBX != null) {
@@ -681,28 +702,16 @@
                            return `<input class="pairs form-control" type="number" min="0" step="1" style="width: 5em;" value="${data.pairs}">`;
                        }, "name": "pairs", "orderable": false, "searchable": false
                    },
-                   {"data":function(data, type, dataToSet) {
-                       if(data.confirmDate != null) {
-                           return `<input type="date" style="width: 100%;" class="form-control confirm-date" value="${data.confirmDate}">`;
-                       }
-                       else {
-                           const showDate = new Date(data.date);
-                           const dayBeforeShowDate = new Date(showDate.setDate(showDate.getDate() - 1));
-                           const day = ("0" + dayBeforeShowDate.getDate()).slice(-2);
-                           const month = ("0" + (dayBeforeShowDate.getMonth() + 1)).slice(-2);
-                           const year = dayBeforeShowDate.getFullYear();
-                           const fullDate =  year + "-" + month + "-" + day;
-                           return `<input type="date" style="width: 100%;" class="form-control confirm-date" value="${fullDate}">`;
-                       }
-
-                       }, "name": "dataPotwierdzenia", "orderable": false, "searchable": false
+                   {"data":function (data, type, dataToSet) {
+                           return data.date;
+                       },"name":"date", "searchable": false
                    },
                    {"data":function(data, type, dataToSet) {
                            return data.client_route_id;
                        }, "name": "client_route_id", "orderable": true, "searchable": false, "visible": false
                    }
                ],
-               order: [[1, 'asc'], [3, 'asc'], [12, 'desc'], [4, 'asc']],
+               order: [[11, 'asc'], [3, 'asc'], [12, 'desc'], [4, 'asc']],
                rowGroup: {
                    dataSrc: 'date',
                    startRender: null,
@@ -816,6 +825,10 @@
            $('#date_start, #date_stop').on('change', () => {
                table.ajax.reload();
 
+           });
+
+           $('#confirmationDateFilterCheckbox').change(function () {
+              table.ajax.reload();
            });
 
            function saveHandler(e) {

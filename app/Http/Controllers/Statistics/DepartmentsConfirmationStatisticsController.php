@@ -11,13 +11,21 @@ use App\Utilities\DataProcessing\ConfirmationStatistics;
 use App\Utilities\Dates\MonthFourWeeksDivision;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Redirect;
 
 class DepartmentsConfirmationStatisticsController extends Controller
 {
     //
     public function departmentsConfirmationGet(){
+
         $deps = Department_info::where('id_dep_type', 1)->with('departments')->with('department_type')->get();
+        $userDepInfo = $deps->where('id', Auth::user()->department_info_id)->first();
+        if($userDepInfo == null){
+            return Redirect::to('/');
+        }
+
         $trainers = User::select(
             'id',
             'first_name',

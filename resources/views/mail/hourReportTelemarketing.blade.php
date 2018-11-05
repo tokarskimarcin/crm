@@ -74,7 +74,7 @@
                         $avg_per_hour=0;
                         $color = '#ffffff';
                        if($avg_per_hour !=0){
-                                if($avg_per_hour< 2.5 || $avg_per_hour >3.5){
+                                if($avg_per_hour< $telemarketingLevels[0] || $avg_per_hour > $telemarketingLevels[1]){
                                      $color = '#e46464';
                                 }else{
                                     $color = '#ffffff';
