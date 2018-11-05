@@ -1012,7 +1012,7 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
 /** AUTO SCRIPT **/
 Route::get('/autoSalaryIncrease', 'AutoScriptController@autoSalaryIncrease');
 
-Route::get('/get30rbhData', 'AutoScriptController@get30rbhData');
+Route::get('/getNewUsersData', 'AutoScriptController@getNewUsersData');
 /** KONIEC AUTO SCRIPT */
 
 //CHARTS

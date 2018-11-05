@@ -26,7 +26,7 @@ use App\Utilities\Dates\MonthFourWeeksDivision;
 use App\Utilities\DataProcessing\ConfirmationStatistics;
 use App\Utilities\Dates\MonthIntoCompanyWeeksDivision;
 use App\Utilities\Dates\MonthPerWeekDivision;
-use App\Utilities\Reports\Report_data_methods\Data30RBHreport;
+use App\Utilities\Reports\Report_data_methods\DataNewUsersRbhReport;
 use App\Utilities\Salary\ProvisionLevels;
 use App\Work_Hour;
 use DateTime;
@@ -681,7 +681,8 @@ class FinancesController extends Controller
 
                     $date_start = $companyWeek->firstDay;
                     $date_stop = $companyWeek->lastDay;
-                    $RBH30Data = Data30RBHreport::get($date_start, $date_stop, 1);
+                    
+                    $newUsersRbhData = DataNewUsersRbhReport::get($date_start, $date_stop, 1);
 
                     $sumConsultants = 0; // number of consultants = denumerator for average
                     if(isset($RBH30Data[$dep_info])) {
@@ -706,7 +707,7 @@ class FinancesController extends Controller
                     $dataTrainingGroup = RecruitmentStory::getReportTrainingDataShort($date_start,$date_stop, $deps2);
                     $dateHireCandidate = RecruitmentStory::getReportTrainingDataAndHireShort($date_start,$date_stop);
                     $dataTrainingGroup = $this::mapTrainingGroupInfoAndHireCandidate($dataTrainingGroup,$dateHireCandidate);
-                    $RBH30Data = Data30RBHreport::get($date_start, $date_stop, 1);
+                    $newUsersData = DataNewUsersRbhReport::get($date_start, $date_stop, 1);
 
                     foreach($dataTrainingGroup as $recruitmentInfo) { //we are filling firstStatistcArr with parameter: recruited to stage 1.
                         if($recruitmentInfo->dep_id == $dep_info) { //data from user's department
@@ -716,13 +717,14 @@ class FinancesController extends Controller
                     }
 
                     $sumConsultants = 0; // number of consultants = denumerator for average
-                    if(isset($RBH30Data[$dep_info])) {
-                        $sumConsultants = count($RBH30Data[$dep_info]);
+
+                    if(isset($newUsersData[$dep_info])) {
+                        $sumConsultants = count($newUsersData[$dep_info]);
                     }
 
                     $sum_success = 0; // number of successes = numerator for average
-                    if(isset($RBH30Data[$dep_info])) {
-                        foreach($RBH30Data[$dep_info] as $rbhInfo) {
+                    if(isset($newUsersData[$dep_info])) {
+                        foreach($newUsersData[$dep_info] as $rbhInfo) {
                             $sum_success += $rbhInfo->success;
                         }
                     }
