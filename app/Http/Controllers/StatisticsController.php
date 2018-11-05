@@ -13,13 +13,13 @@ use App\HourReport;
 use App\Pbx_report_extension;
 use App\PBXDetailedCampaign;
 use App\PBXDKJTeam;
-use App\Rbh30Report;
+use App\NewUsersRbhReport;
 use App\RecruitmentStory;
 use App\ReportCampaign;
 use App\UserEmploymentStatus;
 use App\Utilities\Dates\MonthFourWeeksDivision;
 use App\Utilities\GlobalVariables\StatisticsGlobalVariables;
-use App\Utilities\Reports\Report_data_methods\Data30RBHreport;
+use App\Utilities\GlobalVariables\UsersGlobalVariables;
 use App\Work_Hour;
 use DateTime;
 use Illuminate\Http\Request;
@@ -3351,7 +3351,8 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
             ->with([
                 'coaches'   => $coaches,
                 'months'    => self::getMonthsNames(),
-                'month_selected' => date('m')
+                'month_selected' => date('m'),
+                'newUsersRbh'   => UsersGlobalVariables::$newUsersRbh
             ]);
     }
 
@@ -3374,12 +3375,12 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
 
         if(strtotime(date('Y-m-d')) < strtotime(StatisticsGlobalVariables::$firstNovember)){
             if($request->onlyNewUser == 1){
-                $onlyUserID = $this::getUser30RBH('<')->pluck('id_user')->toArray();
+                $onlyUserID = $this::getUserNewUsers('<')->pluck('id_user')->toArray();
             }else if($request->onlyNewUser == 2){
-                $onlyUserID = $this::getUser30RBH('>=')->pluck('id_user')->toArray();
+                $onlyUserID = $this::getUserNewUsers('>=')->pluck('id_user')->toArray();
             }
         }else{
-            $RBHUsersBetweenDates = Rbh30Report::RBHUsersBetweenDates([$date_start,$date_stop])->get()->pluck('user_id')->toArray();
+            $RBHUsersBetweenDates = NewUsersRbhReport::RBHUsersBetweenDates([$date_start,$date_stop])->get()->pluck('user_id')->toArray();
             if($request->onlyNewUser == 1){
                 $onlyUserID = $RBHUsersBetweenDates;
             }else if($request->onlyNewUser == 2){
@@ -3402,7 +3403,8 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
                 'month_selected'    => $request->month_selected,
                 'onlyNewUser'       => $request->onlyNewUser,
                 'withoutNewUser'    => $request->withoutNewUser,
-                'onlyUserID'        => $onlyUserID
+                'onlyUserID'        => $onlyUserID,
+                'newUsersRbh'   => UsersGlobalVariables::$newUsersRbh
             ]);
     }
 
@@ -3972,6 +3974,7 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
                 'dep_id'        => $departments->first()->id,
                 'data'          => $data,
                 'onlyNewUser'   => 0,
+                'newUsersRbh'   => UsersGlobalVariables::$newUsersRbh
             ]);
     }
 
@@ -3999,13 +4002,13 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
         $newUserID = [];
         if(strtotime(date('Y-m-d')) < strtotime(StatisticsGlobalVariables::$firstNovember)){
             if($request->onlyNewUser == 1){
-                $newUserID = $this::getUser30RBH('<')->pluck('id_user')->toArray();
+                $newUserID = $this::getUserNewUsers('<')->pluck('id_user')->toArray();
             }else if($request->onlyNewUser == 2){
-                $newUserID = $this::getUser30RBH('>=')->pluck('id_user')->toArray();
+                $newUserID = $this::getUserNewUsers('>=')->pluck('id_user')->toArray();
             }
         }
         else{
-            $RBHUsersBetweenDates = Rbh30Report::RBHUsersBetweenDates([$data_start,$data_stop])->get()->pluck('user_id')->toArray();
+            $RBHUsersBetweenDates = NewUsersRbhReport::RBHUsersBetweenDates([$data_start,$data_stop])->get()->pluck('user_id')->toArray();
             if($request->onlyNewUser == 1){
                 $newUserID = $RBHUsersBetweenDates;
             }else if($request->onlyNewUser == 2){
@@ -4029,7 +4032,8 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
                 'dep_id'        => $request->dep_selected,
                 'data'          => $data,
                 'onlyNewUser'   => $request->onlyNewUser,
-                'onlyUserID'    => $newUserID
+                'onlyUserID'    => $newUserID,
+                'newUsersRbh'   => UsersGlobalVariables::$newUsersRbh
             ]);
     }
 
@@ -4049,6 +4053,7 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
             ->with('user_type_ids_for_managers_report', array_merge(StatisticsGlobalVariables::$userTypeIdsForManagersReportOfUnusedAccounts, StatisticsGlobalVariables::$userTypeIdsForEveryData))
             ->with('user_type_ids_for_departments_report', array_merge(StatisticsGlobalVariables::$userTypeIdsForDepartmentsReportOfUnusedAccounts, StatisticsGlobalVariables::$userTypeIdsForEveryData))
             ->with('user_type_ids_for_every_data', StatisticsGlobalVariables::$userTypeIdsForEveryData)
+            ->with('sendingMails',  $data['sendingMails'])
             ->with('user_to_show', $user);
     }
 
@@ -4066,7 +4071,7 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
         //Pobranie użytkowników do zakończenia umowy
 
         $users_warning = User::
-        whereBetween('last_login', [$date_disable, $date_warning])
+        where('last_login','<', $date_warning)
             ->whereIn('users.user_type_id', [1, 2])
             ->where('status_work', '=', 1)
             ->get();
@@ -4098,7 +4103,8 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
             'coaches'           => $coaches,
             'managers'          => $managers,
             'cadre'             => $cadre,
-            'administrationManagers'          => $administrationManagers
+            'administrationManagers'          => $administrationManagers,
+            'sendingMails'     => $sendingMails
         ];
         return $data;
     }
@@ -4149,14 +4155,15 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
                 'coach_id'  => 0,
                 'date_selected' => date('Y-m-d'),
                 'hour_selected' => '09:00:00',
-                'months'    => self::getMonthsNames()
+                'months'    => self::getMonthsNames(),
+                'newUsersRbh' => UsersGlobalVariables::$newUsersRbh
             ]);
     }
 
-    function getUser30RBH($comparator){
-        $iTimeInSHours = 30;
-        $CusersWorkingLessThan30RBH = Work_Hour::usersWorkingRBHSelector($iTimeInSHours, $comparator)->unique('id_user');
-        return $CusersWorkingLessThan30RBH;
+    function getUserNewUsers($comparator){
+        $iTimeInSHours = UsersGlobalVariables::$newUsersRbh;
+        $CusersWorkingLessThanNewUsers = Work_Hour::usersWorkingRBHSelector($iTimeInSHours, $comparator)->unique('id_user');
+        return $CusersWorkingLessThanNewUsers;
     }
 
     /**
@@ -4206,12 +4213,12 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
 
         if(strtotime(date('Y-m-d')) < strtotime(StatisticsGlobalVariables::$firstNovember)){
             if($request->onlyNewUser == 1){
-                $data = $data->whereIn('user_id',$this::getUser30RBH('<')->pluck('id_user'));
+                $data = $data->whereIn('user_id',$this::getUserNewUsers('<')->pluck('id_user'));
             }else if($request->onlyNewUser == 2){
-                $data = $data->whereIn('user_id',$this::getUser30RBH('>=')->pluck('id_user'));
+                $data = $data->whereIn('user_id',$this::getUserNewUsers('>=')->pluck('id_user'));
             }
         }else{
-            $RBHUsersBetweenDates = Rbh30Report::RBHUsersBetweenDates([$request->day_select,$request->day_select])->get()->pluck('user_id')->toArray();
+            $RBHUsersBetweenDates = NewUsersRbhReport::RBHUsersBetweenDates([$request->day_select,$request->day_select])->get()->pluck('user_id')->toArray();
             if($request->onlyNewUser == 1){
                 $data = $data->whereIn('user_id',$RBHUsersBetweenDates);
             }else if($request->onlyNewUser == 2){
@@ -4231,7 +4238,8 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
                 'date_selected' => $request->day_select,
                 'hour_selected' => $request->hour_select,
                 'months'        => self::getMonthsNames(),
-                'onlyNewUser'   => $request->onlyNewUser
+                'onlyNewUser'   => $request->onlyNewUser,
+                'newUsersRbh' => UsersGlobalVariables::$newUsersRbh
             ]);
     }
 
@@ -4258,6 +4266,7 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
                 'date_selected'     => date('Y-m-d'),
                 'months'            => self::getMonthsNames(),
                 'onlyNewUser'   => 0,
+                'newUsersRbh'   => UsersGlobalVariables::$newUsersRbh
             ]);
     }
 
@@ -4278,14 +4287,14 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
 
         $data = $this->getDayCoachStatistics($request->dep_id, $request->day_select);
         $onlyUserID = [];
-        if (strtotime(date('Y-m-d')) > strtotime(StatisticsGlobalVariables::$firstNovember)) {
+        if (strtotime(date('Y-m-d')) < strtotime(StatisticsGlobalVariables::$firstNovember)) {
             if ($request->onlyNewUser == 1) {
-                $onlyUserID = $this::getUser30RBH('<')->pluck('id_user')->toArray();
+                $onlyUserID = $this::getUserNewUsers('<')->pluck('id_user')->toArray();
             } else if ($request->onlyNewUser == 2) {
-                $onlyUserID = $this::getUser30RBH('>=')->pluck('id_user')->toArray();
+                $onlyUserID = $this::getUserNewUsers('>=')->pluck('id_user')->toArray();
             }
         } else {
-            $RBHUsersBetweenDates = Rbh30Report::RBHUsersBetweenDates([$request->day_select, $request->day_select])->get()->pluck('user_id')->toArray();
+            $RBHUsersBetweenDates = NewUsersRbhReport::RBHUsersBetweenDates([$request->day_select, $request->day_select])->get()->pluck('user_id')->toArray();
             if ($request->onlyNewUser == 1) {
                 $onlyUserID = $RBHUsersBetweenDates;
             } else if ($request->onlyNewUser == 2) {
@@ -4315,7 +4324,8 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
                 'report_date'       => $data['report_date'],
                 'months'            => self::getMonthsNames(),
                 'onlyNewUser'       => $request->onlyNewUser,
-                'onlyUserID'        => $onlyUserID
+                'onlyUserID'        => $onlyUserID,
+                'newUsersRbh'   => UsersGlobalVariables::$newUsersRbh
             ]);
     }
 
@@ -4851,7 +4861,8 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
                 'months'    => self::getMonthsNames(),
                 'month'     => date('m'),
                 'coach_selected' => 0,
-                'onlyNewUser'   => 0,
+                'onlyNewUser'   => 0,,
+                'newUsersRbh'   => UsersGlobalVariables::$newUsersRbh
             ]);
     }
 
@@ -4874,12 +4885,12 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
         $newUserID = [];
         if(strtotime(date('Y-m-d')) < strtotime(StatisticsGlobalVariables::$firstNovember)){
             if($request->onlyNewUser == 1){
-                $newUserID = $this::getUser30RBH('<')->pluck('id_user')->toArray();
+                $newUserID = $this::getUserNewUsers('<')->pluck('id_user')->toArray();
             } else if($request->onlyNewUser == 2){
-                $newUserID = $this::getUser30RBH('>=')->pluck('id_user')->toArray();
+                $newUserID = $this::getUserNewUsers('>=')->pluck('id_user')->toArray();
             }
         }else{
-            $RBHUsersBetweenDates = Rbh30Report::RBHUsersBetweenDates([$request->day_select,$request->day_select])->get()->pluck('user_id')->toArray();
+            $RBHUsersBetweenDates = NewUsersRbhReport::RBHUsersBetweenDates([$request->day_select,$request->day_select])->get()->pluck('user_id')->toArray();
             if($request->onlyNewUser == 1){
                 $newUserID =$RBHUsersBetweenDates;
             }else if($request->onlyNewUser == 2){
@@ -4899,7 +4910,8 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
                 'coach_selected'=> $request->coach_id,
                 'data'          => $data,
                 'onlyNewUser'   => $request->onlyNewUser,
-                'onlyUserID'    => $newUserID
+                'onlyUserID'    => $newUserID,
+                'newUsersRbh'   => UsersGlobalVariables::$newUsersRbh
             ]);
     }
 
@@ -5778,9 +5790,11 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
     }
 
     private function recruitmentRotationVariables($view, $date_start, $date_stop, $department){
-        $rbh = 30 * 60 * 60; //30RBH
+        $rbh = UsersGlobalVariables::$newUsersRbs; // rbh in seconds
 
         $departments = Department_info::with('departments')->with('department_type')->get();
+
+        //departments statistics with information about number of new accounts, disabled by system accounts and accounts with end work date between passed dates
         $departmentStats = Department_info::leftJoin('users','department_info.id','users.department_info_id')
             ->select('department_info.id',
             DB::raw('COUNT(CASE WHEN created_at BETWEEN "'.$date_start.'" AND "'.$date_stop.'" THEN 1 ELSE null END)  as new_accounts_sum' ),
@@ -5792,10 +5806,16 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
         }
         $departmentStats = $departmentStats->get();
 
+        //users that worked between passed dates
+        $users = Work_Hour::select('id_user')->whereBetween('created_at',[$date_start, $date_stop])->distinct()->get()->pluck('id_user')->toArray();
+        if(count($users) == 0){
+            $users = [0];
+        }
 
+        //departments statistics with information about number of users that worked between passed dates
         $departmentStats2 =  Department_info::leftJoin('users','department_info.id','users.department_info_id')
             ->select('department_info.id', DB::raw('COUNT(CASE WHEN users.user_type_id IN (1,2) AND users.id IN ('.
-                implode(",",Work_Hour::select('id_user')->whereBetween('created_at',[$date_start,$date_stop])->distinct()->get()->pluck('id_user')->toArray())
+                implode(",", $users)
                 .') THEN 1 ELSE NULL END) as working_users_sum'))
             ->groupBy('department_info.id');
         if($department>0){
@@ -5811,7 +5831,7 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
                         ->having(DB::raw('IFNULL(SUM(TIME_TO_SEC(TIMEDIFF(accept_stop, accept_start))), 0)'), '<', $rbh)
                         ->groupBy('id_user')
                         ->get()->pluck('id_user')->toArray())
-                    .') THEN 1 ELSE NULL END) as users_less_30rbh_sum'))
+                    .') THEN 1 ELSE NULL END) as users_less_new_users_rbh_sum'))
                 ->groupBy('department_info.id');
         if($department>0){
             $departmentStats3->where('department_info.id', $department);
@@ -5821,11 +5841,14 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
 
         $data = $departmentStats->map(function ($item, $key) use ($departmentStats2, $departmentStats3) {
             $working_user_sum = $departmentStats2->where('id', $item->id)->first();
-            $users_less_30rbh_sum = $departmentStats3->where('id', $item->id)->first();
-            return (object)array_merge($item->toArray(),$working_user_sum->toArray(), $users_less_30rbh_sum->toArray());
+            $users_less_new_users_rbh_sum = $departmentStats3->where('id', $item->id)->first();
+            return (object)array_merge($item->toArray(),$working_user_sum->toArray(), $users_less_new_users_rbh_sum->toArray());
         });
 
-        return $view->with('departments',$departments)->with('data',$data)->with('period',(object)['date_start' => $date_start, 'date_stop' => $date_stop]);
+        return $view->with('departments',$departments)
+            ->with('data', $data)
+            ->with('period',(object)['date_start' => $date_start, 'date_stop' => $date_stop])
+            ->with('newUsersRbh', UsersGlobalVariables::$newUsersRbh);
     }
     public function pageReportRecruitmentRotationGet(){
         $date_start = date('Y-m-').'01';

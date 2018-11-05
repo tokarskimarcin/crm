@@ -6,12 +6,19 @@
     <div class="row">
         <div class="col-lg-12">
             <div class="page-header">
-                <div class="alert gray-nav">Raport Miesięczny 30 Rbh(zbiorczy)</div>
+                <div class="alert gray-nav">Raport Tygodniowy 30 Rbh(zbiorczy)</div>
             </div>
         </div>
     </div>
-    <form action="{{URL::to('/pageMonth30RbhReport')}}" method="post">
-
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="alert alert-info">
+                Wiersze, które mają kolor jasno czerwony wskazują osoby, których liczba zgód jest niższa niż średnia w ich oddziale <br>
+                Wiersze, które mają kolor jasno zielony wskazują osoby, których liczba zgód jest wyższa niż średnia w ich oddziale.
+            </div>
+        </div>
+    </div>
+    <form action="{{URL::to('/pageWeekNewUsersReport')}}" method="post">
     <div class="row">
         <div class="col-lg-6">
             <input type="hidden" name="_token" value="{{ csrf_token() }}">
@@ -33,22 +40,24 @@
                 </div>
             </div>
         </div>
-
-        <div class="col-lg-12">
-            <div class="form-group">
-                <input type="submit" class="btn btn-info form-control" value="Generuj" style="width:50%;">
+    </div>
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="form-group">
+                    <input type="submit" class="btn btn-info form-control" value="Generuj" style="width:50%;">
+                </div>
             </div>
         </div>
-
-    </div>
-    <div class="row">
-        <div class="col-lg-12">
-            <div class="panel-body" style="font-size: 12px;">
-                @include('mail.month30RbhReport')
-            </div>
-        </div>
-    </div>
     </form>
+        <div class="col-lg-12">
+            <div class="row">
+                <div class="panel-body" style="font-size: 12px;">
+                    @include('mail.weekNewUsersReport')
+                </div>
+            </div>
+        </div>
+    </div>
+
 
 @endsection
 

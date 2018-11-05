@@ -369,7 +369,7 @@ Route::get('/monthReportTelemarketing', 'StatisticsController@MailmonthReportTel
 Route::get('/dayReportTelemarketing', 'StatisticsController@MailDayReportTelemarketing'); // tutaj dodac
 
 Route::get('/weekReportPlanningRBH', 'StatisticsRBHController@WeekReportPlanningRBHMail');
-Route::get('/dayReport30RBH', 'StatisticsRBHController@DayReport30RBHMail');
+Route::get('/dayReportNewUsers', 'StatisticsRBHController@DayReportNewUsersMail');
 
 Route::get('/invoices', 'CrmRouteController@invoicesMail');
 //Gniezno
@@ -679,8 +679,8 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
     Route::get('/pageWeekReportPlanningRBH', 'StatisticsRBHController@weekReportPlanningRBHGet');
     Route::post('/pageWeekReportPlanningRBH', 'StatisticsRBHController@weekReportPlanningRBHPost');
     //New Users RBH Rerpot
-    Route::get('/pageDayReport30RBH', 'StatisticsRBHController@dayReport30RBHGet');
-    Route::Post('/pageDayReport30RBH', 'StatisticsRBHController@dayReport30RBHPost');
+    Route::get('/pageDayReportNewUsers', 'StatisticsRBHController@dayReportNewUsersGet');
+    Route::Post('/pageDayReportNewUsers', 'StatisticsRBHController@dayReportNewUsersPost');
 
     Route::get('/weekReportCampaign', 'StatisticsController@weekReportCampaignGet');
     Route::post('/weekReportCampaign', 'StatisticsController@weekReportCampaignPost');
@@ -778,11 +778,11 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
 
     //Raporty Rekrutacji
 
-    Route::get('/pageWeek30RbhReport', 'StatisticsRBHController@pageWeek30RbhReport');
-    Route::post('/pageWeek30RbhReport', 'StatisticsRBHController@pageWeek30RbhReportPost');
+    Route::get('/pageWeekNewUsersReport', 'StatisticsRBHController@pageWeekNewUsersReport');
+    Route::post('/pageWeekNewUsersReport', 'StatisticsRBHController@pageWeekNewUsersReportPost');
 
-    Route::get('/pageMonth30RbhReport', 'StatisticsRBHController@pageMonth30RbhReport');
-    Route::post('/pageMonth30RbhReport', 'StatisticsRBHController@pageMonth30RbhReportPost');
+    Route::get('/pageMonthNewUsersReport', 'StatisticsRBHController@pageMonthNewUsersReport');
+    Route::post('/pageMonthNewUsersReport', 'StatisticsRBHController@pageMonthNewUsersReportPost');
 
     //Dzienny
     Route::get('/pageDayReportRecruitmentFlow', 'StatisticsController@pageDayReportRecruitmentFlow');
@@ -1012,7 +1012,7 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
 /** AUTO SCRIPT **/
 Route::get('/autoSalaryIncrease', 'AutoScriptController@autoSalaryIncrease');
 
-Route::get('/get30rbhData', 'AutoScriptController@get30rbhData');
+Route::get('/getNewUsersData', 'AutoScriptController@getNewUsersData');
 /** KONIEC AUTO SCRIPT */
 
 //CHARTS

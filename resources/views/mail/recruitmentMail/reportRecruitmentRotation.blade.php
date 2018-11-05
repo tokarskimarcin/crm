@@ -11,7 +11,7 @@
             <th style="border:1px solid #231f20;text-align:center;padding:3px;background:#231f20;color:#efd88f">Lb. osób <br>zatrudnionych</th>
             <th style="border:1px solid #231f20;text-align:center;padding:3px;background:#231f20;color:#efd88f">Lb. osób, które odeszły/<br>zwolnione (przez system)</th>
             <th style="border:1px solid #231f20;text-align:center;padding:3px;background:#231f20;color:#efd88f">Współczynnik rotacji</th>
-            <th style="border:1px solid #231f20;text-align:center;padding:3px;background:#231f20;color:#efd88f">Lb. osób, które <br>odeszły (<30RBH)</th>
+            <th style="border:1px solid #231f20;text-align:center;padding:3px;background:#231f20;color:#efd88f">Lb. osób, które <br>odeszły (<{{$newUsersRbh}}RBH)</th>
         </tr>
     </thead>
     <tbody>
@@ -20,7 +20,7 @@
         $end_work_total = 0;
         $disabled_by_system_total = 0;
         $working_users_total = 0;
-        $users_less_30rbh_total = 0;
+        $users_less_new_users_rbh_total = 0;
     @endphp
     @foreach($data as $department)
         @php
@@ -29,14 +29,14 @@
             $end_work_total += $department->end_work_sum;
             $disabled_by_system_total += $department->disabled_by_system_sum;
             $working_users_total += $department->working_users_sum;
-            $users_less_30rbh_total += $department->users_less_30rbh_sum;
+            $users_less_new_users_rbh_total += $department->users_less_new_users_rbh_sum;
         @endphp
         <tr>
             <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$dep->departments->name}} {{$dep->department_type->name}}</td>
             <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$department->new_accounts_sum}}</td>
             <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$department->end_work_sum}} ({{$department->disabled_by_system_sum}})</td>
             <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$department->working_users_sum > 0 ? round($department->end_work_sum*100/$department->working_users_sum,2) : 0}}%</td>
-            <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$department->users_less_30rbh_sum}}</td>
+            <td style="border:1px solid #231f20;text-align:center;padding:3px">{{$department->users_less_new_users_rbh_sum}}</td>
         </tr>
     @endforeach
     <tr>
@@ -44,7 +44,7 @@
         <td style="background: #444444;border:1px solid #231f20;text-align:center;padding:3px; color:#efd88f"><b>{{$new_accounts_total}}</b></td>
         <td style="background: #444444;border:1px solid #231f20;text-align:center;padding:3px; color:#efd88f"><b>{{$end_work_total}} ({{$disabled_by_system_total}})</b></td>
         <td style="background: #444444;border:1px solid #231f20;text-align:center;padding:3px; color:#efd88f"><b>{{$working_users_total > 0 ? round($end_work_total*100/$working_users_total,2) : 0}}%</b></td>
-        <td style="background: #444444;border:1px solid #231f20;text-align:center;padding:3px; color:#efd88f"><b>{{$users_less_30rbh_total}}</b></td>
+        <td style="background: #444444;border:1px solid #231f20;text-align:center;padding:3px; color:#efd88f"><b>{{$users_less_new_users_rbh_total}}</b></td>
     </tr>
     </tbody>
 </table>
