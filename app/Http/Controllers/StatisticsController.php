@@ -733,6 +733,7 @@ class StatisticsController extends Controller
                   sum(count_bad_check) as sum_janky,
                   SUM(all_jaky_disagreement) as all_jaky_disagreement,
                   SUM(good_jaky_disagreement) as good_jaky_disagreement,
+                  SUM(count_checked) as count_checked,
                   department_info.id as department_info_id,
                   department_type.name as deptype,
                   departments.name as depname
