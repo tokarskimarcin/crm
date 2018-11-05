@@ -58,7 +58,7 @@ class AutoScriptController extends Controller
     public function getNewUsersData() {
         $today = date('Y-m-d');
 
-        //array of users working less than 30 rbh this day with their data
+        //array of users working less than 40 rbh this day with their data
         $usersWorkingLessThanNewUsers = Work_Hour::usersWorkingRBHSelectorActual(40, '<');
         $usersArr = $usersWorkingLessThanNewUsers->pluck('id_user')->toArray();
         $maxIds = Pbx_report_extension::select(DB::raw('MAX(id) as id'))->whereIn('user_id', $usersArr)->groupBy('user_id', 'report_date')->pluck('id')->toArray(); //max ids for every date for every user
