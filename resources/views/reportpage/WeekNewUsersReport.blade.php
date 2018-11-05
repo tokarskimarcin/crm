@@ -18,7 +18,7 @@
             </div>
         </div>
     </div>
-    <form action="{{URL::to('/pageWeek30RbhReport')}}" method="post">
+    <form action="{{URL::to('/pageWeekNewUsersReport')}}" method="post">
     <div class="row">
         <div class="col-lg-6">
             <input type="hidden" name="_token" value="{{ csrf_token() }}">
