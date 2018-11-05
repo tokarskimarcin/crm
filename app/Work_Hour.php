@@ -214,7 +214,7 @@ class Work_Hour extends Model
 
                 $allUserRecords = Work_Hour::getWorkHoursRecordsGroupedByDate($item->id_user);
                 $iSecondSum = 0;
-                $only30RBHSuccess = 0;
+                $onlyNewUsersSuccess = 0;
                 $sDateStart = null;
                 $sDateStop = null;
 
@@ -224,12 +224,12 @@ class Work_Hour extends Model
                             $sDateStart = $value->date;
                         }
                         $iSecondSum += $value->sec_sum;
-                        $only30RBHSuccess += $value->success;
+                        $onlyNewUsersSuccess += $value->success;
                     }
                     if($iSecondSum >= $iTimeInSeconds) {
                         $sDateStop = $value->date;
                         $item->secondStop = $iSecondSum;
-                        $item->success = $only30RBHSuccess;
+                        $item->success = $onlyNewUsersSuccess;
                         break;
                     }
                 }

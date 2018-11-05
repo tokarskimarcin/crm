@@ -7,6 +7,7 @@ use App\Department_types;
 use App\Schedule;
 use App\User;
 use App\UserTypes;
+use App\Utilities\GlobalVariables\UsersGlobalVariables;
 use App\Work_Hour;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -55,9 +56,9 @@ class WorkHoursController extends Controller
     }
 
     public function test() {
-        $workingLessThan30RBH = Work_Hour::usersWorkingRBHSelector(30,'<=');
+        $workingLessThanNewUsersRBH = Work_Hour::usersWorkingRBHSelector(UsersGlobalVariables::$newUsersRbh,'<=');
 //        dd($workingLessThan30RBH->pluck('last_name')->toArray());
-        dd($workingLessThan30RBH->pluck('id_user')->toarray());
+        dd($workingLessThanNewUsersRBH->pluck('id_user')->toarray());
     }
 
     public function usersLive()
@@ -73,13 +74,13 @@ class WorkHoursController extends Controller
 
 //        dd($shedule);
 
-        $workingLessThan30RBH = Work_Hour::usersWorkingRBHSelector(30,'<');
+        $workingLessThanNewUsersRBH = Work_Hour::usersWorkingRBHSelector(UsersGlobalVariables::$newUsersRbh,'<');
 
         //we are adding field newUser with value 1 if user is new, otherwise 0.
-        $sheduleWithNewUsers = $shedule->map(function($item) use($workingLessThan30RBH) {
+        $sheduleWithNewUsers = $shedule->map(function($item) use($workingLessThanNewUsersRBH) {
             $item->newUser = 0;
 
-            foreach($workingLessThan30RBH as $newUser) {
+            foreach($workingLessThanNewUsersRBH as $newUser) {
                 if($item->id_user == $newUser->id_user) { //user from schedule is in set of users that work less than 30 RBH
                     $item->newUser = 1;
                 }
