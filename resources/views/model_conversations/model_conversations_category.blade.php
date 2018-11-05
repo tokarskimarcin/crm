@@ -1,6 +1,6 @@
 @extends('model_conversations.model_conversations_menu')
 @section('styles')
-    <link rel="stylesheet" href="{{ asset('css/model_conversations/category2.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/model_conversations/category.css') }}">
 @endsection
 @section('section')
 
@@ -145,5 +145,5 @@
         };
     </script>
     <script src="{{ asset('js/model_conversations/category.js') }}"></script>
-    <script src="{{ asset('js/model_conversations/categories.js') }}"></script>
+    <script src="{{ asset('js/model_conversations/categories3.js') }}"></script>
 @endsection

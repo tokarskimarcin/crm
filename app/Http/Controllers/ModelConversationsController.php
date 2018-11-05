@@ -266,12 +266,22 @@ class ModelConversationsController extends Controller
         $picture = $request->file('picture');
         $picture_name = null;
         $id = $request->id;
+        $acceptedExtensions = ['jpeg', 'jpg'];
+
 
         if($toAdd == 1) {
             if(isset($picture)) { //user send picture
                 $clientOriginalName = str_replace(' ','_',$picture->getClientOriginalName());
-                $picture_name = 'playlist_' . date('Y-m-d') . '_' . $clientOriginalName;
-                $picture->storeAs('public',$picture_name);
+                $fileExtension = strtolower($picture->getClientOriginalExtension());
+
+                if(in_array($fileExtension, $acceptedExtensions)) {
+                    $picture_name = 'playlist_' . date('Y-m-d') . '_' . $clientOriginalName;
+                    $picture->storeAs('public',$picture_name);
+                }
+                else {
+                    throw new \Exception('Niedozwolone rozszerzenie zdjęcia, możliwe rozszerzenia: jpeg, jpg');
+                }
+
             }
             else { //user didn't send picture, we assing default one.
                 $rnd = rand(1,5);
@@ -281,8 +291,14 @@ class ModelConversationsController extends Controller
         else {
             if(isset($picture)) { //user send picture
                 $clientOriginalName = str_replace(' ','_',$picture->getClientOriginalName());
-                $picture_name = 'playlist_' . date('Y-m-d') . '_' . $clientOriginalName;
-                $picture->storeAs('public',$picture_name);
+                $fileExtension = strtolower($picture->getClientOriginalExtension());
+                if(in_array($fileExtension, $acceptedExtensions)) {
+                    $picture_name = 'playlist_' . date('Y-m-d') . '_' . $clientOriginalName;
+                    $picture->storeAs('public',$picture_name);
+                }
+                else {
+                    throw new \Exception('Niedozwolone rozszerzenie zdjęcia, możliwe rozszerzenia: jpeg, jpg');
+                }
             }
         }
 
@@ -383,6 +399,7 @@ class ModelConversationsController extends Controller
         $user_department_type = Department_info::getUserDepartmentType($user->id)->id_dep_type;
 
         $toAdd = $request->toAdd; //This varible defines whether user edit category or add new one 1 - add, 0 - edit
+        $acceptedExtensions = ['jpeg', 'jpg'];
 
             //przy zmianie zdiecia, trzeba usunać stare - trzeba dodać to i przypisanie do danej kategori tego nowego zdiecia
             $id = $request->id;
@@ -392,8 +409,16 @@ class ModelConversationsController extends Controller
             if($toAdd == 1) {
                 if(isset($picture)) { //user send picture
                     $clientOriginalName = str_replace(' ','_',$picture->getClientOriginalName());
-                    $picture_name = 'category_' . date('Y-m-d') . '_' . $clientOriginalName;
-                    $picture->storeAs('public',$picture_name);
+                    $fileExtension = strtolower($picture->getClientOriginalExtension());
+
+                    if(in_array($fileExtension, $acceptedExtensions)) {
+                        $picture_name = 'category_' . date('Y-m-d') . '_' . $clientOriginalName;
+                        $picture->storeAs('public',$picture_name);
+                    }
+                    else {
+                        throw new \Exception('Niedozwolone rozszerzenie zdjęcia, możliwe rozszerzenia: jpeg, jpg');
+                    }
+
                 }
                 else { //user didn't send picture, we assing default one.
                     $rnd = rand(1,5);
@@ -403,8 +428,16 @@ class ModelConversationsController extends Controller
             else {
                 if(isset($picture)) { //user send picture
                     $clientOriginalName = str_replace(' ','_',$picture->getClientOriginalName());
-                    $picture_name = 'category_' . date('Y-m-d') . '_' . $clientOriginalName;
-                    $picture->storeAs('public',$picture_name);
+                    $fileExtension = strtolower($picture->getClientOriginalExtension());
+
+                    if(in_array($fileExtension, $acceptedExtensions)) {
+                        $picture_name = 'category_' . date('Y-m-d') . '_' . $clientOriginalName;
+                        $picture->storeAs('public',$picture_name);
+                    }
+                    else {
+                        throw new \Exception('Niedozwolone rozszerzenie zdjęcia, możliwe rozszerzenia: jpeg, jpg');
+                    }
+
                 }
             }
 
@@ -487,6 +520,7 @@ class ModelConversationsController extends Controller
      */
     public function itemsPost(Request $request) {
         $toAdd = $request->toAdd;
+        $acceptedExtensions = ['wav', 'mp3', 'ogg'];
 
         //we are adding new item
         $name = $request->name;
@@ -501,8 +535,14 @@ class ModelConversationsController extends Controller
         $sound_name = null;
         if(isset($sound)) {
             $clientOriginalName = str_replace(' ','_',$sound->getClientOriginalName());
-            $sound_name = 'item_' . date('Y-m-d') . '_' . $clientOriginalName;
-            $sound->storeAs('public',$sound_name);
+            $fileExtension = strtolower($sound->getClientOriginalExtension());
+            if(in_array($fileExtension, $acceptedExtensions)) {
+                $sound_name = 'item_' . date('Y-m-d') . '_' . $clientOriginalName;
+                $sound->storeAs('public',$sound_name);
+            }
+            else {
+                throw new \Exception('Niedozwolone rozszerzenie pliku, możliwe rozserzenia: wav, mp3, ogg');
+            }
         }
 
         $newItem = null;
