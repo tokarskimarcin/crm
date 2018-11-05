@@ -9,9 +9,10 @@ use App\ClientRouteInfo;
 use App\Department_info;
 use App\MedicalPackage;
 use App\UserEmploymentStatus;
+use App\Utilities\GlobalVariables\UsersGlobalVariables;
 use Exception;
 use App\PrivilageRelation;
-use App\Rbh30Report;
+use App\NewUsersRbhReport;
 use App\Schedule;
 use App\Pbx_report_extension;
 use App\ClientRouteCampaigns;
@@ -27,19 +28,19 @@ class AutoScriptController extends Controller
 {
 
     /**
-     * This method saves once a day records to rbh30report table
+     * This method saves once a day records to newUsersReport table
      */
-    public function get30rbhData() {
+    public function getNewUsersData() {
         $today = date('Y-m-d');
 
         //array of users working less than 30 rbh this day with their data
-        $usersWorkingLessThan30Rbh = Work_Hour::usersWorkingRBHSelectorActual(30, '<');
-        $usersArr = $usersWorkingLessThan30Rbh->pluck('id_user')->toArray();
+        $usersWorkingLessThanNewUsers = Work_Hour::usersWorkingRBHSelectorActual(30, '<');
+        $usersArr = $usersWorkingLessThanNewUsers->pluck('id_user')->toArray();
         $maxIds = Pbx_report_extension::select(DB::raw('MAX(id) as id'))->whereIn('user_id', $usersArr)->groupBy('user_id', 'report_date')->pluck('id')->toArray(); //max ids for every date for every user
         $pbxReportExtData = Pbx_report_extension::select('user_id', 'all_bad_talks', 'received_calls', 'all_checked_talks')->whereIn('id', $maxIds)->get();
 
         //adding 2 fields janki and avg through maping
-        $usersWorkingLessThan30Rbh->map(function($item) use($pbxReportExtData) {
+        $usersWorkingLessThanNewUsers->map(function($item) use($pbxReportExtData) {
             $reportInfo = $pbxReportExtData->where('user_id', '=', $item->id_user); //all records from pbx report extension (only last from each day) related to this user
             $sumJanki = 0;
             $sumReceivedCalls = 0;
@@ -56,26 +57,26 @@ class AutoScriptController extends Controller
             return $item;
         });
 
-        //collection of records from rbh30report from this day
-        $actual30RbhRecords = Rbh30Report::where('created_at', '=', $today)->get();
+        //collection of records from newUsersReport from this day
+        $actualNewUsersRecords = NewUsersRbhReport::where('created_at', '=', $today)->get();
 
-        foreach($usersWorkingLessThan30Rbh as $user) {
-            if($actual30RbhRecords->where('user_id', '=', $user->id_user)->where('created_at', '=', $today)->isEmpty()) { //there is no duplicates
-                $rbh30Report = new Rbh30Report();
-                $rbh30Report->user_id = $user->id_user;
-                $rbh30Report->department_info_id = $user->dep_id;
-                $rbh30Report->success = $user->success;
-                $rbh30Report->sec_sum = $user->sec_sum;
-                $rbh30Report->average = $user->avg;
-                $rbh30Report->janki = $user->janki;
-                $rbh30Report->received_calls = $user->received_calls;
-                $rbh30Report->all_checked_talks = $user->all_checked_talks;
-                $rbh30Report->created_at = $today;
-                $rbh30Report->updated_at = null;
-                $rbh30Report->save();
+        foreach($usersWorkingLessThanNewUsers as $user) {
+            if($usersWorkingLessThanNewUsers->where('user_id', '=', $user->id_user)->where('created_at', '=', $today)->isEmpty()) { //there is no duplicates
+                $newUsersReport = new NewUsersRbhReport();
+                $newUsersReport->user_id = $user->id_user;
+                $newUsersReport->department_info_id = $user->dep_id;
+                $newUsersReport->success = $user->success;
+                $newUsersReport->sec_sum = $user->sec_sum;
+                $newUsersReport->average = $user->avg;
+                $newUsersReport->janki = $user->janki;
+                $newUsersReport->received_calls = $user->received_calls;
+                $newUsersReport->all_checked_talks = $user->all_checked_talks;
+                $newUsersReport->created_at = $today;
+                $newUsersReport->updated_at = null;
+                $newUsersReport->save();
             }
             else {
-                $updatedRecord = $actual30RbhRecords->where('user_id', '=', $user->id_user)->where('created_at', '=', $today)->first();
+                $updatedRecord = $actualNewUsersRecords->where('user_id', '=', $user->id_user)->where('created_at', '=', $today)->first();
                 $updatedRecord->success = $user->success;
                 $updatedRecord->sec_sum = $user->sec_sum;
                 $updatedRecord->average = $user->avg;
@@ -296,7 +297,7 @@ class AutoScriptController extends Controller
             ->get();
 
         $scheduleGroupedByUser = $scheduleData->groupBy('userId', 'week_num');
-        $usersWorkingLessThan30RBH = Work_Hour::usersWorkingRBHSelector(30,'<');
+        $usersWorkingLessThanNewUsers = Work_Hour::usersWorkingRBHSelector(UsersGlobalVariables::$newUsersRbh,'<');
         $cl = $clientRouteInfoRecords->where('confirmingUser', '!=', null)->where('confirmDate', '<>', null)->where('confirmDate', '>', $lastMonthFull);
 
         $confirmingUsersArr = $cl->pluck('confirmingUser')->toArray();
@@ -308,7 +309,7 @@ class AutoScriptController extends Controller
             $user = new \stdClass();
             $user->user_id = $id; //id of consultant
             $user->new_user = 0; //indices whether consultant it is new consultant(working less than x RBH)
-            foreach($usersWorkingLessThan30RBH as $newUser) { //change new_user fild value to 1 if it is new consultant
+            foreach($usersWorkingLessThanNewUsers as $newUser) { //change new_user fild value to 1 if it is new consultant
                 if($newUser->id_user == $id) {
                     $user->new_user = 1;
                 }
