@@ -36,7 +36,7 @@
         <footer class="main_part">
             <p>Własność <u>Verona Consulting</u> </p>
             <p>Pomoc techniczna: <a href="mailto:pawel.chmielewski@veronaconsulting.pl">
-                    pawel.chmielewski@veronaconsulting.pl</a>.</p>
+                    programisci@veronaconsulting.pl</a>.</p>
         </footer>
     </div>
 </body>

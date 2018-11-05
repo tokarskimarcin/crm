@@ -19,7 +19,8 @@ class ModelConversationsController extends Controller
 {
 
     private $adminPanelAccessArr = [3, 13]; //Array of privilaged user types
-    private $superUserDepartmentType = 6;
+    private $superUserDepartmentType = 6; //see all stuff from other departments
+//    private $privilagedUser = 47; //id of privilaged user.
 
     public function modelConversationMenuGet() {
         $user = Auth::user();
@@ -27,18 +28,18 @@ class ModelConversationsController extends Controller
         $user_department_type = Department_info::getUserDepartmentType($user->id)->id_dep_type;
 
         $categories = null;
-        if($user_department_type == $this->superUserDepartmentType) {
-            if(in_array($user_type_id, $this->adminPanelAccessArr)) { //sees all available categories
+        if($user_department_type == $this->superUserDepartmentType) { //dkj
+//            if(in_array($user_type_id, $this->adminPanelAccessArr)) { //sees all available categories
                 $categories = ModelConvCategories::OnlyActive()
                     ->where('subcategory_id', '=', 0)
                     ->get();
-            }
-            else { //sees only categories from it's own department_type
-                $categories = ModelConvCategories::OnlyActive()
-                    ->where('subcategory_id', '=', 0)
-                    ->where('department_type_id', '=', $user_type_id)
-                    ->get();
-            }
+//            }
+//            else { //sees only categories from it's own department_type
+//                $categories = ModelConvCategories::OnlyActive()
+//                    ->where('subcategory_id', '=', 0)
+//                    ->where('department_type_id', '=', $user_type_id)
+//                    ->get();
+//            }
         }
         else { //sees only categories from its own department_type
             $categories = ModelConvCategories::OnlyActive()
