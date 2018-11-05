@@ -9,10 +9,10 @@
 namespace App\Utilities\Reports\Report_data_methods;
 
 
-use App\Rbh30Report;
+use App\NewUsersRbhReport;
 use Illuminate\Support\Facades\DB;
 
-class Data30RBHreport
+class DataNewUsersRbhReport
 {
     public static function get($date_start, $date_stop, $groupByType = 0) {
         $maxIds = DB::table('rbh_30_report')
@@ -27,7 +27,7 @@ class Data30RBHreport
             ->pluck('id')->toArray();
 
         //All most recent records from given range
-        $data = Rbh30Report::select(
+        $data = NewUsersRbhReport::select(
             DB::raw('CONCAT(departments.name, " ", department_type.name) as department_info_id'),
             'department_info.id as id',
             'first_name',

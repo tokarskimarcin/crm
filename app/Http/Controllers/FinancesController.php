@@ -716,7 +716,8 @@ class FinancesController extends Controller
                     }
 
                     $sumConsultants = 0; // number of consultants = denumerator for average
-                    if2(isset($newUsersData[$dep_info])) {
+
+                    if(isset($newUsersData[$dep_info])) {
                         $sumConsultants = count($newUsersData[$dep_info]);
                     }
 
