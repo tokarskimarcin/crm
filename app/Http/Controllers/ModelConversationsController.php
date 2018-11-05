@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\ActivityRecorder;
+use App\Department_info;
+use App\Department_types;
 use App\ModelConvCategories;
 use App\ModelConvItems;
 use App\ModelConvPlaylist;
@@ -16,70 +18,151 @@ use Illuminate\Support\Facades\Storage;
 class ModelConversationsController extends Controller
 {
 
-    private $adminPanelAccessArr = [3, 13]; //Array of user_type_id who can access admin panel
+    private $adminPanelAccessArr = [3, 13, 15]; //Array of privilaged user types
+    private $superUserDepartmentType = 6; //see all stuff from other departments
+//    private $privilagedUser = 47; //id of privilaged user.
 
     public function modelConversationMenuGet() {
+        $user = Auth::user();
+        $user_type_id = $user->user_type_id;
+        $user_department_type = Department_info::getUserDepartmentType($user->id)->id_dep_type;
 
-        //Mockup of categories
-        $user = Auth::user()->user_type_id;
-        $categories = ModelConvCategories::OnlyActive()->where('subcategory_id', '=', 0)->get();
+        $categories = null;
+        if($user_department_type == $this->superUserDepartmentType) { //dkj
+//            if(in_array($user_type_id, $this->adminPanelAccessArr)) { //sees all available categories
+                $categories = ModelConvCategories::OnlyActive()
+                    ->where('subcategory_id', '=', 0)
+                    ->get();
+//            }
+//            else { //sees only categories from it's own department_type
+//                $categories = ModelConvCategories::OnlyActive()
+//                    ->where('subcategory_id', '=', 0)
+//                    ->where('department_type_id', '=', $user_type_id)
+//                    ->get();
+//            }
+        }
+        else { //sees only categories from its own department_type and its own
+            $categories = ModelConvCategories::OnlyActive()
+                ->where('subcategory_id', '=', 0)
+                ->where(function ($query) use($user_department_type) {
+                    $query->where('department_type_id', '=', $user_department_type)
+                        ->orwhere('status', '=', -1);
+                })
+                ->get();
+        }
 
         return view('model_conversations.model_conversations_categories')
             ->with('categories', $categories)
             ->with('adminPanelAccessArr', $this->adminPanelAccessArr)
-            ->with('user', $user);
+            ->with('user', $user_type_id);
     }
 
     public function categoryGet($id) {
-        $user = Auth::user()->user_type_id;
+        $user = Auth::user();
+        $user_type_id = $user->user_type_id;
+        $user_department_type = Department_info::getUserDepartmentType($user->id)->id_dep_type;
+
         $categories = ModelConvCategories::OnlyActive()->where('subcategory_id', '=', $id)->get();
-        $playlists = ModelConvPlaylist::all();
+
+        $playlists = null;
+
+        if($user_department_type == $this->superUserDepartmentType) {
+            if(in_array($user_type_id, $this->adminPanelAccessArr)) { //this see privilaged user (all available users playlists)
+                $playlists = ModelConvPlaylist::all();
+            }
+            else {
+                $playlists = ModelConvPlaylist::where('user_id', '=', Auth::user()->id)->get();
+            }
+        }
+        else {
+            $playlists = ModelConvPlaylist::where('user_id', '=', Auth::user()->id)->get();
+        }
+
+
         $playlistItems = ModelConvPlaylistItem::select(
             'model_conv_playlist.name as name',
+            'model_conv_playlist.user_id as user_id',
             'model_conv_playlist.id as id',
             'model_conv_playlist_items.item_id as item_id'
-        )->join('model_conv_playlist', 'model_conv_playlist_items.playlist_id', '=', 'model_conv_playlist.id')
-        ->get();
+        )
+            ->join('model_conv_playlist', 'model_conv_playlist_items.playlist_id', '=', 'model_conv_playlist.id')
+            ->get();
 
         $items = ModelConvItems::where('model_category_id', '=', $id)->OnlyActive()->get();
         $items->map(function($item) use($playlistItems) {
-             $allItemsInPlaylists = $playlistItems->where('item_id', '=',$item->id)->pluck('name')->toArray();
+             $allItemsInPlaylists = $playlistItems->where('item_id', '=',$item->id);
              $item->playlists = $allItemsInPlaylists;
             return $item;
         });
 
         return view('model_conversations.model_conversations_category')
             ->with('adminPanelAccessArr', $this->adminPanelAccessArr)
-            ->with('user', $user)
+            ->with('user', $user_type_id)
             ->with('categories', $categories)
             ->with('items', $items)
             ->with('playlists', $playlists);
     }
 
+    /**
+     * @return mixed
+     * This method returns data for management panel.
+     */
     public function modelConversationsManagementGet() {
-        $user = Auth::user()->user_type_id;
+        $user = Auth::user();
+        $user_type_id = $user->user_type_id;
+        $user_department_type = Department_info::getUserDepartmentType($user->id)->id_dep_type;
 
-            $items = ModelConvItems::all();
-            $categories = ModelConvCategories::all();
-            $playlists = ModelConvPlaylist::select(
-                'first_name',
-                'last_name',
-                'model_conv_playlist.id',
-                'model_conv_playlist.name',
-                'users.id as user_id', 'img'
-            )
-                ->join('users', 'model_conv_playlist.user_id', '=', 'users.id')
-                ->get();
+        $availableDepartmentTypes = Department_types::whereIn('id', [1,2,6])->get();
+        $showAvailableDepartmentTypes = false;
+        if($user_department_type == $this->superUserDepartmentType) {
+            if(in_array($user_type_id, $this->adminPanelAccessArr)) {
+                $showAvailableDepartmentTypes = true;
+            }
+        }
 
-            $playlistItems = ModelConvPlaylistItem::all();
+        $items = null;
 
-            return view('model_conversations.model_conversations_management')
-                ->with('categories', $categories)
-                ->with('user', $user)
-                ->with('adminPanelAccessArr', $this->adminPanelAccessArr)
-                ->with('items', $items)
-                ->with('playlists', $playlists)
-                ->with('playlistItems', $playlistItems);
+        if($user_department_type == $this->superUserDepartmentType) {
+            if (in_array($user_type_id, $this->adminPanelAccessArr)) {
+                $categories = ModelConvCategories::whereNotIn('status', [-1])->get(); //all categories without this with status -1 (permanent)
+            }
+            else {
+                $categories = ModelConvCategories::whereNotIn('status', [-1])->where('department_type_id', '=', $user_department_type)->get(); //all categories from user department type without this with status -1 (permanent)
+            }
+        }
+        else {
+            $categories = ModelConvCategories::whereNotIn('status', [-1])->where('department_type_id', '=', $user_department_type)->get();  //all categories from user department type without this with status -1 (permanent)
+        }
+
+        $playlists = null;
+
+        if(in_array($user_type_id, $this->adminPanelAccessArr)) { //this see privilaged user (all available users playlists)
+            if($user_department_type == $this->superUserDepartmentType) { //
+                $playlists = ModelConvPlaylist::getPlaylistInfo(false);
+                $items = ModelConvItems::getPlaylistItemsInfo(false);
+            }
+            else {
+                $playlists = ModelConvPlaylist::getPlaylistInfo(false, $user_department_type);
+                $items = ModelConvItems::getPlaylistItemsInfo(false, $user_department_type);
+            }
+        }
+        else { //this see regular user (only his own playlist)
+            $playlists = ModelConvPlaylist::getPlaylistInfo(true);
+            $items = ModelConvItems::getPlaylistItemsInfo(true);
+        }
+
+        $playlistItems = ModelConvPlaylistItem::all();
+
+        return view('model_conversations.model_conversations_management')
+            ->with('categories', $categories)
+            ->with('user', $user_type_id)
+            ->with('adminPanelAccessArr', $this->adminPanelAccessArr)
+            ->with('items', $items)
+            ->with('playlists', $playlists)
+            ->with('playlistItems', $playlistItems)
+            ->with('superUserDepartmentType', $this->superUserDepartmentType)
+            ->with('showAvailableDepartmentTypes', $showAvailableDepartmentTypes)
+            ->with('availableDepartmentTypes', $availableDepartmentTypes);
 
     }
 
@@ -133,18 +216,22 @@ class ModelConversationsController extends Controller
     }
 
     public function modelConversationsPlaylistGet() {
-        $user = Auth::user()->user_type_id;
+        $user = Auth::user();
+        $user_type_id = $user->user_type_id;
+        $user_department_type = Department_info::getUserDepartmentType($user->id)->id_dep_type;
 
-        $playlistCategories = ModelConvPlaylist::all();
+        $playlistCategories = ModelConvPlaylist::where('user_id', '=', $user->id)->get(); //only logged user's playlists
 
         return view('model_conversations.model_conversations_playlist_categories')
             ->with('adminPanelAccessArr', $this->adminPanelAccessArr)
             ->with('playlistCategories', $playlistCategories)
-            ->with('user', $user);
+            ->with('user', $user_type_id);
     }
 
     public function playlistGet($id) {
-        $user = Auth::user()->user_type_id;
+        $user = Auth::user();
+        $user_type_id = $user->user_type_id;
+        $user_department_type = Department_info::getUserDepartmentType($user->id)->id_dep_type;
 
         $playlistObject = ModelConvPlaylist::find($id);
 
@@ -166,13 +253,11 @@ class ModelConversationsController extends Controller
             ->orderBy('playlist_order')
             ->get();
 
-//        dd($playlist);
-
         return view('model_conversations.model_conversations_playlist')
             ->with('playlist', $playlist)
             ->with('playlistObject', $playlistObject)
             ->with('adminPanelAccessArr', $this->adminPanelAccessArr)
-            ->with('user', $user);
+            ->with('user', $user_type_id);
     }
 
     public function modelConversationsPlaylistPost(Request $request) {
@@ -181,12 +266,22 @@ class ModelConversationsController extends Controller
         $picture = $request->file('picture');
         $picture_name = null;
         $id = $request->id;
+        $acceptedExtensions = ['jpeg', 'jpg'];
+
 
         if($toAdd == 1) {
             if(isset($picture)) { //user send picture
                 $clientOriginalName = str_replace(' ','_',$picture->getClientOriginalName());
-                $picture_name = 'playlist_' . date('Y-m-d') . '_' . $clientOriginalName;
-                $picture->storeAs('public',$picture_name);
+                $fileExtension = strtolower($picture->getClientOriginalExtension());
+
+                if(in_array($fileExtension, $acceptedExtensions)) {
+                    $picture_name = 'playlist_' . date('Y-m-d') . '_' . $clientOriginalName;
+                    $picture->storeAs('public',$picture_name);
+                }
+                else {
+                    throw new \Exception('Niedozwolone rozszerzenie zdjęcia, możliwe rozszerzenia: jpeg, jpg');
+                }
+
             }
             else { //user didn't send picture, we assing default one.
                 $rnd = rand(1,5);
@@ -196,8 +291,14 @@ class ModelConversationsController extends Controller
         else {
             if(isset($picture)) { //user send picture
                 $clientOriginalName = str_replace(' ','_',$picture->getClientOriginalName());
-                $picture_name = 'playlist_' . date('Y-m-d') . '_' . $clientOriginalName;
-                $picture->storeAs('public',$picture_name);
+                $fileExtension = strtolower($picture->getClientOriginalExtension());
+                if(in_array($fileExtension, $acceptedExtensions)) {
+                    $picture_name = 'playlist_' . date('Y-m-d') . '_' . $clientOriginalName;
+                    $picture->storeAs('public',$picture_name);
+                }
+                else {
+                    throw new \Exception('Niedozwolone rozszerzenie zdjęcia, możliwe rozszerzenia: jpeg, jpg');
+                }
             }
         }
 
@@ -256,7 +357,7 @@ class ModelConversationsController extends Controller
      * This method removes playlist item
      */
     public function managementPlaylistItemsDelete($id) {
-
+//        dd($id);
         return ModelConvPlaylistItem::smartDelete($id);
     }
 
@@ -292,7 +393,13 @@ class ModelConversationsController extends Controller
      * This method changes picture of category or adds new category
      */
     public function categoryPost(Request $request) {
+
+        $user = Auth::user();
+        $user_type_id = $user->user_type_id;
+        $user_department_type = Department_info::getUserDepartmentType($user->id)->id_dep_type;
+
         $toAdd = $request->toAdd; //This varible defines whether user edit category or add new one 1 - add, 0 - edit
+        $acceptedExtensions = ['jpeg', 'jpg'];
 
             //przy zmianie zdiecia, trzeba usunać stare - trzeba dodać to i przypisanie do danej kategori tego nowego zdiecia
             $id = $request->id;
@@ -302,8 +409,16 @@ class ModelConversationsController extends Controller
             if($toAdd == 1) {
                 if(isset($picture)) { //user send picture
                     $clientOriginalName = str_replace(' ','_',$picture->getClientOriginalName());
-                    $picture_name = 'category_' . date('Y-m-d') . '_' . $clientOriginalName;
-                    $picture->storeAs('public',$picture_name);
+                    $fileExtension = strtolower($picture->getClientOriginalExtension());
+
+                    if(in_array($fileExtension, $acceptedExtensions)) {
+                        $picture_name = 'category_' . date('Y-m-d') . '_' . $clientOriginalName;
+                        $picture->storeAs('public',$picture_name);
+                    }
+                    else {
+                        throw new \Exception('Niedozwolone rozszerzenie zdjęcia, możliwe rozszerzenia: jpeg, jpg');
+                    }
+
                 }
                 else { //user didn't send picture, we assing default one.
                     $rnd = rand(1,5);
@@ -313,8 +428,16 @@ class ModelConversationsController extends Controller
             else {
                 if(isset($picture)) { //user send picture
                     $clientOriginalName = str_replace(' ','_',$picture->getClientOriginalName());
-                    $picture_name = 'category_' . date('Y-m-d') . '_' . $clientOriginalName;
-                    $picture->storeAs('public',$picture_name);
+                    $fileExtension = strtolower($picture->getClientOriginalExtension());
+
+                    if(in_array($fileExtension, $acceptedExtensions)) {
+                        $picture_name = 'category_' . date('Y-m-d') . '_' . $clientOriginalName;
+                        $picture->storeAs('public',$picture_name);
+                    }
+                    else {
+                        throw new \Exception('Niedozwolone rozszerzenie zdjęcia, możliwe rozszerzenia: jpeg, jpg');
+                    }
+
                 }
             }
 
@@ -343,6 +466,16 @@ class ModelConversationsController extends Controller
             }
 
             $category->status = $status;
+
+            $department_type_request = null;
+            if($request->has('department_type_id')) {
+                $department_type_request = $request->department_type_id;
+            }
+            else {
+                $department_type_request = $user_department_type;
+            }
+            $category->department_type_id = $department_type_request;
+
             try {
                 $category->save();
             }
@@ -380,8 +513,14 @@ class ModelConversationsController extends Controller
 
     }
 
+    /**
+     * @param Request $request
+     * @return mixed
+     * This method enables to edit or add new item
+     */
     public function itemsPost(Request $request) {
         $toAdd = $request->toAdd;
+        $acceptedExtensions = ['wav', 'mp3', 'ogg'];
 
         //we are adding new item
         $name = $request->name;
@@ -390,13 +529,20 @@ class ModelConversationsController extends Controller
         $gift = $request->gift;
         $client = $request->client;
         $category = $request->category_id;
+        $temp = $request->temp;
 
         $sound = $request->file('sound');
         $sound_name = null;
         if(isset($sound)) {
             $clientOriginalName = str_replace(' ','_',$sound->getClientOriginalName());
-            $sound_name = 'item_' . date('Y-m-d') . '_' . $clientOriginalName;
-            $sound->storeAs('public',$sound_name);
+            $fileExtension = strtolower($sound->getClientOriginalExtension());
+            if(in_array($fileExtension, $acceptedExtensions)) {
+                $sound_name = 'item_' . date('Y-m-d') . '_' . $clientOriginalName;
+                $sound->storeAs('public',$sound_name);
+            }
+            else {
+                throw new \Exception('Niedozwolone rozszerzenie pliku, możliwe rozserzenia: wav, mp3, ogg');
+            }
         }
 
         $newItem = null;
@@ -424,6 +570,8 @@ class ModelConversationsController extends Controller
         $user_id = Auth::user()->id;
         $newItem->user_id = $user_id;
         $newItem->status = $status;
+        $newItem->temp = $temp;
+        $newItem->created_at = date('Y-m-d');
         try {
             $newItem->save();
         }
