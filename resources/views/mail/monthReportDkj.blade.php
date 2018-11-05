@@ -228,13 +228,13 @@
         <tr>
             <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$i}}</td>
             @if($item->department_info_id == 13)
-                <td style="border:1px solid #231f20;text-align:center;padding:3px;">Radom Potwierdzenia Badania </td>
+                <td style="border:1px solid #231f20;text-align:center;padding:3px;">Radom Potwierdzenia</td>
             @elseif($item->department_info_id == 4)
-                <td style="border:1px solid #231f20;text-align:center;padding:3px;">Radom Potwierdzenia Wysyłka </td>
+                <td style="border:1px solid #231f20;text-align:center;padding:3px;">Radom Potwierdzenia</td>
             @elseif($item->department_info_id == 1)
-                <td style="border:1px solid #231f20;text-align:center;padding:3px;">Lublin Potwierdzenia Badania </td>
+                <td style="border:1px solid #231f20;text-align:center;padding:3px;">Lublin Potwierdzenia</td>
             @elseif($item->department_info_id == 15)
-                <td style="border:1px solid #231f20;text-align:center;padding:3px;">Lublin Potwierdzenia Wysyłka </td>
+                <td style="border:1px solid #231f20;text-align:center;padding:3px;">Lublin Potwierdzenia</td>
             @else
             <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$item->depname}} {{$item->deptype}}</td>
             @endif
