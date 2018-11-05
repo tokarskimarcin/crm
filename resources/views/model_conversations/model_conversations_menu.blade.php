@@ -19,7 +19,7 @@
             </div>
             <div class="links">
                 <div class="link link4">
-                    <a href="/modelConversationsPlaylist">Play lista</a>
+                    <a href="/modelConversationsPlaylist">Playlista</a>
                 </div>
                 <div class="link link1">
                     <a href="/modelConversationMenu">Kategorie</a>

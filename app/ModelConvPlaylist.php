@@ -22,10 +22,11 @@ class ModelConvPlaylist extends Model
 
     /**
      * @param bool $onlyLoggedUser
+     * @param bool/int $onlyOwnDepartmentId = id_dep_type of user
      * @return null/Collection
      * This method return info about playlist(user name, last name, playlist id, playlist name, img)
      */
-    public static function getPlaylistInfo($onlyLoggedUser = false) {
+    public static function getPlaylistInfo($onlyLoggedUser, $onlyOwnDepartmentId = false) {
         $info = null;
         if($onlyLoggedUser) {
             $info = ModelConvPlaylist::select(
@@ -33,7 +34,8 @@ class ModelConvPlaylist extends Model
                 'last_name',
                 'model_conv_playlist.id',
                 'model_conv_playlist.name',
-                'users.id as user_id', 'img'
+                'users.id as user_id',
+                'img'
             )
                 ->join('users', 'model_conv_playlist.user_id', '=', 'users.id')
                 ->where('user_id', '=', Auth::user()->id)
@@ -45,10 +47,19 @@ class ModelConvPlaylist extends Model
                 'last_name',
                 'model_conv_playlist.id',
                 'model_conv_playlist.name',
-                'users.id as user_id', 'img'
+                'users.id as user_id',
+                'id_dep_type',
+                'img'
             )
                 ->join('users', 'model_conv_playlist.user_id', '=', 'users.id')
-                ->get();
+                ->join('department_info', 'users.department_info_id', '=', 'department_info.id');
+
+            if($onlyOwnDepartmentId) {
+                $info = $info->where('id_dep_type', '=', $onlyOwnDepartmentId)->get();
+            }
+            else {
+                $info = $info->get();
+            }
         }
 
         return $info;

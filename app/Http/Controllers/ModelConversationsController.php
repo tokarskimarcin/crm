@@ -18,7 +18,7 @@ use Illuminate\Support\Facades\Storage;
 class ModelConversationsController extends Controller
 {
 
-    private $adminPanelAccessArr = [3, 13]; //Array of privilaged user types
+    private $adminPanelAccessArr = [3, 13, 15]; //Array of privilaged user types
     private $superUserDepartmentType = 6; //see all stuff from other departments
 //    private $privilagedUser = 47; //id of privilaged user.
 
@@ -41,10 +41,13 @@ class ModelConversationsController extends Controller
 //                    ->get();
 //            }
         }
-        else { //sees only categories from its own department_type
+        else { //sees only categories from its own department_type and its own
             $categories = ModelConvCategories::OnlyActive()
                 ->where('subcategory_id', '=', 0)
-                ->where('department_type_id', '=', $user_type_id)
+                ->where(function ($query) use($user_department_type) {
+                    $query->where('department_type_id', '=', $user_department_type)
+                        ->orwhere('status', '=', -1);
+                })
                 ->get();
         }
 
@@ -100,6 +103,10 @@ class ModelConversationsController extends Controller
             ->with('playlists', $playlists);
     }
 
+    /**
+     * @return mixed
+     * This method returns data for management panel.
+     */
     public function modelConversationsManagementGet() {
         $user = Auth::user();
         $user_type_id = $user->user_type_id;
@@ -128,9 +135,16 @@ class ModelConversationsController extends Controller
         }
 
         $playlists = null;
+
         if(in_array($user_type_id, $this->adminPanelAccessArr)) { //this see privilaged user (all available users playlists)
-            $playlists = ModelConvPlaylist::getPlaylistInfo();
-            $items = ModelConvItems::getPlaylistItemsInfo();
+            if($user_department_type == $this->superUserDepartmentType) { //
+                $playlists = ModelConvPlaylist::getPlaylistInfo(false);
+                $items = ModelConvItems::getPlaylistItemsInfo(false);
+            }
+            else {
+                $playlists = ModelConvPlaylist::getPlaylistInfo(false, $user_department_type);
+                $items = ModelConvItems::getPlaylistItemsInfo(false, $user_department_type);
+            }
         }
         else { //this see regular user (only his own playlist)
             $playlists = ModelConvPlaylist::getPlaylistInfo(true);

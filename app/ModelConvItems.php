@@ -57,10 +57,11 @@ class ModelConvItems extends Model
 
     /**
      * @param bool $onlyLoggedUser
+     * @param bool/int $onlyOwnDepartmentId = id_dep_type of user
      * @return null/Collection
      * This method returns info about playlist items
      */
-    public static function getPlaylistItemsInfo($onlyLoggedUser = false) {
+    public static function getPlaylistItemsInfo($onlyLoggedUser, $onlyOwnDepartmentId = false) {
         $items = null;
         if($onlyLoggedUser) {
             $items = ModelConvItems::select(
@@ -92,10 +93,18 @@ class ModelConvItems extends Model
                 'user_id',
                 'model_conv_items.status as status',
                 'first_name',
-                'last_name'
+                'last_name',
+                'department_type_id'
             )
                 ->join('users', 'model_conv_items.user_id', '=', 'users.id')
-                ->get();
+                ->join('model_conv_categories', 'model_conv_items.model_category_id', '=', 'model_conv_categories.id');
+
+            if($onlyOwnDepartmentId) {
+                $items = $items->where('model_conv_categories.department_type_id', '=', $onlyOwnDepartmentId)->get();
+            }
+            else {
+                $items = $items->get();
+            }
         }
 
 
