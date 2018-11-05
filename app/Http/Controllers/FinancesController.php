@@ -1875,22 +1875,22 @@ class FinancesController extends Controller
             $dividedMonth = MonthFourWeeksDivision::get($year, $month);
             if($userTypeId == 4 && $departmentInfo->id_dep_type == 1){          //confirmation trainers
                 $employeesOfTheWeek = $this->getEmployeesOfTheWeek($userTypeId, $departmentInfoId, $dividedMonth, 1);
-                $this->updateConfirmationRanking($employeesOfTheWeek->where('accepted',0), $dividedMonth, $departmentInfoId, [200], 'coach_id', ['provision','shows']);
+                $this->updateConfirmationRanking($employeesOfTheWeek->where('accepted',0), $dividedMonth, $departmentInfoId, [200], 'coach_id', ['successfulPct','provision']);
 
                 $employeesOfTheWeekRankings = EmployeeOfTheWeekRanking::whereIn('employee_of_the_week_id',$employeesOfTheWeek->pluck('id')->toArray())->with('user')->get();
                 return view('finances.employeeOfTheWeek.subViewEmployeeOfTheWeekConfirmation')
                     ->with('employeesOfTheWeek',$employeesOfTheWeek->sortBy('first_day_week'))
                     ->with('employeesOfTheWeekRankings',$employeesOfTheWeekRankings)
-                    ->with('criterionHeader', 'prowizja[zł] (lb. pokazów)');
+                    ->with('criterionHeader', '% udanych (prowizja[zł])');
             }else if($userTypeId == 1 && $departmentInfo->id_dep_type == 1){        //confirmation consultants
                 $employeesOfTheWeek = $this->getEmployeesOfTheWeek($userTypeId, $departmentInfoId, $dividedMonth, 2);
-                $this->updateConfirmationRanking($employeesOfTheWeek->where('accepted',0), $dividedMonth, $departmentInfoId, [100,50], 'confirmingUser', ['provision','avgFrequency']);
+                $this->updateConfirmationRanking($employeesOfTheWeek->where('accepted',0), $dividedMonth, $departmentInfoId, [100,50], 'confirmingUser', ['successfulPct','provision']);
 
                 $employeesOfTheWeekRankings = EmployeeOfTheWeekRanking::whereIn('employee_of_the_week_id',$employeesOfTheWeek->pluck('id')->toArray())->with('user')->get();
                 return view('finances.employeeOfTheWeek.subViewEmployeeOfTheWeekConfirmation')
                     ->with('employeesOfTheWeek',$employeesOfTheWeek->sortBy('first_day_week'))
                     ->with('employeesOfTheWeekRankings',$employeesOfTheWeekRankings)
-                    ->with('criterionHeader', 'prowizja[zł] (śr. lb. osób)');
+                    ->with('criterionHeader', '% udanych (prowizja[zł])');
             }else{
                 return 'noView';
             }
@@ -1928,8 +1928,37 @@ class FinancesController extends Controller
         foreach ($confirmationStatistics as $confirmationStatisticWeek){
             foreach ($employeesOfTheWeek as $employeeOfTheWeek){
                 if($confirmationStatisticWeek->firstDay == $employeeOfTheWeek->first_day_week && $confirmationStatisticWeek->lastDay == $employeeOfTheWeek->last_day_week){
+                    $confirmationStatisticWeekArr = [];
+                    foreach($confirmationStatisticWeek->secondGrouping->where('shows','>',3)->sortByDesc($criterion[0]) as $secondGroupingSum){
+                        array_push($confirmationStatisticWeekArr, $secondGroupingSum);
+                    }
+                    $groupStartIndex = 0;
+
+                    //BUBBLE sorting after sorting on first criterion
+                    for($i = 1; $i < count($confirmationStatisticWeekArr); $i++){
+                        if($confirmationStatisticWeekArr[$i]->{$criterion[0]} !== $confirmationStatisticWeekArr[$i-1]->{$criterion[0]}){
+                            $endGroupElementIndex = $i-1;
+                            while($endGroupElementIndex > $groupStartIndex){
+                                for ($j = $groupStartIndex+1; $j <= $endGroupElementIndex; $j++){
+                                    try{
+                                        if($confirmationStatisticWeekArr[$j-1]->{$criterion[1]} <=
+                                            $confirmationStatisticWeekArr[$j]->{$criterion[1]} ) {
+                                            $temp = clone $confirmationStatisticWeekArr[$j-1];
+                                            $confirmationStatisticWeekArr[$j-1] = $confirmationStatisticWeekArr[$j];
+                                            $confirmationStatisticWeekArr[$j] = $temp;
+                                        }
+                                    }catch(\ErrorException $e){
+                                        dd($e, $groupStartIndex, $endGroupElementIndex);
+                                    }
+                                }
+                                $endGroupElementIndex--;
+                            }
+                            $groupStartIndex = $i;
+                        }
+                    }
+
                     $rankingPositionCounter = 0;
-                    foreach ($confirmationStatisticWeek->secondGrouping->where('shows','>',3)->sortByDesc('provision') as $secondGroupingSum){
+                    foreach ($confirmationStatisticWeekArr as $secondGroupingSum){
                         $employeeOfTheWeekRanking = new EmployeeOfTheWeekRanking();
                         $employeeOfTheWeekRanking->employee_of_the_week_id = $employeeOfTheWeek->id;
                         $employeeOfTheWeekRanking->user_id = $secondGroupingSum->secondGroup;
