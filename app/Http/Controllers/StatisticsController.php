@@ -710,6 +710,20 @@ class StatisticsController extends Controller
         if($dayOfWeek == 0) {
             $date_stop = date('Y-m-d', strtotime($date_stop . ' - 1 day'));
         }
+
+
+        $arrayOfIds = [];
+
+        $i = 0; //this is parameter that prevent from infinite loop
+        $tempDateStart = date('Y-m-d', strtotime($date_start));
+        $tempDateStop = date('Y-m-d', strtotime($date_stop . ' + 1 day'));
+        while(($tempDateStart != $tempDateStop) && $i < 370) { //filling arrayOfIds
+            $maxIdsFromSingleDay = PBXDKJTeam::select(DB::raw('MAX(id)'))->where('report_date', '=', $tempDateStart)->groupBy('department_info_id')->pluck('MAX(id)')->toArray();
+            $arrayOfIds = array_merge($maxIdsFromSingleDay, $arrayOfIds);
+            $i++;
+            $tempDateStart = date('Y-m-d', strtotime($tempDateStart . ' + 1 day'));
+        }
+
         $dkj = DB::table('pbx_dkj_team')
             ->select(DB::raw(
                 '
@@ -726,14 +740,7 @@ class StatisticsController extends Controller
             ->join('department_info', 'department_info.id', '=', 'pbx_dkj_team.department_info_id')
             ->join('departments', 'departments.id', '=', 'department_info.id_dep')
             ->join('department_type', 'department_type.id', '=', 'department_info.id_dep_type')
-            ->whereIn('pbx_dkj_team.id', function($query) use($date_start, $date_stop){
-                $query->select(DB::raw(
-                    'MAX(pbx_dkj_team.id)'
-                ))
-                    ->from('pbx_dkj_team')
-                    ->whereBetween('report_date', [$date_start, $date_stop])
-                    ->groupBy('department_info_id');
-            })
+            ->whereIn('pbx_dkj_team.id', $arrayOfIds)
             ->groupBy('pbx_dkj_team.department_info_id')
             ->get();
 
