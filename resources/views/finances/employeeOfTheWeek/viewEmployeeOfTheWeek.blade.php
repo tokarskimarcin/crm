@@ -99,21 +99,77 @@
             };
 
             FUNCTIONS = {
+                loadingSwalCall: function(){
+                    swal({
+                        title: 'Ładowawnie...',
+                        text: 'To może chwilę zająć',
+                        showConfirmButton: false,
+                        allowOutsideClick: false,
+                        allowEscapeKey: false,
+                        allowEnterKey: false,
+                        onOpen: () => {
+                            swal.showLoading();
+                        }
+                    });
+                },
                 createUserTypeSelect: function(userTypes){
-
+                    let userTypeLabel = $('<label>').attr('for','userTypeSelect').append('Typ pracownika');
+                    let userTypeSelect = $('<select>').addClass('form-control')
+                        .attr('id','userTypeSelect')
+                        .attr('name','userTypeSelect');
+                    let userTypeSection = $('<div>').addClass('col-md-2').attr('id','userTypeSection')
+                        .append(userTypeLabel)
+                        .append(userTypeSelect)
+                        .on('remove',function () {
+                            $('#monthDatetimepicker').trigger('remove');
+                        });
+                    if(userTypes.length === 0){
+                        userTypeSelect.append($('<option>').append('Brak systemu pracowników tygodnia'));
+                    }else{
+                        userTypeSelect.append($('<option>').append('Wybierz').prop('selected',true).attr('value', 0));
+                        $.each(userTypes,function (index, item) {
+                            userTypeSelect.append($('<option>').append(item.name).attr('value', item.id));
+                        });
+                    }
+                    VARIABLES.jQElements.departmentTypeSection.after(userTypeSection);
+                    userTypeSelect.selectpicker();
                 },
                 SUBVIEW:{},
                 /* function grups should be before other functions which aren't grouped */
                 EVENT_HANDLERS: {
                     callEvents:function () {
                         (function departmentTypeSelectHandler() {
-                            VARIABLES.jQElements.departmentTypeSelect.change(function () {
-
+                            VARIABLES.jQElements.departmentTypeSelect.change(function (e) {
+                                let value = $(e.target).val();
+                                $('#userTypeSection').trigger('remove');
+                                if(value != 0){
+                                    FUNCTIONS.loadingSwalCall();
+                                    FUNCTIONS.AJAXs.getUserTypesOfDepartmentTypeAjax(value)
+                                        .then(function (result) {
+                                            FUNCTIONS.createUserTypeSelect(result);
+                                        });
+                                }
                             });
-                            })();
+                        })();
                     }
                 },
                 AJAXs: {
+                    getUserTypesOfDepartmentTypeAjax: function (departmentTypeId) {
+                        return $.ajax({
+                            type: 'POST',
+                            url: '{{route('api.getUserTypesOfDepartmentTypeAjax')}}',
+                            data: {
+                                departmentTypeId: departmentTypeId
+                            },
+                            headers: {
+                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                            },
+                            success: function (response) {
+                                swal.close();
+                                return response;
+                            }
+                        });
+                    }
                 }
             };
             FUNCTIONS.EVENT_HANDLERS.callEvents();

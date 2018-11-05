@@ -1852,6 +1852,12 @@ class FinancesController extends Controller
     public function getUserTypesOfDepartmentTypeAjax(Request $request){
         $departmentTypeId = $request->departmentTypeId;
 
+        $userTypes = [];
+        if($departmentTypeId == 1){
+            $userTypes = [1,4];
+        }
+        $userTypesGet = UserTypes::whereIn('id',$userTypes)->get();
+        return $userTypesGet;
     }
 
     public function viewEmployeeOfTheWeekCadreGet(){
