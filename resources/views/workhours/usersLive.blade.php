@@ -21,7 +21,7 @@
     <div class="panel-body">
         <div class="alert alert-info">
             Zakładka <strong>Godziny / Pracownicy Live</strong> pokazuje, informacje o ewidencji godzin. <br>
-            Osoba, która w kolumnie <strong>Nowy</strong> ma <i>Tak</i> pracuje w firmie mniej niż 30 RBH.
+            Osoba, która w kolumnie <strong>Nowy</strong> ma <i>Tak</i> pracuje w firmie mniej niż {{$newUsersRbh}} RBH.
             <ul class="list-group">
                 <li class="list-group-item">Osoby podświetlone na <span style="background-color: #83e05c;">zielono</span> nacisneły "rozpoczynam pracę" w czasie przewidzianym w grafiku.</li>
                 <li class="list-group-item">Osoby podświetlone na <span style="background-color: #ffd932;">pomarańczowo</span> nacisneły "rozpoczynam pracę" po czasie przewidzianym w grafiku.</li>

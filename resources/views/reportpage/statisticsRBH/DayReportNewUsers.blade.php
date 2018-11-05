@@ -5,7 +5,7 @@
     <div class="row">
         <div class="col-lg-12">
             <div class="page-header">
-                <div class="alert gray-nav">Raport Dzienny 30 RBH</div>
+                <div class="alert gray-nav">Raport Dzienny {{$newUsersRbh}} RBH</div>
             </div>
         </div>
     </div>
