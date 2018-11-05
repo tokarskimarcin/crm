@@ -41,7 +41,7 @@
                         <div class="col-lg-12">
                             <div id="start_stop">
                                 <div class="panel-body">
-                                    @include('mail.statisticsRBHMail.dayReport30RBH');
+                                    @include('mail.statisticsRBHMail.dayReportNewUsers');
                                     </div>
                                 </div>
                             </div>
