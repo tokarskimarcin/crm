@@ -148,6 +148,22 @@ class Department_info extends Model
             ->get();
     }
 
+    public static function getUserDepartmentType($user_id) {
+        $info = Department_info::select(
+            'department_info.id as department_info_id',
+            'users.id as user_id',
+            'id_dep_type'
+        )
+            ->join('departments', 'department_info.id_dep', '=', 'departments.id')
+            ->join('department_type', 'department_info.id_dep_type', '=', 'department_type.id')
+            ->join('users', 'department_info.id', '=', 'users.department_info_id')
+            ->where('users.id', '=', $user_id)
+            ->first();
+
+        return $info;
+    }
+
+
     /** Edit or modify department
      * @param $request
      * @return Department_info|\Illuminate\Support\Collection

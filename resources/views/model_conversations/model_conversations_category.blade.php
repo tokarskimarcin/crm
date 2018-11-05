@@ -1,6 +1,6 @@
 @extends('model_conversations.model_conversations_menu')
 @section('styles')
-    <link rel="stylesheet" href="{{ asset('css/model_conversations/category2.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/model_conversations/category.css') }}">
 @endsection
 @section('section')
 
@@ -32,7 +32,7 @@
                                     <span data-nameOfFile="{{$item->file_name}}" class="play-sound glyphicon glyphicon-play-circle"></span>
                                 </a>
                             </td>
-                            <td>{{$item->name}}</td>
+                            <td><b>{{$item->name}}</b></td>
                             <td>{{$item->gift}}</td>
                             <td>{{$item->trainer}}</td>
                             <td>{{$item->client}}</td>
@@ -41,18 +41,20 @@
                                 $count = count($item->playlists);
                                 $i = 0;
                                     foreach($item->playlists as $playlist) {
-                                        if($i == $count - 1) {
-                                            echo $playlist;
+                                        if($playlist->user_id == \Illuminate\Support\Facades\Auth::user()->id) {
+                                            if($i == $count - 1) {
+                                                echo $playlist->name;
+                                            }
+                                            else {
+                                                echo $playlist->name . ', ';
+                                            }
+                                            $i++;
                                         }
-                                        else {
-                                            echo $playlist . ', ';
-                                        }
-                                        $i++;
                                     }
                                 @endphp
                             </td>
                             <td>
-                                <button class="btn btn-info change-playlist" data-type="playlists" data-action="5" data-toggle="modal" data-target="#playlistAdd">Zarządzaj playlistami</button>
+                                <button class="btn btn-info change-playlist" data-type="playlists" data-action="5" data-toggle="modal" data-target="#playlistAdd">Dodaj do playlisty</button>
                             </td>
                         </tr>
                     @endforeach
@@ -94,7 +96,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
-                    <h4 class="modal-title">Edytuj playlisty</h4>
+                    <h4 class="modal-title">Dodawanie rozmowy do playlisty!</h4>
                 </div>
                 <div class="modal-body2">
                     <form action="/modelConversationCategoryChangePlaylist" method="post">
@@ -106,16 +108,18 @@
                             <select name="playlist" class="form-control playlists">
                                 <option value="0">Wybierz</option>
                                 @foreach($playlists as $playlist)
-                                    <option value="{{$playlist->id}}">{{$playlist->name}}</option>
+                                    @if($playlist->user_id == \Illuminate\Support\Facades\Auth::user()->id)
+                                        <option value="{{$playlist->id}}">{{$playlist->name}}</option>
+                                    @endif
                                 @endforeach
                             </select>
                         </div>
 
-                        <input type="submit" class="btn btn-success playlist_save" value="Zapisz">
+                        <input type="submit" class="btn btn-success playlist_save" value="Dodaj do playlisty">
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Zamknij</button>
                 </div>
             </div>
 
@@ -141,5 +145,5 @@
         };
     </script>
     <script src="{{ asset('js/model_conversations/category.js') }}"></script>
-    <script src="{{ asset('js/model_conversations/categories.js') }}"></script>
+    <script src="{{ asset('js/model_conversations/categories3.js') }}"></script>
 @endsection
