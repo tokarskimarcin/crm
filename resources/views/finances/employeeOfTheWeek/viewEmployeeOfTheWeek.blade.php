@@ -31,10 +31,20 @@
     </div>
     <div class="panel panel-default">
         <div class="panel-heading">
-            Panel z zatwierdzaniem premii za pracownika tygodnia
+            Panel z zatwierdzaniem premii dla pracownika tygodnia
         </div>
         <div class="panel-body">
             <div class="row">
+                <div class="col-md-2" id="departmentTypeSection">
+                    <label for="departmentTypeSelect">Typ oddziału</label>
+                    <select id="departmentTypeSelect" name="departmentTypeSelect" class="form-control">
+                        <option value="0">Wybierz</option>
+                        <option value="1">Potwierdzanie</option>
+                        <option value="2">Telemarketing</option>
+                    </select>
+                </div>
+            </div>
+            {{--<div class="row">
                 <div class="col-md-4">
                     <label>Miesiąc:</label>
                     <div class="form-group">
@@ -64,9 +74,9 @@
                         @endforeach
                     </select>
                 </div>
-            </div>
+            </div>--}}
             <div class="row">
-                <div id="employeeOfTheWeekSection" class="col-md-12"
+                <div id="employeeOfTheWeekSection" class="col-md-12">
                 </div>
             </div>
         </div>
@@ -76,6 +86,41 @@
 @section('script')
     <script src="{{ asset('/js/moment.js')}}"></script>
     <script>
+        let VARIABLES;
+        let FUNCTIONS;
+        $(document).ready(function () {
+            VARIABLES = {
+                SUBVIEW:{},
+                jQElements: {
+                    departmentTypeSection: $('#departmentTypeSection'),
+                    departmentTypeSelect: $('#departmentTypeSelect').selectpicker()
+                },
+                DATA_TABLES: {}
+            };
+
+            FUNCTIONS = {
+                createUserTypeSelect: function(userTypes){
+
+                },
+                SUBVIEW:{},
+                /* function grups should be before other functions which aren't grouped */
+                EVENT_HANDLERS: {
+                    callEvents:function () {
+                        (function departmentTypeSelectHandler() {
+                            VARIABLES.jQElements.departmentTypeSelect.change(function () {
+
+                            });
+                            })();
+                    }
+                },
+                AJAXs: {
+                }
+            };
+            FUNCTIONS.EVENT_HANDLERS.callEvents();
+            //resizeDatatablesOnMenuToggle();
+        });
+    </script>
+    {{--<script>
         let VARIABLES;
         let FUNCTIONS;
         $(document).ready(function () {
@@ -175,5 +220,5 @@
             FUNCTIONS.EVENT_HANDLERS.callEvents();
             //resizeDatatablesOnMenuToggle();
         });
-    </script>
+    </script>--}}
 @endsection

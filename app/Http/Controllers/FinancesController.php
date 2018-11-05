@@ -1849,6 +1849,11 @@ class FinancesController extends Controller
             ->with('departments_info', $departments_info->get());
     }
 
+    public function getUserTypesOfDepartmentTypeAjax(Request $request){
+        $departmentTypeId = $request->departmentTypeId;
+
+    }
+
     public function viewEmployeeOfTheWeekCadreGet(){
         $userTypes = UserTypes::whereNotIn('id',[1,2,9,3])->get();
         $departments_info = Department_info::with('departments')->with('department_type');
