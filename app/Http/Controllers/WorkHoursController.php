@@ -102,7 +102,8 @@ class WorkHoursController extends Controller
 
         return view('workhours.usersLive')
             ->with('shedule',$sheduleWithNewUsers)
-            ->with('day_number',$day_number);
+            ->with('day_number',$day_number)
+            ->with('newUsersRbh', UsersGlobalVariables::$newUsersRbh);
     }
 
     public function datatableAcceptHour(Request $request) // akceptacja godzin dla konsultantów
