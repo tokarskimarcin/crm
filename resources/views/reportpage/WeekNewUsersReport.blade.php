@@ -52,7 +52,7 @@
         <div class="col-lg-12">
             <div class="row">
                 <div class="panel-body" style="font-size: 12px;">
-                    @include('mail.week30RbhReport')
+                    @include('mail.weekNewUsersReport')
                 </div>
             </div>
         </div>

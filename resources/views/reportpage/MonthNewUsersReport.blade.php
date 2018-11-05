@@ -44,7 +44,7 @@
     <div class="row">
         <div class="col-lg-12">
             <div class="panel-body" style="font-size: 12px;">
-                @include('mail.month30RbhReport')
+                @include('mail.monthNewUsersReport')
             </div>
         </div>
     </div>
