@@ -1131,3 +1131,5 @@ Route::delete('/modelConversationsGetPlaylist/{id}', 'ModelConversationsControll
 
 Route::get('/modelConversationsGetPlaylistItems/{id}', 'ModelConversationsController@managementPlaylistGet');
 Route::delete('/modelConversationsGetPlaylistItems/{id}', 'ModelConversationsController@managementPlaylistItemsDelete');
+
+Route::get('/removeTemporaryConversations', 'AutoScriptController@removeTemporaryConversations');

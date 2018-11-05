@@ -8,7 +8,7 @@
 @endsection
 
 @section('styles')
-    <link rel="stylesheet" href="{{asset('css/model_conversations/categories2.css')}}">
+    <link rel="stylesheet" href="{{asset('css/model_conversations/categories.css')}}">
 @endsection
 
 
@@ -27,5 +27,5 @@
     </script>
 
     <script src="{{ asset('js/model_conversations/category.js') }}"></script>
-    <script src="{{ asset('js/model_conversations/menu.js') }}"></script>
+    <script src="{{ asset('js/model_conversations/menu2.js') }}"></script>
 @endsection

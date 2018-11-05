@@ -9,10 +9,28 @@ class ModelConvPlaylistItem extends Model
     protected $table = 'model_conv_playlist_items';
     public $timestamps = false;
 
+    protected $fillable = ['playlist_order'];
 
     public static function smartDelete($id) {
         //Nalezy dodac funkcje uaktualniającą kolejność playlisty
-        ModelConvPlaylistItem::find($id)->delete();
+        $playlist = ModelConvPlaylistItem::find($id);
+        $playlist_id = $playlist->playlist_id;
+        $playlist->delete();
+        ModelConvPlaylistItem::updateOrder($playlist_id);
+    }
+
+    /**
+     * @param $playlist_id
+     * This method adjust order of playlist
+     */
+    public static function updateOrder($playlist_id) {
+        $playlist_items = ModelConvPlaylistItem::where('playlist_id', '=', $playlist_id)->orderBy('playlist_order')->get();
+
+        $i = 1;
+        foreach($playlist_items as $item) {
+            $item->update(['playlist_order' => $i]);
+            $i++;
+        }
     }
 
     /**

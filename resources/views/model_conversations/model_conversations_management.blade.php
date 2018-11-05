@@ -1,6 +1,6 @@
 @extends('model_conversations.model_conversations_menu')
 @section('styles')
-    <link rel="stylesheet" href="{{asset('css/model_conversations/management2.css')}}">
+    <link rel="stylesheet" href="{{asset('css/model_conversations/management.css')}}">
 @endsection
 
 @section('section')
@@ -9,18 +9,18 @@
         <ul class="nav nav-tabs">
             <li><a data-toggle="tab" href="#home">Legenda</a></li>
             @if(in_array($user, $adminPanelAccessArr))
-            <li><a data-toggle="tab" href="#menu1">Kategorie</a></li>
-            <li><a data-toggle="tab" href="#menu2">Rozmowy</a></li>
+                <li><a data-toggle="tab" href="#menu1">Kategorie</a></li>
             @endif
-            <li><a data-toggle="tab" href="#playlists">Playlisty</a></li>
+            <li><a data-toggle="tab" href="#menu2">Rozmowy</a></li>
+            <li><a data-toggle="tab" href="#playlists2">Playlisty</a></li>
         </ul>
 
         <div class="tab-content">
             @include('model_conversations.management_partials.legend')
             @if(in_array($user, $adminPanelAccessArr))
-            @include('model_conversations.management_partials.categories')
-            @include('model_conversations.management_partials.conversations')
+                @include('model_conversations.management_partials.categories')
             @endif
+            @include('model_conversations.management_partials.conversations')
             @include('model_conversations.management_partials.playlists')
         </div>
     </div>
@@ -44,7 +44,7 @@
 
                         <div class="form-group">
                             <label for="name">Nazwa kategorii</label>
-                            <input class="form-control category_name" type="text" placeholder="Nazwa kategorii" name="name">
+                            <input class="form-control category_name" type="text" placeholder="Nazwa kategorii" name="name" required>
                         </div>
 
                         <div class="form-group">
@@ -60,13 +60,24 @@
                             </select>
                         </div>
 
+                        @if($showAvailableDepartmentTypes)
+                            <div class="form-group">
+                                <label for="department_type_id">Rodzaj oddziału</label>
+                                <select class="form-control" name="department_type_id" id="department_type_id">
+                                    @foreach($availableDepartmentTypes as $dep)
+                                        <option value="{{$dep->id}}">{{$dep->name}}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        @endif
+
                         <div class="form-group">
                             <label for="subcategory">Kategoria</label>
-                            <select name="subcategory" class="form-control category_subcategory">
+                            <select name="subcategory" class="form-control category_subcategory" required>
                                 <option value="0">Główna kategoria</option>
                                 @foreach($categories as $category)
                                     @if($category->status == 1)
-                                        <option value="{{$category->id}}">{{$category->name}}</option>
+                                        <option value="{{$category->id}}">{{$category->name}} @if($showAvailableDepartmentTypes) - {{$availableDepartmentTypes->where('id', '=', $category->department_type_id)->first()->name}} @endif</option>
                                     @endif
                                 @endforeach
                             </select>
@@ -75,7 +86,7 @@
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Zamknij</button>
                 </div>
             </div>
 
@@ -97,9 +108,10 @@
                             <input type="hidden" name="toAdd" value="1" class="item_toAdd">
                             <input type="hidden" name="id" class="item_id">
                             <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                            <input type="hidden" name="temp" @if(in_array($user, $adminPanelAccessArr)) value="0" @else value="1" @endif>
                         <div class="form-group">
                             <label for="name">Nazwa</label>
-                            <input type="text" class="form-control item_name" placeholder="Podaj nazwę" name="name">
+                            <input type="text" class="form-control item_name" placeholder="Podaj nazwę" name="name" required>
                         </div>
 
                         <div class="form-group">
@@ -124,17 +136,21 @@
 
                         <div class="form-group">
                             <label for="category_id">Kategoria</label>
-                            <select name="category_id" class="form-control item_category_id">
-                                @foreach($categories as $category)
-                                    <option value="{{$category->id}}">{{$category->name}}</option>
-                                @endforeach
+                            <select name="category_id" class="form-control item_category_id" required>
+                                @if(in_array($user, $adminPanelAccessArr))
+                                    @foreach($categories as $category)
+                                        <option value="{{$category->id}}">{{$category->name}}</option>
+                                    @endforeach
+                                @else
+                                    <option value="1">Własne rozmowy</option>
+                                @endif
                             </select>
                         </div>
                         <div class="form-group">
                             <label for="status">Status</label>
                             <select name="status" class="form-control item_status">
-                                <option value="1">Aktywna</option>
-                                <option value="0">Nie Aktywna</option>
+                                    <option value="1">Aktywna</option>
+                                    <option value="0">Nie Aktywna</option>
                             </select>
                         </div>
 
@@ -142,7 +158,7 @@
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Zamknij</button>
                 </div>
             </div>
 
@@ -166,7 +182,7 @@
                         <input type="hidden" name="_token" value="{{ csrf_token() }}">
                         <div class="form-group">
                             <label for="name">Nazwa</label>
-                            <input type="text" class="form-control playlist_name" placeholder="Podaj nazwę" name="name">
+                            <input type="text" class="form-control playlist_name" placeholder="Podaj nazwę" name="name" required>
                         </div>
 
                         <div class="form-group">
@@ -178,7 +194,7 @@
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Zamknij</button>
                 </div>
             </div>
 
@@ -198,7 +214,7 @@
                     <p>Some text in the modal.</p>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Zamknij</button>
                 </div>
             </div>
         </div>
@@ -228,5 +244,5 @@
     </script>
     <script src="{{ asset('/js/sweetAlert.js')}}"></script>
     <script src="{{ asset('js/model_conversations/category.js') }}"></script>
-    <script src="{{ asset('js/model_conversations/management.js') }}"></script>
+    <script src="{{ asset('js/model_conversations/management2.js') }}"></script>
 @endsection

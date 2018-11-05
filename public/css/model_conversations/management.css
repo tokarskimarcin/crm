@@ -45,6 +45,10 @@
     background-color: rgba(255,255,255,0.5);
 }
 
+#menu2 .btn {
+    font-size: 0.8em !important;
+}
+
 @media only screen and (max-width: 600px) {
     /*Telefony*/
     #playlists {

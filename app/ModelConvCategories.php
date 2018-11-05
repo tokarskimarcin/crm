@@ -10,12 +10,14 @@ class ModelConvCategories extends Model
     public $timestamps = false;
     protected $guarded = [];
 
+    //Status 0 - deactivated, status 1 = active, status -1 = permanent(nobody can touch them)
+
     /**
      * @param $query
-     * This scope method indicates only active categories (with status 1)
+     * This scope method indicates only active categories (with status 1 and permanent with status -1)
      */
     public function scopeOnlyActive($query) {
-        $query->where('status', '=', 1);
+        $query->where('status', '=', 1)->orwhere('status', '=', -1);
     }
 
     /**
