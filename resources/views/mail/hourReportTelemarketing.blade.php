@@ -69,12 +69,12 @@
                       $difference_succes_total += $difference_succes;
                       $difference_hour_time_use_total += $difference_hour_time_use;
                       if($difference_hour_time_use > 0)
-                        $avg_per_hour = round($difference_succes/$difference_hour_time_use,2);
+                        $avg_per_hour = round($difference_succes/$difference_hour_time_use, 2);
                       else
                         $avg_per_hour=0;
                         $color = '#ffffff';
                        if($avg_per_hour !=0){
-                                if($avg_per_hour< $telemarketingLevels[0] || $avg_per_hour > $telemarketingLevels[1]){
+                                if($avg_per_hour < $telemarketingLevels[0] || $avg_per_hour > $telemarketingLevels[1]){
                                      $color = '#e46464';
                                 }else{
                                     $color = '#ffffff';
