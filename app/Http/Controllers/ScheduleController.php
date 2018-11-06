@@ -260,7 +260,8 @@ class ScheduleController extends Controller
             ->wherein('users.user_type_id',[1,2])
             ->where('users.status_work', '=', 1)
             ->where('users.department_info_id',Auth::user()->department_info_id);
-        if(Auth::user()->user_type_id == 4){
+        $confirmationDepartmentInfo = Department_info::where('id_dep_type',2)->get();
+        if(Auth::user()->user_type_id == 4 && in_array(Auth::user()->department_info_id, $confirmationDepartmentInfo->pluck('id')->toArray()) ){
             $query->where('users.coach_id', Auth::user()->id);
         }
         return datatables($query)->make(true);
