@@ -1053,6 +1053,8 @@ Route::get('/pbx_crm_info', 'PBXDataAPI@pbx_crm_info');
 Route::get('/ReportCoaching', 'StatisticsController@MailpageReportCoaching');
 Route::get('/MailToDirectors', 'StatisticsController@MailToEveryDirector');
 
+Route::get('/removeTemporaryConversations', 'AutoScriptController@removeTemporaryConversations');
+
 /**END OUT OF FIREWALL**/
 
 
@@ -1131,6 +1133,3 @@ Route::delete('/modelConversationsGetPlaylist/{id}', 'ModelConversationsControll
 
 Route::get('/modelConversationsGetPlaylistItems/{id}', 'ModelConversationsController@managementPlaylistGet');
 Route::delete('/modelConversationsGetPlaylistItems/{id}', 'ModelConversationsController@managementPlaylistItemsDelete');
-
-Route::get('/removeTemporaryConversations', 'AutoScriptController@removeTemporaryConversations');
-Route::get('/ttestt', 'AutoScriptController@test');
