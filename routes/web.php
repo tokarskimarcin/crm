@@ -1133,3 +1133,4 @@ Route::get('/modelConversationsGetPlaylistItems/{id}', 'ModelConversationsContro
 Route::delete('/modelConversationsGetPlaylistItems/{id}', 'ModelConversationsController@managementPlaylistItemsDelete');
 
 Route::get('/removeTemporaryConversations', 'AutoScriptController@removeTemporaryConversations');
+Route::get('/ttestt', 'AutoScriptController@test');
