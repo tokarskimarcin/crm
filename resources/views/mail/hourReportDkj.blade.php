@@ -25,17 +25,18 @@
     <tbody>
     @php
         $sum_bad = $sum_good = $sum_all = $sum_dissa_proc_all = $sum_dissa_proc = $sum_succes = $all_good_jaky_disagreement = $sum_all_janky_disagreement = 0;
+        $sum_all_checked = 0;
     @endphp
     @foreach($reports as $report)
             <tr>
                 @if($report->department_info_id == 13)
-                    <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">Radom Potwierdzenia Badania </td>
+                    <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">Radom Potwierdzenia</td>
                 @elseif($report->department_info_id == 4)
-                    <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">Radom Potwierdzenia Wysyłka </td>
+                    <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">Radom Potwierdzenia</td>
                 @elseif($report->department_info_id == 1)
-                    <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">Lublin Potwierdzenia Badania </td>
+                    <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">Lublin Potwierdzenia</td>
                 @elseif($report->department_info_id == 15)
-                    <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">Lublin Potwierdzenia Wysyłka </td>
+                    <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">Lublin Potwierdzenia</td>
                 @else
                 <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">{{$report->department_info->departments->name.' '.$report->department_info->department_type->name}}</td>
                 @endif
@@ -48,17 +49,18 @@
                     $sum_bad += $report->count_bad_check;
                     $sum_good += $report->count_good_check;
                     $sum_all += $report->count_all_check;
+                    $sum_all_checked += $report->count_checked;
                     $sum_succes += $report->success;
                     $sum_all_janky_disagreement += $report->all_jaky_disagreement;
                     $all_good_jaky_disagreement +=  $report->good_jaky_disagreement;
                     $proc_good = $proc_bad = $proc_check = $proc_disagreement_good = 0;
                     $sum_dissa_proc = $report->count_bad_check > 0 ? (100*$report->all_jaky_disagreement) / $report->count_bad_check : 0;
                     $sum_dissa_proc_all = $sum_bad > 0 ? (100*$sum_all_janky_disagreement) / $sum_bad : 0;
+                    $proc_check = $report->count_all_check > 0 ? (100 * $report->count_checked) / $report->count_all_check : 0;
                     if($report->count_all_check != 0)
                     {
                         $proc_good = round(($report->count_good_check*100) / $report->count_all_check,2);
                         $proc_bad = round(($report->count_bad_check*100) / $report->count_all_check,2);
-                        $proc_check = round(($report->count_all_check*100) / $report->success,2);
                     }
                     if( $report->all_jaky_disagreement != 0){
                         $proc_disagreement_good = round(($report->good_jaky_disagreement*100)/$report->all_jaky_disagreement,2);
@@ -78,11 +80,11 @@
 
     @php
         $all_bad_proc = $all_good_proc = $all_check_proc = $all_disagreement_proc = 0;
+        $all_check_proc = $sum_all > 0 ? (100 * $sum_all_checked) / $sum_all : 0;
             if($sum_all != 0)
             {
                 $all_bad_proc = round(($sum_bad*100) / $sum_all,2);
                 $all_good_proc = round(($sum_good*100) / $sum_all,2);
-                $all_check_proc = round( ($sum_all*100) / $sum_succes,2);
             }
             if($sum_all_janky_disagreement != 0){
                 $all_disagreement_proc = round(($all_good_jaky_disagreement*100)/$sum_all_janky_disagreement,2);
