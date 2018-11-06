@@ -11,6 +11,7 @@ namespace App\Utilities\DataProcessing;
 use App\Http\Controllers\Statistics\DepartmentsConfirmationStatisticsController;
 use App\Utilities\Dates\SecondsToTime;
 use App\Utilities\Salary\ProvisionLevels;
+use function foo\func;
 
 class ConfirmationStatistics
 {
@@ -32,6 +33,11 @@ class ConfirmationStatistics
                 }
             }
         }
+        $usersPbxConfirmationStatistics = DepartmentsConfirmationStatisticsController::getEveryPbxConfirmationReport($clientRouteInfo->pluck('confirmingUser')->unique()->toArray(),
+            (object)['firstDay' => $dividedMonth[0]->firstDay,
+                'lastDay' => $dividedMonth[count($dividedMonth)-1]->lastDay]);
+
+        //dd($usersPbxConfirmationStatistics);
         $confirmationStatistics = ['data'=>collect(),'sums'=>collect()];
         $clientRouteInfo = $clientRouteInfo->groupBy('dateGroup');
         foreach ($clientRouteInfo as $dateGroup => $clientRouteInfoByDateGroup){
@@ -143,7 +149,10 @@ class ConfirmationStatistics
                     $consultantConfirmationStatistics->avgFrequency     = round($consultantFrequencySum/$consultantConfirmationStatistics->shows,2);
                     $consultantConfirmationStatistics->avgPairs         = round($consultantPairsSum/$consultantConfirmationStatistics->shows,2);
 
-                    $consultantConfirmationReports = [];//DepartmentsConfirmationStatisticsController::getEveryPbxConfirmationReport($consultantConfirmationStatistics->confirmingUser, $dateGroupSum);
+                    $consultantConfirmationReports = $usersPbxConfirmationStatistics->where('pbx_id', $consultantConfirmationData[0]->login_phone)
+                        ->filter(function ($value, $key) use ($dateGroupSum){
+                        return strtotime($value['report_date']) >= strtotime($dateGroupSum->firstDay) && strtotime($value['report_date']) <= strtotime($dateGroupSum->lastDay);
+                    });//[];//DepartmentsConfirmationStatisticsController::getEveryPbxConfirmationReport($consultantConfirmationStatistics->confirmingUser, $dateGroupSum);
 
                     foreach($consultantConfirmationReports as $confirmationReport){
                         if(!is_null($confirmationReport['time_on_record'])){

@@ -152,14 +152,14 @@ class DepartmentsConfirmationStatisticsController extends Controller
 
     /**
      * Getting every pbx confirmation report for specified consultant in specified week
-     * @param $userId
+     * @param array $userId
      * @param $pbxId
      * @param object $dateGroupSum - {'firstDay','lastDay'}
      * @return \Illuminate\Support\Collection
      */
     public static function getEveryPbxConfirmationReport($userId, $dateGroupSum){
         ini_set('max_execution_time', 300);
-        $consultantEmploymentStatus = UserEmploymentStatus::where('user_id', $userId)
+        $consultantEmploymentStatus = UserEmploymentStatus::whereIn('user_id', $userId)
             ->where(function ($query) use ($dateGroupSum){
                 /*                         dateGroup->firstDay              dateGroup->lastDay                   dateGroup->firstDay                      dateGroup->lastDay*/
                 //and ((pbx_id_add_date >= '2018-09-01' and pbx_id_add_date < '2018-09-30' ) or (pbx_id_remove_date >= '2018-09-01' and pbx_id_remove_date < '2018-09-30' ) or isnull(pbx_id_remove_date ))
@@ -180,13 +180,20 @@ class DepartmentsConfirmationStatisticsController extends Controller
 
             })->get();
 
-        if(count($consultantEmploymentStatus) == 0){
-            $consultantEmploymentStatus->push((object)[
-                'pbx_id' => User::find($userId)->login_phone,
-                'pbx_id_add_date' => $dateGroupSum->firstDay,
-                'pbx_id_remove_date' => $dateGroupSum->lastDay
-            ]);
+        $userIdsFromUserEmploymentStatus = $consultantEmploymentStatus->pluck('user_id')->unique()->toArray();
+        $userIdsWithoutEmploymentStatus = array_diff($userId, $userIdsFromUserEmploymentStatus);
+        if(count($userIdsWithoutEmploymentStatus) > 0){
+            $usersWithoutEmploymentStatus = User::whereIn('id',$userIdsWithoutEmploymentStatus)->get();
+            foreach ($usersWithoutEmploymentStatus as $userWithoutEmploymentStatus){
+                $consultantEmploymentStatus->push((object)[
+                    'pbx_id' => $userWithoutEmploymentStatus->login_phone,
+                    'pbx_id_add_date' => $dateGroupSum->firstDay,
+                    'pbx_id_remove_date' => $dateGroupSum->lastDay
+                ]);
+            }
+
         }
+
         $consultantConfirmationReports = [];
         foreach ($consultantEmploymentStatus as $employmentStatus){
             $firstDayOfPeriod = is_null($employmentStatus->pbx_id_add_date) ? $dateGroupSum->firstDay : $employmentStatus->pbx_id_add_date;
