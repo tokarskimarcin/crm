@@ -3,14 +3,14 @@
     <div class="alert alert-info">
         <ul class="list-group">
 
-            @if(in_array($user, $adminPanelAccessArr))
+            @if(in_array($user, $adminPanelAccessArr) || in_array(Auth::user()->id, $privilagedUserArr))
                 <li class="list-group-item">
                     <b>Ogólne informacje</b> - jesteś użytkownikiem uprzywilejowanym, możesz zmieniać/dodawać/usuwać kategorie oraz rozmowy dla oddziałów o takim samym typie jak Twoj.<br>
 
                 </li>
             @endif
 
-            @if(in_array($user, $adminPanelAccessArr))
+            @if(in_array($user, $adminPanelAccessArr) || in_array(Auth::user()->id, $privilagedUserArr))
             <li class="list-group-item">
                 <b>Kategorie</b> - zakładka pozwalająca zarządzać kategoriami.<br>
                 W tej zakładce można dodawać/edytować/usuwać/włączać/wyłączać dostępne w programie kategorie. <br>
@@ -21,7 +21,7 @@
             @endif
 
             <li class="list-group-item">
-                @if(in_array($user, $adminPanelAccessArr))
+                @if(in_array($user, $adminPanelAccessArr) || in_array(Auth::user()->id, $privilagedUserArr))
                     <b>Rozmowy</b> - zakładka pozwalająca zarządzać rozmowami. <br>
                     W tej zakładce, można dodawać/edytować/usuwać/włączać/wyłączać dostępne w programie rozmowy, które wszyscy będą widzieć.<br>
                     Pliki z rozmowami mogą mieć rozszerzenia: wav, mp3, ogg <br>
@@ -39,7 +39,7 @@
             </li>
 
             <li class="list-group-item">
-                @if(in_array($user, $adminPanelAccessArr))
+                @if(in_array($user, $adminPanelAccessArr) || in_array(Auth::user()->id, $privilagedUserArr))
                     <b>Playlisty</b> - zakładka pozwalająca zarządzać wszystkimi playlistami. <br>
                     Playlista, to rozmowy rozmowy z różnych kategorii uporządkowane w dowolnej kolejności, dostępne w zakładce "<i>Playlisty</i>".
                     W tej zakładce, można edytować/usuwać/dodawać dostępne w programie playlisty, również innych użytkowników. <br>
