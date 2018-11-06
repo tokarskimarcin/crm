@@ -225,7 +225,8 @@ class StatisticsRBHController extends Controller
             'date_start' => $date_start,
             'date_stop' => $date_stop,
             'data' => $data,
-            'regionalManagersInstructors' => $regionalManagersInstructors
+            'regionalManagersInstructors' => $regionalManagersInstructors,
+            'newUsersRbh'   => UsersGlobalVariables::$newUsersRbh
         ]);
     }
 
@@ -246,7 +247,8 @@ class StatisticsRBHController extends Controller
             'date_start' => $date_start,
             'date_stop' => $date_stop,
             'data' => $data,
-            'regionalManagersInstructors' => $regionalManagersInstructors
+            'regionalManagersInstructors' => $regionalManagersInstructors,
+            'newUsersRbh'   => UsersGlobalVariables::$newUsersRbh
         ]);
     }
 

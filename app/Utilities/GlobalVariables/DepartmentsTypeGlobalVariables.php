@@ -11,5 +11,5 @@ namespace App\Utilities\GlobalVariables;
 
 class DepartmentsTypeGlobalVariables
 {
-    public static $telemarketingLevels = [2.3, 3.3];
+    public static $telemarketingLevels = [2.2, 3.3];
 }

@@ -7,6 +7,8 @@ use App\Cities;
 use App\ClientRoute;
 use App\ClientRouteInfo;
 use App\Department_info;
+use App\HourRepoerOtherCompany;
+use App\HourReport;
 use App\MedicalPackage;
 use App\UserEmploymentStatus;
 use App\Utilities\GlobalVariables\UsersGlobalVariables;
@@ -652,4 +654,5 @@ class AutoScriptController extends Controller
         }
 
     }
+
 }

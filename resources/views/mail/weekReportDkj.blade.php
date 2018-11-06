@@ -30,6 +30,7 @@
         $sum_proc = 0;
         $sum_succes = 0;
         $sum_proc_check = 0;
+        $sum_checked = 0;
         $all_good_jaky_disagreement = $sum_all_janky_disagreement = 0;
         $proc_disagreement_good = 0;
         $all_disagreement_proc = 0;
@@ -40,13 +41,13 @@
             <tr>
                   <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$i}}</td>
                 @if($item->department_info_id == 13)
-                    <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">Radom Potwierdzenia Badania </td>
+                    <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">Radom Potwierdzenia</td>
                 @elseif($item->department_info_id == 4)
-                    <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">Radom Potwierdzenia Wysyłka </td>
+                    <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">Radom Potwierdzenia</td>
                 @elseif($item->department_info_id == 1)
-                    <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">Lublin Potwierdzenia Badania </td>
+                    <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">Lublin Potwierdzenia</td>
                 @elseif($item->department_info_id == 15)
-                    <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">Lublin Potwierdzenia Wysyłka </td>
+                    <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">Lublin Potwierdzenia</td>
                 @else
                     <td style="font-weight: bold;border:1px solid #231f20;text-align:center;padding:3px">{{$item->depname}} {{$item->deptype}}</td>
                 @endif
@@ -56,14 +57,15 @@
                   <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$item->sum_janky}}</td>
                 @php
                     $bad_proc = ( $item->sum_all_talks > 0 ? (100*$item->sum_janky) / $item->sum_all_talks : 0 );
-                    $check_proc = ($item->success > 0 ? (100*$item->sum_all_talks) / $item->success : 0);
+                    $check_proc = ($item->sum_all_talks > 0 ? (100*$item->count_checked) / $item->sum_all_talks : 0);
                     $i++;
                     $sum_all_talks += $item->sum_all_talks;
                     $sum_all_good += $item->sum_correct_talks;
                     $sum_all_bad += $item->sum_janky;
                     $sum_succes += $item->success;
+                    $sum_checked += $item->count_checked;
                     $sum_proc = $sum_all_talks > 0 ? (100*$sum_all_bad) / $sum_all_talks : 0;
-                    $sum_proc_check = $sum_succes > 0 ? (100*$sum_all_talks) / $sum_succes : 0;
+                    $sum_proc_check = $sum_all_talks > 0 ? (100 * $sum_checked) / $sum_all_talks : 0;
                     $sum_all_janky_disagreement += $item->all_jaky_disagreement;
                     $all_good_jaky_disagreement +=  $item->good_jaky_disagreement;
                     $sum_dissa_proc = $item->sum_janky > 0 ? (100*$item->all_jaky_disagreement) / $item->sum_janky : 0;

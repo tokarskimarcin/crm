@@ -251,9 +251,9 @@
                 @foreach($departments as $dep)
                 if($('#selected_dep').val() == {{$dep->id}}){
                     if({{$dep->id_dep_type}} == 1){
-                        hoursAfterWhichItBecomesUnsettled = 14;
+                        hoursAfterWhichItBecomesUnsettled = 8;
                     }else{
-                        hoursAfterWhichItBecomesUnsettled = 14;
+                        hoursAfterWhichItBecomesUnsettled = 8;
                     }
                 }
                 @endforeach

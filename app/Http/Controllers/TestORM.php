@@ -125,7 +125,6 @@ class TestORM extends Controller
             }else
                 array_push($finall_array,$item);
         }
-
         HourReport::insert($finall_array);
 
     }

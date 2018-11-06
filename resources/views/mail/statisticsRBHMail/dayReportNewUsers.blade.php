@@ -4,14 +4,14 @@
     @php
     $i = 1;
     $item = $item->sortByDESC('avg');
-    $sumSecond30RBH = 0;
+    $sumSecondNewUsers = 0;
     $sumSecondAll = 0;
     @endphp
 <table style="width:100%;border:1px solid #231f20;border-collapse:collapse;padding:3px">
     <thead style="color:#efd88f">
     <tr>
         <td colspan="9" style="border:1px solid #231f20;text-align:center;padding:3px;background:#231f20;color:#efd88f">
-            <font size="6" face="Calibri">RAPORT DZIENNY 30RBH {{$item[0]['dep_city']}} {{$item[0]['dep_type']}}</font></td>
+            <font size="6" face="Calibri">RAPORT DZIENNY {{$newUsersRbh}}RBH {{$item[0]['dep_city']}} {{$item[0]['dep_type']}}</font></td>
     </tr>
     <tr>
         <th style="border:1px solid #231f20;padding:3px;background:#231f20;">L.p</th>
@@ -39,19 +39,19 @@
                 <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{$value['pause_time']}}</td>
                 <td style="border:1px solid #231f20;text-align:center;padding:3px;">{{isset($value['secondStop']) ? \App\Schedule::secondToHour($value['secondStop']).' / ' : ' '}}  {{\App\Schedule::secondToHour($value['sec_sum'])}} </td>
                 @php
-                    $sumSecond30RBH += isset($value['secondStop']) ? $value['secondStop'] : $value['sec_sum'];
+                    $sumSecondNewUsers += isset($value['secondStop']) ? $value['secondStop'] : $value['sec_sum'];
                 @endphp
             </tr>
             @endforeach
             <tr>
                 <td style="background-color: #c67979;border:1px solid #231f20;text-align:center;padding:3px" colspan="2">Suma</td>
-                <td style="background-color: #c67979;border:1px solid #231f20;text-align:center;padding:3px">{{$sumSecond30RBH != 0 ? round($item->sum('success')/($sumSecond30RBH/3600),2): 0}}</td>
+                <td style="background-color: #c67979;border:1px solid #231f20;text-align:center;padding:3px">{{$sumSecondNewUsers != 0 ? round($item->sum('success')/($sumSecondNewUsers/3600),2): 0}}</td>
                 <td style="background-color: #c67979;border:1px solid #231f20;text-align:center;padding:3px">{{$item->sum('all_checked_talks') != 0 ? round($item->sum('bad_talks')/($item->sum('all_checked_talks'))*100,2): 0}} %</td>
                 <td style="background-color: #c67979;border:1px solid #231f20;text-align:center;padding:3px">{{$item->sum('received_calls')}}</td>
                 <td style="background-color: #c67979;border:1px solid #231f20;text-align:center;padding:3px">{{$item->sum('success')}}</td>
                 <td style="background-color: #c67979;border:1px solid #231f20;text-align:center;padding:3px">{{$item->sum('received_calls') != 0 ? round($item->sum('success')/($item->sum('received_calls')) * 100,2): 0}} %</td>
                 <td style="background-color: #c67979;border:1px solid #231f20;text-align:center;padding:3px">{{\App\Schedule::secondToHour($item->sum('pause_timeSec'))}}</td>
-                <td style="background-color: #c67979;border:1px solid #231f20;text-align:center;padding:3px">{{\App\Schedule::secondToHour($sumSecond30RBH).' / '}}  {{\App\Schedule::secondToHour($item->sum('sec_sum'))}} </td>
+                <td style="background-color: #c67979;border:1px solid #231f20;text-align:center;padding:3px">{{\App\Schedule::secondToHour($sumSecondNewUsers).' / '}}  {{\App\Schedule::secondToHour($item->sum('sec_sum'))}} </td>
             </tr>
     </tbody>
 </table>
