@@ -135,9 +135,10 @@ class DepartmentsController
             //Save change
             if(!empty($department_info)){
                 $data = [
-                    'Edycja danych oddziału' => '',
+                    'T' => 'Edycja danych oddziału',
                     'Id oddziału' => $request->selected_department_info_id
                 ];
+                $data = array_merge($data, $department_info->toArray());
                 new ActivityRecorder($data,66,2);
                 Session::flash('message_ok', "Zmiany zapisano pomyślnie!");
                 return Redirect::back();
