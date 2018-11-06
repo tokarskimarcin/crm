@@ -166,7 +166,6 @@ class Department_info extends Model
 
     /** Edit or modify department
      * @param $request
-     * @return Department_info|\Illuminate\Support\Collection
      */
     public static function addModifyDepartment($request){
 
@@ -187,9 +186,11 @@ class Department_info extends Model
 
             $id_dep = $departments[0]->id;
         }
-        if(isset($request->selected_department_info_id))
-            $department_info =Department_info::find($request->selected_department_info_id);
-        else{
+        $department_info_prev = null;
+        if(isset($request->selected_department_info_id)) {
+            $department_info = Department_info::find($request->selected_department_info_id);
+            $department_info_prev = clone $department_info;
+        }else{
             $department_info = new Department_info();
             $department_info->id_dep                    = $id_dep;
         }
@@ -220,6 +221,6 @@ class Department_info extends Model
         }catch (\Exception $exception){
             return collect();
         }
-        return $department_info;
+        return ['department_prev_version' => $department_info_prev,'department_next_version' => $department_info];
     }
 }
