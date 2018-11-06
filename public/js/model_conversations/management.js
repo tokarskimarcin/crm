@@ -105,15 +105,17 @@ document.addEventListener('DOMContentLoaded', function() {
                     let subcategorySelect = thisRow.cells[4].querySelector('.category_subcategory');
                     let selectedSubcategory = getSelectedValue(subcategorySelect);
 
-                    let departmentTypeSelect = thisRow.cells[5].querySelector('.department_type_id');
-                    let departmentTypeId = getSelectedValue(departmentTypeSelect);
+                    if(MANAGEMENT.globalVariables.showAvailableDepartmentTypes == 'true') {
+                        let departmentTypeSelect = thisRow.cells[5].querySelector('.department_type_id');
+                        let departmentTypeId = getSelectedValue(departmentTypeSelect);
+                        MANAGEMENT.DOMElements.categoryModal.querySelector('#department_type_id').value = departmentTypeId;
+                    }
 
                     MANAGEMENT.DOMElements.categoryModal.querySelector('.category_toAdd').value = 0; //edition
                     MANAGEMENT.DOMElements.categoryModal.querySelector('.category_id').value = id; //edition
                     MANAGEMENT.DOMElements.categoryModal.querySelector('.category_name').value = name;
                     MANAGEMENT.DOMElements.categoryModal.querySelector('.category_status').value = selectedStatus;
                     MANAGEMENT.DOMElements.categoryModal.querySelector('.category_subcategory').value = selectedSubcategory;
-                    MANAGEMENT.DOMElements.categoryModal.querySelector('#department_type_id').value = departmentTypeId;
                 }
                 else if(action == 5) { //adding new category
                     let header = MANAGEMENT.DOMElements.categoryModal.querySelector('h4');
