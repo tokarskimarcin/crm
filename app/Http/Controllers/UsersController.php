@@ -512,7 +512,7 @@ class UsersController extends Controller
                         }
                         $user->login_phone = null;
                         $userEmployment2->user_id = $user->id;
-                        $userEmployment2->pbx_id_add_date = $request->stop_date;
+                        $userEmployment2->pbx_id_add_date = $user->start_work;
                         $userEmployment2->pbx_id_remove_date = $request->stop_date;
                         $userEmployment2->save();
                     }
