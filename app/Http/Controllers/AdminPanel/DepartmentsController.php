@@ -53,7 +53,7 @@ class DepartmentsController
      * @return mixed
      */
     public function addDepartmentPost(Request $request) {
-        $department_info = Department_info::addModifyDepartment($request);
+        $department_info = Department_info::addModifyDepartment($request)['department_next_version'];
         if(!empty($department_info)){
             new ActivityRecorder("Dodano oddział o numerze ID: " . $department_info->id,51,1);
             Session::flash('message_ok', "Oddział został dodany!");
@@ -133,11 +133,12 @@ class DepartmentsController
             }
             $department_info = Department_info::addModifyDepartment($request);
             //Save change
-            if(!empty($department_info)){
+            if(!empty($department_info['department_next_version'])){
                 $data = [
-                    'Edycja danych oddziału' => '',
+                    'T' => 'Edycja danych oddziału',
                     'Id oddziału' => $request->selected_department_info_id
                 ];
+                $data = array_merge($data, $department_info);
                 new ActivityRecorder($data,66,2);
                 Session::flash('message_ok', "Zmiany zapisano pomyślnie!");
                 return Redirect::back();
