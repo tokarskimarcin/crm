@@ -504,13 +504,13 @@ class UsersController extends Controller
                         $user->login_phone = null;
                         $userEmployment->save();
                     } else { // user has no history in user_employment_status
-                        $user->login_phone = null;
                         $userEmployment2 = new UserEmploymentStatus();
                         if ($request->login_phone == 0) {
-                            $userEmployment2->pbx_id = null;
+                                $userEmployment2->pbx_id = $user->login_phone;
                         } else {
                             $userEmployment2->pbx_id = $request->login_phone;
                         }
+                        $user->login_phone = null;
                         $userEmployment2->user_id = $user->id;
                         $userEmployment2->pbx_id_add_date = $request->stop_date;
                         $userEmployment2->pbx_id_remove_date = $request->stop_date;
