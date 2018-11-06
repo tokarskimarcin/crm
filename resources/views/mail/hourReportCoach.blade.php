@@ -49,9 +49,9 @@
                         @php
                             $flag = null;
                         @endphp
-                        @if($onlyNewUse == 1)
+                        @if($onlyNewUser == 1)
                             $flag = in_array($item->user_id, $onlyUserID);
-                        @elseif ($onlyNewUse == 2)
+                        @elseif ($onlyNewUser == 2)
                             $flag = !in_array($item->user_id, $onlyUserID);
                         @endif
                         @if($flag && count($onlyUserID) != 0)
