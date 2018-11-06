@@ -50,9 +50,13 @@
                             $flag = null;
                         @endphp
                         @if($onlyNewUser == 1)
+                            @php
                             $flag = in_array($item->user_id, $onlyUserID);
+                            @endphp
                         @elseif ($onlyNewUser == 2)
+                            @php
                             $flag = !in_array($item->user_id, $onlyUserID);
+                            @endphp
                         @endif
                         @if($flag && count($onlyUserID) != 0)
                             @php
