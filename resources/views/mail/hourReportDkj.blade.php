@@ -56,7 +56,7 @@
                     $proc_good = $proc_bad = $proc_check = $proc_disagreement_good = 0;
                     $sum_dissa_proc = $report->count_bad_check > 0 ? (100*$report->all_jaky_disagreement) / $report->count_bad_check : 0;
                     $sum_dissa_proc_all = $sum_bad > 0 ? (100*$sum_all_janky_disagreement) / $sum_bad : 0;
-                    $proc_check = $report->count_all_check > 0 ? (100 * $report->count_checked) / $report->count_all_check : 0;
+                    $proc_check = $report->count_all_check > 0 ? round((100 * $report->count_checked) / $report->count_all_check, 2) : 0;
                     if($report->count_all_check != 0)
                     {
                         $proc_good = round(($report->count_good_check*100) / $report->count_all_check,2);
@@ -80,7 +80,7 @@
 
     @php
         $all_bad_proc = $all_good_proc = $all_check_proc = $all_disagreement_proc = 0;
-        $all_check_proc = $sum_all > 0 ? (100 * $sum_all_checked) / $sum_all : 0;
+        $all_check_proc = $sum_all > 0 ? round((100 * $sum_all_checked) / $sum_all, 2) : 0;
             if($sum_all != 0)
             {
                 $all_bad_proc = round(($sum_bad*100) / $sum_all,2);
