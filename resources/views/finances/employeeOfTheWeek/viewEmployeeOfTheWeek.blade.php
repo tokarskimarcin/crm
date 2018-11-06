@@ -34,7 +34,7 @@
             Panel z zatwierdzaniem premii dla pracownika tygodnia
         </div>
         <div class="panel-body">
-            <div class="row">
+            <div class="row" id="selectorSection">
                 <div class="col-md-2" id="departmentTypeSection">
                     <label for="departmentTypeSelect">Typ oddziału</label>
                     <select id="departmentTypeSelect" name="departmentTypeSelect" class="form-control">
@@ -75,7 +75,7 @@
                     </select>
                 </div>
             </div>--}}
-            <div class="row">
+            <div class="row" style="margin-top: 1em">
                 <div id="employeeOfTheWeekSection" class="col-md-12">
                 </div>
             </div>
@@ -92,8 +92,10 @@
             VARIABLES = {
                 SUBVIEW:{},
                 jQElements: {
+                    selectorSection: $('#selectorSection'),
                     departmentTypeSection: $('#departmentTypeSection'),
-                    departmentTypeSelect: $('#departmentTypeSelect').selectpicker()
+                    departmentTypeSelect: $('#departmentTypeSelect').selectpicker(),
+                    employeeOfTheWeekSection: $('#employeeOfTheWeekSection')
                 },
                 DATA_TABLES: {}
             };
@@ -113,7 +115,7 @@
                     });
                 },
                 createUserTypeSelect: function(userTypes){
-                    let userTypeLabel = $('<label>').attr('for','userTypeSelect').append('Typ pracownika');
+                    let userTypeLabel = $('<label>').attr('for','userTypeSelect').append('Typ pracownika tygodnia');
                     let userTypeSelect = $('<select>').addClass('form-control')
                         .attr('id','userTypeSelect')
                         .attr('name','userTypeSelect');
@@ -121,7 +123,7 @@
                         .append(userTypeLabel)
                         .append(userTypeSelect)
                         .on('remove',function () {
-                            $('#monthDatetimepicker').trigger('remove');
+                            $('#departmentInfoSection').trigger('remove');
                         });
                     if(userTypes.length === 0){
                         userTypeSelect.append($('<option>').append('Brak systemu pracowników tygodnia'));
@@ -131,12 +133,133 @@
                             userTypeSelect.append($('<option>').append(item.name).attr('value', item.id));
                         });
                     }
-                    VARIABLES.jQElements.departmentTypeSection.after(userTypeSection);
+                    VARIABLES.jQElements.selectorSection.append(userTypeSection);
                     userTypeSelect.selectpicker();
+                    FUNCTIONS.EVENT_HANDLERS.userTypeSelectHandler(userTypeSelect);
+                },
+                createDepartmentInfoSelect: function(departmentInfos){
+                    let departmentInfoLabel = $('<label>').attr('for','departmentInfoSelect').append('Oddział');
+                    let departmentInfoSelect = $('<select>').addClass('form-control')
+                        .attr('id','departmentInfoSelect')
+                        .attr('name','departmentInfoSelect');
+                    if(departmentInfos.length === 0){
+                        departmentInfoSelect.append($('<option>').append('Brak systemu pracowników tygodnia'));
+                    }else{
+                        departmentInfoSelect.append($('<option>').append('Wybierz').prop('selected',true).attr('value', 0));
+                        $.each(departmentInfos,function (index, item) {
+                            departmentInfoSelect.append($('<option>').append(item.departments.name).attr('value', item.id));
+                        });
+                    }
+                    let departmentInfoSection = $('<div>').addClass('col-md-2').attr('id','departmentInfoSection')
+                        .append(departmentInfoLabel)
+                        .append(departmentInfoSelect)
+                        .on('remove',function () {
+                            $('#monthDatetimepickerSection').trigger('remove');
+                        });
+                    VARIABLES.jQElements.selectorSection.append(departmentInfoSection);
+                    departmentInfoSelect.selectpicker();
+                    FUNCTIONS.EVENT_HANDLERS.departmentInfoSelectHandler(departmentInfoSelect);
+                },
+                createMonthDatetimepicker: function(){
+                    let monthDatetimepickerLabel = $('<label>').attr('for','userTypeSelect').append('Miesiąc');
+                    let input = $('<input>').attr('type','text').addClass('form-control').prop('readonly',true);
+                    let span = $('<span>').addClass('input-group-addon').append($('<span>').addClass('glyphicon glyphicon-calendar'));
+                    let monthDatetimepicker = $('<div>').addClass('input-group date').attr('id','monthDatetimepicker').append(span).append(input);
+                    let formGroup = $('<div>').addClass('form-group').append(monthDatetimepicker);
+                    let monthDatetimepickerSection = $('<div>').addClass('col-md-3').attr('id','monthDatetimepickerSection')
+                        .append(monthDatetimepickerLabel)
+                        .append(formGroup).on('remove',function () {
+                            $('#trainerSection').trigger('remove');
+                        });
+                    VARIABLES.jQElements.selectorSection.append(monthDatetimepickerSection);
+                    monthDatetimepicker.datetimepicker({
+                        language: 'pl',
+                        minView: 3,
+                        startView: 3,
+                        format: 'yyyy-mm',
+                        startDate: moment('2018-09-01').format('YYYY-MM-DD'),
+                        endDate: moment().format('YYYY-MM-DD')
+                    });
+                    FUNCTIONS.EVENT_HANDLERS.monthDatetimepickerHandler(monthDatetimepicker);
+                },
+                createTrainerSelect: function(trainers){
+                    let trainerLabel = $('<label>').attr('for','trainerSelect').append('Zespół trenera');
+                    let trainerSelect = $('<select>').addClass('form-control')
+                        .attr('id','trainerSelect')
+                        .attr('name','trainerSelect');
+                    let trainerSection = $('<div>').addClass('col-md-3').attr('id','trainerSection')
+                        .append(trainerLabel)
+                        .append(trainerSelect)
+                        .on('remove',function () {
+                            VARIABLES.jQElements.employeeOfTheWeekSection.empty();
+                        });
+                    if(trainers.length === 0){
+                        trainerSelect.append($('<option>').append('Brak informacji o trenerach w oddziale w tym miesiącu'));
+                    }else{
+                        trainerSelect.append($('<option>').append('Wybierz').prop('selected',true).attr('value', 0));
+                        $.each(trainers,function (index, item) {
+                            trainerSelect.append($('<option>').append(item.last_name+' '+item.first_name).attr('value', item.id));
+                        });
+                    }
+                    VARIABLES.jQElements.selectorSection.append(trainerSection);
+                    trainerSelect.selectpicker();
+                    FUNCTIONS.EVENT_HANDLERS.trainerSelectHandler(trainerSelect);
                 },
                 SUBVIEW:{},
                 /* function grups should be before other functions which aren't grouped */
                 EVENT_HANDLERS: {
+                    userTypeSelectHandler: function(userTypeSelect){
+                        userTypeSelect
+                            .change(function (e) {
+                                let userTypeSelect = $(e.target);
+                                $('#departmentInfoSection').trigger('remove');
+                                $('#monthDatetimepickerSection').trigger('remove');
+                                if(userTypeSelect.val() === '1'){
+                                    FUNCTIONS.loadingSwalCall();
+                                    FUNCTIONS.AJAXs.getDepartmentInfoAjax(VARIABLES.jQElements.departmentTypeSelect.val())
+                                        .then(function (result) {
+                                            FUNCTIONS.createDepartmentInfoSelect(result);
+                                        });
+                                }else if(userTypeSelect.val() === '4'){
+                                    FUNCTIONS.createMonthDatetimepicker();
+                                }
+
+                            });
+                    },
+                    departmentInfoSelectHandler: function(departmentInfoSelect){
+                        departmentInfoSelect.change( function(e){
+                            let value = $(e.target).val();
+                            $('#monthDatetimepickerSection').trigger('remove');
+                            if(value != 0){
+                                FUNCTIONS.createMonthDatetimepicker();
+                            }
+                        });
+                    },
+                    monthDatetimepickerHandler: function(monthDatetimepicker){
+                        monthDatetimepicker
+                            .change( function(e){
+                                let value = $(e.target).val();
+                                let userTypeSelect = $('#userTypeSelect');
+                                $('#trainerSection').trigger('remove');
+                                if(userTypeSelect.val() === '1'){
+                                    FUNCTIONS.loadingSwalCall();
+                                    FUNCTIONS.AJAXs.getTrainersAjax($('#departmentInfoSelect').val(), value).then(function (result) {
+                                        console.log(result);
+                                        FUNCTIONS.createTrainerSelect(result)
+                                    });
+                                }else if(userTypeSelect.val() === '4'){
+                                    FUNCTIONS.loadSubview();
+                                }
+                            });
+                    },
+                    trainerSelectHandler: function(trainerSelect){
+                        trainerSelect.change( function(e){
+                            let value = $(e.target).val();
+                            if(value !== '0'){
+                                FUNCTIONS.loadSubview();
+                            }
+                        });
+                    },
                     callEvents:function () {
                         (function departmentTypeSelectHandler() {
                             VARIABLES.jQElements.departmentTypeSelect.change(function (e) {
@@ -168,6 +291,75 @@
                                 swal.close();
                                 return response;
                             }
+                        });
+                    },
+                    getDepartmentInfoAjax: function (departmentTypeId) {
+                        return $.ajax({
+                            type: 'POST',
+                            url: '{{route('api.getDepartmentInfoAjax')}}',
+                            data: {
+                                departmentTypeId: departmentTypeId
+                            },
+                            headers: {
+                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                            },
+                            success: function (response) {
+                                swal.close();
+                                return response;
+                            }
+                        });
+                    },
+                    getTrainersAjax: function (departmentInfoId, month) {
+                        return $.ajax({
+                            type: 'POST',
+                            url: '{{route('api.getTrainersAjax')}}',
+                            data: {
+                                departmentInfoId: departmentInfoId,
+                                month: month
+                            },
+                            headers: {
+                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                            },
+                            success: function (response) {
+                                swal.close();
+                                return response;
+                            }
+                        });
+                    },
+                    getEmployeeOfTheWeekSectionSubView: function (data) {
+                        return $.ajax({
+                            type: 'POST',
+                            url: '{{route('api.employeeOfTheWeekSubViewAjax')}}',
+                            data: data,
+                            headers: {
+                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                            },
+                            success: function (response) {
+                                return response;
+                            }
+                        });
+                    }
+                },
+                loadSubview: function(){
+                    VARIABLES.SUBVIEW = {};
+                    FUNCTIONS.SUBVIEW = {};
+                    if(parseInt($('#userTypeSelect').val())>0){
+                        FUNCTIONS.loadingSwalCall();
+                        FUNCTIONS.AJAXs.getEmployeeOfTheWeekSectionSubView({
+                            departmentInfoId: $('#departmentInfoSelect').val(),
+                            departmentTypeId: $('#departmentTypeSelect').val(),
+                            userTypeId: $('#userTypeSelect').val(),
+                            selectedMonth: $('#monthDatetimepicker').find('input').val(),
+                            trainerId: $('#trainerSelect').val()
+                        }).done(function (resolve) {
+                            VARIABLES.jQElements.employeeOfTheWeekSection.empty();
+                            console.log(resolve);
+                            if(resolve !== 'noView'){
+                                VARIABLES.jQElements.employeeOfTheWeekSection.html(resolve);
+                            }else{
+                                VARIABLES.jQElements.employeeOfTheWeekSection.append($('<h1>').append('Brak danych o premiach'))
+                            }
+                            swal.close();
                         });
                     }
                 }
