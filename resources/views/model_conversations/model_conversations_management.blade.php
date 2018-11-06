@@ -8,7 +8,7 @@
     <div class="box">
         <ul class="nav nav-tabs">
             <li><a data-toggle="tab" href="#home">Legenda</a></li>
-            @if(in_array($user, $adminPanelAccessArr))
+            @if(in_array($user, $adminPanelAccessArr) || in_array(Auth::user()->id, $privilagedUserArr))
                 <li><a data-toggle="tab" href="#menu1">Kategorie</a></li>
             @endif
             <li><a data-toggle="tab" href="#menu2">Rozmowy</a></li>
@@ -17,7 +17,7 @@
 
         <div class="tab-content">
             @include('model_conversations.management_partials.legend')
-            @if(in_array($user, $adminPanelAccessArr))
+            @if(in_array($user, $adminPanelAccessArr) || in_array(Auth::user()->id, $privilagedUserArr))
                 @include('model_conversations.management_partials.categories')
             @endif
             @include('model_conversations.management_partials.conversations')
@@ -60,7 +60,7 @@
                             </select>
                         </div>
 
-                        @if($showAvailableDepartmentTypes)
+                        @if($showAvailableDepartmentTypes == 'true')
                             <div class="form-group">
                                 <label for="department_type_id">Rodzaj oddziału</label>
                                 <select class="form-control" name="department_type_id" id="department_type_id">
@@ -77,7 +77,7 @@
                                 <option value="0">Główna kategoria</option>
                                 @foreach($categories as $category)
                                     @if($category->status == 1)
-                                        <option value="{{$category->id}}">{{$category->name}} @if($showAvailableDepartmentTypes) - {{$availableDepartmentTypes->where('id', '=', $category->department_type_id)->first()->name}} @endif</option>
+                                        <option value="{{$category->id}}">{{$category->name}} @if($showAvailableDepartmentTypes == 'true') - {{$availableDepartmentTypes->where('id', '=', $category->department_type_id)->first()->name}} @endif</option>
                                     @endif
                                 @endforeach
                             </select>
@@ -108,7 +108,7 @@
                             <input type="hidden" name="toAdd" value="1" class="item_toAdd">
                             <input type="hidden" name="id" class="item_id">
                             <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                            <input type="hidden" name="temp" @if(in_array($user, $adminPanelAccessArr)) value="0" @else value="1" @endif>
+                            <input type="hidden" name="temp" @if(in_array($user, $adminPanelAccessArr) || in_array(Auth::user()->id, $privilagedUserArr)) value="0" @else value="1" @endif>
                         <div class="form-group">
                             <label for="name">Nazwa</label>
                             <input type="text" class="form-control item_name" placeholder="Podaj nazwę" name="name" required>
@@ -137,7 +137,7 @@
                         <div class="form-group">
                             <label for="category_id">Kategoria</label>
                             <select name="category_id" class="form-control item_category_id" required>
-                                @if(in_array($user, $adminPanelAccessArr))
+                                @if(in_array($user, $adminPanelAccessArr) || in_array(Auth::user()->id, $privilagedUserArr))
                                     @foreach($categories as $category)
                                         <option value="{{$category->id}}">{{$category->name}}</option>
                                     @endforeach
@@ -238,11 +238,12 @@
                 categories: @json($categories),
                 playlists: @json($playlists),
                 playlistItems: @json($playlistItems),
-                url: `{{asset('storage/')}}`
+                url: `{{asset('storage/')}}`,
+                showAvailableDepartmentTypes: {{$showAvailableDepartmentTypes}}
             }
         };
     </script>
     <script src="{{ asset('/js/sweetAlert.js')}}"></script>
     <script src="{{ asset('js/model_conversations/category.js') }}"></script>
-    <script src="{{ asset('js/model_conversations/management2.js') }}"></script>
+    <script src="{{ asset('js/model_conversations/management.js') }}"></script>
 @endsection

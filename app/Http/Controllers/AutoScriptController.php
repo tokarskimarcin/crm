@@ -88,7 +88,7 @@ class AutoScriptController extends Controller
         $actualNewUsersRecords = NewUsersRbhReport::where('created_at', '=', $today)->get();
 
         foreach($usersWorkingLessThanNewUsers as $user) {
-            if($usersWorkingLessThanNewUsers->where('user_id', '=', $user->id_user)->where('created_at', '=', $today)->isEmpty()) { //there is no duplicates
+            if($actualNewUsersRecords->where('user_id', '=', $user->id_user)->where('created_at', '=', $today)->isEmpty()) { //there is no duplicates
                 $newUsersReport = new NewUsersRbhReport();
                 $newUsersReport->user_id = $user->id_user;
                 $newUsersReport->department_info_id = $user->dep_id;
@@ -103,6 +103,7 @@ class AutoScriptController extends Controller
                 $newUsersReport->save();
             }
             else {
+
                 $updatedRecord = $actualNewUsersRecords->where('user_id', '=', $user->id_user)->where('created_at', '=', $today)->first();
                 $updatedRecord->success = $user->success;
                 $updatedRecord->sec_sum = $user->sec_sum;
