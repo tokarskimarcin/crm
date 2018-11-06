@@ -36,7 +36,13 @@
     @foreach($data as $item)
         @php
             if($onlyNewUser > 0){
-                if(in_array($item['consultant']->id,$onlyUserID) && count($onlyUserID) != 0){
+            $flag = null;
+            if($onlyNewUser == 1){
+                $flag = in_array($item['consultant']->id,$onlyUserID);
+            }else if($onlyNewUser == 2){
+                $flag = !in_array($item['consultant']->id,$onlyUserID);
+            }
+            if($flag && count($onlyUserID) != 0){
                     $total_success += $item['success'];
                     $total_received_calls += $item['received_calls'];
                     $total_pause_time += $item['pause_time'];

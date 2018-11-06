@@ -45,8 +45,16 @@
             </tr>
             @foreach($coach as $item)
                 @if(is_object($item))
-                    @if($onlyNewUser > 0)
-                        @if(in_array($item->user_id,$onlyUserID) && count($onlyUserID) != 0)
+                    @if($onlyNewUser > 0 )
+                        @php
+                            $flag = null;
+                        @endphp
+                        @if($onlyNewUse == 1)
+                            $flag = in_array($item->user_id, $onlyUserID);
+                        @elseif ($onlyNewUse == 2)
+                            $flag = !in_array($item->user_id, $onlyUserID);
+                        @endif
+                        @if($flag && count($onlyUserID) != 0)
                             @php
                                 if($item->all_checked_talks != 0 && $item->all_checked_talks != null) {
                                     $janky_percent = round($item->all_bad_talks / $item->all_checked_talks * 100, 2);
@@ -84,6 +92,7 @@
                                 $day_total_all_checked_talks += $item->all_checked_talks;
                             @endphp
                         @endif
+
                         @else
                         @php
                             if($item->all_checked_talks != 0 && $item->all_checked_talks != null) {

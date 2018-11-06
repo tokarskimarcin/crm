@@ -55,8 +55,15 @@
         @foreach($coachData as $value)
                 @foreach($value as $item)
                     @php
-                    if($onlyNewUser >0){
-                        if(in_array($item[$i]['user_id'],$onlyUserID) && count($onlyUserID) != 0){
+                    if($onlyNewUser > 0){
+                        $flag = null;
+                        if($onlyNewUser == 1){
+                            $flag = in_array($item[$i]['user_id'], $onlyUserID);
+                        }else if($onlyNewUser == 2){
+                            $flag = !in_array($item[$i]['user_id'],$onlyUserID);
+                        }
+
+                        if($flag && count($onlyUserID) != 0){
                         $collect_week->push($item[$i]);
                             $data = $item[$i];
 
