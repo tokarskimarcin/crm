@@ -25,6 +25,7 @@ use App\Schedule;
 use App\User;
 use App\Utilities\Dates\MonthPerWeekDivision;
 use App\Utilities\Dates\NameOfWeek;
+use App\Utilities\Departments\CarRegistrationShortcuts;
 use App\Voivodes;
 use App\Work_Hour;
 use DateTime;
@@ -4432,7 +4433,8 @@ class CrmRouteController extends Controller
             ->with('currentYear', $year)
             ->with('departmentInfo', $departmentInfo)
             ->with('userData', $userArr)
-            ->with('workHours', $workHours);
+            ->with('workHours', $workHours)
+            ->with('registrations', CarRegistrationShortcuts::$registrations);
     }
 
     /**
@@ -4460,6 +4462,8 @@ class CrmRouteController extends Controller
         client_route_info.confirmingUser as confirmingUser,
         client_route_info.confirmDate as confirmDate,
         client_route_info.actual_success as actual_success,
+        client_route_info.comment_for_confirming,
+        client_route_info.confirming_department_info,
         DATE(FROM_UNIXTIME(client_route_info.client_route_id * 86400)) as client_route_id,
         YEAR(client_route_info.date) as year,
         client.name as clientName,
@@ -4505,7 +4509,20 @@ class CrmRouteController extends Controller
         if($typ[0] != '0') {
             $campaignsInfo = $campaignsInfo->whereIn('client_route.type', $typ);
         }
-        return datatables($campaignsInfo->get())->make(true);
+
+        $campaignsInfo = $campaignsInfo->get();
+
+        $campaignsInfo->map(function($item) {
+            if(array_key_exists($item->departmentName, CarRegistrationShortcuts::$registrations)) {
+                $item->shortDepartmentName = CarRegistrationShortcuts::$registrations[$item->departmentName];
+            }
+            else {
+                $item->shortDepartmentName = null;
+            }
+            return $item;
+        });
+
+        return datatables($campaignsInfo)->make(true);
     }
 
     /**
@@ -4517,15 +4534,73 @@ class CrmRouteController extends Controller
         $data = json_decode($request->data);
         $idsArr = [];
         foreach($data as $item) {
-            ClientRouteInfo::where('id', '=', $item->id)
-                ->update([
-                    'frequency' => $item->frequency == ''  ? null :  $item->frequency ,
-                    'pairs' => $item->pairs == ''  ? null :  $item->pairs,
-                    'confirmingUser' => $item->confirmingPerson,
-                    'confirmDate' => $item->date
-                ]);
+            if($item->frequency != '' && $item->pairs != '') {
+                ClientRouteInfo::where('id', '=', $item->id)
+                    ->update([
+                        'frequency' => $item->frequency,
+                        'pairs' => $item->pairs,
+                        'confirmingUser' => $item->confirmingPerson,
+                        'confirmDate' => $item->date
+                    ]);
+            }
+            else if($item->frequency != '') {
+                ClientRouteInfo::where('id', '=', $item->id)
+                    ->update([
+                        'frequency' => $item->frequency,
+                        'confirmingUser' => $item->confirmingPerson,
+                        'confirmDate' => $item->date
+                    ]);
+            }
+            else if($item->pairs != '') {
+                ClientRouteInfo::where('id', '=', $item->id)
+                    ->update([
+                        'pairs' => $item->pairs,
+                        'confirmingUser' => $item->confirmingPerson,
+                        'confirmDate' => $item->date
+                    ]);
+            }
+            else {
+                ClientRouteInfo::where('id', '=', $item->id)
+                    ->update([
+                        'confirmingUser' => $item->confirmingPerson,
+                        'confirmDate' => $item->date
+                    ]);
+            }
+
+
         }
         return 'Zmiany zostały zapisane!';
+    }
+
+    /**
+     * @param Request $request
+     * This method updates client route info records for comment_for_confirming and/or confirming_department_info
+     */
+    public function engraverForConfirmingAjaxUpdate(Request $request) {
+        $clientRouteInfoArr = json_decode($request->ids);
+
+        if($clientRouteInfoArr) { //array is not empty
+            foreach($clientRouteInfoArr as $id) {
+                $clientRouteInfoRecord = ClientRouteInfo::find($id);
+
+                if($request->has('comment')) {
+                    $comment = $request->comment;
+                    $clientRouteInfoRecord->comment_for_confirming = $comment;
+                }
+
+                if($request->has('department')) {
+                    $department = $request->department;
+                    $clientRouteInfoRecord->confirming_department_info = $department;
+                }
+
+                if($request->has('comment') || $request->has('department')) { //request body has at least one of 2 properties
+                    $clientRouteInfoRecord->save();
+                }
+                else {
+                    throw new \Exception('Zmiany nie zostały zapisane');
+                }
+            }
+        }
     }
 
     public function hotelConfirmationHotelInfoAjax(Request $request) {
