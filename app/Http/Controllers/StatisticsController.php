@@ -4051,15 +4051,21 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
     public function pageReportUnusedAccounts(){
         $user = Auth::user();
         $data = StatisticsController::UnusedAccountsInfo(false);
+
+        $userTypeIdsForTrainersReportOfUnusedAccounts = array_merge(StatisticsGlobalVariables::$userTypeIdsForTrainersReportOfUnusedAccounts, StatisticsGlobalVariables::$userTypeIdsForEveryData);
+        $userTypeIdsForManagersReportOfUnusedAccounts = array_merge(StatisticsGlobalVariables::$userTypeIdsForManagersReportOfUnusedAccounts, StatisticsGlobalVariables::$userTypeIdsForEveryData);
+        $userTypeIdsForDepartmentsReportOfUnusedAccounts = array_merge(StatisticsGlobalVariables::$userTypeIdsForDepartmentsReportOfUnusedAccounts, StatisticsGlobalVariables::$userTypeIdsForEveryData);
+        $userTypeIdsForEveryData = StatisticsGlobalVariables::$userTypeIdsForEveryData;
+
         return view('reportpage.accountReport.ReportUnusedAccount')
             ->with('department_info', $data['departments'])
             ->with('users_warning', $data['users_warning'])
             ->with('users_disable', $data['users_disable'])
             ->with('coaches', $data['coaches'])
-            ->with('user_type_ids_for_trainers_report', array_merge(StatisticsGlobalVariables::$userTypeIdsForTrainersReportOfUnusedAccounts, StatisticsGlobalVariables::$userTypeIdsForEveryData))
-            ->with('user_type_ids_for_managers_report', array_merge(StatisticsGlobalVariables::$userTypeIdsForManagersReportOfUnusedAccounts, StatisticsGlobalVariables::$userTypeIdsForEveryData))
-            ->with('user_type_ids_for_departments_report', array_merge(StatisticsGlobalVariables::$userTypeIdsForDepartmentsReportOfUnusedAccounts, StatisticsGlobalVariables::$userTypeIdsForEveryData))
-            ->with('user_type_ids_for_every_data', StatisticsGlobalVariables::$userTypeIdsForEveryData)
+            ->with('user_type_ids_for_trainers_report', $userTypeIdsForTrainersReportOfUnusedAccounts)
+            ->with('user_type_ids_for_managers_report', $userTypeIdsForManagersReportOfUnusedAccounts)
+            ->with('user_type_ids_for_departments_report', $userTypeIdsForDepartmentsReportOfUnusedAccounts)
+            ->with('user_type_ids_for_every_data', $userTypeIdsForEveryData)
             ->with('sendingMails',  $data['sendingMails'])
             ->with('user_to_show', $user);
     }

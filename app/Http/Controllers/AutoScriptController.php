@@ -568,13 +568,19 @@ class AutoScriptController extends Controller
 
         //check if should send mails
         if(count($data['users_warning']) > 0 || count($data['users_disable']) > 0){
+
+            $userTypeIdsForTrainersReportOfUnusedAccounts = array_merge(StatisticsGlobalVariables::$userTypeIdsForTrainersReportOfUnusedAccounts, StatisticsGlobalVariables::$userTypeIdsForEveryData);
+            $userTypeIdsForManagersReportOfUnusedAccounts = array_merge(StatisticsGlobalVariables::$userTypeIdsForManagersReportOfUnusedAccounts, StatisticsGlobalVariables::$userTypeIdsForEveryData);
+            $userTypeIdsForDepartmentsReportOfUnusedAccounts = array_merge(StatisticsGlobalVariables::$userTypeIdsForDepartmentsReportOfUnusedAccounts, StatisticsGlobalVariables::$userTypeIdsForEveryData);
+            $userTypeIdsForEveryData = StatisticsGlobalVariables::$userTypeIdsForEveryData;
+
             $department_info =  Department_info::all();
             $data_to_send = array_merge($data, [
                 'department_info' => $department_info,
-                'user_type_ids_for_trainers_report' => array_merge(StatisticsGlobalVariables::$userTypeIdsForTrainersReportOfUnusedAccounts, StatisticsGlobalVariables::$userTypeIdsForEveryData),
-                'user_type_ids_for_managers_report' => array_merge(StatisticsGlobalVariables::$userTypeIdsForManagersReportOfUnusedAccounts, StatisticsGlobalVariables::$userTypeIdsForEveryData),
-                'user_type_ids_for_departments_report' => array_merge(StatisticsGlobalVariables::$userTypeIdsForDepartmentsReportOfUnusedAccounts, StatisticsGlobalVariables::$userTypeIdsForEveryData),
-                'user_type_ids_for_every_data' => StatisticsGlobalVariables::$userTypeIdsForEveryData]);
+                'user_type_ids_for_trainers_report' => $userTypeIdsForTrainersReportOfUnusedAccounts,
+                'user_type_ids_for_managers_report' => $userTypeIdsForManagersReportOfUnusedAccounts,
+                'user_type_ids_for_departments_report' => $userTypeIdsForDepartmentsReportOfUnusedAccounts,
+                'user_type_ids_for_every_data' => $userTypeIdsForEveryData]);
             $title = 'Raport Nieaktywnych Kont Konsultantów '.date('Y-m-d');
 
 
