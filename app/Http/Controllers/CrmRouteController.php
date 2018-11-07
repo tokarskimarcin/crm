@@ -4519,8 +4519,8 @@ class CrmRouteController extends Controller
         foreach($data as $item) {
             ClientRouteInfo::where('id', '=', $item->id)
                 ->update([
-                    'frequency' => $item->frequency,
-                    'pairs' => $item->pairs,
+                    'frequency' => $item->frequency == ''  ? null :  $item->frequency ,
+                    'pairs' => $item->pairs == ''  ? null :  $item->pairs,
                     'confirmingUser' => $item->confirmingPerson,
                     'confirmDate' => $item->date
                 ]);

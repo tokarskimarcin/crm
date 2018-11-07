@@ -82,7 +82,7 @@ class DepartmentsConfirmationStatisticsController extends Controller
         }
         $clientRouteInfo = $clientRouteInfo->get();
 
-        $confirmationStatistics = ConfirmationStatistics::getConsultantsConfirmationStatisticsForMonth($clientRouteInfo, $monthFourWeeksDivision, false);
+        $confirmationStatistics = ConfirmationStatistics::getConsultantsConfirmationStatisticsForMonth($clientRouteInfo, $monthFourWeeksDivision);
 
         $confirmationStatistics['data'] = $confirmationStatistics['data']->sortByDesc('provision')->groupBy('dateGroup');
         $dateGroupArrays = [];
@@ -148,7 +148,7 @@ class DepartmentsConfirmationStatisticsController extends Controller
             ->whereNotNull('users.coach_id');
         $clientRouteInfo = $clientRouteInfo->get();
 
-        $confirmationStatistics = ConfirmationStatistics::getConsultantsConfirmationStatisticsForMonth($clientRouteInfo, $monthFourWeeksDivision,false, 'department_info_id');
+        $confirmationStatistics = ConfirmationStatistics::getConsultantsConfirmationStatisticsForMonth($clientRouteInfo, $monthFourWeeksDivision, 'department_info_id');
 
         $confirmationStatistics['data'] = $confirmationStatistics['data']->sortByDesc('provision')->groupBy('dateGroup');
 

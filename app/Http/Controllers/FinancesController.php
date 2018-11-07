@@ -521,7 +521,7 @@ class FinancesController extends Controller
                 ->whereNotNull('confirmingUser')
                 ->whereNotNull('users.coach_id')
                 ->where('users.coach_id', $user->id)->get(); //client route info poszczególnych konsultantów wybranego trenera w miesiacu
-            $confirmationStatistics = ConfirmationStatistics::getConsultantsConfirmationStatisticsForMonth($clientRouteInfo, $dividedMonth, true, 'coach_id');
+            $confirmationStatistics = ConfirmationStatistics::getConsultantsConfirmationStatisticsForMonth($clientRouteInfo, $dividedMonth, 'coach_id');
 
             foreach ($confirmationStatistics['sums'] as $confirmationStatisticsWeek){
                 $user->bonus += ProvisionLevels::get('trainer', $confirmationStatisticsWeek->successfulPct,2);
@@ -648,7 +648,7 @@ class FinancesController extends Controller
                     ->where('di.id_dep_type',1)
                     ->whereNotNull('confirmingUser')
                     ->whereNotNull('users.coach_id')->get(); //client route info poszczególnych konsultantów w calym oddziale w miesiacu
-                $confirmationStatistics = ConfirmationStatistics::getConsultantsConfirmationStatisticsForMonth($clientRouteInfo, $dividedMonth, true);
+                $confirmationStatistics = ConfirmationStatistics::getConsultantsConfirmationStatisticsForMonth($clientRouteInfo, $dividedMonth);
                 foreach ($confirmationStatistics['sums'] as $confirmationStatisticsWeek){
                     $user->bonus += ProvisionLevels::get('instructor', $confirmationStatisticsWeek->successfulPct,2);
                     $user->bonus += ProvisionLevels::get('instructor', $confirmationStatisticsWeek->unsuccessfulBadlyPct,1);
@@ -1925,7 +1925,7 @@ class FinancesController extends Controller
     private function updateConfirmationRanking($employeesOfTheWeek, $dividedMonth, $departmentInfoId, $bonusArr, $secondGroup, $criterion = ['successfulPct','shows']){
         EmployeeOfTheWeekRanking::whereIn('employee_of_the_week_id',$employeesOfTheWeek->pluck('id')->toArray())->delete();
         $clientRouteInfo = $this->getConfirmationConsultantsRoutesInformation($departmentInfoId, $dividedMonth);
-        $confirmationStatistics = ConfirmationStatistics::getConsultantsConfirmationStatisticsForMonth($clientRouteInfo, $dividedMonth, true, $secondGroup)['sums'];
+        $confirmationStatistics = ConfirmationStatistics::getConsultantsConfirmationStatisticsForMonth($clientRouteInfo, $dividedMonth, $secondGroup)['sums'];
         foreach ($confirmationStatistics as $confirmationStatisticWeek){
             foreach ($employeesOfTheWeek as $employeeOfTheWeek){
                 if($confirmationStatisticWeek->firstDay == $employeeOfTheWeek->first_day_week && $confirmationStatisticWeek->lastDay == $employeeOfTheWeek->last_day_week){
