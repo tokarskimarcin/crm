@@ -5,6 +5,7 @@
     <link rel="stylesheet" href="{{asset('/assets/css/VCtooltip.css')}}">
     {{--<link rel="stylesheet" href="{{asset('/css/fixedHeader.dataTables.min.css')}}">
 --}}
+    <link href="{{ asset('/css/buttons.dataTables.min.css')}}" rel="stylesheet">
 @endsection
 @section('content')
 
@@ -250,6 +251,9 @@
         <script src="{{asset('/js/numeric-comma.js')}}"></script>
         {{--<script src="{{asset('/js/dataTables.fixedHeader.min.js')}}"></script>--}}
         <script src="{{ asset('/js/moment.js')}}"></script>
+        <script src="{{ asset('/js/dataTables.buttons.min.js')}}"></script>
+        <script src="{{ asset('/js/jszip.min.js')}}"></script>
+        <script src="{{ asset('/js/buttons.html5.min.js')}}"></script>
     <script>
        document.addEventListener('DOMContentLoaded', function() {
            /********** GLOBAL VARIABLES ***********/
@@ -708,9 +712,64 @@
                autoWidth: true,
                processing: true,
                serverSide: true,
+               dom: 'Bftipr',
                scrollY: APP.globalVariables.datatableHeight,
                "lengthMenu": [[10, 25, 50, 100, 150, 200], [10, 25, 50, 100, 150, 200]],
                "iDisplayLength": 200,
+               buttons: [
+                   {
+                       extend: 'excel',
+                       text: 'Eksportuj do Excela',
+                       exportOptions: {
+                           columns: ':visible',
+                           modifier: {
+                               page: 'current'
+                           },
+                           format: {
+                               body: function(data, row, column, node) {
+                                   if(column == 10) {
+                                       let thisElement = node;
+                                       let thisElementInput = thisElement.querySelector('input');
+                                       return thisElementInput.value;
+                                   }
+                                   else if(column == 11) {
+                                       let thisElement = node;
+                                       let thisElementInput = thisElement.querySelector('input');
+                                       return thisElementInput.value;
+                                   }
+                                   else if(column == 12) {
+                                       let thisElement = node;
+                                       let thisElementInput = thisElement.querySelector('input');
+                                       return thisElementInput.value;
+                                   }
+                                   else if(column == 7) {
+                                       let thisElement = node;
+                                       let thisElementSelect = thisElement.querySelector('select');
+                                       if(thisElementSelect.options[thisElementSelect.selectedIndex].value == 0) {
+                                           return '';
+                                       }
+                                       else {
+                                           return thisElementSelect.options[thisElementSelect.selectedIndex].textContent;
+                                       }
+                                   }
+                                   else if(column == 5) {
+                                       let thisElement = node;
+                                       if(thisElement.querySelector('textarea')) {
+                                           let thisElementInput = thisElement.querySelector('textarea');
+                                           return thisElementInput.textContent;
+                                       }
+                                       else {
+                                           return data;
+                                       }
+                                   }
+                                   else {
+                                       return data;
+                                   }
+                               }
+                           }
+                       }
+                   }
+               ],
                "drawCallback": function( settings ) {
 
                },
@@ -990,7 +1049,12 @@
                    },
                    {"data":function(data, type, dataToSet) {
                            return `<input class="frequency form-control" data-type="noAction" type="number" min="0" step="1" style="width: 5em;" value="${data.frequency}">`;
-                       }, "name": "Frekw.", "orderable": false, "searchable": false
+                       },
+                    // "render": function(data, type, row) {
+                    //     console.log('render', data);
+                    //     return type === 'export' ? 'Wartość' : 'wartosc';
+                    //     },
+                       "name": "Frekw.", "orderable": false, "searchable": false
                    },
                    {"data":function(data, type, dataToSet) {
                            return `<input class="pairs form-control" data-type="noAction" type="number" min="0" step="1" style="width: 5em;" value="${data.pairs}">`;
@@ -1057,6 +1121,23 @@
                    },
                },
            });
+
+           // var data = table.buttons.exportData( {
+           //     format: {
+           //         header: function(a,b) {
+           //             return 'dupa';
+           //         },
+           //         body: function ( a, b, c) {
+           //             console.log('a', a);
+           //             console.log('b', b);
+           //             console.log('c', c);
+           //         },
+           //         footer: function(a,b) {
+           //             console.log('fa', a);
+           //             console.log('fb', b);
+           //         }
+           //     }
+           // } );
 
            /*********************EVENT LISTENERS FUNCTIONS****************************/
            /*Functions from this section moslty update arrays which are going to be send by ajax for datatable.
