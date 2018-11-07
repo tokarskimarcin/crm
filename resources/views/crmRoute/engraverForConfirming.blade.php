@@ -243,7 +243,8 @@
                    from: document.querySelector('#date_start'),
                    to: document.querySelector('#date_stop'),
                    saveButton: document.querySelector('#save'),
-                   badge: document.querySelector('.badge')
+                   badge: document.querySelector('.badge'),
+                   confirmationDateFilterCheckbox: $('#confirmationDateFilterCheckbox')
                },
                globalVariables: {
                    numberOfChanges: 0,
@@ -604,7 +605,7 @@
                         d.to = APP.DOMElements.to.value;
                         d.departments = APP.arrays.selectedDepartments;
                         d.typ = APP.arrays.selectedTypes;
-                        d.confirmationDateFilter = $('#confirmationDateFilterCheckbox').prop('checked');
+                        d.confirmationDateFilter = APP.DOMElements.confirmationDateFilterCheckbox.prop('checked');
                    },
                    'headers': {'X-CSRF-TOKEN': '{{ csrf_token() }}'}
                },
@@ -827,7 +828,7 @@
 
            });
 
-           $('#confirmationDateFilterCheckbox').change(function () {
+           APP.DOMElements.confirmationDateFilterCheckbox.change(function () {
               table.ajax.reload();
            });
 
