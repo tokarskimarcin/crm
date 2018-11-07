@@ -48,7 +48,7 @@
                     @foreach($firewall_privileges as $item)
                         @php $i++;  @endphp
                         <tr id="{{$i}}">
-                            <td>{{$item->user->last_name . ' ' . $item->user->first_name}}</td>
+                            <td>{{$item->user['last_name'] . ' ' . $item->user['first_name']}}</td>
                             <td>{{$item->updated_at}}</td>
                             <td><button class="btn btn-danger" data-user_id="{{$item->user_id}}" data-row_id="{{$i}}">Usuń</button></td>
                         </tr>
