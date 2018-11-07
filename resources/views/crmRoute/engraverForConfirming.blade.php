@@ -425,7 +425,7 @@
                serverSide: true,
                scrollY: APP.globalVariables.datatableHeight,
                "lengthMenu": [[10, 25, 50, 100, 150, 200], [10, 25, 50, 100, 150, 200]],
-               "iDisplayLength": 100,
+               "iDisplayLength": 200,
                "drawCallback": function( settings ) {
 
                },

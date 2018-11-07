@@ -9,6 +9,7 @@ use App\User;
 use App\UserEmploymentStatus;
 use App\Utilities\DataProcessing\ConfirmationStatistics;
 use App\Utilities\Dates\MonthFourWeeksDivision;
+use function foo\func;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
@@ -189,7 +190,8 @@ class DepartmentsConfirmationStatisticsController extends Controller
                             ->where('pbx_id_add_date', '<', $dateGroupSum->lastDay);
                     });
 
-            })->get();
+            });
+        $consultantEmploymentStatus = $consultantEmploymentStatus->get();
 
         $userIdsFromUserEmploymentStatus = $consultantEmploymentStatus->pluck('user_id')->unique()->toArray();
         $userIdsWithoutEmploymentStatus = array_diff($userId, $userIdsFromUserEmploymentStatus);
@@ -206,34 +208,39 @@ class DepartmentsConfirmationStatisticsController extends Controller
         }
 
         $consultantConfirmationReports = [];
-        foreach ($consultantEmploymentStatus as $employmentStatus){
-            $firstDayOfPeriod = is_null($employmentStatus->pbx_id_add_date) ? $dateGroupSum->firstDay : $employmentStatus->pbx_id_add_date;
-            $lastDayOfPeriod = is_null($employmentStatus->pbx_id_remove_date) || $employmentStatus->pbx_id_remove_date == '0000-00-00' ? $dateGroupSum->lastDay : $employmentStatus->pbx_id_remove_date;
+        $confirmationReport = PbxConfirmationReport::whereIn('id',function ($query) use($consultantEmploymentStatus, $dateGroupSum){
+            $query->select(DB::raw('max(id)'))
+                ->from('pbx_confirmation_report')
+                ->groupBy('report_date','pbx_id');
 
-            if(\DateTime::createFromFormat('Y-m-d', $firstDayOfPeriod) < \DateTime::createFromFormat('Y-m-d', $dateGroupSum->firstDay)){
-                $firstDayOfPeriod = $dateGroupSum->firstDay;
-            }
-            if(\DateTime::createFromFormat('Y-m-d', $lastDayOfPeriod) > \DateTime::createFromFormat('Y-m-d', $dateGroupSum->lastDay)){
-                $lastDayOfPeriod = $dateGroupSum->lastDay;
-            }
+            //building query in loop
+            foreach ($consultantEmploymentStatus as $employmentStatus){
+                $firstDayOfPeriod = is_null($employmentStatus->pbx_id_add_date) ? $dateGroupSum->firstDay : $employmentStatus->pbx_id_add_date;
+                $lastDayOfPeriod = is_null($employmentStatus->pbx_id_remove_date) || $employmentStatus->pbx_id_remove_date == '0000-00-00' ? $dateGroupSum->lastDay : $employmentStatus->pbx_id_remove_date;
 
-            $confirmationReport = PbxConfirmationReport::whereIn('id',function ($query) use($firstDayOfPeriod, $lastDayOfPeriod, $employmentStatus){
-                $query->select(DB::raw('max(id)'))
-                    ->from('pbx_confirmation_report')
-                    ->where('pbx_id', $employmentStatus->pbx_id)
-                    ->whereBetween('report_date',[$firstDayOfPeriod,$lastDayOfPeriod])
-                    ->groupBy('report_date');
-            })->get();
-
-
-            if(count($confirmationReport) > 0){
-                foreach ($confirmationReport as $item){
-                    $item->user_id = $employmentStatus->user_id;
+                if(\DateTime::createFromFormat('Y-m-d', $firstDayOfPeriod) < \DateTime::createFromFormat('Y-m-d', $dateGroupSum->firstDay)){
+                    $firstDayOfPeriod = $dateGroupSum->firstDay;
                 }
+                if(\DateTime::createFromFormat('Y-m-d', $lastDayOfPeriod) > \DateTime::createFromFormat('Y-m-d', $dateGroupSum->lastDay)){
+                    $lastDayOfPeriod = $dateGroupSum->lastDay;
+                }
+                $query->orWhere(function ($query) use ($employmentStatus, $firstDayOfPeriod, $lastDayOfPeriod){
+                    $query->where('pbx_id', $employmentStatus->pbx_id)
+                        ->whereBetween('report_date',[$firstDayOfPeriod,$lastDayOfPeriod]);
+                });
             }
-            $consultantConfirmationReports = array_merge($consultantConfirmationReports, $confirmationReport->toArray());
+        })->get();
 
+        $consultantEmploymentStatusOnlyUserIdAndPbxId = $consultantEmploymentStatus->map(function ($item) {
+            return (object)['user_id' => $item->user_id, 'pbx_id' => $item->pbx_id];
+        });
+        //adding user id to every confirming report
+        foreach ($consultantEmploymentStatusOnlyUserIdAndPbxId->unique() as $employmentStatus){
+            $consultantConfirmationReports = $confirmationReport->where('pbx_id', $employmentStatus->pbx_id);
+            foreach ($consultantConfirmationReports as $consultantConfirmationReport){
+                $consultantConfirmationReport->user_id = $employmentStatus->user_id;
+            }
         }
-        return collect($consultantConfirmationReports);
+        return collect($confirmationReport);
     }
 }
