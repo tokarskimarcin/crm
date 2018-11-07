@@ -718,7 +718,6 @@
                    let frequencyCell = row.cells['10'];
                    let frequencyInput = frequencyCell.firstChild;
                    if(frequencyInput.value != null && frequencyInput.value != '') {
-                       console.log('f', frequencyInput.value);
                        if(frequencyInput.value < 16) {
                            frequencyInput.style.backgroundColor = '#f77471';
                        }
