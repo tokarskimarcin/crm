@@ -17,6 +17,7 @@
 @extends('layouts.main')
 @section('style')
     <link rel="stylesheet" href="{{asset('/assets/css/VCtooltip.css')}}">
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/1.5.2/css/buttons.dataTables.min.css">
     <style>
         .DTFC_LeftHeadWrapper thead tr, .DTFC_LeftBodyWrapper thead tr{
             background: white;
@@ -230,6 +231,10 @@
 
 @section('script')
     <script src="{{ asset('/js/moment.js')}}"></script>
+    <script src="https://cdn.datatables.net/buttons/1.5.2/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.flash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.html5.min.js"></script>
     <script>
         $(document).ready(function () {
             const columnsNr = {'lp':0,'name':1,'shows':2,'provision':3,'avgTimeOnRecord': 15,'dateGroup':19,'secondGroup':20};
@@ -278,6 +283,10 @@
                             scrollCollapse: true,
                             processing: true,
                             paging: false,
+                            dom: 'Bfrtip',
+                            buttons: [
+                                'csv', 'excel'
+                            ],
                             language: {
                                 "url": "//cdn.datatables.net/plug-ins/1.10.16/i18n/Polish.json"
                             },
@@ -398,6 +407,10 @@
                             scrollCollapse: true,
                             processing: true,
                             paging: false,
+                            dom: 'Bfrtip',
+                            buttons: [
+                                'csv', 'excel'
+                            ],
                             language: {
                                 "url": "//cdn.datatables.net/plug-ins/1.10.16/i18n/Polish.json"
                             },

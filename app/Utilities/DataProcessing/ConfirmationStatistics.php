@@ -20,9 +20,11 @@ class ConfirmationStatistics
      * 'concat(trainer.first_name," ",trainer.last_name) as confirmingUserTrainerName'
      * @param $dividedMonth - array that every cell has object with `firstDay` and `lastDay` fields
      * @param string $secondGrouping - pointing on column that should be grouped after weeks grouping
+     * @param bool $statisticsForPayment
      * @return array
+     * @throws \Exception
      */
-    public static function getConsultantsConfirmationStatisticsForMonth($clientRouteInfo, $dividedMonth, $secondGrouping = 'confirmingUserTrainerName'){
+    public static function getConsultantsConfirmationStatisticsForMonth($clientRouteInfo, $dividedMonth, $statisticsForPayment, $secondGrouping = 'confirmingUserTrainerName'){
         $clientRouteInfo = $clientRouteInfo->sortBy('confirmDate');
         foreach($clientRouteInfo as $consultantConfirmation){
             foreach ($dividedMonth as $week){
@@ -33,13 +35,19 @@ class ConfirmationStatistics
                 }
             }
         }
-        $usersPbxConfirmationStatistics = DepartmentsConfirmationStatisticsController::getEveryPbxConfirmationReport($clientRouteInfo->pluck('confirmingUser')->unique()->toArray(),
-            (object)['firstDay' => $dividedMonth[0]->firstDay,
-                'lastDay' => $dividedMonth[count($dividedMonth)-1]->lastDay]);
 
-        //dd($usersPbxConfirmationStatistics);
+        $statisticsForPayment = true;
+
+        $usersPbxConfirmationStatistics = collect([]);
+        if(!$statisticsForPayment){
+            $usersPbxConfirmationStatistics = DepartmentsConfirmationStatisticsController::getEveryPbxConfirmationReport($clientRouteInfo->pluck('confirmingUser')->unique()->toArray(),
+                (object)['firstDay' => $dividedMonth[0]->firstDay,
+                    'lastDay' => $dividedMonth[count($dividedMonth)-1]->lastDay]);
+        }
+
         $confirmationStatistics = ['data'=>collect(),'sums'=>collect()];
         $clientRouteInfo = $clientRouteInfo->groupBy('dateGroup');
+
         foreach ($clientRouteInfo as $dateGroup => $clientRouteInfoByDateGroup){
             $dates = explode(' ',$dateGroup);
             $firstDay = explode('.',$dates[0]);
@@ -127,18 +135,22 @@ class ConfirmationStatistics
                         //consultant sums
                         $consultantConfirmationStatistics->provision += ProvisionLevels::get('consultant', $confirmationInfo->frequency);
                         //sums for average
-                        if($confirmationInfo->frequency > 19){
-                            $consultantConfirmationStatistics->successful += 1;
-                        }else if($confirmationInfo->frequency > 15){
-                            $consultantConfirmationStatistics->neutral += 1;
-                        }else if($confirmationInfo->frequency > 11){
-                            $consultantConfirmationStatistics->unsuccessful += 1;
-                        }else{
-                            $consultantConfirmationStatistics->unsuccessfulBadly += 1;
+                        if($confirmationInfo->frequency !== null){
+                            if($confirmationInfo->frequency > 19){
+                                $consultantConfirmationStatistics->successful += 1;
+                            }else if($confirmationInfo->frequency > 15){
+                                $consultantConfirmationStatistics->neutral += 1;
+                            }else if($confirmationInfo->frequency > 11){
+                                $consultantConfirmationStatistics->unsuccessful += 1;
+                            }else{
+                                $consultantConfirmationStatistics->unsuccessfulBadly += 1;
+                            }
+                            $consultantFrequencySum += $confirmationInfo->frequency;
+                        }
+                        if($confirmationInfo->pairs !== null) {
+                            $consultantPairsSum += $confirmationInfo->pairs;
                         }
                         $consultantConfirmationStatistics->recordsCount += $confirmationInfo->actual_success;
-                        $consultantFrequencySum += $confirmationInfo->frequency;
-                        $consultantPairsSum  += $confirmationInfo->pairs;
                     }
                     //counting percentages for consultant
                     $consultantConfirmationStatistics->successfulPct        = round($consultantConfirmationStatistics->successful*100/$consultantConfirmationStatistics->shows, 2);
@@ -149,10 +161,11 @@ class ConfirmationStatistics
                     $consultantConfirmationStatistics->avgFrequency     = round($consultantFrequencySum/$consultantConfirmationStatistics->shows,2);
                     $consultantConfirmationStatistics->avgPairs         = round($consultantPairsSum/$consultantConfirmationStatistics->shows,2);
 
-                    $consultantConfirmationReports = $usersPbxConfirmationStatistics->where('pbx_id', $consultantConfirmationData[0]->login_phone)
+
+                    $consultantConfirmationReports = $usersPbxConfirmationStatistics->where('user_id', $consultantConfirmationData[0]->confirmingUser)
                         ->filter(function ($value, $key) use ($dateGroupSum){
                         return strtotime($value['report_date']) >= strtotime($dateGroupSum->firstDay) && strtotime($value['report_date']) <= strtotime($dateGroupSum->lastDay);
-                    });//[];//DepartmentsConfirmationStatisticsController::getEveryPbxConfirmationReport($consultantConfirmationStatistics->confirmingUser, $dateGroupSum);
+                    });
 
                     foreach($consultantConfirmationReports as $confirmationReport){
                         if(!is_null($confirmationReport['time_on_record'])){
