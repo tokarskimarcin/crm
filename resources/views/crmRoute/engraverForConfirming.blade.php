@@ -264,8 +264,8 @@
            let APP = {
                objects: {
                  departmentInfoColors: {
-                     1: 'lightblue',
-                     4: '#fcedbd'
+                     1: '#fcedbd',
+                     4: 'lightblue'
                  }
                },
                arrays: {
@@ -284,7 +284,7 @@
                    to: document.querySelector('#date_stop'),
                    saveButton: document.querySelector('#save'),
                    clearButton: document.querySelector('#clearButton'),
-                   editButton: document.querySelector('#editOneRecord')
+                   editButton: document.querySelector('#editOneRecord'),
                    badge: document.querySelector('.badge'),
                    confirmationDateFilterCheckbox: $('#confirmationDateFilterCheckbox')
                },
