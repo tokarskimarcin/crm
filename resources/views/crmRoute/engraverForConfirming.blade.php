@@ -83,21 +83,9 @@
 
     </style>
 
-{{--Header page --}}
-
-   {{-- <div class="col-md-12">
-        <div class="page-header">
-            <div class="alert gray-nav "> Grafik dla potwierdzeń
-        </div>
-    </div>--}}
-
-
 <div class="row">
     <div class="col-lg-12">
         <div class="panel panel-default">
-            {{--<div class="panel-heading">
-                Szczegółowe informacje o grafiku
-            </div>--}}
             <div class="panel-body">
                 <div class="row">
 
@@ -191,7 +179,7 @@
                         <thead>
                         <tr>
                             <th>T</th>
-                            <th>Data potw.</th>
+                            <th>Data</th>
                             <th>Miasto</th>
                             <th>Nazwa_klienta</th>
                             <th>G</th>
@@ -201,7 +189,7 @@
                             <th>Zgody</th>
                             <th>Frekw.</th>
                             <th>Pary</th>
-                            <th>Data</th>
+                            <th>Data potw.</th>
                             <th>cri</th>
                         </tr>
                         </thead>
@@ -424,7 +412,7 @@
                serverSide: true,
                scrollY: APP.globalVariables.datatableHeight,
                "lengthMenu": [[10, 25, 50, 100, 150, 200], [10, 25, 50, 100, 150, 200]],
-               "iDisplayLength": 100,
+               "iDisplayLength": 200,
                "drawCallback": function( settings ) {
 
                },
@@ -617,26 +605,9 @@
                            return data.weekOfYear;
                        },"name":"weekOfYear", "width": "1%", "searchable": false
                    },
-                   {"data":function(data, type, dataToSet) {
-                           if(data.confirmDate != null) {
-
-                               /*let confirmDateInput = $('<input>').attr('type', 'date').css({'width':'100%'}).addClass('form-control confirm-date').val(data.confirmDate);
-                               //console.log(moment(data.date).diff(moment(data.confirmDate),'days'), confirmDateInput);
-                               return confirmDateInput.prop('outerHTML');*/
-
-                               return `<input type="date" style="width: 100%;" class="form-control confirm-date" value="${data.confirmDate}">`;
-                           }
-                           else {
-                               const showDate = new Date(data.date);
-                               const dayBeforeShowDate = new Date(showDate.setDate(showDate.getDate() - 1));
-                               const day = ("0" + dayBeforeShowDate.getDate()).slice(-2);
-                               const month = ("0" + (dayBeforeShowDate.getMonth() + 1)).slice(-2);
-                               const year = dayBeforeShowDate.getFullYear();
-                               const fullDate =  year + "-" + month + "-" + day;
-                               return `<input type="date" style="width: 100%;" class="form-control confirm-date" value="${fullDate}">`;
-                           }
-
-                       }, "name": "dataPotwierdzenia", "orderable": false, "searchable": false
+                   {"data":function (data, type, dataToSet) {
+                           return data.date;
+                       },"name":"date", "searchable": false
                    },
                    {"data":function (data, type, dataToSet) {
                            if(data.nrPBX != null) {
@@ -702,16 +673,33 @@
                            return `<input class="pairs form-control" type="number" min="0" step="1" style="width: 5em;" value="${data.pairs}">`;
                        }, "name": "pairs", "orderable": false, "searchable": false
                    },
-                   {"data":function (data, type, dataToSet) {
-                           return data.date;
-                       },"name":"date", "searchable": false
+                   {"data":function(data, type, dataToSet) {
+                           if(data.confirmDate != null) {
+
+                               /*let confirmDateInput = $('<input>').attr('type', 'date').css({'width':'100%'}).addClass('form-control confirm-date').val(data.confirmDate);
+                               //console.log(moment(data.date).diff(moment(data.confirmDate),'days'), confirmDateInput);
+                               return confirmDateInput.prop('outerHTML');*/
+
+                               return `<input type="date" style="width: 100%;" class="form-control confirm-date" value="${data.confirmDate}">`;
+                           }
+                           else {
+                               const showDate = new Date(data.date);
+                               const dayBeforeShowDate = new Date(showDate.setDate(showDate.getDate() - 1));
+                               const day = ("0" + dayBeforeShowDate.getDate()).slice(-2);
+                               const month = ("0" + (dayBeforeShowDate.getMonth() + 1)).slice(-2);
+                               const year = dayBeforeShowDate.getFullYear();
+                               const fullDate =  year + "-" + month + "-" + day;
+                               return `<input type="date" style="width: 100%;" class="form-control confirm-date" value="${fullDate}">`;
+                           }
+
+                       }, "name": "dataPotwierdzenia", "orderable": false, "searchable": false
                    },
                    {"data":function(data, type, dataToSet) {
                            return data.client_route_id;
                        }, "name": "client_route_id", "orderable": true, "searchable": false, "visible": false
                    }
                ],
-               order: [[11, 'asc'], [3, 'asc'], [12, 'desc'], [4, 'asc']],
+               order: [[1, 'asc'], [3, 'asc'], [12, 'desc'], [4, 'asc']],
                rowGroup: {
                    dataSrc: 'date',
                    startRender: null,
