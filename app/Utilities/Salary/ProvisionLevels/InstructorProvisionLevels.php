@@ -15,26 +15,29 @@ class InstructorProvisionLevels
         $provision = 0;
         switch ($subtype) {
             case '1': { //case when red shows
-                if($level < 6) {
-                    $provision = 200;
-                }
-                else {
-                    $provision = 0;
+                if($subsubtype < 5) { // janky < 5
+                    if ($level < 6) {
+                        $provision = 200;
+                    } else {
+                        $provision = 0;
+                    }
                 }
                 return $provision;
                 break;
             }
             case '2': { //case when green shows
-                if($level >= 95){
-                    $provision = 350;
-                }else if($level >= 90){
-                    $provision = 300;
-                }else if($level >= 85 ){
-                    $provision = 250;
-                }else if($level >= 80){
-                    $provision = 200;
-                }else {
-                    $provision = 0;
+                if($subsubtype < 5) { // janky < 5
+                    if ($level >= 95) {
+                        $provision = 350;
+                    } else if ($level >= 90) {
+                        $provision = 300;
+                    } else if ($level >= 85) {
+                        $provision = 250;
+                    } else if ($level >= 80) {
+                        $provision = 200;
+                    } else {
+                        $provision = 0;
+                    }
                 }
                 return $provision;
                 break;
