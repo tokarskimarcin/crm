@@ -619,14 +619,7 @@
                        },"name":"cityName", "orderable": false
                    },
                    {"data":function (data, type, dataToSet) {
-                           let clientNameVariable = '';
-                           if(data.typ == '2') {
-                               clientNameVariable = data.clientName + ' (W)'
-                           }
-                           else {
-                               clientNameVariable = data.clientName + ' (B)'
-                           }
-                           return clientNameVariable;
+                           return data.clientName;
                        },"name":"clientName"
                    },
 
