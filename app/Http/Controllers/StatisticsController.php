@@ -4050,7 +4050,7 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
 
     public function pageReportUnusedAccounts(){
         $user = Auth::user();
-        $data = StatisticsController::UnusedAccountsInfo(false);
+        $data = $this->UnusedAccountsInfo();
 
         $userTypeIdsForTrainersReportOfUnusedAccounts = array_merge(StatisticsGlobalVariables::$userTypeIdsForTrainersReportOfUnusedAccounts, StatisticsGlobalVariables::$userTypeIdsForEveryData);
         $userTypeIdsForManagersReportOfUnusedAccounts = array_merge(StatisticsGlobalVariables::$userTypeIdsForManagersReportOfUnusedAccounts, StatisticsGlobalVariables::$userTypeIdsForEveryData);
@@ -4078,24 +4078,22 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
 
     }*/
 
-    public static function UnusedAccountsInfo($sendingMails = true){
+    private function UnusedAccountsInfo(){
         $date_warning = date("Y-m-d",strtotime('-7 Days'));
         $date_disable = date("Y-m-d",strtotime('-14 Days'));
-        //Pobranie użytkowników do zakończenia umowy
+        $sendingMails = false;
 
+
+        //Pobranie użytkowników do zakończenia umowy
         $users_warning = User::
         where('last_login','<', $date_warning)
             ->whereIn('users.user_type_id', [1, 2])
             ->where('status_work', '=', 1)
             ->get();
 
-        $users_disable = User::whereIn('users.user_type_id', [1, 2]);
-        if($sendingMails){
-            $users_disable->where('last_login', '<', $date_disable)
-                ->where('status_work', '=', 1);
-        }else{
-            $users_disable->where('end_work', date('Y-m-d'))->where('disabled_by_system', 1);
-        }
+        $users_disable = User::whereIn('users.user_type_id', [1, 2])
+            ->where('end_work', date('Y-m-d'))
+            ->where('disabled_by_system', 1);
 
         $users_disable = $users_disable->get();
         $departments = Department_info::all();
