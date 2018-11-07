@@ -164,13 +164,9 @@
                                             @endforeach
                                         </ul>
                                         <p>Skróty oddziałów: </p>
-                                        <ul class="list-group">
                                             @foreach($registrations as $key => $value)
-                                                <li class="list-group-item">
-                                                    {{$key}} => {{$value}}
-                                                </li>
+                                                    {{$key}} => {{$value}},
                                             @endforeach
-                                        </ul>
                                     </div>
                                 </span>
                             </div>
@@ -1239,6 +1235,7 @@
            function saveHandler(e) {
                const saveBtn = e.target;
                if(saveBtn.disabled == false) { //user clicked on active save button, it mean there are rows to change
+                   console.log(APP.arrays.changeArr);
                    const dataJSON = JSON.stringify(APP.arrays.changeArr);
 
                    const ourHeaders = new Headers();

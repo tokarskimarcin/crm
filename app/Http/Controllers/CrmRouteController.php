@@ -4534,13 +4534,40 @@ class CrmRouteController extends Controller
         $data = json_decode($request->data);
         $idsArr = [];
         foreach($data as $item) {
-            ClientRouteInfo::where('id', '=', $item->id)
-                ->update([
-                    'frequency' => $item->frequency,
-                    'pairs' => $item->pairs,
-                    'confirmingUser' => $item->confirmingPerson,
-                    'confirmDate' => $item->date
-                ]);
+            if($item->frequency != '' && $item->pairs != '') {
+                ClientRouteInfo::where('id', '=', $item->id)
+                    ->update([
+                        'frequency' => $item->frequency,
+                        'pairs' => $item->pairs,
+                        'confirmingUser' => $item->confirmingPerson,
+                        'confirmDate' => $item->date
+                    ]);
+            }
+            else if($item->frequency != '') {
+                ClientRouteInfo::where('id', '=', $item->id)
+                    ->update([
+                        'frequency' => $item->frequency,
+                        'confirmingUser' => $item->confirmingPerson,
+                        'confirmDate' => $item->date
+                    ]);
+            }
+            else if($item->pairs != '') {
+                ClientRouteInfo::where('id', '=', $item->id)
+                    ->update([
+                        'pairs' => $item->pairs,
+                        'confirmingUser' => $item->confirmingPerson,
+                        'confirmDate' => $item->date
+                    ]);
+            }
+            else {
+                ClientRouteInfo::where('id', '=', $item->id)
+                    ->update([
+                        'confirmingUser' => $item->confirmingPerson,
+                        'confirmDate' => $item->date
+                    ]);
+            }
+
+
         }
         return 'Zmiany zostały zapisane!';
     }
