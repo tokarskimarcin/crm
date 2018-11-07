@@ -82,6 +82,13 @@
             background-color: #55f !important;
         }
 
+        table {
+            font-size: 0.9em;
+        }
+
+        textarea {
+            resize: vertical;
+        }
     </style>
 
 <div class="row">
@@ -629,6 +636,7 @@
 
                let optionElement = document.createElement('option');
                optionElement.value = person.userId;
+               optionElement.setAttribute('data-type', 'noAction');
                optionElement.textContent = `${person.name} ${person.surname}`;
                $(optionElement).addClass('dep'+person.department_id);
                placeToAppend.appendChild(optionElement);
@@ -774,6 +782,9 @@
 
                },
                "rowCallback": function( row, data, index ) {
+                   // let confirmingCell = row.cells['7'];
+                   // confirmingCell.setAttribute('data-type', 'noAction');
+
                    let frequencyCell = row.cells['10'];
                    let frequencyInput = frequencyCell.firstChild;
                    if(frequencyInput.value != null && frequencyInput.value != '') {
@@ -858,6 +869,8 @@
                        select.addClass(className);
                    });
                    $('#datatable tbody tr').on('change', function(e) {
+                        // e.stopPropagation();
+                        // e.preventDefault();
                         const changedElement = e.target;
                         const elementRow = this;
                         const id = elementRow.dataset.id;
@@ -1027,14 +1040,14 @@
                        },"name":"departmentName", "searchable": "false", "orderable": false
                    },
                    {"data":function(data, type, dataToSet) {
-                       let customSelect =  $('<select>').addClass('confirming form-control').css({'width':'100%'});
+                       let customSelect =  $('<select>').addClass('confirming form-control').attr('data-type', 'noAction').css({'width':'100%'});
                        customSelect.append($('<option>').val(0).append('Wybierz'));
                                 if(data.confirmingUser) {
                                     let option = $('<option>').prop('selected', true).val(data.confirmingUser).append(data.first_name+' '+data.last_name)
                                         .addClass('dep'+data.confirm_id_dep);
 
                                     customSelect.append(option);
-                                    customSelect.attr('data-confirm-id-dep', data.confirm_id_dep).attr('data-type', 'noAction').addClass('dep'+data.confirm_id_dep);
+                                    customSelect.attr('data-confirm-id-dep', data.confirm_id_dep).addClass('dep'+data.confirm_id_dep);
                                }
                                     return customSelect.prop('outerHTML');
                         }, "name": "potwierdzający", "width": "20%", "orderable": false, "searchable": false
