@@ -1125,6 +1125,7 @@
                            .append('<td></td>')
                            .append('<td></td>')
                            .append('<td></td>')
+                           .append('<td></td>')
                            .append('<td>' + sumAllLimit + '</td>')
                            .append('<td>' + sumAllSuccess + '</td>')
                            .append('<td colspan="3"></td>')
