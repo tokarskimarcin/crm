@@ -641,24 +641,24 @@ class UsersController extends Controller
         } else {
             $user->end_work = $request->stop_date;
             if($user->user_type_id == 7){
-                Department_info::update('menager_id', null)->where('menager_id', $user->id);
+                Department_info::where('menager_id', $user->id)->update(['menager_id' => null]);
+            }
+            if($user->user_type_id == 17){
+                Department_info::where('menager_id', $user->id)->update(['menager_id' => null]);
+                Department_info::where('regionalManager_id', $user->id)->update(['regionalManager_id' => null]);
             }
             if($user->user_type_id == 15){
-                Department_info::update('menager_id', null)->where('menager_id', $user->id);
-                Department_info::update('regionalManager_id', null)->where('regionalManager_id', $user->id);
-            }
-            if($user->user_type_id == 15){
-                Department_info::update('director_id', null)->where('director_id', $user->id);
+                Department_info::where('director_id', $user->id)->update(['director_id' => null]);
             }
             if($user->user_type_id == 14){
-                Department_info::update('director_hr_id', null)->where('director_hr_id', $user->id);
+                Department_info::where('director_hr_id', $user->id)->update(['director_hr_id' => null]);
             }
             if($user->user_type_id == 21){
-                Department_info::update('instructor_regional_id', null)->where('instructor_regional_id', $user->id);
+                Department_info::where('instructor_regional_id', $user->id)->update(['instructor_regional_id' => null]);
             }
             if($user->user_type_id == 5){
-                Department_info::update('hr_id', null)->where('hr_id', $user->id);
-                Department_info::update('hr_id_second', null)->where('hr_id_second', $user->id);
+                Department_info::where('hr_id', $user->id)->update(['hr_id' => null]);
+                Department_info::where('hr_id_second', $user->id)->update(['hr_id_second' => null]);
             }
         }
         if ($request->password != '') {
