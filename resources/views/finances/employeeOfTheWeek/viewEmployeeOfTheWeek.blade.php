@@ -21,6 +21,10 @@
         .bootstrap-select > .dropdown-menu {
             left: 0 !important;
         }
+        .VCtooltip .well:hover {
+            background-color: rgba(185,185,185,0.75) !important;
+            cursor: help;
+        }
     </style>
 @endsection
 @section('content')
@@ -34,6 +38,23 @@
             Panel z zatwierdzaniem premii dla pracownika tygodnia
         </div>
         <div class="panel-body">
+            <div class="row">
+                <div class="col-md-2">
+                    <div class="VCtooltip VCtooltip-rgith" align="right">
+                        <div class="well well-sm" style="border-radius: 10%; background-color: #5bc0de; color: white; margin-bottom: 0;">
+                            Legenda <span class="glyphicon glyphicon-info-sign"></span>
+                        </div>
+                        <span class="tooltiptext">
+                            <div class="alert alert-info">
+                                <div class="legendInfo" id="noUserTypeSelected">Wybierz typ oddziału i typ pracownika by zobaczyć legendę dla wybranej opcji.</div>
+                                <div class="legendInfo" id="confirmationTrainer" hidden><strong>[POTWIERDZENIA] Trener tygodnia:</strong> tylko jedno miejsce dla trenera ze wszystkich oddziałów potwierdzeń.</div>
+                                <div class="legendInfo" id="confirmationConsultant" hidden><strong>[POTWIERDZENIA] Konsultant tygodnia:</strong> premiowane dwa pierwsze miejsca poszczególnego zespołu wybranego trenera.
+                                    Konsultant znajduje się w rankingu, gdy potwierdzał przynajmniej 4 pokazy</div>
+                            </div>
+                        </span>
+                    </div>
+                </div>
+            </div>
             <div class="row" id="selectorSection">
                 <div class="col-md-2" id="departmentTypeSection">
                     <label for="departmentTypeSelect">Typ oddziału</label>
@@ -95,7 +116,13 @@
                     selectorSection: $('#selectorSection'),
                     departmentTypeSection: $('#departmentTypeSection'),
                     departmentTypeSelect: $('#departmentTypeSelect').selectpicker(),
-                    employeeOfTheWeekSection: $('#employeeOfTheWeekSection')
+                    employeeOfTheWeekSection: $('#employeeOfTheWeekSection'),
+                    legends: {
+                        legendInfo: $('.legendInfo'),
+                        noUserTypeSelected: $('#noUserTypeSelected'),
+                        confirmationTrainer: $('#confirmationTrainer'),
+                        confirmationConsultant: $('#confirmationConsultant')
+                    }
                 },
                 DATA_TABLES: {}
             };
@@ -123,6 +150,8 @@
                         .append(userTypeLabel)
                         .append(userTypeSelect)
                         .on('remove',function () {
+                            VARIABLES.jQElements.legends.legendInfo.prop('hidden',true);
+                            VARIABLES.jQElements.legends.noUserTypeSelected.prop('hidden',false);
                             $('#departmentInfoSection').trigger('remove');
                             if(userTypeSelect.val() === '4'){
                                 $('#monthDatetimepickerSection').trigger('remove');
@@ -217,6 +246,18 @@
                     userTypeSelectHandler: function(userTypeSelect){
                         userTypeSelect
                             .change(function (e) {
+                                let value = $(e.target).val();
+                                VARIABLES.jQElements.legends.legendInfo.prop('hidden',true);
+                                if(value > 0){
+                                    if(value === '1'){
+                                        VARIABLES.jQElements.legends.confirmationConsultant.prop('hidden',false);
+                                    }
+                                    if(value === '4'){
+                                        VARIABLES.jQElements.legends.confirmationTrainer.prop('hidden',false);
+                                    }
+                                }else{
+                                    VARIABLES.jQElements.legends.noUserTypeSelected.prop('hidden',false);
+                                }
                                 let userTypeSelect = $(e.target);
                                 $('#departmentInfoSection').trigger('remove');
                                 $('#monthDatetimepickerSection').trigger('remove');
