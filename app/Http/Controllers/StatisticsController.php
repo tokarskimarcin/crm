@@ -2402,7 +2402,6 @@ class StatisticsController extends Controller
             $departments = Department_info::whereIn('id_dep_type', [1, 2])->get();
             $data = $this->getCoachingData($month, $year, (array)$dep_id);
 
-//            dd($data);
             return view('reportpage.ReportCoachingWeek')
                 ->with([
                     'departments' => $departments,
