@@ -124,6 +124,9 @@
                         .append(userTypeSelect)
                         .on('remove',function () {
                             $('#departmentInfoSection').trigger('remove');
+                            if(userTypeSelect.val() === '4'){
+                                $('#monthDatetimepickerSection').trigger('remove');
+                            }
                             VARIABLES.jQElements.employeeOfTheWeekSection.empty();
                         });
                     if(userTypes.length === 0){
