@@ -82,7 +82,7 @@ class StatisticsRBHController extends Controller
      * Send mail with statistics
      * @return string
      */
-    public function  DayReportNewUsersMail(){
+    public function  DayReportNewUsersMail() {
         $sThisMonth = date('n');
         $sThisMonthToView  = $sThisMonth <10 ? '0'.$sThisMonth : $sThisMonth;
         $sThisYear = date('Y');
