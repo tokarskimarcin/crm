@@ -109,6 +109,12 @@
                     </div>
                 </div>
             </div>
+        @else
+            <div class="panel panel-default myPanels">
+                <div class="panel-heading">
+                    Tydzień: {{date('Y.m.d',strtotime($employeeOfTheWeek->first_day_week))}} - {{date('Y.m.d',strtotime($employeeOfTheWeek->last_day_week))}} [dane wciąż wprowadzane do systemu]
+                </div>
+            </div>
         @endif
     @endforeach
 </div>

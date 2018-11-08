@@ -124,6 +124,7 @@
                         .append(userTypeSelect)
                         .on('remove',function () {
                             $('#departmentInfoSection').trigger('remove');
+                            VARIABLES.jQElements.employeeOfTheWeekSection.empty();
                         });
                     if(userTypes.length === 0){
                         userTypeSelect.append($('<option>').append('Brak systemu pracowników tygodnia'));
@@ -155,6 +156,7 @@
                         .append(departmentInfoSelect)
                         .on('remove',function () {
                             $('#monthDatetimepickerSection').trigger('remove');
+                            VARIABLES.jQElements.employeeOfTheWeekSection.empty();
                         });
                     VARIABLES.jQElements.selectorSection.append(departmentInfoSection);
                     departmentInfoSelect.selectpicker();
@@ -170,6 +172,7 @@
                         .append(monthDatetimepickerLabel)
                         .append(formGroup).on('remove',function () {
                             $('#trainerSection').trigger('remove');
+                            VARIABLES.jQElements.employeeOfTheWeekSection.empty();
                         });
                     VARIABLES.jQElements.selectorSection.append(monthDatetimepickerSection);
                     monthDatetimepicker.datetimepicker({
@@ -244,7 +247,6 @@
                                 if(userTypeSelect.val() === '1'){
                                     FUNCTIONS.loadingSwalCall();
                                     FUNCTIONS.AJAXs.getTrainersAjax($('#departmentInfoSelect').val(), value).then(function (result) {
-                                        console.log(result);
                                         FUNCTIONS.createTrainerSelect(result)
                                     });
                                 }else if(userTypeSelect.val() === '4'){
@@ -353,7 +355,6 @@
                             trainerId: $('#trainerSelect').val()
                         }).done(function (resolve) {
                             VARIABLES.jQElements.employeeOfTheWeekSection.empty();
-                            console.log(resolve);
                             if(resolve !== 'noView'){
                                 VARIABLES.jQElements.employeeOfTheWeekSection.html(resolve);
                             }else{
