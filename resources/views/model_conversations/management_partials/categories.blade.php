@@ -9,7 +9,7 @@
             <th>Zdjęcie</th>
             <th>Status</th>
             <th>Podkategoria</th>
-            @if($showAvailableDepartmentTypes)
+            @if($showAvailableDepartmentTypes == 'true')
             <th>Typ oddziału</th>
             @endif
             <th>Akcja</th>
@@ -35,7 +35,7 @@
                     @endforeach
                 </select>
             </td>
-            @if($showAvailableDepartmentTypes)
+            @if($showAvailableDepartmentTypes == 'true')
                 <td>
                     <select class="form-control department_type_id" disabled>
                         <option>Wybierz</option>

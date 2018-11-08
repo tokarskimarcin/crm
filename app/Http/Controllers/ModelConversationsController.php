@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\ActivityRecorder;
 use App\Department_info;
 use App\Department_types;
+use App\Exceptions\model_conv\WrongExtensionException;
+use App\Exceptions\TooLongNameException;
 use App\ModelConvCategories;
 use App\ModelConvItems;
 use App\ModelConvPlaylist;
@@ -20,7 +22,7 @@ class ModelConversationsController extends Controller
 
     private $adminPanelAccessArr = [3, 13, 15]; //Array of privilaged user types
     private $superUserDepartmentType = 6; //see all stuff from other departments
-//    private $privilagedUser = 47; //id of privilaged user.
+    private $privilagedUser = []; //array of privilaged user_id
 
     public function modelConversationMenuGet() {
         $user = Auth::user();
@@ -28,18 +30,11 @@ class ModelConversationsController extends Controller
         $user_department_type = Department_info::getUserDepartmentType($user->id)->id_dep_type;
 
         $categories = null;
+
         if($user_department_type == $this->superUserDepartmentType) { //dkj
-//            if(in_array($user_type_id, $this->adminPanelAccessArr)) { //sees all available categories
                 $categories = ModelConvCategories::OnlyActive()
                     ->where('subcategory_id', '=', 0)
                     ->get();
-//            }
-//            else { //sees only categories from it's own department_type
-//                $categories = ModelConvCategories::OnlyActive()
-//                    ->where('subcategory_id', '=', 0)
-//                    ->where('department_type_id', '=', $user_type_id)
-//                    ->get();
-//            }
         }
         else { //sees only categories from its own department_type and its own
             $categories = ModelConvCategories::OnlyActive()
@@ -153,6 +148,8 @@ class ModelConversationsController extends Controller
 
         $playlistItems = ModelConvPlaylistItem::all();
 
+        $returnShowAvailable = $showAvailableDepartmentTypes ? 'true' : 'false';
+
         return view('model_conversations.model_conversations_management')
             ->with('categories', $categories)
             ->with('user', $user_type_id)
@@ -161,8 +158,9 @@ class ModelConversationsController extends Controller
             ->with('playlists', $playlists)
             ->with('playlistItems', $playlistItems)
             ->with('superUserDepartmentType', $this->superUserDepartmentType)
-            ->with('showAvailableDepartmentTypes', $showAvailableDepartmentTypes)
-            ->with('availableDepartmentTypes', $availableDepartmentTypes);
+            ->with('showAvailableDepartmentTypes', $returnShowAvailable)
+            ->with('availableDepartmentTypes', $availableDepartmentTypes)
+            ->with('privilagedUserArr', $this->privilagedUser);
 
     }
 
@@ -272,14 +270,21 @@ class ModelConversationsController extends Controller
         if($toAdd == 1) {
             if(isset($picture)) { //user send picture
                 $clientOriginalName = str_replace(' ','_',$picture->getClientOriginalName());
+                $clientOriginalNameLength = strlen($clientOriginalName);
+                $acceptedLength = $clientOriginalNameLength < 235 ? true : false; //255 - 20
                 $fileExtension = strtolower($picture->getClientOriginalExtension());
 
                 if(in_array($fileExtension, $acceptedExtensions)) {
-                    $picture_name = 'playlist_' . date('Y-m-d') . '_' . $clientOriginalName;
-                    $picture->storeAs('public',$picture_name);
+                    if($acceptedLength) {
+                        $picture_name = 'playlist_' . date('Y-m-d') . '_' . $clientOriginalName;
+                        $picture->storeAs('public',$picture_name);
+                    }
+                    else {
+                        throw new TooLongNameException('Za długa nazwa przesyłanego pliku. Maksymalna długość nazwy pliku to 235 znaków');
+                    }
                 }
                 else {
-                    throw new \Exception('Niedozwolone rozszerzenie zdjęcia, możliwe rozszerzenia: jpeg, jpg');
+                    throw new WrongExtensionException('Niedozwolone rozszerzenie zdjęcia, możliwe rozszerzenia: jpeg, jpg');
                 }
 
             }
@@ -291,13 +296,21 @@ class ModelConversationsController extends Controller
         else {
             if(isset($picture)) { //user send picture
                 $clientOriginalName = str_replace(' ','_',$picture->getClientOriginalName());
+                $clientOriginalNameLength = strlen($clientOriginalName);
+                $acceptedLength = $clientOriginalNameLength < 235 ? true : false; //255 - 20
                 $fileExtension = strtolower($picture->getClientOriginalExtension());
+
                 if(in_array($fileExtension, $acceptedExtensions)) {
-                    $picture_name = 'playlist_' . date('Y-m-d') . '_' . $clientOriginalName;
-                    $picture->storeAs('public',$picture_name);
+                    if($acceptedLength) {
+                        $picture_name = 'playlist_' . date('Y-m-d') . '_' . $clientOriginalName;
+                        $picture->storeAs('public',$picture_name);
+                    }
+                    else {
+                        throw new TooLongNameException('Za długa nazwa przesyłanego pliku. Maksymalna długość nazwy pliku to 235 znaków');
+                    }
                 }
                 else {
-                    throw new \Exception('Niedozwolone rozszerzenie zdjęcia, możliwe rozszerzenia: jpeg, jpg');
+                    throw new WrongExtensionException('Niedozwolone rozszerzenie zdjęcia, możliwe rozszerzenia: jpeg, jpg');
                 }
             }
         }
@@ -410,13 +423,21 @@ class ModelConversationsController extends Controller
                 if(isset($picture)) { //user send picture
                     $clientOriginalName = str_replace(' ','_',$picture->getClientOriginalName());
                     $fileExtension = strtolower($picture->getClientOriginalExtension());
+                    $clientOriginalNameLength = strlen($clientOriginalName);
+                    $acceptedLength = $clientOriginalNameLength < 235 ? true : false; //255 - 20
 
                     if(in_array($fileExtension, $acceptedExtensions)) {
-                        $picture_name = 'category_' . date('Y-m-d') . '_' . $clientOriginalName;
-                        $picture->storeAs('public',$picture_name);
+                        if($acceptedLength) {
+                            $picture_name = 'category_' . date('Y-m-d') . '_' . $clientOriginalName;
+                            $picture->storeAs('public',$picture_name);
+                        }
+                        else {
+                            throw new TooLongNameException('Za długa nazwa przesyłanego pliku. Maksymalna długość nazwy pliku to 235 znaków');
+                        }
+
                     }
                     else {
-                        throw new \Exception('Niedozwolone rozszerzenie zdjęcia, możliwe rozszerzenia: jpeg, jpg');
+                        throw new WrongExtensionException('Niedozwolone rozszerzenie zdjęcia, możliwe rozszerzenia: jpeg, jpg');
                     }
 
                 }
@@ -429,13 +450,21 @@ class ModelConversationsController extends Controller
                 if(isset($picture)) { //user send picture
                     $clientOriginalName = str_replace(' ','_',$picture->getClientOriginalName());
                     $fileExtension = strtolower($picture->getClientOriginalExtension());
+                    $clientOriginalNameLength = strlen($clientOriginalName);
+                    $acceptedLength = $clientOriginalNameLength < 235 ? true : false; //255 - 20
 
                     if(in_array($fileExtension, $acceptedExtensions)) {
-                        $picture_name = 'category_' . date('Y-m-d') . '_' . $clientOriginalName;
-                        $picture->storeAs('public',$picture_name);
+                        if($acceptedLength) {
+                            $picture_name = 'category_' . date('Y-m-d') . '_' . $clientOriginalName;
+                            $picture->storeAs('public',$picture_name);
+                        }
+                        else {
+                            throw new TooLongNameException('Za długa nazwa przesyłanego pliku. Maksymalna długość nazwy pliku to 235 znaków');
+                        }
+
                     }
                     else {
-                        throw new \Exception('Niedozwolone rozszerzenie zdjęcia, możliwe rozszerzenia: jpeg, jpg');
+                        throw new WrongExtensionException('Niedozwolone rozszerzenie zdjęcia, możliwe rozszerzenia: jpeg, jpg');
                     }
 
                 }
@@ -536,12 +565,20 @@ class ModelConversationsController extends Controller
         if(isset($sound)) {
             $clientOriginalName = str_replace(' ','_',$sound->getClientOriginalName());
             $fileExtension = strtolower($sound->getClientOriginalExtension());
+            $clientOriginalNameLength = strlen($clientOriginalName);
+            $acceptedLength = $clientOriginalNameLength < 240 ? true : false; //255 - 15
+
             if(in_array($fileExtension, $acceptedExtensions)) {
-                $sound_name = 'item_' . date('Y-m-d') . '_' . $clientOriginalName;
-                $sound->storeAs('public',$sound_name);
+                if($acceptedLength) {
+                    $sound_name = 'item_' . date('Y-m-d') . '_' . $clientOriginalName;
+                    $sound->storeAs('public',$sound_name);
+                }
+                else {
+                    throw new TooLongNameException('Za długa nazwa przesyłanego pliku. Maksymalna długość nazwy pliku to 240 znaków');
+                }
             }
             else {
-                throw new \Exception('Niedozwolone rozszerzenie pliku, możliwe rozserzenia: wav, mp3, ogg');
+                throw new WrongExtensionException('Niedozwolone rozszerzenie pliku, możliwe rozserzenia: wav, mp3, ogg');
             }
         }
 

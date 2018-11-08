@@ -2402,7 +2402,6 @@ class StatisticsController extends Controller
             $departments = Department_info::whereIn('id_dep_type', [1, 2])->get();
             $data = $this->getCoachingData($month, $year, (array)$dep_id);
 
-//            dd($data);
             return view('reportpage.ReportCoachingWeek')
                 ->with([
                     'departments' => $departments,
@@ -4050,16 +4049,22 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
 
     public function pageReportUnusedAccounts(){
         $user = Auth::user();
-        $data = StatisticsController::UnusedAccountsInfo(false);
+        $data = $this->UnusedAccountsInfo();
+
+        $userTypeIdsForTrainersReportOfUnusedAccounts = array_merge(StatisticsGlobalVariables::$userTypeIdsForTrainersReportOfUnusedAccounts, StatisticsGlobalVariables::$userTypeIdsForEveryData);
+        $userTypeIdsForManagersReportOfUnusedAccounts = array_merge(StatisticsGlobalVariables::$userTypeIdsForManagersReportOfUnusedAccounts, StatisticsGlobalVariables::$userTypeIdsForEveryData);
+        $userTypeIdsForDepartmentsReportOfUnusedAccounts = array_merge(StatisticsGlobalVariables::$userTypeIdsForDepartmentsReportOfUnusedAccounts, StatisticsGlobalVariables::$userTypeIdsForEveryData);
+        $userTypeIdsForEveryData = StatisticsGlobalVariables::$userTypeIdsForEveryData;
+
         return view('reportpage.accountReport.ReportUnusedAccount')
             ->with('department_info', $data['departments'])
             ->with('users_warning', $data['users_warning'])
             ->with('users_disable', $data['users_disable'])
             ->with('coaches', $data['coaches'])
-            ->with('user_type_ids_for_trainers_report', array_merge(StatisticsGlobalVariables::$userTypeIdsForTrainersReportOfUnusedAccounts, StatisticsGlobalVariables::$userTypeIdsForEveryData))
-            ->with('user_type_ids_for_managers_report', array_merge(StatisticsGlobalVariables::$userTypeIdsForManagersReportOfUnusedAccounts, StatisticsGlobalVariables::$userTypeIdsForEveryData))
-            ->with('user_type_ids_for_departments_report', array_merge(StatisticsGlobalVariables::$userTypeIdsForDepartmentsReportOfUnusedAccounts, StatisticsGlobalVariables::$userTypeIdsForEveryData))
-            ->with('user_type_ids_for_every_data', StatisticsGlobalVariables::$userTypeIdsForEveryData)
+            ->with('user_type_ids_for_trainers_report', $userTypeIdsForTrainersReportOfUnusedAccounts)
+            ->with('user_type_ids_for_managers_report', $userTypeIdsForManagersReportOfUnusedAccounts)
+            ->with('user_type_ids_for_departments_report', $userTypeIdsForDepartmentsReportOfUnusedAccounts)
+            ->with('user_type_ids_for_every_data', $userTypeIdsForEveryData)
             ->with('sendingMails',  $data['sendingMails'])
             ->with('user_to_show', $user);
     }
@@ -4072,24 +4077,22 @@ public function getCoachingDataAllLevel($month, $year, $dep_id,$level_coaching,$
 
     }*/
 
-    public static function UnusedAccountsInfo($sendingMails = true){
+    private function UnusedAccountsInfo(){
         $date_warning = date("Y-m-d",strtotime('-7 Days'));
         $date_disable = date("Y-m-d",strtotime('-14 Days'));
-        //Pobranie użytkowników do zakończenia umowy
+        $sendingMails = false;
 
+
+        //Pobranie użytkowników do zakończenia umowy
         $users_warning = User::
         where('last_login','<', $date_warning)
             ->whereIn('users.user_type_id', [1, 2])
             ->where('status_work', '=', 1)
             ->get();
 
-        $users_disable = User::whereIn('users.user_type_id', [1, 2]);
-        if($sendingMails){
-            $users_disable->where('last_login', '<', $date_disable)
-                ->where('status_work', '=', 1);
-        }else{
-            $users_disable->where('end_work', date('Y-m-d'))->where('disabled_by_system', 1);
-        }
+        $users_disable = User::whereIn('users.user_type_id', [1, 2])
+            ->where('end_work', date('Y-m-d'))
+            ->where('disabled_by_system', 1);
 
         $users_disable = $users_disable->get();
         $departments = Department_info::all();

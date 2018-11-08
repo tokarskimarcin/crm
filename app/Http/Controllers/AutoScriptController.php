@@ -88,7 +88,7 @@ class AutoScriptController extends Controller
         $actualNewUsersRecords = NewUsersRbhReport::where('created_at', '=', $today)->get();
 
         foreach($usersWorkingLessThanNewUsers as $user) {
-            if($usersWorkingLessThanNewUsers->where('user_id', '=', $user->id_user)->where('created_at', '=', $today)->isEmpty()) { //there is no duplicates
+            if($actualNewUsersRecords->where('user_id', '=', $user->id_user)->where('created_at', '=', $today)->isEmpty()) { //there is no duplicates
                 $newUsersReport = new NewUsersRbhReport();
                 $newUsersReport->user_id = $user->id_user;
                 $newUsersReport->department_info_id = $user->dep_id;
@@ -103,6 +103,7 @@ class AutoScriptController extends Controller
                 $newUsersReport->save();
             }
             else {
+
                 $updatedRecord = $actualNewUsersRecords->where('user_id', '=', $user->id_user)->where('created_at', '=', $today)->first();
                 $updatedRecord->success = $user->success;
                 $updatedRecord->sec_sum = $user->sec_sum;
@@ -525,7 +526,7 @@ class AutoScriptController extends Controller
     {
         ini_set('max_execution_time', 10000);
         $today = date('Y-m-d');
-        $data = StatisticsController::UnusedAccountsInfo();
+        $data = $this->UnusedAccountsInfo();
         // disabling accounts
         foreach ($data['users_disable'] as $user) {
             /**
@@ -567,13 +568,19 @@ class AutoScriptController extends Controller
 
         //check if should send mails
         if(count($data['users_warning']) > 0 || count($data['users_disable']) > 0){
+
+            $userTypeIdsForTrainersReportOfUnusedAccounts = array_merge(StatisticsGlobalVariables::$userTypeIdsForTrainersReportOfUnusedAccounts, StatisticsGlobalVariables::$userTypeIdsForEveryData);
+            $userTypeIdsForManagersReportOfUnusedAccounts = array_merge(StatisticsGlobalVariables::$userTypeIdsForManagersReportOfUnusedAccounts, StatisticsGlobalVariables::$userTypeIdsForEveryData);
+            $userTypeIdsForDepartmentsReportOfUnusedAccounts = array_merge(StatisticsGlobalVariables::$userTypeIdsForDepartmentsReportOfUnusedAccounts, StatisticsGlobalVariables::$userTypeIdsForEveryData);
+            $userTypeIdsForEveryData = StatisticsGlobalVariables::$userTypeIdsForEveryData;
+
             $department_info =  Department_info::all();
             $data_to_send = array_merge($data, [
                 'department_info' => $department_info,
-                'user_type_ids_for_trainers_report' => array_merge(StatisticsGlobalVariables::$userTypeIdsForTrainersReportOfUnusedAccounts, StatisticsGlobalVariables::$userTypeIdsForEveryData),
-                'user_type_ids_for_managers_report' => array_merge(StatisticsGlobalVariables::$userTypeIdsForManagersReportOfUnusedAccounts, StatisticsGlobalVariables::$userTypeIdsForEveryData),
-                'user_type_ids_for_departments_report' => array_merge(StatisticsGlobalVariables::$userTypeIdsForDepartmentsReportOfUnusedAccounts, StatisticsGlobalVariables::$userTypeIdsForEveryData),
-                'user_type_ids_for_every_data' => StatisticsGlobalVariables::$userTypeIdsForEveryData]);
+                'user_type_ids_for_trainers_report' => $userTypeIdsForTrainersReportOfUnusedAccounts,
+                'user_type_ids_for_managers_report' => $userTypeIdsForManagersReportOfUnusedAccounts,
+                'user_type_ids_for_departments_report' => $userTypeIdsForDepartmentsReportOfUnusedAccounts,
+                'user_type_ids_for_every_data' => $userTypeIdsForEveryData]);
             $title = 'Raport Nieaktywnych Kont Konsultantów '.date('Y-m-d');
 
 
@@ -655,4 +662,45 @@ class AutoScriptController extends Controller
 
     }
 
+    private function UnusedAccountsInfo(){
+        $date_warning = date("Y-m-d",strtotime('-7 Days'));
+        $date_disable = date("Y-m-d",strtotime('-14 Days'));
+        $sendingMails = true;
+
+        //Pobranie użytkowników do zakończenia umowy
+
+        $users_warning = User::
+        where('last_login','<', $date_warning)
+            ->whereIn('users.user_type_id', [1, 2])
+            ->where('status_work', '=', 1)
+            ->get();
+
+        $users_disable = User::whereIn('users.user_type_id', [1, 2])
+            ->where('last_login', '<', $date_disable)
+                ->where('status_work', '=', 1);
+
+        $users_disable = $users_disable->get();
+        $departments = Department_info::all();
+
+        $coach_ids = collect(array_merge($users_warning->pluck('coach_id')->unique()->toArray(), $users_disable->pluck('coach_id')->unique()->toArray()))->unique()->toArray();
+        $coaches = User::whereIn('id',$coach_ids)->get();
+
+
+        $managers_id = Department_info::whereIn('id',$coaches->pluck('department_info_id')->unique()->toArray())->get()->pluck('menager_id')->toArray();
+        $regionalManagers_id = Department_info::whereIn('id',$coaches->pluck('department_info_id')->unique()->toArray())->get()->pluck('regionalManager_id')->toArray();
+        $managers = User::whereIn('id',array_merge($managers_id,$regionalManagers_id))->get();
+        $cadre = User::where('user_type_id', 10)->where('status_work',1)->get();
+        $administrationManagers = User::where('user_type_id', 23)->where('status_work',1)->get();
+        $data = [
+            'users_warning'     => $users_warning,
+            'users_disable'     => $users_disable,
+            'departments'       => $departments,
+            'coaches'           => $coaches,
+            'managers'          => $managers,
+            'cadre'             => $cadre,
+            'administrationManagers'          => $administrationManagers,
+            'sendingMails'     => $sendingMails
+        ];
+        return $data;
+    }
 }

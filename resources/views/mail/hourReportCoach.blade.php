@@ -49,10 +49,14 @@
                         @php
                             $flag = null;
                         @endphp
-                        @if($onlyNewUse == 1)
+                        @if($onlyNewUser == 1)
+                            @php
                             $flag = in_array($item->user_id, $onlyUserID);
-                        @elseif ($onlyNewUse == 2)
+                            @endphp
+                        @elseif ($onlyNewUser == 2)
+                            @php
                             $flag = !in_array($item->user_id, $onlyUserID);
+                            @endphp
                         @endif
                         @if($flag && count($onlyUserID) != 0)
                             @php

@@ -17,6 +17,7 @@
 @extends('layouts.main')
 @section('style')
     <link rel="stylesheet" href="{{asset('/assets/css/VCtooltip.css')}}">
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/1.5.2/css/buttons.dataTables.min.css">
     <style>
         .DTFC_LeftHeadWrapper thead tr, .DTFC_LeftBodyWrapper thead tr{
             background: white;
@@ -143,6 +144,7 @@
                             <th class="yellow">Śr. liczba par</th>
                             <th class="yellow">Liczba rekordów</th>
                             <th class="yellow">Czas na rekord</th>
+                            <th class="yellow">% janki</th>
                             <th class="yellow">% zgód</th>
                             <th class="yellow">% niepewnych</th>
                             <th class="yellow">% odmów</th>
@@ -211,6 +213,7 @@
                             <th class="yellow">Śr. liczba par</th>
                             <th class="yellow">Liczba rekordów</th>
                             <th class="yellow">Czas na rekord</th>
+                            <th class="yellow">% janki</th>
                             <th class="yellow">% zgód</th>
                             <th class="yellow">% niepewnych</th>
                             <th class="yellow">% odmów</th>
@@ -230,9 +233,13 @@
 
 @section('script')
     <script src="{{ asset('/js/moment.js')}}"></script>
+    <script src="https://cdn.datatables.net/buttons/1.5.2/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.flash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.html5.min.js"></script>
     <script>
         $(document).ready(function () {
-            const columnsNr = {'lp':0,'name':1,'shows':2,'provision':3,'avgTimeOnRecord': 15,'dateGroup':19,'secondGroup':20};
+            const columnsNr = {'lp':0,'name':1,'shows':2,'provision':3,'avgTimeOnRecord': 15,'dateGroup':20,'secondGroup':21};
             let hiddenColumns = [columnsNr['dateGroup'], columnsNr['secondGroup']];
             let groupColumns = [columnsNr['dateGroup'], columnsNr['secondGroup']];
             let VARIABLES  = {
@@ -278,6 +285,10 @@
                             scrollCollapse: true,
                             processing: true,
                             paging: false,
+                            dom: 'Bftipr',
+                            buttons: [
+                                'csv', 'excel'
+                            ],
                             language: {
                                 "url": "//cdn.datatables.net/plug-ins/1.10.16/i18n/Polish.json"
                             },
@@ -311,6 +322,9 @@
                                 {data: 'recordsCount'},
                                 {data: 'avgTimeOnRecord'},
                                 {data: function (data) {
+                                        return data.jankyPct+'%';
+                                    }},
+                                {data: function (data) {
                                         return data.agreementPct+'%';
                                     }},
                                 {data: function (data) {
@@ -327,9 +341,9 @@
                                 FUNCTIONS.setColumnClass([4,5],'green', VARIABLES.DATA_TABLES.departmentsConfirmation.table);
                                 FUNCTIONS.setColumnClass([6,7],'yellow', VARIABLES.DATA_TABLES.departmentsConfirmation.table);
                                 FUNCTIONS.setColumnClass([8,11],'red', VARIABLES.DATA_TABLES.departmentsConfirmation.table);
-                                FUNCTIONS.insertGroupRows(groupColumns[0], this, 19, {background:'#444444', color:'white', 'font-weight':'bold'});
+                                FUNCTIONS.insertGroupRows(groupColumns[0], this, 20, {background:'#444444', color:'white', 'font-weight':'bold'});
                                 if(VARIABLES.jQElements.trainersGroupingCheckboxjQ.get(0).checked) {
-                                    FUNCTIONS.insertGroupRows(groupColumns[1], this, 19, {
+                                    FUNCTIONS.insertGroupRows(groupColumns[1], this, 20, {
                                         background: '#ffe599',
                                         'font-weight': 'bold'
                                     });
@@ -383,7 +397,7 @@
 
                         },
                         ajaxReload: function () {
-                            FUNCTIONS.ajaxReload(this);
+                            return FUNCTIONS.ajaxReload(this);
                         }
                     },
                     allDepartmentsConfirmation: {
@@ -398,6 +412,10 @@
                             scrollCollapse: true,
                             processing: true,
                             paging: false,
+                            dom: 'Bftipr',
+                            buttons: [
+                                'csv', 'excel'
+                            ],
                             language: {
                                 "url": "//cdn.datatables.net/plug-ins/1.10.16/i18n/Polish.json"
                             },
@@ -431,6 +449,9 @@
                                 {data: 'recordsCount'},
                                 {data: 'avgTimeOnRecord'},
                                 {data: function (data) {
+                                        return data.jankyPct+'%';
+                                    }},
+                                {data: function (data) {
                                         return data.agreementPct+'%';
                                     }},
                                 {data: function (data) {
@@ -447,7 +468,7 @@
                                 FUNCTIONS.setColumnClass([4,5],'green', VARIABLES.DATA_TABLES.allDepartmentsConfirmation.table);
                                 FUNCTIONS.setColumnClass([6,7],'yellow', VARIABLES.DATA_TABLES.allDepartmentsConfirmation.table);
                                 FUNCTIONS.setColumnClass([8,11],'red', VARIABLES.DATA_TABLES.allDepartmentsConfirmation.table);
-                                FUNCTIONS.insertGroupRows(groupColumns[0], this, 19, {background:'#444444', color:'white', 'font-weight':'bold'});
+                                FUNCTIONS.insertGroupRows(groupColumns[0], this, 20, {background:'#444444', color:'white', 'font-weight':'bold'});
                                 FUNCTIONS.insertSumRowAfterGroup(false, this, VARIABLES.DATA_TABLES.allDepartmentsConfirmation.data.allDepartmentsConfirmationStatisticsSums);
 
                                 //coloring to green date(week) group rows if week didn't end
@@ -480,7 +501,7 @@
 
                         },
                         ajaxReload: function () {
-                            FUNCTIONS.ajaxReload(this);
+                            return FUNCTIONS.ajaxReload(this);
                         }
                     }
                 }
@@ -673,6 +694,7 @@
                                .append($('<td>').addClass('gray').text(data.avgPairs))
                                .append($('<td>').addClass('gray').text(data.recordsCount))
                                .append($('<td>').addClass('gray').text(data.avgTimeOnRecord))
+                                .append($('<td>').addClass('gray').text(data.jankyPct+'%'))
                                .append($('<td>').addClass('gray').text(data.agreementPct+'%'))
                                .append($('<td>').addClass('gray').text(data.uncertainPct+'%'))
                                .append($('<td>').addClass('gray').text(data.refusalPct+'%'));
@@ -688,7 +710,7 @@
                 ajaxReload: function(dataTable){
                     let processing = $('#'+dataTable.table.attr('id')+'_processing');
                     processing.show();
-                    dataTable.getData().done(function (response) {
+                    return dataTable.getData().then(function (response) {
                         dataTable.setTableData(response);
                         processing.hide();
                     });
@@ -746,12 +768,18 @@
                 }
             };
 
+
+            let reloadDatatableDeferred = $.Deferred();
             VARIABLES.DATA_TABLES.departmentsConfirmation.dataTable.on('init.dt', function () {
-                VARIABLES.DATA_TABLES.departmentsConfirmation.ajaxReload();
+                VARIABLES.DATA_TABLES.departmentsConfirmation.ajaxReload().then(function () {
+                    reloadDatatableDeferred.resolve();
+                });
             });
 
             VARIABLES.DATA_TABLES.allDepartmentsConfirmation.dataTable.on('init.dt', function () {
-                VARIABLES.DATA_TABLES.allDepartmentsConfirmation.ajaxReload();
+                reloadDatatableDeferred.done(function () {
+                    VARIABLES.DATA_TABLES.allDepartmentsConfirmation.ajaxReload();
+                });
             });
             FUNCTIONS.EVENT_HANDLERS.callEvents();
             resizeDatatablesOnMenuToggle([VARIABLES.DATA_TABLES.departmentsConfirmation.dataTable, VARIABLES.DATA_TABLES.allDepartmentsConfirmation.dataTable]);

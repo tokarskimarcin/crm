@@ -53,9 +53,8 @@ class FireWallController extends Controller
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
     public function firewallPrivilegesGet() {
-        $firewall_privileges = FirewallPrivileges::all();
+        $firewall_privileges = FirewallPrivileges::with('user')->get();
         $users = User::onlyCadre()->activeUser()->orderBy('last_name')->get();
-
         return view('admin.firewallPrivileges')
             ->with('firewall_privileges', $firewall_privileges)
             ->with('users', $users);

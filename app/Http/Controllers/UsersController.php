@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Agencies;
+use App\Candidate;
 use App\CoachChange;
 use App\CoachHistory;
 use App\Department_info;
@@ -105,7 +106,6 @@ class UsersController extends Controller
         $user->username = $request->username;
         $user->first_name = $request->first_name;
         $user->last_name = $request->last_name;
-        $user->created_by = Auth::user()->id;
         if ($request->email == null) {
             $user->email_off = null;
         } else {
@@ -149,6 +149,20 @@ class UsersController extends Controller
         }
         $user->dating_type = ($request->dating_type != null) ? $request->dating_type : 0;
         $user->candidate_id = ($request->candidate_id != null) ? $request->candidate_id : null;
+
+        if($request->candidate_id) { //candidate_id is known
+            $candidate = Candidate::select('cadre_id')->where('id', '=', $request->candidate_id)->first();
+            if($candidate) { //candidate has been found. => assigning created_by field to HR employee who started recruitment process.
+                $user->created_by = $candidate->cadre_id;
+            }
+            else { //candidate hasn't been found
+                $user->created_by = Auth::user()->id;
+            }
+        }
+        else { //candidate_id is unknown
+            $user->created_by = Auth::user()->id;
+        }
+
         $user->start_work = $request->start_date;
         $user->status_work = 1;
         $user->phone = $request->phone;
@@ -504,13 +518,13 @@ class UsersController extends Controller
                         $user->login_phone = null;
                         $userEmployment->save();
                     } else { // user has no history in user_employment_status
-                        $user->login_phone = null;
                         $userEmployment2 = new UserEmploymentStatus();
                         if ($request->login_phone == 0) {
-                            $userEmployment2->pbx_id = null;
+                                $userEmployment2->pbx_id = $user->login_phone;
                         } else {
                             $userEmployment2->pbx_id = $request->login_phone;
                         }
+                        $user->login_phone = null;
                         $userEmployment2->user_id = $user->id;
                         $userEmployment2->pbx_id_add_date = $request->stop_date;
                         $userEmployment2->pbx_id_remove_date = $request->stop_date;
@@ -626,6 +640,26 @@ class UsersController extends Controller
             $user->disabled_by_system = 0;
         } else {
             $user->end_work = $request->stop_date;
+            if($user->user_type_id == 7){
+                Department_info::where('menager_id', $user->id)->update(['menager_id' => null]);
+            }
+            if($user->user_type_id == 17){
+                Department_info::where('menager_id', $user->id)->update(['menager_id' => null]);
+                Department_info::where('regionalManager_id', $user->id)->update(['regionalManager_id' => null]);
+            }
+            if($user->user_type_id == 15){
+                Department_info::where('director_id', $user->id)->update(['director_id' => null]);
+            }
+            if($user->user_type_id == 14){
+                Department_info::where('director_hr_id', $user->id)->update(['director_hr_id' => null]);
+            }
+            if($user->user_type_id == 21){
+                Department_info::where('instructor_regional_id', $user->id)->update(['instructor_regional_id' => null]);
+            }
+            if($user->user_type_id == 5){
+                Department_info::where('hr_id', $user->id)->update(['hr_id' => null]);
+                Department_info::where('hr_id_second', $user->id)->update(['hr_id_second' => null]);
+            }
         }
         if ($request->password != '') {
             $user->password = bcrypt($request->password);

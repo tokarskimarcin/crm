@@ -11,6 +11,7 @@ namespace App\Utilities\DataProcessing;
 use App\Http\Controllers\Statistics\DepartmentsConfirmationStatisticsController;
 use App\Utilities\Dates\SecondsToTime;
 use App\Utilities\Salary\ProvisionLevels;
+use function foo\func;
 
 class ConfirmationStatistics
 {
@@ -19,7 +20,9 @@ class ConfirmationStatistics
      * 'concat(trainer.first_name," ",trainer.last_name) as confirmingUserTrainerName'
      * @param $dividedMonth - array that every cell has object with `firstDay` and `lastDay` fields
      * @param string $secondGrouping - pointing on column that should be grouped after weeks grouping
+     * @param bool $statisticsForPayment
      * @return array
+     * @throws \Exception
      */
     public static function getConsultantsConfirmationStatisticsForMonth($clientRouteInfo, $dividedMonth, $secondGrouping = 'confirmingUserTrainerName'){
         $clientRouteInfo = $clientRouteInfo->sortBy('confirmDate');
@@ -32,8 +35,15 @@ class ConfirmationStatistics
                 }
             }
         }
+
+        $usersPbxConfirmationStatistics = DepartmentsConfirmationStatisticsController::getEveryPbxConfirmationReport($clientRouteInfo->pluck('confirmingUser')->unique()->toArray(),
+            (object)['firstDay' => $dividedMonth[0]->firstDay,
+                'lastDay' => $dividedMonth[count($dividedMonth)-1]->lastDay]);
+
+
         $confirmationStatistics = ['data'=>collect(),'sums'=>collect()];
         $clientRouteInfo = $clientRouteInfo->groupBy('dateGroup');
+
         foreach ($clientRouteInfo as $dateGroup => $clientRouteInfoByDateGroup){
             $dates = explode(' ',$dateGroup);
             $firstDay = explode('.',$dates[0]);
@@ -57,6 +67,10 @@ class ConfirmationStatistics
             $dateGroupSum->uncertainPct         = 0;
             $dateGroupSum->refusal              = 0;
             $dateGroupSum->refusalPct           = 0;
+            $dateGroupSum->janky                = 0;
+            $dateGroupSum->jankyPct             = 0;
+            $dateGroupSum->recordsClosed        = 0;
+
             $dateGroupTimeOnRecordSum      = 0;
             $dateGroupClosedRecordsSum     = 0;
             $dateGroupFrequencySum  = 0;
@@ -80,6 +94,10 @@ class ConfirmationStatistics
                 $secondGroupSum->uncertainPct         = 0;
                 $secondGroupSum->refusal              = 0;
                 $secondGroupSum->refusalPct           = 0;
+                $secondGroupSum->janky                = 0;
+                $secondGroupSum->jankyPct             = 0;
+                $secondGroupSum->recordsClosed        = 0;
+
                 $secondGroupTimeOnRecordSum            = 0;
                 $secondGroupClosedRecordsSum           = 0;
                 $secondGroupFrequencySum  = 0;
@@ -109,6 +127,9 @@ class ConfirmationStatistics
                     $consultantConfirmationStatistics->uncertainPct         = 0;
                     $consultantConfirmationStatistics->refusal              = 0;
                     $consultantConfirmationStatistics->refusalPct           = 0;
+                    $consultantConfirmationStatistics->janky                = 0;
+                    $consultantConfirmationStatistics->jankyPct             = 0;
+                    $consultantConfirmationStatistics->recordsClosed        = 0;
                     $timeOnRecordSum            = 0;
                     $closedRecordsSum           = 0;
                     $consultantFrequencySum     = 0;
@@ -121,18 +142,22 @@ class ConfirmationStatistics
                         //consultant sums
                         $consultantConfirmationStatistics->provision += ProvisionLevels::get('consultant', $confirmationInfo->frequency);
                         //sums for average
-                        if($confirmationInfo->frequency > 19){
-                            $consultantConfirmationStatistics->successful += 1;
-                        }else if($confirmationInfo->frequency > 15){
-                            $consultantConfirmationStatistics->neutral += 1;
-                        }else if($confirmationInfo->frequency > 11){
-                            $consultantConfirmationStatistics->unsuccessful += 1;
-                        }else{
-                            $consultantConfirmationStatistics->unsuccessfulBadly += 1;
+                        if($confirmationInfo->frequency !== null){
+                            if($confirmationInfo->frequency > 19){
+                                $consultantConfirmationStatistics->successful += 1;
+                            }else if($confirmationInfo->frequency > 15){
+                                $consultantConfirmationStatistics->neutral += 1;
+                            }else if($confirmationInfo->frequency > 11){
+                                $consultantConfirmationStatistics->unsuccessful += 1;
+                            }else{
+                                $consultantConfirmationStatistics->unsuccessfulBadly += 1;
+                            }
+                            $consultantFrequencySum += $confirmationInfo->frequency;
+                        }
+                        if($confirmationInfo->pairs !== null) {
+                            $consultantPairsSum += $confirmationInfo->pairs;
                         }
                         $consultantConfirmationStatistics->recordsCount += $confirmationInfo->actual_success;
-                        $consultantFrequencySum += $confirmationInfo->frequency;
-                        $consultantPairsSum  += $confirmationInfo->pairs;
                     }
                     //counting percentages for consultant
                     $consultantConfirmationStatistics->successfulPct        = round($consultantConfirmationStatistics->successful*100/$consultantConfirmationStatistics->shows, 2);
@@ -143,7 +168,11 @@ class ConfirmationStatistics
                     $consultantConfirmationStatistics->avgFrequency     = round($consultantFrequencySum/$consultantConfirmationStatistics->shows,2);
                     $consultantConfirmationStatistics->avgPairs         = round($consultantPairsSum/$consultantConfirmationStatistics->shows,2);
 
-                    $consultantConfirmationReports = [];//DepartmentsConfirmationStatisticsController::getEveryPbxConfirmationReport($consultantConfirmationStatistics->confirmingUser, $dateGroupSum);
+
+                    $consultantConfirmationReports = $usersPbxConfirmationStatistics->where('user_id', $consultantConfirmationData[0]->confirmingUser)
+                        ->filter(function ($value, $key) use ($dateGroupSum){
+                        return strtotime($value['report_date']) >= strtotime($dateGroupSum->firstDay) && strtotime($value['report_date']) <= strtotime($dateGroupSum->lastDay);
+                    });
 
                     foreach($consultantConfirmationReports as $confirmationReport){
                         if(!is_null($confirmationReport['time_on_record'])){
@@ -151,15 +180,18 @@ class ConfirmationStatistics
                             $timeOnRecordSum += ($timeOnRecord[0]*3600 + $timeOnRecord[1]*60 + $timeOnRecord[2])*$confirmationReport['records_closed'];
                             $closedRecordsSum += $confirmationReport['records_closed'];
                         }
+                        $consultantConfirmationStatistics->recordsClosed += $confirmationReport['records_closed'];
                         $consultantConfirmationStatistics->agreement += $confirmationReport['records_agreement'];
                         $consultantConfirmationStatistics->uncertain += $confirmationReport['records_uncertain'];
                         $consultantConfirmationStatistics->refusal += $confirmationReport['records_refusal'];
+                        $consultantConfirmationStatistics->janky += $confirmationReport['records_janky'];
                     }
                     $consultantConfirmationStatistics->avgTimeOnRecord      = SecondsToTime::get($closedRecordsSum > 0 ? round($timeOnRecordSum/$closedRecordsSum,0) : 0);
 
-                    $consultantConfirmationStatistics->agreementPct         = $consultantConfirmationStatistics->recordsCount > 0 ? round($consultantConfirmationStatistics->agreement*100/$consultantConfirmationStatistics->recordsCount, 2) : 0;
-                    $consultantConfirmationStatistics->uncertainPct         = $consultantConfirmationStatistics->recordsCount > 0 ? round($consultantConfirmationStatistics->uncertain*100/$consultantConfirmationStatistics->recordsCount, 2) : 0;
-                    $consultantConfirmationStatistics->refusalPct           = $consultantConfirmationStatistics->recordsCount > 0 ? round($consultantConfirmationStatistics->refusal*100/$consultantConfirmationStatistics->recordsCount, 2) : 0;
+                    $consultantConfirmationStatistics->agreementPct         = $consultantConfirmationStatistics->recordsClosed > 0 ? round($consultantConfirmationStatistics->agreement*100/$consultantConfirmationStatistics->recordsClosed, 2) : 0;
+                    $consultantConfirmationStatistics->uncertainPct         = $consultantConfirmationStatistics->recordsClosed > 0 ? round($consultantConfirmationStatistics->uncertain*100/$consultantConfirmationStatistics->recordsClosed, 2) : 0;
+                    $consultantConfirmationStatistics->refusalPct           = $consultantConfirmationStatistics->recordsClosed > 0 ? round($consultantConfirmationStatistics->refusal*100/$consultantConfirmationStatistics->recordsClosed, 2) : 0;
+                    $consultantConfirmationStatistics->jankyPct             = $consultantConfirmationStatistics->recordsClosed > 0 ? round($consultantConfirmationStatistics->janky*100/$consultantConfirmationStatistics->recordsClosed, 2) : 0;
 
                     //adding consultant to data
                     $confirmationStatistics['data']->push($consultantConfirmationStatistics);
@@ -176,6 +208,8 @@ class ConfirmationStatistics
                     $secondGroupSum->agreement              += $consultantConfirmationStatistics->agreement;
                     $secondGroupSum->uncertain              += $consultantConfirmationStatistics->uncertain;
                     $secondGroupSum->refusal                += $consultantConfirmationStatistics->refusal;
+                    $secondGroupSum->janky                  += $consultantConfirmationStatistics->janky;
+                    $secondGroupSum->recordsClosed          += $consultantConfirmationStatistics->recordsClosed;
 
 
                     //second group sums for average
@@ -190,9 +224,10 @@ class ConfirmationStatistics
                 $secondGroupSum->unsuccessfulPct      = round($secondGroupSum->unsuccessful*100/$secondGroupSum->shows, 2);
                 $secondGroupSum->unsuccessfulBadlyPct = round($secondGroupSum->unsuccessfulBadly*100/$secondGroupSum->shows, 2);
 
-                $secondGroupSum->agreementPct         = $secondGroupSum->recordsCount > 0 ? round($secondGroupSum->agreement*100/$secondGroupSum->recordsCount, 2) : 0;
-                $secondGroupSum->uncertainPct         = $secondGroupSum->recordsCount > 0 ? round($secondGroupSum->uncertain*100/$secondGroupSum->recordsCount, 2) : 0;
-                $secondGroupSum->refusalPct           = $secondGroupSum->recordsCount > 0 ? round($secondGroupSum->refusal*100/$secondGroupSum->recordsCount, 2) : 0;
+                $secondGroupSum->agreementPct         = $secondGroupSum->recordsClosed > 0 ? round($secondGroupSum->agreement*100/$secondGroupSum->recordsClosed, 2) : 0;
+                $secondGroupSum->uncertainPct         = $secondGroupSum->recordsClosed > 0 ? round($secondGroupSum->uncertain*100/$secondGroupSum->recordsClosed, 2) : 0;
+                $secondGroupSum->refusalPct           = $secondGroupSum->recordsClosed > 0 ? round($secondGroupSum->refusal*100/$secondGroupSum->recordsClosed, 2) : 0;
+                $secondGroupSum->jankyPct             = $secondGroupSum->recordsClosed > 0 ? round($secondGroupSum->janky*100/$secondGroupSum->recordsClosed, 2) : 0;
 
                 //counting averages for second group
                 $secondGroupSum->avgTimeOnRecord      = SecondsToTime::get($secondGroupClosedRecordsSum > 0 ? round($secondGroupTimeOnRecordSum/$secondGroupClosedRecordsSum,0) : 0);
@@ -213,6 +248,8 @@ class ConfirmationStatistics
                 $dateGroupSum->agreement              += $secondGroupSum->agreement;
                 $dateGroupSum->uncertain              += $secondGroupSum->uncertain;
                 $dateGroupSum->refusal                += $secondGroupSum->refusal;
+                $dateGroupSum->janky                  += $secondGroupSum->janky;
+                $dateGroupSum->recordsClosed          += $secondGroupSum->recordsClosed;
 
                 //date sums for average
                 $dateGroupTimeOnRecordSum     += $secondGroupTimeOnRecordSum;
@@ -226,9 +263,11 @@ class ConfirmationStatistics
             $dateGroupSum->unsuccessfulPct      = round($dateGroupSum->unsuccessful*100/$dateGroupSum->shows, 2);
             $dateGroupSum->unsuccessfulBadlyPct = round($dateGroupSum->unsuccessfulBadly*100/$dateGroupSum->shows, 2);
 
-            $dateGroupSum->agreementPct         = $dateGroupSum->recordsCount > 0 ? round($dateGroupSum->agreement*100/$dateGroupSum->recordsCount, 2) : 0;
-            $dateGroupSum->uncertainPct         = $dateGroupSum->recordsCount > 0 ? round($dateGroupSum->uncertain*100/$dateGroupSum->recordsCount, 2) : 0;
-            $dateGroupSum->refusalPct           = $dateGroupSum->recordsCount > 0 ? round($dateGroupSum->refusal*100/$dateGroupSum->recordsCount, 2) : 0;
+            $dateGroupSum->agreementPct         = $dateGroupSum->recordsClosed > 0 ? round($dateGroupSum->agreement*100/$dateGroupSum->recordsClosed, 2) : 0;
+            $dateGroupSum->uncertainPct         = $dateGroupSum->recordsClosed > 0 ? round($dateGroupSum->uncertain*100/$dateGroupSum->recordsClosed, 2) : 0;
+            $dateGroupSum->refusalPct           = $dateGroupSum->recordsClosed > 0 ? round($dateGroupSum->refusal*100/$dateGroupSum->recordsClosed, 2) : 0;
+            $dateGroupSum->jankyPct             = $dateGroupSum->recordsClosed > 0 ? round($dateGroupSum->janky*100/$dateGroupSum->recordsClosed, 2) : 0;
+
             //counting averages for date
             $dateGroupSum->avgTimeOnRecord      = SecondsToTime::get($dateGroupClosedRecordsSum > 0 ? round($dateGroupTimeOnRecordSum/$dateGroupClosedRecordsSum,0) : 0);
             $dateGroupSum->avgFrequency     = round($dateGroupFrequencySum/$dateGroupSum->shows,2);

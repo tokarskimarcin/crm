@@ -1,6 +1,10 @@
 .category, .playlist-category {
     box-shadow: 0 0 10px 10px white inset;
-    border-radius: 4%;
+    /*border-radius: 4%;*/
+    /*border: 0.2em solid rgb(125, 125, 125);*/
+
+    background: gray;
+    text-shadow: 2px 2px 2px #3a3a3a, -1px -1px 2px #3a3a3a;
 
     display: flex;
     align-items: center;
@@ -47,7 +51,6 @@
 .center {
     font-size: 1.3em;
     color: white;
-    font-family: Comic Sans MS;
 }
 
 .link {
@@ -71,7 +74,6 @@
     .center {
         font-size: 1.6em;
         color: white;
-        font-family: Comic Sans MS;
     }
 
     @keyframes largeText {
@@ -108,7 +110,6 @@
     .center {
         font-size: 2em;
         color: white;
-        font-family: Comic Sans MS;
     }
 
     @keyframes largeText {
