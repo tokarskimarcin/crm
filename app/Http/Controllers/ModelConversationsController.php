@@ -22,7 +22,7 @@ class ModelConversationsController extends Controller
 
     private $adminPanelAccessArr = [3, 13, 15]; //Array of privilaged user types
     private $superUserDepartmentType = 6; //see all stuff from other departments
-    private $privilagedUser = []; //array of privilaged user_id
+    private $privilagedUser = [5122, 3935]; //array of privilaged user_id
 
     public function modelConversationMenuGet() {
         $user = Auth::user();
