@@ -2086,7 +2086,7 @@ class FinancesController extends Controller
                         date('Y.m.d',strtotime($employeeOfTheWeek->first_day_week)).
                         ' - '.
                         date('Y.m.d',strtotime($employeeOfTheWeek->last_day_week)).
-                        ' Miejsce '.$employeeBonus['bonusPosition'].'#';
+                        ' Miejsce #'.$employeeBonus['bonusPosition'];
                     $penaltyBonus->id_manager = Auth::user()->id;
                     $penaltyBonus->event_date = $employeeOfTheWeek->last_day_week;
                     $penaltyBonus->save();
