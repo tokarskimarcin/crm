@@ -40,11 +40,13 @@ header {
     align-items: center;
     justify-content: flex-end;
 
-    font-size: 1.2em;
     color: white;
-    font-weight: bold;
-    font-family: verdana;
+    font-family: Futura, Trebuchet MS, Arial, sans-serif; font-size: 24px; font-style: normal; font-variant: normal; font-weight: 700; line-height: 26.4px;
 
+}
+
+.link a{
+    color: #f5e69d;
 }
 
 .link {
@@ -72,9 +74,9 @@ footer {
 }
 
 .center {
-    font-size: 2em;
+
     color: white;
-    font-family: Comic Sans MS;
+    font-family: Futura, Trebuchet MS, Arial, sans-serif; font-size: 24px; font-style: normal; font-variant: normal; font-weight: 700; line-height: 26.4px;
 }
 
 .center:hover {
