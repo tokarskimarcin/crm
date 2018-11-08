@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Agencies;
+use App\Candidate;
 use App\CoachChange;
 use App\CoachHistory;
 use App\Department_info;
@@ -105,7 +106,6 @@ class UsersController extends Controller
         $user->username = $request->username;
         $user->first_name = $request->first_name;
         $user->last_name = $request->last_name;
-        $user->created_by = Auth::user()->id;
         if ($request->email == null) {
             $user->email_off = null;
         } else {
@@ -149,6 +149,20 @@ class UsersController extends Controller
         }
         $user->dating_type = ($request->dating_type != null) ? $request->dating_type : 0;
         $user->candidate_id = ($request->candidate_id != null) ? $request->candidate_id : null;
+
+        if($request->candidate_id) { //candidate_id is known
+            $candidate = Candidate::select('cadre_id')->where('id', '=', $request->candidate_id)->first();
+            if($candidate) { //candidate has been found. => assigning created_by field to HR employee who started recruitment process.
+                $user->created_by = $candidate->cadre_id;
+            }
+            else { //candidate hasn't been found
+                $user->created_by = Auth::user()->id;
+            }
+        }
+        else { //candidate_id is unknown
+            $user->created_by = Auth::user()->id;
+        }
+
         $user->start_work = $request->start_date;
         $user->status_work = 1;
         $user->phone = $request->phone;
