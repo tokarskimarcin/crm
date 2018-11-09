@@ -141,6 +141,10 @@ class ModelConversationsController extends Controller
                 $items = ModelConvItems::getPlaylistItemsInfo(false, $user_department_type);
             }
         }
+        else if(in_array($user->id, $this->privilagedUser)) {
+            $playlists = ModelConvPlaylist::getPlaylistInfo(true);
+            $items = ModelConvItems::getPlaylistItemsInfo(false, $user_department_type);
+        }
         else { //this see regular user (only his own playlist)
             $playlists = ModelConvPlaylist::getPlaylistInfo(true);
             $items = ModelConvItems::getPlaylistItemsInfo(true);
