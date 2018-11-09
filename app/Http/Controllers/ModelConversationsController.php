@@ -281,7 +281,13 @@ class ModelConversationsController extends Controller
                 if(in_array($fileExtension, $acceptedExtensions)) {
                     if($acceptedLength) {
                         $picture_name = 'playlist_' . date('Y-m-d') . '_' . $clientOriginalName;
-                        $picture->storeAs('public',$picture_name);
+                        try {
+                            $picture->storeAs('public',$picture_name);
+                            new ActivityRecorder(array_merge(['T' => 'Dodanie zdjecia'], ['Nazwa' => $picture_name]), 250, 1);
+                        }
+                        catch(\Exception $error) {
+                            dd($error);
+                        }
                     }
                     else {
                         throw new TooLongNameException('Za długa nazwa przesyłanego pliku. Maksymalna długość nazwy pliku to 235 znaków');
@@ -307,7 +313,14 @@ class ModelConversationsController extends Controller
                 if(in_array($fileExtension, $acceptedExtensions)) {
                     if($acceptedLength) {
                         $picture_name = 'playlist_' . date('Y-m-d') . '_' . $clientOriginalName;
-                        $picture->storeAs('public',$picture_name);
+                        try {
+                            $picture->storeAs('public',$picture_name);
+                            new ActivityRecorder(array_merge(['T' => 'Dodanie zdjecia'], ['Nazwa' => $picture_name]), 250, 1);
+                        }
+                        catch(\Exception $error) {
+                            dd($error);
+                        }
+
                     }
                     else {
                         throw new TooLongNameException('Za długa nazwa przesyłanego pliku. Maksymalna długość nazwy pliku to 235 znaków');
@@ -374,7 +387,6 @@ class ModelConversationsController extends Controller
      * This method removes playlist item
      */
     public function managementPlaylistItemsDelete($id) {
-//        dd($id);
         return ModelConvPlaylistItem::smartDelete($id);
     }
 
@@ -433,7 +445,13 @@ class ModelConversationsController extends Controller
                     if(in_array($fileExtension, $acceptedExtensions)) {
                         if($acceptedLength) {
                             $picture_name = 'category_' . date('Y-m-d') . '_' . $clientOriginalName;
-                            $picture->storeAs('public',$picture_name);
+                            try {
+                                $picture->storeAs('public',$picture_name);
+                                new ActivityRecorder(array_merge(['T' => 'Dodanie zdjęcia'], ['nazwa' => $picture_name]), 250,1);
+                            }
+                            catch(\Exception $error) {
+                                dd($error);
+                            }
                         }
                         else {
                             throw new TooLongNameException('Za długa nazwa przesyłanego pliku. Maksymalna długość nazwy pliku to 235 znaków');
@@ -460,7 +478,13 @@ class ModelConversationsController extends Controller
                     if(in_array($fileExtension, $acceptedExtensions)) {
                         if($acceptedLength) {
                             $picture_name = 'category_' . date('Y-m-d') . '_' . $clientOriginalName;
-                            $picture->storeAs('public',$picture_name);
+                            try {
+                                $picture->storeAs('public',$picture_name);
+                                new ActivityRecorder(array_merge(['T' => 'Dodanie zdjęcia'], ['Nazwa' => $picture_name]), 250,1);
+                            }
+                            catch(\Exception $error) {
+                                dd($error);
+                            }
                         }
                         else {
                             throw new TooLongNameException('Za długa nazwa przesyłanego pliku. Maksymalna długość nazwy pliku to 235 znaków');
@@ -511,6 +535,12 @@ class ModelConversationsController extends Controller
 
             try {
                 $category->save();
+                if($toAdd == 1) {
+                    new ActivityRecorder(array_merge(['T' => 'Dodanie kategorii'], $category->toArray()),250,1);
+                }
+                else {
+                    new ActivityRecorder(array_merge(['T' => 'Edycja kategorii'], $category->toArray()),250,2);
+                }
             }
             catch(\Exception $error) {
                 new ActivityRecorder($error, 1, 6);
@@ -575,7 +605,13 @@ class ModelConversationsController extends Controller
             if(in_array($fileExtension, $acceptedExtensions)) {
                 if($acceptedLength) {
                     $sound_name = 'item_' . date('Y-m-d') . '_' . $clientOriginalName;
-                    $sound->storeAs('public',$sound_name);
+                    try {
+                        $sound->storeAs('public',$sound_name);
+                        new ActivityRecorder(array_merge(['T' => 'Dodanie nowej rozmowy'], ['nazwa' =>$sound_name]), 250,1);
+                    }
+                    catch(\Exception $error) {
+                        dd($error);
+                    }
                 }
                 else {
                     throw new TooLongNameException('Za długa nazwa przesyłanego pliku. Maksymalna długość nazwy pliku to 240 znaków');
@@ -615,6 +651,12 @@ class ModelConversationsController extends Controller
         $newItem->created_at = date('Y-m-d');
         try {
             $newItem->save();
+            if($toAdd == 1) { //creating new
+                new ActivityRecorder(array_merge(['T' => 'Dodanie rozmowy'], $newItem->toArray()),250,1);
+            }
+            else {
+                new ActivityRecorder(array_merge(['T' => 'Edycja rozmowy'], $newItem->toArray()),250,2);
+            }
         }
         catch(\Exception $error) {
             new ActivityRecorder($error, 1, 6);
