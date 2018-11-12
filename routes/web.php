@@ -1138,3 +1138,5 @@ Route::get('/modelConversationsGetPlaylistItems/{id}', 'ModelConversationsContro
 Route::delete('/modelConversationsGetPlaylistItems/{id}', 'ModelConversationsController@managementPlaylistItemsDelete');
 
 Route::post('/engraverForConfirmingAjaxUpdate', 'CrmRouteController@engraverForConfirmingAjaxUpdate')->name('api.engraverForConfirmingAjaxUpdate');
+
+Route::get('/setAllLinksTemp', 'AutoScriptController@setAllLinks');
