@@ -191,7 +191,7 @@
                     </div>
                     <div class="col-md-3">
                         <button class="btn btn-default" id="clearButton" style="width:100%;">
-                            <span class='glyphicon glyphicon-unchecked'></span> Wyczyść zaznaczenia <span class="badge">0</span></button>
+                            <span class='glyphicon glyphicon-unchecked'></span> Wyczyść zaznaczenia <span id="badge_clear" class="badge">0</span></button>
                     </div>
                 </div>
                 <div class="row">
@@ -273,6 +273,7 @@
                    selectedTypes: ['0'], //array of selected by user types
                    changeArr: [], //This array collect changed rows
                    clientRouteInfoIdArr: [], //array of client_route_info ids
+                   clientRouteInfoIdArr2: [], //array of client_route_info ids 2
                    arrayOfTableRows: [] //array of modal table rows
                },
                JSONS: {
@@ -369,7 +370,7 @@
            function colorRowAndAddIdToArray(id, row) {
                let flag = false;
                let iterator = 0; //in this variable we will store position of id in array, that has been found.
-               APP.arrays.clientRouteInfoIdArr.forEach(stringId => {
+               APP.arrays.clientRouteInfoIdArr2.forEach(stringId => {
                    if (id === stringId) {
                        flag = true; //true - this row is already checked
                    }
@@ -379,7 +380,7 @@
                });
 
                if (flag) {
-                   APP.arrays.clientRouteInfoIdArr.splice(iterator, 1);
+                   APP.arrays.clientRouteInfoIdArr2.splice(iterator, 1);
                    row.removeClass('colorRow');
 
                    //this part removes object with given id form arrayOfTableRows
@@ -393,17 +394,17 @@
 
                }
                else {
-                   APP.arrays.clientRouteInfoIdArr.push(id);
+                   APP.arrays.clientRouteInfoIdArr2.push(id);
                    row.addClass('colorRow');
                }
-               $('#clearButton').find('.badge').text(APP.arrays.clientRouteInfoIdArr.length);
+               $('#clearButton').find('.badge').text(APP.arrays.clientRouteInfoIdArr2.length);
            }
 
            /**
             * This function append modify button with proper name and remove it if necessary
             */
            function showModifyButton() {
-               if (APP.arrays.clientRouteInfoIdArr.length >0) {
+               if (APP.arrays.clientRouteInfoIdArr2.length > 0) {
                    APP.DOMElements.editButton.disabled = false;
                    addModalBodyContext();
                }
@@ -494,7 +495,7 @@
                    const header = new Headers();
                    header.append('X-CSRF-TOKEN', $('meta[name="csrf-token"]').attr('content'));
                    const data = new FormData();
-                   const JSONClientRouteInfoIdArr = JSON.stringify(APP.arrays.clientRouteInfoIdArr);
+                   const JSONClientRouteInfoIdArr = JSON.stringify(APP.arrays.clientRouteInfoIdArr2);
                    data.append('ids', JSONClientRouteInfoIdArr);
 
                    if(departmentValue != -1) {
@@ -515,7 +516,9 @@
                        .then(response => {
                            notify("Rekordy zostały zmienione!", "info");
                            table.ajax.reload();
-                           clearAllSelections(document);
+                           APP.arrays.clientRouteInfoIdArr2 = [];
+                           APP.DOMElements.editButton.disabled = true;
+                           $('#badge_clear').text(APP.arrays.clientRouteInfoIdArr2.length);
                        })
                        .catch(error => notify(error))
 
@@ -527,7 +530,7 @@
             * This function create one row of modal table and place it in rows array.
             */
            function createModalTableRow() {
-               APP.arrays.clientRouteInfoIdArr.forEach(item => {
+               APP.arrays.clientRouteInfoIdArr2.forEach(item => {
                    let addFlag = true;
                    let idItem = item;
                    APP.arrays.arrayOfTableRows.forEach(clientId => {
@@ -601,7 +604,7 @@
                theadElement.appendChild(tr1);
 
                infoTable.appendChild(theadElement);
-               APP.arrays.clientRouteInfoIdArr.forEach(item => {
+               APP.arrays.clientRouteInfoIdArr2.forEach(item => {
                    APP.arrays.arrayOfTableRows.forEach(tableRow => {
                        if(item == tableRow.id){
                            tbodyElement.appendChild(tableRow.row);
@@ -964,6 +967,7 @@
                            const clientRouteInfoId = givenRow.attr('data-id');
                            colorRowAndAddIdToArray(clientRouteInfoId, givenRow);
                            showModifyButton();
+                           console.log(APP.arrays.clientRouteInfoIdArr2);
                        }
                    });
 
@@ -1266,9 +1270,9 @@
                        notify("<strong>Wszystkie zaznaczenia zostały usuniete</strong>", 'success', 4000);
                    }
                }
-               APP.arrays.clientRouteInfoIdArr = [];
+               APP.arrays.clientRouteInfoIdArr2 = [];
                APP.arrays.arrayOfTableRows = [];
-               $(e.target).find('.badge').text(APP.arrays.clientRouteInfoIdArr.length);
+               $(e.target).find('.badge').text(APP.arrays.clientRouteInfoIdArr2.length);
            }
 
            /***************************END OF EVENT LISTENERS FUNCTIONS********************/

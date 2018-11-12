@@ -207,7 +207,6 @@ class DepartmentsConfirmationStatisticsController extends Controller
             }
         }
 
-        $consultantConfirmationReports = [];
         $confirmationReport = PbxConfirmationReport::whereIn('id',function ($query) use($consultantEmploymentStatus, $dateGroupSum){
             $query->select(DB::raw('max(id)'))
                 ->from('pbx_confirmation_report')

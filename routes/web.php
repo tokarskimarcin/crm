@@ -166,6 +166,9 @@ Route::POST('/getManagerId', 'CoachingController@getManagerId')->name('api.getMa
 Route::POST('/paymentStory', 'FinancesController@paymentStory')->name('api.paymentStory');
 Route::post('/employeeOfTheWeekSubViewAjax','FinancesController@employeeOfTheWeekSubViewAjax')->name('api.employeeOfTheWeekSubViewAjax');
 Route::post('/acceptBonusEmployeeOfTheWeekAjax','FinancesController@acceptBonusEmployeeOfTheWeekAjax')->name('api.acceptBonusEmployeeOfTheWeekAjax');
+Route::post('/getUserTypesOfDepartmentTypeAjax','FinancesController@getUserTypesOfDepartmentTypeAjax')->name('api.getUserTypesOfDepartmentTypeAjax');
+Route::post('/getDepartmentInfoAjax','FinancesController@getDepartmentInfoAjax')->name('api.getDepartmentInfoAjax');
+Route::post('/getTrainersAjax','FinancesController@getTrainersAjax')->name('api.getTrainersAjax');
 
 
 /* END FINANCES AJAX  */
@@ -1135,3 +1138,5 @@ Route::get('/modelConversationsGetPlaylistItems/{id}', 'ModelConversationsContro
 Route::delete('/modelConversationsGetPlaylistItems/{id}', 'ModelConversationsController@managementPlaylistItemsDelete');
 
 Route::post('/engraverForConfirmingAjaxUpdate', 'CrmRouteController@engraverForConfirmingAjaxUpdate')->name('api.engraverForConfirmingAjaxUpdate');
+
+Route::get('/setAllLinksTemp', 'AutoScriptController@setAllLinks');
