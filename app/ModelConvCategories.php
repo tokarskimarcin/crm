@@ -25,8 +25,15 @@ class ModelConvCategories extends Model
      * This method deletes playlist with its references
      */
     public static function deleteWithReferences($id) {
-        ModelConvCategories::find($id)->delete();
-        ModelConvItems::where('model_category_id', '=', $id)->update(['model_category_id' => null]);
+        try {
+            ModelConvCategories::find($id)->delete();
+            ModelConvItems::where('model_category_id', '=', $id)->update(['model_category_id' => null]);
+            new ActivityRecorder(['T:' => 'Usunięcie Kategori', 'ID_CATEGORY' => $id],250, 3);
+        }
+        catch(\Exception $error) {
+            echo $error;
+        }
+
     }
 
     /**
