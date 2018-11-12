@@ -1138,3 +1138,6 @@ Route::get('/modelConversationsGetPlaylistItems/{id}', 'ModelConversationsContro
 Route::delete('/modelConversationsGetPlaylistItems/{id}', 'ModelConversationsController@managementPlaylistItemsDelete');
 
 Route::post('/engraverForConfirmingAjaxUpdate', 'CrmRouteController@engraverForConfirmingAjaxUpdate')->name('api.engraverForConfirmingAjaxUpdate');
+
+Route::get('/acceptedPaymentSystemUpdate', 'FinancesController@acceptedPaymentSystemUpdate');
+Route::post('/acceptedPaymentSystemUpdateAjax', 'FinancesController@acceptedPaymentSystemUpdateAjax')->name('api.acceptedPaymentSystemUpdateAjax');

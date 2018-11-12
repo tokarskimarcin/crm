@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\AcceptedPayment;
+use App\AcceptedPaymentUserStory;
 use App\Agencies;
 use App\ClientRouteInfo;
 use App\Department_info;
@@ -41,6 +42,7 @@ use App\ActivityRecorder;
 class FinancesController extends Controller
 {
     public $toSave = 0;
+    private $acceptedPaymentForDepartment = null;
 
     /**
      * @return int
@@ -49,6 +51,7 @@ class FinancesController extends Controller
     {
         return $this->toSave;
     }
+
 
     /**
      * @param int $toSave
@@ -524,11 +527,45 @@ class FinancesController extends Controller
             $confirmationStatistics = ConfirmationStatistics::getConsultantsConfirmationStatisticsForMonth($clientRouteInfo, $dividedMonth, 'coach_id');
 
             foreach ($confirmationStatistics['sums'] as $confirmationStatisticsWeek){
-                $user->bonus += ProvisionLevels::get('trainer', $confirmationStatisticsWeek->successfulPct,2);
-                $user->bonus += ProvisionLevels::get('trainer', $confirmationStatisticsWeek->unsuccessfulBadlyPct,1);
-                if($this->getToSave() == 1){
-                    $this->saveBonus($user->id,ProvisionLevels::get('trainer', $confirmationStatisticsWeek->successfulPct,2, $confirmationStatisticsWeek->jankyPct),$dividedMonth[$weekNumber]->lastDay,"Premia tygodniowa (".$dividedMonth[$weekNumber]->firstDay." -- ".$dividedMonth[0]->lastDay.") za osiągnięcie:  ".$confirmationStatisticsWeek->successfulPct."% pokazów zielonych.");
-                    $this->saveBonus($user->id,ProvisionLevels::get('trainer', $confirmationStatisticsWeek->unsuccessfulBadlyPct,1, $confirmationStatisticsWeek->jankyPct),$dividedMonth[$weekNumber]->lastDay,"Premia tygodniowa (".$dividedMonth[$weekNumber]->firstDay." -- ".$dividedMonth[0]->lastDay.") za osiągnięcie:  ".$confirmationStatisticsWeek->unsuccessfulBadlyPct."% czerwonych pokazów");
+                $bonusFromSuccessfulPct = ProvisionLevels::get('trainer', $confirmationStatisticsWeek->successfulPct,2);
+                $bonusRecordFromSuccessfulPct = null;
+                if($bonusFromSuccessfulPct > 0){
+                    $bonusRecordFromSuccessfulPct = (object)[
+                        'type'      => 2,
+                        'id_user'   => $user->id,
+                        'amount'   => $bonusFromSuccessfulPct,
+                        'comment'   => "Premia tygodniowa (".$dividedMonth[$weekNumber]->firstDay." -- ".$dividedMonth[0]->lastDay.") za osiągnięcie:  ".$confirmationStatisticsWeek->successfulPct."% pokazów zielonych.",
+                        'id_manager'=> null,
+                        'status'    => 1,
+                        'event_date'=> $dividedMonth[$weekNumber]->lastDay,
+                        'manager'   => 'System'
+                    ];
+                    $user->bonuses->push($bonusRecordFromSuccessfulPct);
+                }
+                $bonusFromUnsuccessfulBadlyPct = ProvisionLevels::get('trainer', $confirmationStatisticsWeek->unsuccessfulBadlyPct,1);
+                $bonusRecordFromUnsuccessfulBadlyPct = null;
+                if($bonusFromUnsuccessfulBadlyPct > 0){
+                    $bonusRecordFromUnsuccessfulBadlyPct = (object)[
+                        'type'      => 2,
+                        'id_user'   => $user->id,
+                        'amount'    => $bonusFromUnsuccessfulBadlyPct,
+                        'comment'   => "Premia tygodniowa (".$dividedMonth[$weekNumber]->firstDay." -- ".$dividedMonth[0]->lastDay.") za osiągnięcie:  ".$confirmationStatisticsWeek->unsuccessfulBadlyPct."% czerwonych pokazów.",
+                        'id_manager'=> null,
+                        'status'    => 1,
+                        'event_date'=> $dividedMonth[$weekNumber]->lastDay,
+                        'manager'   => 'System'
+                    ];
+                    $user->bonuses->push($bonusRecordFromUnsuccessfulBadlyPct);
+                }
+                $user->bonus += $bonusFromSuccessfulPct + $bonusFromUnsuccessfulBadlyPct;
+
+                if($this->getToSave() == 1) {
+                    if ($bonusFromSuccessfulPct > 0) {
+                        $this->saveBonus($user->id, $bonusRecordFromSuccessfulPct->amount, $bonusRecordFromSuccessfulPct->event_date, $bonusRecordFromSuccessfulPct->comment);
+                    }
+                    if ($bonusFromUnsuccessfulBadlyPct > 0) {
+                        $this->saveBonus($user->id, $bonusRecordFromUnsuccessfulBadlyPct->amount, $bonusRecordFromUnsuccessfulBadlyPct->event_date, $bonusRecordFromUnsuccessfulBadlyPct->comment);
+                    }
                 }
                 $weekNumber++;
             }
@@ -536,11 +573,45 @@ class FinancesController extends Controller
             foreach ($arrayOfDepartmentStatistics as $item){
                 $commissionAvg = Department_info::find($user->department_info_id)->commission_avg;
                 $total_week_avg_proc = round((100*$item->total_week_avg)/$commissionAvg,2);
-                $user->bonus += ProvisionLevels::get('trainer', $item->janky_proc,3,$total_week_avg_proc, 'avg'); // Średnia
-                $user->bonus += ProvisionLevels::get('trainer', $item->janky_proc,3,$item->total_week_goal_proc, 'ammount'); // Cel zgód
+                $bonusFromAvg = ProvisionLevels::get('trainer', $item->janky_proc,3,$total_week_avg_proc, 'avg'); // Średnia
+                $bonusRecordFromAvg = null;
+                if($bonusFromAvg > 0){
+                    $bonusRecordFromAvg = (object)[
+                        'type'      => 2,
+                        'id_user'   => $user->id,
+                        'amount'    => $bonusRecordFromAvg,
+                        'comment'   => "Premia tygodniowa (".$dividedMonth[$weekNumber]->firstDay." -- ".$dividedMonth[$weekNumber]->lastDay.") za osiągnięcie:  Średniej na projekcie",
+                        'id_manager'=> null,
+                        'status'    => 1,
+                        'event_date'=> $dividedMonth[$weekNumber]->lastDay,
+                        'manager'   => 'System'
+                    ];
+                    $user->bonuses->push($bonusRecordFromAvg);
+                }
+
+                $bonusFromAgreementTarget = ProvisionLevels::get('trainer', $item->janky_proc,3,$item->total_week_goal_proc, 'ammount'); // Cel zgód
+                $bonusRecordFromAgreementTarget = null;
+                if($bonusFromAgreementTarget > 0){
+                    $bonusRecordFromAgreementTarget = (object)[
+                        'type'      => 2,
+                        'id_user'   => $user->id,
+                        'amount'    => $bonusFromAgreementTarget,
+                        'comment'   => "Premia tygodniowa (".$dividedMonth[$weekNumber]->firstDay." -- ".$dividedMonth[$weekNumber]->lastDay.") za osiągnięcie: Celu na projekcie",
+                        'id_manager'=> null,
+                        'status'    => 1,
+                        'event_date'=> $dividedMonth[$weekNumber]->lastDay,
+                        'manager'   => 'System'
+                    ];
+                    $user->bonuses->push($bonusRecordFromAgreementTarget);
+                }
+                $user->bonus += $bonusFromAvg + $bonusFromAgreementTarget;
                 if($this->getToSave() == 1){
-                    $this->saveBonus($user->id,ProvisionLevels::get('trainer', $item->janky_proc,3,$total_week_avg_proc, 'avg'),$dividedMonth[$weekNumber]->lastDay,"Premia tygodniowa (".$dividedMonth[$weekNumber]->firstDay." -- ".$dividedMonth[$weekNumber]->lastDay.") za osiągnięcie:  Średniej na projekcie");
-                    $this->saveBonus($user->id,ProvisionLevels::get('trainer', $item->janky_proc,3,$item->total_week_goal_proc, 'ammount'),$dividedMonth[$weekNumber]->lastDay,"Premia tygodniowa (".$dividedMonth[$weekNumber]->firstDay." -- ".$dividedMonth[$weekNumber]->lastDay.") za osiągnięcie: Celu na projekcie");
+                    if ($bonusFromAvg > 0) {
+                        $this->saveBonus($user->id, $bonusRecordFromAvg->amount, $bonusRecordFromAvg->event_date, $bonusRecordFromAvg->comment);
+                    }
+                    if ($bonusFromAgreementTarget > 0) {
+                        $this->saveBonus($user->id, $bonusRecordFromAgreementTarget->amount, $bonusRecordFromAgreementTarget->event_date, $bonusRecordFromAgreementTarget->comment);
+                    }
                 }
                 $weekNumber++;
             }
@@ -584,18 +655,84 @@ class FinancesController extends Controller
                     $total_week_rbh_proc    = $item['weekGoalRbh']      != 0 ? round((100*$item['weekRbh'])/$item['weekGoalRbh'],2)                     : 0;
                     $janky_proc             = ($item['totalCheck']      != null && $item['totalCheck'] > 0) ? round(($item['totalBad'] / $item['totalCheck']) * 100, 2)  : 0 ;
                     if($user->user_type_id == 17 ||  $user->user_type_id == 7){
-                        $user->bonus += ProvisionLevels::get('manager', $janky_proc,3,$total_week_avg_proc, 'avg',count($allDepartments)); // Średnia
-                        $user->bonus += ProvisionLevels::get('manager', $janky_proc,3,$total_week_goal_proc, 'ammount',count($allDepartments)); // Cel zgód
+                        $bonusFromAvg = ProvisionLevels::get('manager', $janky_proc,3,$total_week_avg_proc, 'avg',count($allDepartments)); // Średnia
+                        $bonusRecordFromAvg = null;
+                        if($bonusFromAvg > 0){
+                            $bonusRecordFromAvg = (object)[
+                                'type'      => 2,
+                                'id_user'   => $user->id,
+                                'amount'    => $bonusFromAvg,
+                                'comment'   => "Premia tygodniowa (".$dividedMonth[$weekNumber]->firstDay." -- ".$dividedMonth[$weekNumber]->lastDay.") za osiągnięcie:  Średniej na projekcie",
+                                'id_manager'=> null,
+                                'status'    => 1,
+                                'event_date'=> $dividedMonth[$weekNumber]->lastDay,
+                                'manager'   => 'System'
+                            ];
+                            $user->bonuses->push($bonusRecordFromAvg);
+                        }
+                        $bonusFromAgreementTarget = ProvisionLevels::get('manager', $janky_proc,3,$total_week_goal_proc, 'ammount',count($allDepartments)); // Cel zgód
+                        $bonusRecordFromAgreementTarget = null;
+                        if($bonusFromAgreementTarget > 0){
+                            $bonusRecordFromAgreementTarget = (object)[
+                                'type'      => 2,
+                                'id_user'   => $user->id,
+                                'amount'    => $bonusFromAgreementTarget,
+                                'comment'   => "Premia tygodniowa (".$dividedMonth[$weekNumber]->firstDay." -- ".$dividedMonth[$weekNumber]->lastDay.") za osiągnięcie: Celu na projekcie",
+                                'id_manager'=> null,
+                                'status'    => 1,
+                                'event_date'=> $dividedMonth[$weekNumber]->lastDay,
+                                'manager'   => 'System'
+                            ];
+                            $user->bonuses->push($bonusRecordFromAgreementTarget);
+                        }
+                        $user->bonus += $bonusFromAvg + $bonusFromAgreementTarget;
                         if($this->getToSave() == 1){
-                            $this->saveBonus($user->id,ProvisionLevels::get('manager', $janky_proc,3,$total_week_avg_proc, 'avg',count($allDepartments)),$dividedMonth[$weekNumber]->lastDay,"Premia tygodniowa (".$dividedMonth[$weekNumber]->firstDay." -- ".$dividedMonth[$weekNumber]->lastDay.") za osiągnięcie:  Średniej na projekcie");
-                            $this->saveBonus($user->id,ProvisionLevels::get('manager', $janky_proc,3,$total_week_goal_proc, 'ammount',count($allDepartments)),$dividedMonth[$weekNumber]->lastDay,"Premia tygodniowa (".$dividedMonth[$weekNumber]->firstDay." -- ".$dividedMonth[$weekNumber]->lastDay.") za osiągnięcie: Celu na projekcie");
+                            if ($bonusFromAvg > 0) {
+                                $this->saveBonus($user->id, $bonusRecordFromAvg->amount, $bonusRecordFromAvg->event_date, $bonusRecordFromAvg->comment);
+                            }
+                            if ($bonusFromAgreementTarget > 0) {
+                                $this->saveBonus($user->id, $bonusRecordFromAgreementTarget->amount, $bonusRecordFromAgreementTarget->event_date, $bonusRecordFromAgreementTarget->comment);
+                            }
                         }
                     }else if($user->user_type_id == 14){
-                        $user->bonus += ProvisionLevels::get('managerHR', $janky_proc,3,$total_week_rbh_proc, 'rbh'); // Średnia
-                        $user->bonus += ProvisionLevels::get('managerHR', $janky_proc,3,$total_week_goal_proc, 'ammount'); // Cel zgód
+                        $bonusFromAvg = ProvisionLevels::get('managerHR', $janky_proc,3,$total_week_rbh_proc, 'rbh'); // Średnia
+                        $bonusRecordFromAvg = null;
+                        if($bonusFromAvg > 0){
+                            $bonusRecordFromAvg = (object)[
+                                'type'      => 2,
+                                'id_user'   => $user->id,
+                                'amount'    => $bonusFromAvg,
+                                'comment'   => "Premia tygodniowa (".$dividedMonth[$weekNumber]->firstDay." -- ".$dividedMonth[$weekNumber]->lastDay.") za osiągnięcie:  RBH na projekcie",
+                                'id_manager'=> null,
+                                'status'    => 1,
+                                'event_date'=> $dividedMonth[$weekNumber]->lastDay,
+                                'manager'   => 'System'
+                            ];
+                            $user->bonuses->push($bonusRecordFromAvg);
+                        }
+                        $bonusFromAgreementTarget = ProvisionLevels::get('managerHR', $janky_proc,3,$total_week_goal_proc, 'ammount'); // Cel zgód
+                        $bonusRecordFromAgreementTarget = null;
+                        if($bonusFromAgreementTarget > 0){
+                            $bonusRecordFromAgreementTarget = (object)[
+                                'type'      => 2,
+                                'id_user'   => $user->id,
+                                'amount'    => $bonusFromAgreementTarget,
+                                'comment'   => "Premia tygodniowa (".$dividedMonth[$weekNumber]->firstDay." -- ".$dividedMonth[$weekNumber]->lastDay.") za osiągnięcie: Celu na projekcie",
+                                'id_manager'=> null,
+                                'status'    => 1,
+                                'event_date'=> $dividedMonth[$weekNumber]->lastDay,
+                                'manager'   => 'System'
+                            ];
+                            $user->bonuses->push($bonusRecordFromAgreementTarget);
+                        }
+                        $user->bonus += $bonusFromAvg + $bonusFromAgreementTarget;
                         if($this->getToSave() == 1){
-                            $this->saveBonus($user->id,ProvisionLevels::get('managerHR', $janky_proc,3,$total_week_rbh_proc, 'rbh'),$dividedMonth[$weekNumber]->lastDay,"Premia tygodniowa (".$dividedMonth[$weekNumber]->firstDay." -- ".$dividedMonth[$weekNumber]->lastDay.") za osiągnięcie:  RBH na projekcie");
-                            $this->saveBonus($user->id,ProvisionLevels::get('managerHR', $janky_proc,3,$total_week_goal_proc, 'ammount'),$dividedMonth[$weekNumber]->lastDay,"Premia tygodniowa (".$dividedMonth[$weekNumber]->firstDay." -- ".$dividedMonth[$weekNumber]->lastDay.") za osiągnięcie: Celu na projekcie");
+                            if ($bonusFromAvg > 0) {
+                                $this->saveBonus($user->id, $bonusRecordFromAvg->amount, $bonusRecordFromAvg->event_date, $bonusRecordFromAvg->comment);
+                            }
+                            if ($bonusFromAgreementTarget > 0) {
+                                $this->saveBonus($user->id, $bonusRecordFromAgreementTarget->amount, $bonusRecordFromAgreementTarget->event_date, $bonusRecordFromAgreementTarget->comment);
+                            }
                         }
                     }
                 $weekNumber++;
@@ -612,13 +749,13 @@ class FinancesController extends Controller
             $penaltyBonusObj->comment       = $comment;
             $penaltyBonusObj->id_manager    = Auth::user()->id;
             $penaltyBonusObj->event_date    = $event_date;
+            $penaltyBonusObj->accepted_payment_id    = $this->acceptedPaymentForDepartment->id;
             try{
                 $penaltyBonusObj->save();
             }catch (\Exception $exception){
                 return 0;
             }
         }
-
     }
 
     private function provisionSystemForInstructors(&$user, $dividedMonth, $dep_info,$deps2, $arrayOfDepartmentStatistics = null){
@@ -650,11 +787,44 @@ class FinancesController extends Controller
                     ->whereNotNull('users.coach_id')->get(); //client route info poszczególnych konsultantów w calym oddziale w miesiacu
                 $confirmationStatistics = ConfirmationStatistics::getConsultantsConfirmationStatisticsForMonth($clientRouteInfo, $dividedMonth);
                 foreach ($confirmationStatistics['sums'] as $confirmationStatisticsWeek){
-                    $user->bonus += ProvisionLevels::get('instructor', $confirmationStatisticsWeek->successfulPct,2);
-                    $user->bonus += ProvisionLevels::get('instructor', $confirmationStatisticsWeek->unsuccessfulBadlyPct,1);
+                    $bonusFromSuccessfulPct = ProvisionLevels::get('instructor', $confirmationStatisticsWeek->successfulPct,2);
+                    $bonusRecordFromSuccessfulPct = null;
+                    if($bonusFromSuccessfulPct > 0){
+                        $bonusRecordFromSuccessfulPct = (object)[
+                            'type'      => 2,
+                            'id_user'   => $user->id,
+                            'amount'    => $bonusFromSuccessfulPct,
+                            'comment'   => "Premia tygodniowa (".$dividedMonth[$weekNumber]->firstDay." -- ".$dividedMonth[0]->lastDay.") za osiągnięcie:  ".$confirmationStatisticsWeek->successfulPct."% pokazów zielonych.",
+                            'id_manager'=> null,
+                            'status'    => 1,
+                            'event_date'=> $dividedMonth[$weekNumber]->lastDay,
+                            'manager'   => 'System'
+                        ];
+                        $user->bonuses->push($bonusRecordFromSuccessfulPct);
+                    }
+                    $bonusFromUnsuccessfulBadlyPct = ProvisionLevels::get('instructor', $confirmationStatisticsWeek->unsuccessfulBadlyPct,1);
+                    $bonusRecordFromUnsuccessfulBadlyPct = null;
+                    if($bonusFromUnsuccessfulBadlyPct > 0){
+                        $bonusRecordFromUnsuccessfulBadlyPct = (object)[
+                            'type'      => 2,
+                            'id_user'   => $user->id,
+                            'amount'    => $bonusFromUnsuccessfulBadlyPct,
+                            'comment'   => "Premia tygodniowa (".$dividedMonth[$weekNumber]->firstDay." -- ".$dividedMonth[0]->lastDay.") za osiągnięcie:  ".$confirmationStatisticsWeek->unsuccessfulBadlyPct."% czerwonych pokazów.",
+                            'id_manager'=> null,
+                            'status'    => 1,
+                            'event_date'=> $dividedMonth[$weekNumber]->lastDay,
+                            'manager'   => 'System'
+                        ];
+                        $user->bonuses->push($bonusRecordFromUnsuccessfulBadlyPct);
+                    }
+                    $user->bonus += $bonusFromSuccessfulPct + $bonusFromUnsuccessfulBadlyPct;
                     if($this->getToSave() == 1){
-                        $this->saveBonus($user->id,ProvisionLevels::get('instructor', $confirmationStatisticsWeek->successfulPct,2, $confirmationStatisticsWeek->jankyPct),$dividedMonth[$weekNumber]->lastDay,"Premia tygodniowa (".$dividedMonth[$weekNumber]->firstDay." -- ".$dividedMonth[$weekNumber]->lastDay.") za osiągnięcie:  ".$confirmationStatisticsWeek->successfulPct."% pokazów zielonych.");
-                        $this->saveBonus($user->id,ProvisionLevels::get('instructor', $confirmationStatisticsWeek->unsuccessfulBadlyPct,1, $confirmationStatisticsWeek->jankyPct),$dividedMonth[$weekNumber]->lastDay,"Premia tygodniowa (".$dividedMonth[$weekNumber]->firstDay." -- ".$dividedMonth[$weekNumber]->lastDay.") za osiągnięcie:  ".$confirmationStatisticsWeek->unsuccessfulBadlyPct."% czerwonych pokazów");
+                        if ($bonusFromSuccessfulPct > 0) {
+                            $this->saveBonus($user->id, $bonusRecordFromSuccessfulPct->amount, $bonusRecordFromSuccessfulPct->event_date, $bonusRecordFromSuccessfulPct->comment);
+                        }
+                        if ($bonusFromUnsuccessfulBadlyPct > 0) {
+                            $this->saveBonus($user->id, $bonusRecordFromUnsuccessfulBadlyPct->amount, $bonusRecordFromUnsuccessfulBadlyPct->event_date, $bonusRecordFromUnsuccessfulBadlyPct->comment);
+                        }
                     }
                     $weekNumber++;
                 }
@@ -735,18 +905,55 @@ class FinancesController extends Controller
                 $time_elapsed_secs = microtime(true) - $start;
                 $weekNumber = 0;
                 foreach ($arrayOfDepartmentStatistics as $item) {
+                    $bonusAvgJankyPct = 0;
+                    $bonusRecordAvgJankyPct = null;
                     if(isset($secondStatisticsArr[$weekNumber])) {
-                        $user->bonus += ProvisionLevels::get('instructor', $item->janky_proc,3 ,$secondStatisticsArr[$weekNumber], 'avg');
+                        $bonusAvgJankyPct = ProvisionLevels::get('instructor', $item->janky_proc,3 ,$secondStatisticsArr[$weekNumber], 'avg');
                     }
+                    if($bonusAvgJankyPct > 0){
+                        $bonusRecordAvgJankyPct = (object)[
+                            'type'      => 2,
+                            'id_user'   => $user->id,
+                            'amount'    => $bonusAvgJankyPct,
+                            'comment'   => "Premia tygodniowa (".$dividedMonth[$weekNumber]->firstDay." -- ".$dividedMonth[$weekNumber]->lastDay.") za osiągnięcie:  Średniej na projekcie",
+                            'id_manager'=> null,
+                            'status'    => 1,
+                            'event_date'=> $dividedMonth[$weekNumber]->lastDay,
+                            'manager'   => 'System'
+                        ];
+                        $user->bonuses->push($bonusRecordAvgJankyPct);
+                    }
+
+                    $bonusEmploymentJankyPct = 0;
+                    $bonusRecordEmploymentJankyPct = null;
                     if(isset($firstStatisticArr[$weekNumber])) {
-                        $user->bonus += ProvisionLevels::get('instructor', $item->janky_proc,3 ,$firstStatisticArr[$weekNumber], 'employment');
+                        $bonusEmploymentJankyPct = ProvisionLevels::get('instructor', $item->janky_proc,3 ,$firstStatisticArr[$weekNumber], 'employment');
                     }
+                    if($bonusEmploymentJankyPct > 0){
+                        $bonusRecordEmploymentJankyPct = (object)[
+                            'type'      => 2,
+                            'id_user'   => $user->id,
+                            'amount'    => $bonusEmploymentJankyPct,
+                            'comment'   => "Premia tygodniowa (".$dividedMonth[$weekNumber]->firstDay." -- ".$dividedMonth[$weekNumber]->lastDay.") za osiągnięcie: Celu na projekcie",
+                            'id_manager'=> null,
+                            'status'    => 1,
+                            'event_date'=> $dividedMonth[$weekNumber]->lastDay,
+                            'manager'   => 'System'
+                        ];
+                        $user->bonuses->push($bonusRecordEmploymentJankyPct);
+                    }
+
+                    $user->bonus += $bonusAvgJankyPct + $bonusEmploymentJankyPct;
                     if($this->getToSave() == 1) {
                         if(isset($secondStatisticsArr[$weekNumber])) {
-                            $this->saveBonus($user->id,ProvisionLevels::get('instructor', $item->janky_proc,3 ,$secondStatisticsArr[$weekNumber], 'avg'),$dividedMonth[$weekNumber]->lastDay,"Premia tygodniowa (".$dividedMonth[$weekNumber]->firstDay." -- ".$dividedMonth[$weekNumber]->lastDay.") za osiągnięcie:  Średniej na projekcie");
+                            if ($bonusAvgJankyPct > 0) {
+                                $this->saveBonus($user->id, $bonusRecordAvgJankyPct->amount, $bonusRecordAvgJankyPct->event_date, $bonusRecordAvgJankyPct->comment);
+                            }
                         }
                         if(isset($firstStatisticArr[$weekNumber])) {
-                            $this->saveBonus($user->id,ProvisionLevels::get('instructor', $item->janky_proc,3 ,$firstStatisticArr[$weekNumber], 'employment'),$dividedMonth[$weekNumber]->lastDay,"Premia tygodniowa (".$dividedMonth[$weekNumber]->firstDay." -- ".$dividedMonth[$weekNumber]->lastDay.") za osiągnięcie: Celu na projekcie");
+                            if ($bonusEmploymentJankyPct > 0) {
+                                $this->saveBonus($user->id, $bonusRecordEmploymentJankyPct->amount, $bonusRecordEmploymentJankyPct->event_date, $bonusRecordEmploymentJankyPct->comment);
+                            }
                         }
                     }
                     $weekNumber++;
@@ -775,7 +982,7 @@ class FinancesController extends Controller
 
         $today = date('Y-m-d'); //today
         $todayDateTime = new DateTime($today);
-        $data = $this->getMultiDepartmentData($firstDayOfMonth->format('Y-m-d'), $lastDayOfMonth->format('Y-m-d'), $month, $year,$departments, $days_in_month);
+        $data = $this->getMultiDepartmentData($firstDayOfMonth->format('Y-m-d'), $lastDayOfMonth->format('Y-m-d'), $month, $year, $departments, $days_in_month);
         $rbhTargetArr = [];
         foreach($weekDateArr as $weekInfo) {
             $total_week_proc_janky = 0;
@@ -850,8 +1057,24 @@ class FinancesController extends Controller
                 foreach($data as $item) {
                     if($item->id == $user->id) {
                         $provision = ProvisionLevels::get('HR',$item->add_user, 1,1);
+                        $provisionRecord = null;
+                        if($provision > 0){
+                            $provisionRecord = (object)[
+                                'type'      => 2,
+                                'id_user'   => $user->id,
+                                'amount'    => $provision,
+                                'comment'   => "Premia tygodniowa (".$weekDateArr[$weekNumber]->firstDay." -- ".$weekDateArr[$weekNumber]->lastDay.") za zatrudnienie: ".$item->add_user ." osób",
+                                'id_manager'=> null,
+                                'status'    => 1,
+                                'event_date'=> $weekDateArr[$weekNumber]->lastDay,
+                                'manager'   => 'System'
+                            ];
+                            $user->bonuses->push($provisionRecord);
+                        }
                         if($this->getToSave() == 1){
-                            $this->saveBonus($user->id,$provision,$weekDateArr[$weekNumber]->lastDay,"Premia tygodniowa (".$weekDateArr[$weekNumber]->firstDay." -- ".$weekDateArr[$weekNumber]->lastDay.") za zatrudnienie: ".$item->add_user ." osób");
+                            if($provision > 0){
+                                $this->saveBonus($user->id, $provisionRecord->amount, $provisionRecord->event_date, $provisionRecord->comment);
+                            }
                         }
                         $obj = new \stdClass();
                         $obj->provision = $provision;
@@ -870,10 +1093,42 @@ class FinancesController extends Controller
             $totalProvision = 0;
             foreach ($arrayOfDepartmentStatistics as $target) {
                 $provTarget = ProvisionLevels::get('HR', $target->janky_proc, $target->total_week_goal_proc, 2, 'ammount');
+                $provTargetRecord = null;
+                if($provTarget > 0){
+                    $provTargetRecord = (object)[
+                        'type'      => 2,
+                        'id_user'   => $user->id,
+                        'amount'    => $provTarget,
+                        'comment'   => "Premia tygodniowa (".$weekDateArr[$weekNumber]->firstDay." -- ".$weekDateArr[$weekNumber]->lastDay.") za osiągnięcie: Celu projektu",
+                        'id_manager'=> null,
+                        'status'    => 1,
+                        'event_date'=> $weekDateArr[$weekNumber]->lastDay,
+                        'manager'   => 'System'
+                    ];
+                    $user->bonuses->push($provTargetRecord);
+                }
                 $prov = ProvisionLevels::get('HR', $target->janky_proc, $target->target_rbh_percentage,2, 'rbh');
+                $provRecord = null;
+                if($prov > 0){
+                    $provRecord = (object)[
+                        'type'      => 2,
+                        'id_user'   => $user->id,
+                        'amount'    => $prov,
+                        'comment'   => "Premia tygodniowa (".$weekDateArr[$weekNumber]->firstDay." -- ".$weekDateArr[$weekNumber]->lastDay.") za zatrudnienie: wymaganego RBH na projekcie",
+                        'id_manager'=> null,
+                        'status'    => 1,
+                        'event_date'=> $weekDateArr[$weekNumber]->lastDay,
+                        'manager'   => 'System'
+                    ];
+                    $user->bonuses->push($provRecord);
+                }
                 if($this->getToSave() == 1){
-                    $this->saveBonus($user->id,$provTarget,$weekDateArr[$weekNumber]->lastDay,"Premia tygodniowa (".$weekDateArr[$weekNumber]->firstDay." -- ".$weekDateArr[$weekNumber]->lastDay.") za osiągnięcie: Celu projektu");
-                    $this->saveBonus($user->id,$prov,$weekDateArr[$weekNumber]->lastDay,"Premia tygodniowa (".$weekDateArr[$weekNumber]->firstDay." -- ".$weekDateArr[$weekNumber]->lastDay.") za zatrudnienie: wymaganego RBH na projekcie");
+                    if($provTarget > 0){
+                        $this->saveBonus($user->id, $provTargetRecord->amount, $provTargetRecord->event_date, $provTargetRecord->comment);
+                    }
+                    if($prov > 0){
+                        $this->saveBonus($user->id, $provRecord->amount, $provRecord->event_date, $provRecord->comment);
+                    }
                 }
                 $sumProv = $prov + $provTarget;
                 array_push($provisions, $sumProv);
@@ -966,14 +1221,46 @@ class FinancesController extends Controller
             $provision = 0;
             if($user->user_type_id == 22) { //coordinators menager
                 $provision = ProvisionLevels::get('coordinator leader', $databasePercentageUsage, $total_week_goal_proc);
+                $provisionRecord = null;
+                if($provision > 0){
+                    $provisionRecord = (object)[
+                        'type'      => 2,
+                        'id_user'   => $user->id,
+                        'amount'    => $provision,
+                        'comment'   => "Premia tygodniowa(".$weekInfo->firstDay." -- ".$weekInfo->lastDay.") za osiągnięcie celu",
+                        'id_manager'=> null,
+                        'status'    => 1,
+                        'event_date'=> $weekInfo->lastDay,
+                        'manager'   => 'System'
+                    ];
+                    $user->bonuses->push($provisionRecord);
+                }
                 if($this->getToSave() == 1){
-                    $this->saveBonus($user->id,$provision,$weekInfo->lastDay,"Premia tygodniowa(".$weekInfo->firstDay." -- ".$weekInfo->lastDay.") za osiągnięcie celu");
+                    if($provision > 0) {
+                        $this->saveBonus($user->id, $provisionRecord->amount, $provisionRecord->event_date, $provisionRecord->comment);
+                    }
                 }
             }
             else if($user->user_type_id == 8) {
                 $provision = ProvisionLevels::get('koordynator', $databasePercentageUsage, $total_week_goal_proc, $daysInPosition);
+                $provisionRecord = null;
+                if($provision > 0){
+                    $provisionRecord = (object)[
+                        'type'      => 2,
+                        'id_user'   => $user->id,
+                        'amount'    => $provision,
+                        'comment'   => "Premia tygodniowa(".$weekInfo->firstDay." -- ".$weekInfo->lastDay.") za osiągnięcie celu",
+                        'id_manager'=> null,
+                        'status'    => 1,
+                        'event_date'=> $weekInfo->lastDay,
+                        'manager'   => 'System'
+                    ];
+                    $user->bonuses->push($provisionRecord);
+                }
                 if($this->getToSave() == 1){
-                    $this->saveBonus($user->id,$provision,$weekInfo->lastDay,"Premia tygodniowa(".$weekInfo->firstDay." -- ".$weekInfo->lastDay.") za osiągnięcie celu");
+                    if($provision > 0) {
+                        $this->saveBonus($user->id, $provisionRecord->amount, $provisionRecord->event_date, $provisionRecord->comment);
+                    }
                 }
             }
             array_push($goals, $total_week_goal_proc);
@@ -986,46 +1273,22 @@ class FinancesController extends Controller
     public function viewPaymentCadrePost(Request $request)
     {
         ini_set('max_execution_time', '1800');
-//        dd($request);
+//      dd($request);
         $this->setToSave($request->toSave);
-        //Zapisanie infromacji o zaakceptowaniu wypłat
-        $savePayment = 1;
-        $payment_saved = AcceptedPayment::
-        where('department_info_id',13)
-            ->where('cadrePayment',1)
-            ->where('payment_month','like', $request->search_money_month.'%')
-            ->get();
-        if($this->getToSave() == 1){
-            if($payment_saved->isEmpty()){
-                 $savePayment = 1;
-                 $newAcceptedPaymentObj                         = new AcceptedPayment ();
-                 $newAcceptedPaymentObj->cadre_id               = 1364;
-                 $newAcceptedPaymentObj->payment_month          = $request->search_money_month.'-01';
-                 $newAcceptedPaymentObj->department_info_id     = 13;
-                 $newAcceptedPaymentObj->cadrePayment           = 1;
-                 $newAcceptedPaymentObj->save();
-            }else{
-                $savePayment = 0;
-            }
-            $payment_saved = collect('123');
-        }else if($this->getToSave() == 0  && !$payment_saved->isEmpty()){
-            $savePayment = 0;
-            $payment_saved = collect('123');
-        }else if($this->getToSave() == 0  && $payment_saved->isEmpty()){
-            $savePayment = 0;
-            $payment_saved = collect();
-        }
 
-        $date_to_post   = $request->search_money_month;
-        $date           = $request->search_money_month.'%';
-        $year           = substr($date, 0, 4);
-        $month          = substr($date, 5, 2);
+        $allDepartments = Department_info::all();
+        $departmentInfoIds = $allDepartments->pluck('id')->toArray();
+
+        $date_to_post = $request->search_money_month;
+        $date = $request->search_money_month . '%';
+        $year = substr($date, 0, 4);
+        $month = substr($date, 5, 2);
 
         $dividedMonth = $this->monthPerRealWeekDivision($month, $year);
         $agencies = Agencies::all();
         $salary = DB::table(DB::raw("users"))
-            ->whereNotIn('users.user_type_id',[1,2,9])
-            ->where('users.salary','>',0)
+            ->whereNotIn('users.user_type_id', [1, 2, 9])
+            ->where('users.salary', '>', 0)
             ->selectRaw('
             `users`.`id`,
             `users`.`user_type_id`,
@@ -1041,201 +1304,143 @@ class FinancesController extends Controller
             `department_type`.`id` as dep_type_id,
             `department_info`.`id` as department_info_id,
             `users`.`salary`,
+            `users`.`rate`,
             `users`.`additional_salary`,
             `users`.`student`,
             `users`.`documents`,
             `users`.`promotion_date`,
             `users`.`start_work`,
-             ROUND(salary / DAY(LAST_DAY("' . $request->search_money_month.'-01' .'")),2) as average_salary,
-            (SELECT SUM(`penalty_bonus`.`amount`) FROM `penalty_bonus` WHERE `penalty_bonus`.`id_user`=`users`.`id` AND `penalty_bonus`.`event_date` LIKE "'.$date.'" AND `penalty_bonus`.`type`=1 AND `penalty_bonus`.`status`=1) as `penalty`,
-            (SELECT SUM(`penalty_bonus`.`amount`) FROM `penalty_bonus` WHERE `penalty_bonus`.`id_user`=`users`.`id` AND `penalty_bonus`.`event_date` LIKE  "'.$date.'" AND `penalty_bonus`.`type`=2 AND `penalty_bonus`.`status`=1) as `bonus`')
-            ->where(function ($query) use ($date){
-                $query->orwhere(DB::raw('SUBSTRING(promotion_date,1,7)'),'<', substr($date,0,strlen($date)-1))
-                    ->orwhere('users.promotion_date','=',null);
+            `users`.`main_department_id`,
+             ROUND(salary / DAY(LAST_DAY("' . $date_to_post . '-01' . '")),2) as average_salary'/*,
+            //now its counting in method because we need information about every bonus/penalty of user depending on if payments are saved or not
+            (SELECT SUM(`penalty_bonus`.`amount`) FROM `penalty_bonus` WHERE `penalty_bonus`.`id_user`=`users`.`id` AND `penalty_bonus`.`event_date` LIKE "' . $date . '" AND `penalty_bonus`.`type`=1 AND `penalty_bonus`.`status`=1) as `penalty`,
+            (SELECT SUM(`penalty_bonus`.`amount`) FROM `penalty_bonus` WHERE `penalty_bonus`.`id_user`=`users`.`id` AND `penalty_bonus`.`event_date` LIKE  "' . $date . '" AND `penalty_bonus`.`type`=2 AND `penalty_bonus`.`status`=1) as `bonus`'*/)
+            ->where(function ($query) use ($date) {
+                $query->orwhere(DB::raw('SUBSTRING(promotion_date,1,7)'), '<', substr($date, 0, strlen($date) - 1))
+                    ->orwhere('users.promotion_date', '=', null);
             })
-            ->join('department_info','department_info.id','users.main_department_id')
+            ->join('department_info', 'department_info.id', 'users.main_department_id')
             ->join('work_hours', 'work_hours.id_user', 'users.id')
-            ->join('departments','departments.id','department_info.id_dep')
-            ->join('department_type','department_type.id','department_info.id_dep_type')
+            ->join('departments', 'departments.id', 'department_info.id_dep')
+            ->join('department_type', 'department_type.id', 'department_info.id_dep_type')
             ->where('work_hours.date', 'like', $date)
             ->groupBy('users.id')
             ->orderBy('users.last_name')->get();
 
-        $allDepartments = Department_info::all();
-        $arrayOfDepartmentStatistics = [];
-        $dividedMonthForDepartmentStatistics = MonthFourWeeksDivision::get($year, $month);
-        $deps2 = Department_info::where('commission_avg','!=',0)->get();
+        $idsOfUsers = $salary->pluck('id')->toArray();
 
-        if($savePayment == 1){
-            foreach ($allDepartments as $item){
-                $arrayOfDepartmentStatistics[$item->id] =  $this->getDepartmentStatistics($dividedMonthForDepartmentStatistics, substr($dividedMonthForDepartmentStatistics[0]->firstDay,5,2), substr($dividedMonthForDepartmentStatistics[0]->firstDay,0,4), [$item->id]);
-            }
-            foreach($salary as $user) {
-                if($user->user_type_id == 4) {
-                    $this->provisionSystemForTrainers($user,  $dividedMonthForDepartmentStatistics ,$arrayOfDepartmentStatistics[$user->department_info_id]);
+        $this->recountSalaryForEmployers($salary, $dividedMonth, $date, $date_to_post);
+
+        $payment_saved = AcceptedPayment::
+        whereIn('department_info_id', $departmentInfoIds)
+            ->where('cadrePayment', 1)
+            ->where('payment_month', 'like', $date)
+            ->get();
+
+        $acceptedPaymentUserStories = AcceptedPaymentUserStory::whereIn('accepted_payment_id',$payment_saved->pluck('id')->toArray())->get();
+
+        $bonus_penalty = PenaltyBonus::whereIn('id_user', $idsOfUsers)
+        ->select('penalty_bonus.*', DB::raw('CONCAT(users.first_name," ",users.last_name) as manager'))
+            ->join('users', 'users.id', 'penalty_bonus.id_manager')
+            ->where('status', 1);
+
+        //if payment not saved: whereNull('accepted_payment_id') else if payment_saved: whereIn('accepted_payment_id', ids)
+        if(count($payment_saved) == 0){
+            $bonus_penalty->whereNull('accepted_payment_id');
+        }else{
+            $bonus_penalty->whereIn('accepted_payment_id', $payment_saved->pluck('id')->toArray());
+        }
+
+        $bonus_penalty = $bonus_penalty->get();
+
+        $this->fillInUserWithBonuses($salary, $bonus_penalty);
+
+        $arrayOfDepartmentStatistics = [];
+        $acceptedPaymentUserStoryInsertQueryArr = [];
+        $dividedMonthForDepartmentStatistics = MonthFourWeeksDivision::get($year, $month);
+        $deps2 = $allDepartments->where('commission_avg', '!=', 0);
+
+        foreach ($allDepartments as $item) {
+            $arrayOfDepartmentStatistics[$item->id] = $this->getDepartmentStatistics($dividedMonthForDepartmentStatistics, substr($dividedMonthForDepartmentStatistics[0]->firstDay, 5, 2), substr($dividedMonthForDepartmentStatistics[0]->firstDay, 0, 4), [$item->id]);
+        }
+        foreach ($allDepartments as $departmentInfo) {
+            $acceptedPayment = $payment_saved->where('department_info_id', $departmentInfo->id)->first();
+            $salaryFromDepartment = $salary->where('main_department_id',$departmentInfo->id);
+            if (empty($acceptedPayment)) {
+                /**
+                 * Saving information about accepted payments
+                 */
+                if ($this->getToSave() == 1) {
+                    $acceptedPayment = new AcceptedPayment();
+                    $acceptedPayment->cadre_id = Auth::user()->id;
+                    $acceptedPayment->payment_month = $request->search_money_month . '-01';
+                    $acceptedPayment->department_info_id = $departmentInfo->id;
+                    $acceptedPayment->cadrePayment = 1;
+                    $acceptedPayment->save();
+                    $this->acceptedPaymentForDepartment = $acceptedPayment;
                 }
-                else if($user->user_type_id == 5) {
-                    $this->provisionSystemForHR($user, $month, $year,$arrayOfDepartmentStatistics[$user->department_info_id]);
-                }
-                else if($user->user_type_id == 19) {
-                        $this->provisionSystemForInstructors($user,  $dividedMonthForDepartmentStatistics, $user->department_info_id,$deps2,$arrayOfDepartmentStatistics[$user->department_info_id]);
-                }
-                else if($user->user_type_id == 21) {
-                    $instructorDepartments = Department_info::where('instructor_regional_id', '=', $user->id)->pluck('id')->toArray(); //array of department_info.id of instructor's departments
-                    foreach($instructorDepartments as $singleDepartment) {
-                        $this->provisionSystemForInstructors($user,  $dividedMonthForDepartmentStatistics,$singleDepartment,$deps2, $arrayOfDepartmentStatistics[$singleDepartment]);
+                foreach ($salaryFromDepartment as $user) {
+                    if ($user->user_type_id == 4) {
+                        $this->provisionSystemForTrainers($user, $dividedMonthForDepartmentStatistics, $arrayOfDepartmentStatistics[$user->department_info_id]);
+                    } else if ($user->user_type_id == 5) {
+                        $this->provisionSystemForHR($user, $month, $year, $arrayOfDepartmentStatistics[$user->department_info_id]);
+                    } else if ($user->user_type_id == 19) {
+                        $this->provisionSystemForInstructors($user, $dividedMonthForDepartmentStatistics, $user->department_info_id, $deps2, $arrayOfDepartmentStatistics[$user->department_info_id]);
+                    } else if ($user->user_type_id == 21) {
+                        $instructorDepartments = Department_info::where('instructor_regional_id', '=', $user->id)->pluck('id')->toArray(); //array of department_info.id of instructor's departments
+                        foreach ($instructorDepartments as $singleDepartment) {
+                            $this->provisionSystemForInstructors($user, $dividedMonthForDepartmentStatistics, $singleDepartment, $deps2, $arrayOfDepartmentStatistics[$singleDepartment]);
+                        }
+                    } else if ($user->user_type_id == 8 || $user->user_type_id == 22) { //koordynator + menager of coordinators
+                        $this->provisionSystemForCoordinators($user, $month, $year);
+                    } else if ($user->user_type_id == 17 || $user->user_type_id == 7 || $user->user_type_id == 14) { // Kierownik + Kierownik Regionaly + kierownik HR + Kierownik Szkoleniowcow
+                        $this->provisionSystemForManagers($user, $dividedMonthForDepartmentStatistics, $arrayOfDepartmentStatistics);
+                    }
+
+                    /**
+                     * Creating table of information about every employer to save - IT HAS TO BE AS LAST INSTRUCTION AFTER COUNTING SALARIES
+                     * fields to insert: accepted_payment_id, user_id, salary, rate, additional_salary, student,
+                     * salary_to_account, max_transaction, department_info_id, agency_id, user_type_id, created_at, updated_at
+                     */
+                    if ($this->getToSave() == 1) {
+                        array_push($acceptedPaymentUserStoryInsertQueryArr,[
+                            'accepted_payment_id'   => $acceptedPayment->id,
+                            'user_id'               => $user->id,
+                            'salary'                => $user->salary,
+                            'rate'                  => $user->rate,
+                            'additional_salary'     => $user->additional_salary,
+                            'student'               => $user->student,
+                            'salary_to_account'     => $user->salary_to_account,
+                            'max_transaction'       => $user->max_transaction,
+                            'department_info_id'    => $user->department_info_id,
+                            'agency_id'             => $user->agency_id,
+                            'user_type_id'          => $user->user_type_id,
+                            'created_at'            => date('Y-m-d H:i:s'),
+                            'updated_at'            => date('Y-m-d H:i:s')]);
                     }
                 }
-                else if($user->user_type_id == 8 || $user->user_type_id == 22) { //koordynator + menager of coordinators
-                    $this->provisionSystemForCoordinators($user, $month, $year);
-                }
-                else if($user->user_type_id == 17 ||  $user->user_type_id == 7 || $user->user_type_id == 14) { // Kierownik + Kierownik Regionaly + kierownik HR + Kierownik Szkoleniowcow
-                    $this->provisionSystemForManagers($user, $dividedMonthForDepartmentStatistics, $arrayOfDepartmentStatistics);
-                }
-            }
-        }
-
-        $freeDaysData = $this->getFreeDays($dividedMonth); //[id_user, freeDays]
-//        dd($freeDaysData);
-
-        /**
-         * Pobranie danych osób którzy nie pracowali całego miesiąca
-         */
-        $days_in_month = date('t', strtotime($request->search_money_month . "-01"));
-
-        //Zdefiniownie ostatniego dnia miesiąca
-        $last_day = $request->search_money_month . '-' . $days_in_month;
-        //zdefiniowanie pierwszego dnia miesiaca
-        $first_day = $request->search_money_month . '-01';
-
-        /**
-         * Puste tablice przechowujące dane osob ktorych pensja musi się zmienic
-         */
-        $working_days = [];
-        $work_days_stop = [];
-        $work_days_in_between = [];
-
-        /**
-         * Pobranie danych osob ktore rozpoczeły prace w tym miesiącu
-         */
-        $users_by_start = DB::table('users')
-            ->select(DB::raw("
-                id,
-                start_work,
-                salary
-            "))
-            ->where('start_work', 'like', $date)
-            ->whereNotIn('user_type_id', [1,2,9])
-            ->get();
-
-        /**
-         * Obliczenie średniej dziennej pensji oraz ilosci przepracowanych dni
-         */
-        foreach($users_by_start as $item) {
-
-            $date_diff = strtotime($last_day) - strtotime($item->start_work);
-
-            $user_salary_per_day = $item->salary / $days_in_month;
-
-            $user_salary = $user_salary_per_day * (($date_diff / 3600 / 24) + 1);
-
-            $working_days[$item->id] = round($user_salary, 0);
-        }
-    
-        foreach($salary as $value) {
-            foreach($working_days as $key => $item) {
-                if ($value->id == $key) {
-                    $value->salary = $item;
+            }else{
+                //get historic information about employers
+                foreach ($salaryFromDepartment as $user) {
+                    $acceptedPaymentUserStory = $acceptedPaymentUserStories->where('user_id', $user->id)->first();
+                    $user->salary               = $acceptedPaymentUserStory->salary;
+                    $user->rate                 = $acceptedPaymentUserStory->rate;
+                    $user->additional_salary    = $acceptedPaymentUserStory->additional_salary;
+                    $user->student              = $acceptedPaymentUserStory->student;
+                    $user->salary_to_account    = $acceptedPaymentUserStory->salary_to_account;
+                    $user->max_transaction      = $acceptedPaymentUserStory->max_transaction;
+                    $user->department_info_id   = $acceptedPaymentUserStory->department_info_id;
+                    $user->agency_id            = $acceptedPaymentUserStory->agency_id;
+                    $user->user_type_id         = $acceptedPaymentUserStory->user_type_id;
                 }
             }
         }
 
         /**
-        * Pobranie danych osob ktore zakończyły prace w tym miesiącu
-        */
-        $users_by_stop = DB::table('users')
-            ->select(DB::raw("
-                id,
-                end_work,
-                salary
-            "))
-            ->where('end_work', 'like', $date)
-            ->whereNotIn('user_type_id', [1,2])
-            ->get();
-
-        /**
-         * Obliczenie średniej dziennej pensji oraz ilosci przepracowanych dni
+         * Saving information about every employer
          */
-        foreach($users_by_stop as $item) {
-
-            $date_diff = strtotime($item->end_work) - strtotime($first_day);
-
-            $user_salary_per_day = $item->salary / $days_in_month;
-
-            $user_salary = $user_salary_per_day * (($date_diff / 3600 / 24) + 1);
-
-            $work_days_stop[$item->id] = round($user_salary, 0);
-        }
-     
-
-        foreach($salary as $value) {
-            foreach($work_days_stop as $key => $item) {
-                if ($value->id == $key) {
-                    $value->salary = $item;
-                }
-            }
-        }
-
-        /**
-         * Pobranie danych osób które rozpoczeły i zakończyły prace w danym miesiącu
-         */
-        $in_between = DB::table('users')
-            ->select(DB::raw("
-                id,
-                start_work,
-                end_work,
-                salary
-            "))
-            ->where('end_work', 'like', $date)
-            ->where('start_work', 'like', $date)
-            ->whereNotIn('user_type_id', [1,2,9])
-            ->get();
-
-        /**
-         * Obliczenie średniej dziennej pensji oraz ilosci przepracowanych dni
-         */
-        foreach($in_between as $item) {
-
-            $date_diff = strtotime($item->end_work) - strtotime($item->start_work);
-
-            $user_salary_per_day = $item->salary / $days_in_month;
-
-            $user_salary = $user_salary_per_day * (($date_diff / 3600 / 24) + 1);            
-
-            $work_days_in_between[$item->id] = round($user_salary, 0);
-        }
-
-        foreach($salary as $value) {
-            foreach($work_days_in_between as $key => $item) {
-                if ($value->id == $key) {
-                    $value->salary = $item;
-                }
-            }
-        }
-
-        foreach($salary as $onePerson) {
-            $flag = false;
-            foreach($freeDaysData as $freeDayData) {
-                if($onePerson->id == $freeDayData['id_user']) {
-                    $flag = true;
-                    $onePerson->salary -= $onePerson->average_salary * $freeDayData['freeDays'];
-                    $onePerson->freeDays = $freeDayData['freeDays'];
-                }
-            }
-            if(!$flag) {
-                $onePerson->freeDays = 0;
-            }
-
+        if ($this->getToSave() == 1) {
+            DB::table('accepted_payment_user_story')->insert($acceptedPaymentUserStoryInsertQueryArr);
         }
 
         /**
@@ -1247,8 +1452,6 @@ class FinancesController extends Controller
             ->join('department_type','department_type.id','department_info.id_dep_type')
             ->get();
 
-
-
         return view('finances.viewPaymentCadre')
             ->with('month',$date_to_post)
             ->with('salary',$salary->groupby('agency_id'))
@@ -1257,6 +1460,23 @@ class FinancesController extends Controller
             ->with('payment_saved',$payment_saved);
     }
 
+    private function fillInUserWithBonuses(&$users, $penaltyBonuses){
+        foreach ($users as $user){
+            $userBonuses = $penaltyBonuses->where('id_user',$user->id);
+            $bonuses = collect([]);
+            $user->bonus = 0;
+            $user->penalty = 0;
+            foreach($userBonuses as $userBonus){
+                $bonuses->push($userBonus);
+                if($userBonus->type == 1){
+                    $user->penalty += $userBonus->amount;
+                }else{
+                    $user->bonus += $userBonus->amount;
+                }
+            }
+            $user->bonuses = collect($bonuses->toArray());
+        }
+    }
     public function viewPaymentPOST(Request $request)
     {
         $date = $request->search_money_month;
@@ -1512,7 +1732,7 @@ class FinancesController extends Controller
             //Czy wypłata jest już zatwierdzona
             $payment_saved = AcceptedPayment::
             where('department_info_id','=',Auth::user()->department_info_id)
-            ->where('payment_month','like', $month)
+            ->where('payment_month','like', $month)->whereNull('cadrePayment')
             ->get();
             $string_to_sql = '';
             if(!$payment_saved->isEmpty()){
@@ -2095,5 +2315,302 @@ class FinancesController extends Controller
             return 'success';
         }
         return 'fail';
+    }
+
+    private function recountSalaryForEmployers(&$salary, $dividedMonth, $date, $date_to_post)
+    {
+        $freeDaysData = $this->getFreeDays($dividedMonth); //[id_user, freeDays]
+//        dd($freeDaysData);
+
+        /**
+         * Pobranie danych osób którzy nie pracowali całego miesiąca
+         */
+        $days_in_month = date('t', strtotime($date_to_post . "-01"));
+
+        //Zdefiniownie ostatniego dnia miesiąca
+        $last_day = $date_to_post. '-' . $days_in_month;
+        //zdefiniowanie pierwszego dnia miesiaca
+        $first_day = $date_to_post . '-01';
+
+        /**
+         * Puste tablice przechowujące dane osob ktorych pensja musi się zmienic
+         */
+        $working_days = [];
+        $work_days_stop = [];
+        $work_days_in_between = [];
+
+        /**
+         * Pobranie danych osob ktore rozpoczeły prace w tym miesiącu
+         */
+        $users_by_start = DB::table('users')
+            ->select(DB::raw("
+                id,
+                start_work,
+                salary
+            "))
+            ->where('start_work', 'like', $date)
+            ->whereNotIn('user_type_id', [1, 2, 9])
+            ->get();
+
+        /**
+         * Obliczenie średniej dziennej pensji oraz ilosci przepracowanych dni
+         */
+        foreach ($users_by_start as $item) {
+
+            $date_diff = strtotime($last_day) - strtotime($item->start_work);
+
+            $user_salary_per_day = $item->salary / $days_in_month;
+
+            $user_salary = $user_salary_per_day * (($date_diff / 3600 / 24) + 1);
+
+            $working_days[$item->id] = round($user_salary, 0);
+        }
+
+        foreach ($salary as $user) {
+            foreach ($working_days as $key => $item) {
+                if ($user->id == $key) {
+                    $user->salary = $item;
+                }
+            }
+        }
+
+        /**
+         * Pobranie danych osob ktore zakończyły prace w tym miesiącu
+         */
+        $users_by_stop = DB::table('users')
+            ->select(DB::raw("
+                id,
+                end_work,
+                salary
+            "))
+            ->where('end_work', 'like', $date)
+            ->whereNotIn('user_type_id', [1, 2])
+            ->get();
+
+        /**
+         * Obliczenie średniej dziennej pensji oraz ilosci przepracowanych dni
+         */
+        foreach ($users_by_stop as $item) {
+
+            $date_diff = strtotime($item->end_work) - strtotime($first_day);
+
+            $user_salary_per_day = $item->salary / $days_in_month;
+
+            $user_salary = $user_salary_per_day * (($date_diff / 3600 / 24) + 1);
+
+            $work_days_stop[$item->id] = round($user_salary, 0);
+        }
+
+
+        foreach ($salary as $value) {
+            foreach ($work_days_stop as $key => $item) {
+                if ($value->id == $key) {
+                    $value->salary = $item;
+                }
+            }
+        }
+
+        /**
+         * Pobranie danych osób które rozpoczeły i zakończyły prace w danym miesiącu
+         */
+        $in_between = DB::table('users')
+            ->select(DB::raw("
+                id,
+                start_work,
+                end_work,
+                salary
+            "))
+            ->where('end_work', 'like', $date)
+            ->where('start_work', 'like', $date)
+            ->whereNotIn('user_type_id', [1, 2, 9])
+            ->get();
+
+        /**
+         * Obliczenie średniej dziennej pensji oraz ilosci przepracowanych dni
+         */
+        foreach ($in_between as $item) {
+
+            $date_diff = strtotime($item->end_work) - strtotime($item->start_work);
+
+            $user_salary_per_day = $item->salary / $days_in_month;
+
+            $user_salary = $user_salary_per_day * (($date_diff / 3600 / 24) + 1);
+
+            $work_days_in_between[$item->id] = round($user_salary, 0);
+        }
+
+        foreach ($salary as $value) {
+            foreach ($work_days_in_between as $key => $item) {
+                if ($value->id == $key) {
+                    $value->salary = $item;
+                }
+            }
+        }
+
+        foreach ($salary as $onePerson) {
+            $flag = false;
+            foreach ($freeDaysData as $freeDayData) {
+                if ($onePerson->id == $freeDayData['id_user']) {
+                    $flag = true;
+                    $onePerson->salary -= $onePerson->average_salary * $freeDayData['freeDays'];
+                    $onePerson->freeDays = $freeDayData['freeDays'];
+                }
+            }
+            if (!$flag) {
+                $onePerson->freeDays = 0;
+            }
+        }
+    }
+
+    public function acceptedPaymentSystemUpdate(){
+        if(!in_array(Auth::user()->id,[6964])){
+            return Redirect::to('/');
+        }
+        $monthStart = '2017-06';
+        $monthEnd = '2018-11';
+        $month = $monthStart;
+        $months = [];
+        while($month !== $monthEnd){
+            $monthToPush = date('Y-m',strtotime($month));
+            array_push($months, $monthToPush);
+            $month = date('Y-m',strtotime('+1 month', strtotime($month)));
+
+        }
+        return view('admin.acceptedPaymentSystem')
+            ->with('months', $months);
+    }
+
+    public function acceptedPaymentSystemUpdateAjax(Request $request){
+        if($request->ajax()){
+            //Natalia Skwarek months
+            $skwarekMonths = ['manager_id'=> 3898,'startMonth'=>'2017-06','endMonth'=>'2018-05'];
+            //MagdalenaCeglarska months
+            $ceglarskaMonths = ['manager_id'=> 7011,'startMonth'=>'2018-06','endMonth'=>'2018-07'];
+            //Kinga Dygas months
+            $dygasMonths = ['manager_id'=> 7551,'startMonth'=>'2017-08','endMonth'=>'2018-08'];
+            //Aleksandra Drewin months
+            $drewinMonths = ['manager_id'=> 921,'startMonth'=>'2017-09','endMonth'=>'2018-10'];
+
+            $acceptors = [$skwarekMonths, $ceglarskaMonths, $dygasMonths, $drewinMonths];
+            $month = $request->month;
+            $date = $month.'%';
+            $departments = Department_info::with('departments')->with('department_type')->get();
+            $users = DB::table(DB::raw("users"))
+                ->whereNotIn('users.user_type_id', [1, 2, 9])
+                ->where('users.salary', '>', 0)
+                ->selectRaw('
+            `users`.`id`,
+            `users`.`user_type_id`,
+            `users`.`agency_id`,
+            `users`.`max_transaction`,
+            `users`.`first_name`,
+            `users`.`last_name`,
+            `users`.`salary_to_account`,
+            `users`.`username`,
+            `department_type`.`id` as department_type_id,
+            `departments`.`name` as dep_name, 
+            `department_type`.`name`  as dep_type,
+            `department_type`.`id` as dep_type_id,
+            `department_info`.`id` as department_info_id,
+            `users`.`salary`,
+            `users`.`rate`,
+            `users`.`additional_salary`,
+            `users`.`student`,
+            `users`.`documents`,
+            `users`.`promotion_date`,
+            `users`.`start_work`,
+            `users`.`main_department_id`')
+                ->where(function ($query) use ($date) {
+                    $query->orwhere(DB::raw('SUBSTRING(promotion_date,1,7)'), '<', substr($date, 0, strlen($date) - 1))
+                        ->orwhere('users.promotion_date', '=', null);
+                })
+                ->join('department_info', 'department_info.id', 'users.main_department_id')
+                ->join('work_hours', 'work_hours.id_user', 'users.id')
+                ->join('departments', 'departments.id', 'department_info.id_dep')
+                ->join('department_type', 'department_type.id', 'department_info.id_dep_type')
+                ->where('work_hours.date', 'like', $date)
+                ->groupBy('users.id')
+                ->orderBy('users.last_name')->get();
+            foreach ($acceptors as $acceptor){
+                if(strtotime($acceptor['startMonth']) <= strtotime($month) && strtotime($acceptor['endMonth']) >= strtotime($month) ){
+                    if(count($users) == 0){
+                        $penaltyBonus = PenaltyBonus::select('penalty_bonus.*','users.main_department_id')->join('users','users.id','id_user')
+                            ->whereNotIn('users.user_type_id',[1, 2, 9])
+                            ->where('status', 1)
+                            ->where('event_date','like',$date)->get();
+                        if(count($penaltyBonus)>0){
+                            foreach ($departments as $department){
+                                $depPenaltyBonus = $penaltyBonus->where('main_department_id', $department->id);
+                                if(count($depPenaltyBonus)>0){
+                                    $acceptedPayment = AcceptedPayment::where('department_info_id',$department->id)->where('payment_month',$month)->where('cadrePayment',1)->first();
+                                    if($acceptedPayment == null){
+                                        $acceptedPayment = new AcceptedPayment();
+                                        $acceptedPayment->cadre_id = $acceptor['manager_id'];
+                                        $acceptedPayment->payment_month = $month.'-01';
+                                        $acceptedPayment->department_info_id = $department->id;
+                                        $acceptedPayment->cadrePayment = 1;
+                                        $acceptedPayment->created_at = date('Y-m-d H:i:s');
+                                        $acceptedPayment->updated_at = date('Y-m-d H:i:s');
+                                        $acceptedPayment->save();
+                                    }
+                                    foreach ($depPenaltyBonus as $bonus){
+                                        $bonus->accepted_payment_id = $acceptedPayment->id;
+                                        $bonus->save();
+                                    }
+                                }
+                            }
+                        }
+                    }else{
+                        $acceptedPaymentUserStoryInsertQueryArr = [];
+                        $penaltyBonus = PenaltyBonus::select('penalty_bonus.*','users.department_info_id')->join('users','users.id','id_user')
+                            ->whereNotIn('users.user_type_id',[1,2,9])
+                            ->where('status', 1)
+                            ->where('event_date','like',$date)->get();
+                        foreach ($departments as $department) {
+                            $depUsers = $users->where('department_info_id',$department->id);
+                            if(count($depUsers) > 0){
+                                $acceptedPayment = AcceptedPayment::where('department_info_id',$department->id)->where('payment_month',$month)->where('cadrePayment',1)->first();
+                                if($acceptedPayment == null){
+                                    $acceptedPayment = new AcceptedPayment();
+                                    $acceptedPayment->cadre_id = $acceptor['manager_id'];
+                                    $acceptedPayment->payment_month = $month.'-01';
+                                    $acceptedPayment->department_info_id = $department->id;
+                                    $acceptedPayment->cadrePayment = 1;
+                                    $acceptedPayment->created_at = date('Y-m-d H:i:s');
+                                    $acceptedPayment->updated_at = date('Y-m-d H:i:s');
+                                    $acceptedPayment->save();
+                                }
+                                foreach($depUsers as $user){
+                                    array_push($acceptedPaymentUserStoryInsertQueryArr,[
+                                        'accepted_payment_id'   => $acceptedPayment->id,
+                                        'user_id'               => $user->id,
+                                        'salary'                => $user->salary,
+                                        'rate'                  => $user->rate,
+                                        'additional_salary'     => $user->additional_salary,
+                                        'student'               => $user->student,
+                                        'salary_to_account'     => $user->salary_to_account,
+                                        'max_transaction'       => $user->max_transaction,
+                                        'department_info_id'    => $user->department_info_id,
+                                        'agency_id'             => $user->agency_id,
+                                        'user_type_id'          => $user->user_type_id,
+                                        'created_at'            => date('Y-m-d H:i:s'),
+                                        'updated_at'            => date('Y-m-d H:i:s')]);
+                                }
+                                $depPenaltyBonus = $penaltyBonus->whereIn('department_info_id', $department->id);
+                                if(count($depPenaltyBonus)>0){
+                                    foreach ($depPenaltyBonus as $bonus){
+                                        $bonus->accepted_payment_id = $acceptedPayment->id;
+                                        $bonus->save();
+                                    }
+                                }
+                            }
+                        }
+                        DB::table('accepted_payment_user_story')->insert($acceptedPaymentUserStoryInsertQueryArr);
+                    }
+                }
+            }
+            return $month.' accepted';
+        }
+        return Redirect::to('/');
     }
 }
