@@ -22,7 +22,7 @@ class ModelConversationsController extends Controller
 
     private $adminPanelAccessArr = [3, 13, 15]; //Array of privilaged user types
     private $superUserDepartmentType = 6; //see all stuff from other departments
-    private $privilagedUser = []; //array of privilaged user_id
+    private $privilagedUser = [5122, 3935, 8137]; //array of privilaged user_id
 
     public function modelConversationMenuGet() {
         $user = Auth::user();
@@ -140,6 +140,10 @@ class ModelConversationsController extends Controller
                 $playlists = ModelConvPlaylist::getPlaylistInfo(false, $user_department_type);
                 $items = ModelConvItems::getPlaylistItemsInfo(false, $user_department_type);
             }
+        }
+        else if(in_array($user->id, $this->privilagedUser)) {
+            $playlists = ModelConvPlaylist::getPlaylistInfo(true);
+            $items = ModelConvItems::getPlaylistItemsInfo(false, $user_department_type);
         }
         else { //this see regular user (only his own playlist)
             $playlists = ModelConvPlaylist::getPlaylistInfo(true);
