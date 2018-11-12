@@ -25,13 +25,10 @@ use App\UserEmploymentStatus;
 use App\UserTypes;
 use App\Utilities\Dates\MonthFourWeeksDivision;
 use App\Utilities\DataProcessing\ConfirmationStatistics;
-use App\Utilities\Dates\MonthIntoCompanyWeeksDivision;
-use App\Utilities\Dates\MonthPerWeekDivision;
 use App\Utilities\Reports\Report_data_methods\DataNewUsersRbhReport;
 use App\Utilities\Salary\ProvisionLevels;
 use App\Work_Hour;
 use DateTime;
-use function foo\func;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -1803,6 +1800,7 @@ class FinancesController extends Controller
             id_dep_type')->get();
 
 
+
         $weekDayArr = MonthFourWeeksDivision::get($realYear, $realMonth);
 
             $result = $r->map(function($item) use($month, $clientRouteInfoRecords, $weekDayArr) {
@@ -1981,17 +1979,15 @@ class FinancesController extends Controller
 
     /**
      * @param Request $request
-     * @return Zapisanie informacji o aktualnym stanie wypłat
+     * @return - Zapisanie informacji o aktualnym stanie wypłat
      */
     public function paymentStory(Request $request){
         if($request->ajax()){
-
-
             //Zapisanie infromacji o zaakceptowaniu wypłat
-            $is_exist = AcceptedPayment::
-              where('department_info_id','=',Auth::user()->department_info_id)
-            ->where('payment_month','like', $request->accetp_month.'%')
-            ->get();
+            $is_exist = AcceptedPayment::where('department_info_id','=',Auth::user()->department_info_id)
+                ->where('payment_month','like', $request->accetp_month.'%')
+                ->whereNull('cadrePayment')
+                ->get();
             if($is_exist->isEmpty()){
                 $accept_payment = new AcceptedPayment();
                 $accept_payment->cadre_id =  Auth::user()->id;
@@ -2044,7 +2040,7 @@ class FinancesController extends Controller
                     }
 
 
-                    $LogData = array_merge(['T ' => ' Zapisanie wypłat '],$accept_payment->toArray());
+                    $LogData = array_merge(['T ' => 'Zapisanie wypłat '],$accept_payment->toArray());
                     new ActivityRecorder($LogData, 24, 1);
                     return $data;
             }
@@ -2542,7 +2538,7 @@ class FinancesController extends Controller
                             foreach ($departments as $department){
                                 $depPenaltyBonus = $penaltyBonus->where('main_department_id', $department->id);
                                 if(count($depPenaltyBonus)>0){
-                                    $acceptedPayment = AcceptedPayment::where('department_info_id',$department->id)->where('payment_month',$month)->where('cadrePayment',1)->first();
+                                    $acceptedPayment = AcceptedPayment::where('department_info_id',$department->id)->where('payment_month','like', $date)->where('cadrePayment',1)->first();
                                     if($acceptedPayment == null){
                                         $acceptedPayment = new AcceptedPayment();
                                         $acceptedPayment->cadre_id = $acceptor['manager_id'];
@@ -2569,7 +2565,7 @@ class FinancesController extends Controller
                         foreach ($departments as $department) {
                             $depUsers = $users->where('department_info_id',$department->id);
                             if(count($depUsers) > 0){
-                                $acceptedPayment = AcceptedPayment::where('department_info_id',$department->id)->where('payment_month',$month)->where('cadrePayment',1)->first();
+                                $acceptedPayment = AcceptedPayment::where('department_info_id',$department->id)->where('payment_month','like', $date)->where('cadrePayment',1)->first();
                                 if($acceptedPayment == null){
                                     $acceptedPayment = new AcceptedPayment();
                                     $acceptedPayment->cadre_id = $acceptor['manager_id'];
