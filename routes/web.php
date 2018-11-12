@@ -495,6 +495,9 @@ Route::middleware(['check-permission', 'check-firewall'])->group(function () {
     Route::get('/edit_medical_package', 'AdminController@edit_medical_package');
 
     Route::get('/logInfo', 'AdminPanel\LogsController@logInfoGet');
+
+    Route::get('/assignPrivilages', 'AdminPanel\ManagementPrivilagesController@assignPrivilagesGET');
+    Route::post('/assignPrivilages', 'AdminPanel\ManagementPrivilagesController@assignPrivilagesPOST');
     // Admin_Panel --Stop--
 
     // Password change --START--
@@ -1138,5 +1141,5 @@ Route::get('/modelConversationsGetPlaylistItems/{id}', 'ModelConversationsContro
 Route::delete('/modelConversationsGetPlaylistItems/{id}', 'ModelConversationsController@managementPlaylistItemsDelete');
 
 Route::post('/engraverForConfirmingAjaxUpdate', 'CrmRouteController@engraverForConfirmingAjaxUpdate')->name('api.engraverForConfirmingAjaxUpdate');
-Route::get('/assignPrivilages', 'AdminPanel\ManagementPrivilagesController@assignPrivilagesGET');
-Route::post('/assignPrivilages', 'AdminPanel\ManagementPrivilagesController@assignPrivilagesPOST');
+
+
