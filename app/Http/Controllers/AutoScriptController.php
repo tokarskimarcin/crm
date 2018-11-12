@@ -703,21 +703,4 @@ class AutoScriptController extends Controller
         ];
         return $data;
     }
-
-    public function setAllLinks() {
-        $from = 4;
-        $to = 9;
-
-        $privilages = PrivilageRelation::where('user_type_id', '=', $from)->pluck('link_id')->toArray();
-
-        foreach($privilages as $privilage) {
-            if(PrivilageRelation::where('user_type_id', '=', $to)->where('link_id', '=', $privilage)->get()->isEmpty()) {
-                $priv = new PrivilageRelation();
-                $priv->user_type_id = $to;
-                $priv->link_id = $privilage;
-                $priv->save();
-            }
-
-        }
-    }
 }
