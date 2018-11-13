@@ -13,8 +13,8 @@
     <div class="row">
         <div class="col-lg-12">
             <div class="alert alert-info">
-                Wiersze, które mają kolor jasno czerwony wskazują osoby, których liczba zgód jest niższa niż średnia w ich oddziale <br>
-                Wiersze, które mają kolor jasno zielony wskazują osoby, których liczba zgód jest wyższa niż średnia w ich oddziale.
+                Wiersze, które mają kolor jasno czerwony wskazują osoby, których średnia jest niższa niż średnia w ich oddziale <br>
+                Wiersze, które mają kolor jasno zielony wskazują osoby, których średnia jest wyższa niż średnia w ich oddziale.
             </div>
         </div>
     </div>
