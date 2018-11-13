@@ -2084,6 +2084,7 @@ class FinancesController extends Controller
                         $DOUBLING_QUERY_LOG = new DoublingQueryLogs();
                         $DOUBLING_QUERY_LOG->table_name = 'AcceptedPayment';
                         $DOUBLING_QUERY_LOG->save();
+
                     }else{
                         session(['isAcceptedPaymentQueryRunning' => true]);
                         $accept_payment->save();
