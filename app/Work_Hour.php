@@ -89,10 +89,31 @@ class Work_Hour extends Model
         $today = date('Y-m-d');
         $actualHour = date('H:i:s');
 
+        //Test example
+//        $qu = Work_Hour::select(DB::raw('
+//        IF(work_hours.date = "' . $today . '",IFNULL(SUM(TIME_TO_SEC(TIMEDIFF(IFNULL(click_stop, "' . $actualHour . '"), click_start))), 0), IFNULL(SUM(TIME_TO_SEC(TIMEDIFF(accept_stop, accept_start))), 0)) as sec_sum,
+//        SUM(
+//            CASE
+//                WHEN DATE_FORMAT(work_hours.date, "%Y-%M-%d") < DATE_FORMAT("'. $today .'", "%Y-%M-%d") THEN
+//                    IFNULL(TIME_TO_SEC(TIMEDIFF(accept_stop, accept_start)), 0)
+//                ELSE
+//                    IFNULL(TIME_TO_SEC(TIMEDIFF(IFNULL(click_stop, "' . $actualHour . '"), click_start)), 0)
+//            END
+//        ) as sec_sum2
+//        '))
+//            ->whereIn('work_hours.date', ['2018-11-08', '2018-11-07'])->get();
+
         $cAllUsers = Work_Hour::select(DB::raw('
         id_user,
         Concat(users.first_name," ",users.last_name) as userNameInfo,
-        IF(work_hours.date = "' . $today . '",IFNULL(SUM(TIME_TO_SEC(TIMEDIFF(IFNULL(click_stop, "' . $actualHour . '"), click_start))), 0), IFNULL(SUM(TIME_TO_SEC(TIMEDIFF(accept_stop, accept_start))), 0)) as sec_sum,
+        SUM(
+            CASE 
+                WHEN DATE_FORMAT(work_hours.date, "%Y-%M-%d") < DATE_FORMAT("'. $today .'", "%Y-%M-%d") THEN
+                    IFNULL(TIME_TO_SEC(TIMEDIFF(accept_stop, accept_start)), 0)
+                ELSE
+                    IFNULL(TIME_TO_SEC(TIMEDIFF(IFNULL(click_stop, "' . $actualHour . '"), click_start)), 0)
+            END
+        ) as sec_sum,
         sum(success) as success,
         departments.name as dep_city,
         department_type.name as dep_type,

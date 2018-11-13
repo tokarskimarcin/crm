@@ -25,6 +25,7 @@ class ModelConvItems extends Model
     public static function deleteWithReferences($id) {
         ModelConvItems::find($id)->delete();
         $playlist_items = ModelConvPlaylistItem::where('item_id', '=', $id)->get();
+        new ActivityRecorder(array_merge(['T' => 'Usunięcie rozmowy'], ['ID' => $id]), 250,3);
 
         //This part adjust order as deleting files
         foreach($playlist_items as $item) {
