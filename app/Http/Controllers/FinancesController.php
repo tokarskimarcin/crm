@@ -29,6 +29,7 @@ use App\Utilities\Reports\Report_data_methods\DataNewUsersRbhReport;
 use App\Utilities\Salary\ProvisionLevels;
 use App\Work_Hour;
 use DateTime;
+use function foo\func;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -740,7 +741,7 @@ class FinancesController extends Controller
     private function saveBonus($userID,$amount,$event_date,$comment){
         if($amount > 0 ){
             $penaltyBonusObj                = new PenaltyBonus();
-            $penaltyBonusObj->type          = 2;
+            $penaltyBonusObj->type          = 2;    //premia
             $penaltyBonusObj->id_user       = $userID;
             $penaltyBonusObj->amount        = $amount;
             $penaltyBonusObj->comment       = $comment;
@@ -1270,7 +1271,6 @@ class FinancesController extends Controller
     public function viewPaymentCadrePost(Request $request)
     {
         ini_set('max_execution_time', '1800');
-//      dd($request);
         $this->setToSave($request->toSave);
 
         $allDepartments = Department_info::all();
@@ -1350,7 +1350,7 @@ class FinancesController extends Controller
 
         $bonus_penalty = $bonus_penalty->get();
 
-        $this->fillInUserWithBonuses($salary, $bonus_penalty);
+        $this->fillInUserWithBonuses($salary, $bonus_penalty,['bonus','penalty']);
 
         $arrayOfDepartmentStatistics = [];
         $acceptedPaymentUserStoryInsertQueryArr = [];
@@ -1364,7 +1364,7 @@ class FinancesController extends Controller
             $acceptedPayment = $payment_saved->where('department_info_id', $departmentInfo->id)->first();
             $salaryFromDepartment = $salary->where('main_department_id',$departmentInfo->id);
             if (empty($acceptedPayment)) {
-                /**
+                /*
                  * Saving information about accepted payments
                  */
                 if ($this->getToSave() == 1) {
@@ -1394,12 +1394,20 @@ class FinancesController extends Controller
                         $this->provisionSystemForManagers($user, $dividedMonthForDepartmentStatistics, $arrayOfDepartmentStatistics);
                     }
 
-                    /**
-                     * Creating table of information about every employer to save - IT HAS TO BE AS LAST INSTRUCTION AFTER COUNTING SALARIES
-                     * fields to insert: accepted_payment_id, user_id, salary, rate, additional_salary, student,
-                     * salary_to_account, max_transaction, department_info_id, agency_id, user_type_id, created_at, updated_at
-                     */
+
                     if ($this->getToSave() == 1) {
+                        /*
+                         * Accepting every penalty and bonus that were added after accepting previous month payments for actual user
+                         */
+                        $bonus_penalty->where('id_user', $user->id)->update(['accepted_payment_id' => $acceptedPayment->id]);
+
+                          /**
+                           * Creating table of information about every employer to save - IT HAS TO BE AS LAST INSTRUCTION AFTER COUNTING SALARIES
+                           */
+                          /*
+                           * FIELDS TO INSERT: accepted_payment_id, user_id, salary, rate, additional_salary, student,
+                           * salary_to_account, max_transaction, department_info_id, agency_id, user_type_id, created_at, updated_at
+                           */
                         array_push($acceptedPaymentUserStoryInsertQueryArr,[
                             'accepted_payment_id'   => $acceptedPayment->id,
                             'user_id'               => $user->id,
@@ -1417,7 +1425,7 @@ class FinancesController extends Controller
                     }
                 }
             }else{
-                //get historic information about employers
+                //getting historic information about employers
                 foreach ($salaryFromDepartment as $user) {
                     $acceptedPaymentUserStory = $acceptedPaymentUserStories->where('user_id', $user->id)->first();
                     $user->salary               = $acceptedPaymentUserStory->salary;
@@ -1457,37 +1465,61 @@ class FinancesController extends Controller
             ->with('payment_saved',$payment_saved);
     }
 
-    private function fillInUserWithBonuses(&$users, $penaltyBonuses){
+    private function fillInUserWithBonuses(&$users, $penaltyBonuses, $fieldsName){
         foreach ($users as $user){
             $userBonuses = $penaltyBonuses->where('id_user',$user->id);
             $bonuses = collect([]);
-            $user->bonus = 0;
-            $user->penalty = 0;
+            $user->{$fieldsName[0]} = 0;
+            $user->{$fieldsName[1]} = 0;
             foreach($userBonuses as $userBonus){
                 $bonuses->push($userBonus);
-                if($userBonus->type == 1){
-                    $user->penalty += $userBonus->amount;
+                if($userBonus->type == 2){
+                    $user->{$fieldsName[0]} += $userBonus->amount;
                 }else{
-                    $user->bonus += $userBonus->amount;
+                    $user->{$fieldsName[1]} += $userBonus->amount;
                 }
             }
             $user->bonuses = collect($bonuses->toArray());
         }
     }
+
     public function viewPaymentPOST(Request $request)
     {
         $date = $request->search_money_month;
-        $salary = $this->getSalary($date.'%');
+        $salary = $this->getSalary($date.'%', Auth::user()->department_info_id );
+
         $department_info = Department_info::find(Auth::user()->department_info_id);
         $janky_system = JankyPenatlyProc::where('system_id',$department_info->janky_system_id)->get();
         $agencies = Agencies::all();
         $department_type = Department_types::find($department_info->id_dep_type);
         $count_agreement = $department_type->count_agreement;
 
-        $payment_saved = AcceptedPayment::
-        where('department_info_id','=',Auth::user()->department_info_id)
+        $payment_saved = AcceptedPayment::where('department_info_id','=',Auth::user()->department_info_id)
             ->where('payment_month','like', $date.'%')
+            ->whereNull('cadrePayment')
             ->get();
+
+        $idsOfUsers = [];
+        foreach ($salary as $agency){
+            $idsOfUsers = array_merge($idsOfUsers, $agency->pluck('id')->toArray());
+        }
+
+        $bonus_penalty = PenaltyBonus::whereIn('id_user', $idsOfUsers)
+            ->select('penalty_bonus.*', DB::raw('CONCAT(users.first_name," ",users.last_name) as manager'))
+            ->join('users', 'users.id', 'penalty_bonus.id_manager')
+            ->where('status', 1);
+
+        //if payment not saved: whereNull('accepted_payment_id') else if payment_saved: whereIn('accepted_payment_id', ids)
+        if(count($payment_saved) == 0){
+            $bonus_penalty->whereNull('accepted_payment_id');
+        }else{
+            $bonus_penalty->whereIn('accepted_payment_id', $payment_saved->pluck('id')->toArray());
+        }
+
+        $bonus_penalty = $bonus_penalty->get();
+        foreach ($salary as $agency){
+            $this->fillInUserWithBonuses($agency,$bonus_penalty,['premia','kara']);
+        }
 
         if($count_agreement == 1)
         {
@@ -1721,14 +1753,14 @@ class FinancesController extends Controller
 
 
     //Custom Function
-    private function getSalary($month)
+    private function getSalary($month, $departmentInfoIds)
     {
             $realMonth = substr($month,5,2);
             $realYear = substr($month, 0,4);
             $clientRouteInfoRecords = ClientRouteInfo::where('confirmDate', 'like', $month)->OnlyActive()->get();
             //Czy wypłata jest już zatwierdzona
             $payment_saved = AcceptedPayment::
-            where('department_info_id','=',Auth::user()->department_info_id)
+            whereIn('department_info_id', is_array($departmentInfoIds) ? $departmentInfoIds : [$departmentInfoIds])
             ->where('payment_month','like', $month)->whereNull('cadrePayment')
             ->get();
             $string_to_sql = '';
@@ -1740,7 +1772,7 @@ class FinancesController extends Controller
         $query = DB::table(DB::raw("users"))
             ->join('work_hours', 'work_hours.id_user', 'users.id')
             ->join('department_info', 'users.department_info_id', '=', 'department_info.id')
-            ->where('users.department_info_id',Auth::user()->department_info_id)
+            ->whereIn('users.department_info_id',is_array($departmentInfoIds) ? $departmentInfoIds : [$departmentInfoIds])
             ->where(function ($querry) use ($month){
                 $querry->orwhere(DB::raw('SUBSTRING(promotion_date,1,7)'),'>=',substr($month,0,strlen($month)-1))
                     ->orwhere('users.user_type_id','=',1)
@@ -1759,14 +1791,16 @@ class FinancesController extends Controller
              SUM( time_to_sec(`work_hours`.`accept_stop`)-time_to_sec(`work_hours`.`accept_start`)) as `sum`,
             `users`.`student`,
             `users`.`documents`,
-            (SELECT SUM(`penalty_bonus`.`amount`) FROM `penalty_bonus` WHERE `penalty_bonus`.`id_user`=`users`.`id` AND `penalty_bonus`.`event_date` LIKE "'.$month.'" AND `penalty_bonus`.`type`=1 AND `penalty_bonus`.`status`=1) as `kara`,
-            (SELECT SUM(`penalty_bonus`.`amount`) FROM `penalty_bonus` WHERE `penalty_bonus`.`id_user`=`users`.`id` AND `penalty_bonus`.`event_date` LIKE  "'.$month.'" AND `penalty_bonus`.`type`=2 AND `penalty_bonus`.`status`=1) as `premia`,
+            `users`.`department_info_id`,
             SUM(`work_hours`.`success`) as `success`,
             `salary_to_account`,
             `users`.`successorUserId`,
             0 as successorSalary,
             id_dep_type
             ');
+            /*
+            (SELECT SUM(`penalty_bonus`.`amount`) FROM `penalty_bonus` WHERE `penalty_bonus`.`id_user`=`users`.`id` AND `penalty_bonus`.`event_date` LIKE "'.$month.'" AND `penalty_bonus`.`type`=1 AND `penalty_bonus`.`status`=1) as `kara`,
+            (SELECT SUM(`penalty_bonus`.`amount`) FROM `penalty_bonus` WHERE `penalty_bonus`.`id_user`=`users`.`id` AND `penalty_bonus`.`event_date` LIKE  "'.$month.'" AND `penalty_bonus`.`type`=2 AND `penalty_bonus`.`status`=1) as `premia`,*/
             if(!$payment_saved->isEmpty()){
                 $query = $query
                     ->leftjoin('payment_agency_story',function ($querry) use ($month){
@@ -1791,31 +1825,50 @@ class FinancesController extends Controller
                    `deleted`=0 AND `dkj_status`=1 AND `add_date` LIKE  "'.$month.'"
                     GROUP by `dkj`.`id_user`) h'),'r.id','h.id_user'
                 )
-                ->selectRaw('`id`,`agency_id`,`first_name`,`last_name`,`max_transaction`,`username`,`rate`,`login_phone`,`sum`,`student`,`documents`,`kara`,`premia`,`success`,
+                ->selectRaw('`id`,`agency_id`,`first_name`,`last_name`,`max_transaction`,`username`,`rate`,`login_phone`,`sum`,`student`,`documents`,`success`,
             `f`.`ods`,
             `h`.`janki`,
             `salary_to_account`,
             successorUserId,
             successorSalary,
-            id_dep_type')->get();
-
-
+            id_dep_type,
+            department_info_id')->get();
+            /*,`kara`,`premia`*/
 
         $weekDayArr = MonthFourWeeksDivision::get($realYear, $realMonth);
 
-            $result = $r->map(function($item) use($month, $clientRouteInfoRecords, $weekDayArr) {
-                $user_empl_status = UserEmploymentStatus::
-                    where( function ($querry) use ($item) {
-                    $querry = $querry->orwhere('pbx_id', '=', $item->login_phone)
-                        ->orWhere('user_id', '=', $item->id);
+        /**
+         * JEZELI BEDA PROBLEMY Z LICZENIEM PO WRPOWADZENIU ZMIAN W 2018-12 ODNOSNIE WYPLAT TO TRZEBA BEDZIE COFNAC ZMIANE - ponizsze zapytanie z
+         * UserEmploymentStatus bylo w mapowaniu, odkomentowac i sprawdzic czy to naprawilo problem
+         */
+        $user_empl_status = UserEmploymentStatus::
+        where( function ($querry) use ($r) {
+            $querry = $querry->orwhere(function ($query) use($r){
+                $query->whereIn('pbx_id', $r->pluck('login_phone')->toArray());
+            })
+                ->orWhere(function ($query) use($r){
+                    $query->whereIn('user_id', $r->pluck('id')->toArray());
+                });
+            })
+            ->where('pbx_id_add_date', 'like', $month)
+            ->where('pbx_id', '!=', 0)
+            ->where('pbx_id', '!=', null)
+            ->get();
+            $result = $r->map(function($item) use($month, $clientRouteInfoRecords, $weekDayArr, $user_empl_status) {
+                $campaignScoresArr = [];
+
+                /*
+                 $user_empl_status = UserEmploymentStatus::
+                where( function ($querry) {
+                    $querry = $querry->orwhere('pbx_id', $item->login_phone)
+                        ->orWhere('user_id', $item->id);
+                        });
                     })
                     ->where('pbx_id_add_date', 'like', $month)
                     ->where('pbx_id', '!=', 0)
                     ->where('pbx_id', '!=', null)
                     ->get();
-
-                $campaignScoresArr = [];
-
+                 */
                 //creating provision field for each confirming consultant with data about provisions.
                 if($item->id_dep_type == 1) { //konsultant potwierdzeń
                     $globalProvisionSum = 0;
@@ -1904,14 +1957,14 @@ class FinancesController extends Controller
                return $item;
             });
 
-            $this::mapSuccessorSalary(Auth::user()->department_info_id,$r,$month);
+            $this::mapSuccessorSalary($departmentInfoIds,$r,$month);
             $final_salary = $r->groupBy('agency_id');
             return $final_salary;
     }
 
     public function mapSuccessorSalary($departmentInfoID,&$usersSalary,$month){
         $map = SuccessorHistory::select('successor_history.*','users.rate','users.successorUserId')->join('users','users.id','successor_history.user_id')
-            ->where('users.department_info_id',$departmentInfoID)
+            ->whereIn('users.department_info_id',is_array($departmentInfoID) ? $departmentInfoID : [$departmentInfoID])
             ->where(function ($querry) use ($month){
                 $querry->orwhere('successor_history.date_stop','<=',substr($month,0,7).'-31')
                     ->orwhere('successor_history.date_stop',null);
@@ -1978,8 +2031,9 @@ class FinancesController extends Controller
     }
 
     /**
+     * Zapisanie informacji o aktualnym stanie wypłat
      * @param Request $request
-     * @return - Zapisanie informacji o aktualnym stanie wypłat
+     * @return array
      */
     public function paymentStory(Request $request){
         if($request->ajax()){
@@ -1993,58 +2047,78 @@ class FinancesController extends Controller
                 $accept_payment->cadre_id =  Auth::user()->id;
                 $accept_payment->payment_month = $request->accetp_month.'-01';
                 $accept_payment->department_info_id = Auth::user()->department_info_id;
-                    $salary = $this::getSalary($request->accetp_month.'%');
-                    $data = array();
-                    foreach ($salary as $item ){
-                        foreach ($item as $value){
-                            array_push($data,array('consultant_id' => $value->id,
-                                'agency_id' => $value->agency_id,
-                                'cadre_id' => Auth::user()->id,
-                                'department_info_id' => Auth::user()->department_info_id,
-                                'accept_month' => $request->accetp_month.'-01',
-                                'created_at' =>date('Y-m-d H:m:s:i'),
-                                'updated_at' => date('Y-m-d H:m:s:i')));
-                        }
+                $salary = $this::getSalary($request->accetp_month.'%', Auth::user()->department_info_id );
+                $data = array();
+                $idsOfConsultants = [];
+                foreach ($salary as $agency ){
+                    $idsOfConsultants = array_merge($idsOfConsultants, $agency->pluck('id')->toArray());
+                    foreach ($agency as $user){
+                        array_push($data,array('consultant_id' => $user->id,
+                            'agency_id' => $user->agency_id,
+                            'cadre_id' => Auth::user()->id,
+                            'department_info_id' => Auth::user()->department_info_id,
+                            'accept_month' => $request->accetp_month.'-01',
+                            'created_at' =>date('Y-m-d H:m:s:i'),
+                            'updated_at' => date('Y-m-d H:m:s:i')));
                     }
+                }
 
-                    if(session()->has('isPaymentAgencyStoryQueryRunning')){
-                        if(session('isPaymentAgencyStoryQueryRunning')){
-                            $DOUBLING_QUERY_LOG = new DoublingQueryLogs();
-                            $DOUBLING_QUERY_LOG->table_name = 'PaymentAgencyStory';
-                            $DOUBLING_QUERY_LOG->save();
-                        }else{
-                            session(['isPaymentAgencyStoryQueryRunning' => true]);
-                            PaymentAgencyStory::insert($data);
-                            session()->forget('isPaymentAgencyStoryQueryRunning');
-                        }
+                if(session()->has('isPaymentAgencyStoryQueryRunning')){
+                    if(session('isPaymentAgencyStoryQueryRunning')){
+                        $DOUBLING_QUERY_LOG = new DoublingQueryLogs();
+                        $DOUBLING_QUERY_LOG->table_name = 'PaymentAgencyStory';
+                        $DOUBLING_QUERY_LOG->save();
                     }else{
                         session(['isPaymentAgencyStoryQueryRunning' => true]);
                         PaymentAgencyStory::insert($data);
                         session()->forget('isPaymentAgencyStoryQueryRunning');
                     }
+                }else{
+                    session(['isPaymentAgencyStoryQueryRunning' => true]);
+                    PaymentAgencyStory::insert($data);
+                    session()->forget('isPaymentAgencyStoryQueryRunning');
+                }
 
-                    if(session()->has('isAcceptedPaymentQueryRunning')){
-                        if(session('isAcceptedPaymentQueryRunning')){
-                            $DOUBLING_QUERY_LOG = new DoublingQueryLogs();
-                            $DOUBLING_QUERY_LOG->table_name = 'AcceptedPayment';
-                            $DOUBLING_QUERY_LOG->save();
-                        }else{
-                            session(['isAcceptedPaymentQueryRunning' => true]);
-                            $accept_payment->save();
-                            session()->forget('isAcceptedPaymentQueryRunning');
-                        }
+                if(session()->has('isAcceptedPaymentQueryRunning')){
+                    if(session('isAcceptedPaymentQueryRunning')){
+                        $DOUBLING_QUERY_LOG = new DoublingQueryLogs();
+                        $DOUBLING_QUERY_LOG->table_name = 'AcceptedPayment';
+                        $DOUBLING_QUERY_LOG->save();
                     }else{
                         session(['isAcceptedPaymentQueryRunning' => true]);
                         $accept_payment->save();
                         session()->forget('isAcceptedPaymentQueryRunning');
                     }
+                }else{
+                    session(['isAcceptedPaymentQueryRunning' => true]);
+                    $accept_payment->save();
+                    session()->forget('isAcceptedPaymentQueryRunning');
+                }
 
 
-                    $LogData = array_merge(['T ' => 'Zapisanie wypłat '],$accept_payment->toArray());
-                    new ActivityRecorder($LogData, 24, 1);
-                    return $data;
+                $bonus_penalty = PenaltyBonus::whereIn('id_user', $idsOfConsultants)
+                    ->select('penalty_bonus.*', DB::raw('CONCAT(users.first_name," ",users.last_name) as manager'))
+                    ->join('users', 'users.id', 'penalty_bonus.id_manager')
+                    ->where('status', 1);
+
+                //if payment not saved: whereNull('accepted_payment_id') else if payment_saved: whereIn('accepted_payment_id', ids)
+                $bonus_penalty->whereNull('accepted_payment_id');
+
+                $bonus_penalty = $bonus_penalty->get();
+                foreach ($salary as $agency){
+                    $this->fillInUserWithBonuses($agency,$bonus_penalty,['premia','kara']);
+                }
+
+                /*
+                 * Accepting every penalty and bonus that were added after accepting previous month payments for every consultant
+                 */
+                $bonus_penalty->update(['accepted_payment_id' => $accept_payment->id]);
+
+                $LogData = array_merge(['T ' => 'Zapisanie wypłat '],$accept_payment->toArray());
+                new ActivityRecorder($LogData, 24, 1);
+                return $data;
             }
-            return 0;
+            return null;
         }
     }
 
@@ -2476,7 +2550,7 @@ class FinancesController extends Controller
             ->with('months', $months);
     }
 
-    public function acceptedPaymentSystemUpdateAjax(Request $request){
+    public function acceptedPaymentSystemUpdateCadreAjax(Request $request){
         if($request->ajax()){
             //Natalia Skwarek months
             $skwarekMonths = ['manager_id'=> 3898,'startMonth'=>'2017-06','endMonth'=>'2018-05'];
@@ -2558,7 +2632,8 @@ class FinancesController extends Controller
                         }
                     }else{
                         $acceptedPaymentUserStoryInsertQueryArr = [];
-                        $penaltyBonus = PenaltyBonus::select('penalty_bonus.*','users.department_info_id')->join('users','users.id','id_user')
+                        $penaltyBonus = PenaltyBonus::select('penalty_bonus.*','users.department_info_id')
+                            ->join('users','users.id','id_user')
                             ->whereNotIn('users.user_type_id',[1,2,9])
                             ->where('status', 1)
                             ->where('event_date','like',$date)->get();
@@ -2603,6 +2678,58 @@ class FinancesController extends Controller
                         }
                         DB::table('accepted_payment_user_story')->insert($acceptedPaymentUserStoryInsertQueryArr);
                     }
+                }
+            }
+            return $month.' accepted';
+        }
+        return Redirect::to('/');
+    }
+
+    public function acceptedPaymentSystemUpdateAjax(Request $request){
+        if($request->ajax()){
+            $month = $request->month;
+            $date = $month.'%';
+            $departments = Department_info::all();
+            $salary = $this->getSalary($date, $departments->pluck('id')->toArray());
+            if(count($salary) > 0){
+                $departmentInfoIds = [];
+                $consultantsIds = [];
+                $successorsIds = [];
+                foreach ($salary as $agency) {
+                    $departmentInfoIds = array_merge($departmentInfoIds,$agency->pluck('department_info_id')->unique()->toArray());
+                    $consultantsIds = array_merge($consultantsIds,$agency->pluck('id')->unique()->toArray());
+                    $successorsIds = array_merge($successorsIds,$agency->where('successorUserId','!=',null)->pluck('successorUserId')->toArray());
+                }
+                $departmentInfoIds = collect($departmentInfoIds)->unique()->toArray();
+                $consultantsIds = collect($consultantsIds)->unique()->toArray();
+                $successorsIds = collect($successorsIds)->unique()->toArray();
+                if(count($successorsIds)>0){
+                    dd($month, $successorsIds);
+                }
+
+                $acceptedPayment = AcceptedPayment::whereIn('department_info_id', $departmentInfoIds)
+                    ->where('payment_month','like',$date.'-01')
+                    ->whereNull('cadrePayment')
+                    ->get();
+                $bonus_penalty = PenaltyBonus::select('penalty_bonus.*','users.department_info_id')
+                    ->join('users','users.id','id_user')
+                    ->whereIn('users.user_type_id',[1,2,9])
+                    ->where('status', 1)
+                    ->where('event_date','like',$date)
+                    ->get();
+                foreach ($departmentInfoIds as $departmentInfoId){
+                    $acceptedPayment = $acceptedPayment->where('department_info_id',$departmentInfoId)->first();
+                    /*if($acceptedPayment == null){
+                        $acceptedPayment = new AcceptedPayment();
+                        $acceptedPayment->cadre_id = Auth::user()->id;
+                        $acceptedPayment->payment_month = $date.'-01';
+                        $acceptedPayment->department_info_id = $departmentInfoId;
+                        $acceptedPayment->cadrePayment = null;
+                        $acceptedPayment->created_at = date('Y-m-d H:i:s');
+                        $acceptedPayment->updated_at = date('Y-m-d H:i:s');
+                        $acceptedPayment->save();
+                    }*/
+                    //$bonus_penalty->where('department_info_id',$departmentInfoId)->update(['accepted_payment_id'=>$acceptedPayment->id]);
                 }
             }
             return $month.' accepted';

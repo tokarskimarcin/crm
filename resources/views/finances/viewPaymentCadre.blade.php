@@ -590,7 +590,6 @@
     });
 
     function showBonuses(bonuses){
-        console.log(bonuses);
         bonuses = JSON.parse(bonuses);
         let modalBonusesBody = modalBonuses.find('.modal-body');
         modalBonusesBody.empty();

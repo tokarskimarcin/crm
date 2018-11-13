@@ -29,7 +29,14 @@
             Przepisywanie rekordów z bazy na nowy system akceptowania wypłat
         </div>
         <div class="panel-body">
-            <button id="rewriteButton" class="form-control btn btn-primary">Przepisz</button>
+            <div class="row">
+                <div class="col-md-6">
+                    <button id="rewriteButton" class="form-control btn btn-primary">Przepisz konsultantów</button>
+                </div>
+                <div class="col-md-6">
+                    <button id="rewriteButtonCadre" class="form-control btn btn-primary">Przepisz kadre</button>
+                </div>
+            </div>
             <hr>
             <label for="changeLog">Change log:</label>
             <textarea id="changeLog" style="resize: none; width: 100%; height: 20em; overflow: auto"></textarea>
@@ -44,6 +51,7 @@
                 months: <?php echo json_encode($months)?>,
                 counter: 0,
                 jQElements:{
+                    rewriteButtonCadre: $('#rewriteButtonCadre'),
                     rewriteButton: $('#rewriteButton'),
                     changeLog: $('#changeLog')
                 },
@@ -54,7 +62,7 @@
                 /* function grups should be before other functions which aren't grouped */
                 EVENT_HANDLERS: {
                     callEvents(){
-                        VARIABLES.jQElements.rewriteButton.click(function (e) {
+                        VARIABLES.jQElements.rewriteButtonCadre.click(function (e) {
                             swal({
                                 type: 'warning',
                                 title: 'Czy na pewno przepisać na nowy system?',
@@ -62,12 +70,58 @@
                             }).then((result)=>{
                                 $(e.target).prop('disabled', true);
                                 VARIABLES.jQElements.changeLog.append('Kadra start\n');
+                                FUNCTIONS.AJAXs.acceptedPaymentSystemUpdateCadreAjax();
+                            });
+                        });
+                        VARIABLES.jQElements.rewriteButton.click(function (e) {
+                            swal({
+                                type: 'warning',
+                                title: 'Czy na pewno przepisać na nowy system?',
+                                showCancelButton: true
+                            }).then((result)=>{
+                                $(e.target).prop('disabled', true);
+                                VARIABLES.jQElements.changeLog.append('Konsultant start\n');
                                 FUNCTIONS.AJAXs.acceptedPaymentSystemUpdateAjax();
                             });
                         });
                     }
                 },
                 AJAXs: {
+                    acceptedPaymentSystemUpdateCadreAjax(){
+                        return $.ajax({
+                            url: "{{ route('api.acceptedPaymentSystemUpdateCadreAjax') }}",
+                            type: 'POST',
+                            headers: {'X-CSRF-TOKEN': '{{ csrf_token() }}'},
+                            data: {
+                                month: VARIABLES.months[VARIABLES.counter]
+                            },
+                            success: function (response) {
+                                console.log(VARIABLES.counter, VARIABLES.months.length);
+                                FUNCTIONS.fillChangeLogWithResponse(response);
+                                FUNCTIONS.scrollTextarea(VARIABLES.jQElements.changeLog);
+                                VARIABLES.counter++;
+                                if(VARIABLES.counter === VARIABLES.months.length){
+                                    VARIABLES.counter = 0;
+                                    VARIABLES.jQElements.rewriteButtonCadre.prop('disabled', false);
+                                    VARIABLES.jQElements.changeLog.append('Kadra stop\n');
+                                }else{
+                                    FUNCTIONS.AJAXs.acceptedPaymentSystemUpdateCadreAjax();
+                                }
+                            },
+                            error: function (jqXHR, textStatus, thrownError) {
+                                console.log(jqXHR);
+                                console.log('textStatus: ' + textStatus);
+                                console.log('thrownError: ' + thrownError);
+                                swal({
+                                    type: 'error',
+                                    title: 'Błąd ' + jqXHR.status,
+                                    text: 'Wystąpił błąd: ' + thrownError+' "'+(typeof jqXHR.responseJSON === 'undefined' ? '': jqXHR.responseJSON.message )+'"',
+                                });
+                                VARIABLES.jQElements.rewriteButtonCadre.prop('disabled', false);
+                                console.log(VARIABLES.counter++ );
+                            }
+                        });
+                    },
                     acceptedPaymentSystemUpdateAjax(){
                         return $.ajax({
                             url: "{{ route('api.acceptedPaymentSystemUpdateAjax') }}",
@@ -84,7 +138,7 @@
                                 if(VARIABLES.counter === VARIABLES.months.length){
                                     VARIABLES.counter = 0;
                                     VARIABLES.jQElements.rewriteButton.prop('disabled', false);
-                                    VARIABLES.jQElements.changeLog.append('Kadra stop\n');
+                                    VARIABLES.jQElements.changeLog.append('Konsultant stop\n');
                                 }else{
                                     FUNCTIONS.AJAXs.acceptedPaymentSystemUpdateAjax();
                                 }
